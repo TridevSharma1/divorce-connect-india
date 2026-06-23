@@ -78,6 +78,10 @@ def register_view(request):
                 last_name=last_name,
                 mobile_number='+91'
             )
+            # Log user in and redirect for clients
+            user = authenticate(username=email, password=password)
+            login(request, user)
+            return redirect_to_dashboard(user)
         elif role == 'lawyer':
             LawyerProfile.objects.create(
                 user=user,
@@ -86,17 +90,21 @@ def register_view(request):
                 bar_registration_number=f"BAR-{user.id}",
                 state_bar_council="Not Specified"
             )
+            # Log user in and redirect for lawyers
+            user = authenticate(username=email, password=password)
+            login(request, user)
+            return redirect_to_dashboard(user)
         elif role == 'admin':
             AdminPanelProfile.objects.create(
                 user=user,
                 full_name=f"{first_name} {last_name}",
                 mobile_number='+91'
             )
-
-        # Log user in
-        user = authenticate(username=email, password=password)
-        login(request, user)
-        return redirect_to_dashboard(user)
+            # Show success page for admin users (pending approval)
+            return render(request, 'registration_success.html', {
+                'email': email,
+                'first_name': first_name
+            })
 
     return render(request, 'register.html')
 

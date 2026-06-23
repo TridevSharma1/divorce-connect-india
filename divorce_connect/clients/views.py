@@ -25,3 +25,29 @@ def client_profile_view(request):
     if not hasattr(request.user, 'client_profile'):
         return redirect('/api/auth/login/')
     return render(request, 'profile_client.html')
+
+# --- NEW COUNSELING VIEW ---
+def counseling_view(request):
+    """Page for emotional and financial support services."""
+    return render(request, 'counseling.html')
+
+# --- NEW ABOUT VIEW ---
+def about_view(request):
+    """About us page for brand authority and trust."""
+    return render(request, 'about.html')
+
+# --- NEW SUPPORT VIEW ---
+def support_view(request):
+    """Self-serve help center for users."""
+    return render(request, 'support.html')
+
+# --- NEW CONTACT VIEW ---
+def contact_view(request):
+    """Public contact page for general inquiries."""
+    return render(request, 'contact.html')
+
+# --- NEW REPORT VIEW ---
+@login_required(login_url='/api/auth/login/')
+def report_lawyer_view(request):
+    """Trust and safety page for reporting professionals."""
+    return render(request, 'report_lawyer.html')

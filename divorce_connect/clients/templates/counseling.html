@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counseling & Support Services | DivorceConnect India</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #0a0a0a;
+            background-color: #ffffff;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ HERO BANNER ============ -->
+    <section class="py-32 px-4 text-center bg-white">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-6xl md:text-7xl font-bold text-[#0a0a0a] mb-8 leading-tight">
+                Support for Every Step of Your Journey.
+            </h1>
+            <p class="text-lg md:text-xl text-[#64748b] font-light leading-relaxed max-w-2xl mx-auto">
+                Navigate the emotional and financial complexities of separation with our network of verified mental health professionals, mediators, and financial advisors.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============ CONFIDENTIALITY GUARANTEE ============ -->
+    <section class="py-6 px-4 bg-[#f8fafc] border-y border-[#e2e8f0]">
+        <div class="max-w-5xl mx-auto flex items-center justify-center gap-4">
+            <!-- Shield Icon -->
+            <svg class="w-7 h-7 text-[#0a0a0a] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 1L3 5v6c0 6.6 9 12 9 12s9-5.4 9-12V5l-9-4z"/>
+            </svg>
+            <p class="text-center text-[#1e293b] font-medium">
+                <span class="text-[#0a0a0a] font-bold">100% Private & Confidential.</span> Your counseling inquiries and sessions are strictly isolated from your legal proceedings.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============ COUNSELOR & THERAPIST GRID ============ -->
+    <section class="py-24 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <!-- Section Heading -->
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-bold text-[#0a0a0a] mb-6">
+                    Our Verified Professionals
+                </h2>
+                <p class="text-lg text-[#64748b] max-w-2xl mx-auto">
+                    Each member of our network has been carefully vetted to provide compassionate, professional support tailored to your unique needs.
+                </p>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-[#f8fafc] rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+                    <div class="w-24 h-24 rounded-full bg-[#e2e8f0] mx-auto mb-6 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-[#94a3b8]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0a0a0a] text-center mb-1">Dr. Priya Sharma</h3>
+                    <p class="text-center text-[#0a0a0a] font-semibold mb-3">Clinical Psychologist</p>
+                    <p class="text-sm text-[#64748b] text-center mb-6 flex-grow">
+                        Specializing in trauma recovery and emotional resilience, Priya brings 12+ years of experience supporting individuals through major life transitions with compassionate, evidence-based care.
+                    </p>
+                    <div class="space-y-2 mb-6 border-t border-[#e2e8f0] pt-6">
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Location:</span> Mumbai, India</p>
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Session Fee:</span> ₹1,500 per hour</p>
+                    </div>
+                    <button class="w-full bg-[#0a0a0a] text-white font-semibold py-3 rounded-xl hover:bg-[#1a1a1a] transition-colors duration-200">
+                        Request Discovery Call
+                    </button>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-[#f8fafc] rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+                    <div class="w-24 h-24 rounded-full bg-[#e2e8f0] mx-auto mb-6 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-[#94a3b8]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0a0a0a] text-center mb-1">Rajesh Patel</h3>
+                    <p class="text-center text-[#0a0a0a] font-semibold mb-3">Certified Divorce Mediator</p>
+                    <p class="text-sm text-[#64748b] text-center mb-6 flex-grow">
+                        With 15+ years mediating high-conflict separations, Rajesh creates safe spaces for respectful dialogue and collaborative problem-solving, ensuring fair outcomes for all parties.
+                    </p>
+                    <div class="space-y-2 mb-6 border-t border-[#e2e8f0] pt-6">
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Location:</span> Delhi, India</p>
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Session Fee:</span> ₹2,000 per hour</p>
+                    </div>
+                    <button class="w-full bg-[#0a0a0a] text-white font-semibold py-3 rounded-xl hover:bg-[#1a1a1a] transition-colors duration-200">
+                        Request Discovery Call
+                    </button>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-[#f8fafc] rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+                    <div class="w-24 h-24 rounded-full bg-[#e2e8f0] mx-auto mb-6 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-[#94a3b8]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0a0a0a] text-center mb-1">Aisha Kapoor</h3>
+                    <p class="text-center text-[#0a0a0a] font-semibold mb-3">Certified Financial Planner</p>
+                    <p class="text-sm text-[#64748b] text-center mb-6 flex-grow">
+                        Helping clients rebuild financial security post-separation, Aisha designs personalized strategies for asset protection, tax optimization, and long-term wealth building with empathy and expertise.
+                    </p>
+                    <div class="space-y-2 mb-6 border-t border-[#e2e8f0] pt-6">
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Location:</span> Bangalore, India</p>
+                        <p class="text-sm text-[#475569]"><span class="font-semibold">Session Fee:</span> ₹1,800 per hour</p>
+                    </div>
+                    <button class="w-full bg-[#0a0a0a] text-white font-semibold py-3 rounded-xl hover:bg-[#1a1a1a] transition-colors duration-200">
+                        Request Discovery Call
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ BOOKING FORM SECTION ============ -->
+    <section class="py-24 px-4 bg-[#f8fafc]">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+                <!-- Left: Supportive Copy -->
+                <div>
+                    <h2 class="text-5xl md:text-6xl font-bold text-[#0a0a0a] mb-8 leading-tight">
+                        Your First Step Toward Support
+                    </h2>
+                    <div class="space-y-6 text-[#475569] text-lg leading-relaxed">
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#0a0a0a] mb-2">What to Expect</h3>
+                            <p>
+                                Your complimentary 15-minute discovery call is designed to help you and the professional determine if there's a good fit. We'll discuss your needs, concerns, and the support you're seeking.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#0a0a0a] mb-2">Complete Privacy</h3>
+                            <p>
+                                All conversations are held in the strictest confidence. Your session records are encrypted and stored separately from your legal case to ensure complete separation and confidentiality.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#0a0a0a] mb-2">Your Pace</h3>
+                            <p>
+                                After the discovery call, you decide if you'd like to proceed with ongoing support. There's no pressure—this is entirely about what serves your wellbeing and recovery.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Booking Form -->
+                <div class="bg-white rounded-2xl p-8 shadow-sm">
+                    <h3 class="text-2xl font-bold text-[#0a0a0a] mb-8">Request a Confidential Call</h3>
+                    <form class="space-y-6">
+                        <!-- Full Name -->
+                        <div>
+                            <label for="fullName" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Full Name
+                            </label>
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                placeholder="Enter your full name"
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div>
+                            <label for="phone" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Phone Number
+                            </label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="+91 98765 43210"
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent transition"
+                                required
+                            >
+                        </div>
+
+                        <!-- Select Professional -->
+                        <div>
+                            <label for="professional" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Select Professional
+                            </label>
+                            <select
+                                id="professional"
+                                name="professional"
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent transition bg-white"
+                                required
+                            >
+                                <option value="">Choose a professional...</option>
+                                <option value="psychologist">Dr. Priya Sharma - Clinical Psychologist</option>
+                                <option value="mediator">Rajesh Patel - Certified Divorce Mediator</option>
+                                <option value="financial">Aisha Kapoor - Certified Financial Planner</option>
+                            </select>
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label for="message" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                What would you like support with?
+                            </label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="4"
+                                placeholder="Share briefly what brings you here and how we can help..."
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent transition resize-none"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                            type="submit"
+                            class="w-full bg-[#0a0a0a] text-white font-semibold py-4 rounded-xl hover:bg-[#1a1a1a] transition-colors duration-200 text-lg"
+                        >
+                            Request Confidential Call
+                        </button>
+
+                        <!-- Privacy Notice -->
+                        <p class="text-xs text-[#64748b] text-center">
+                            Your information is encrypted and will never be shared. We respect your privacy completely.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ CTA FOOTER ============ -->
+    <section class="py-20 px-4 bg-[#0a0a0a] text-center">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                You Don't Have to Navigate This Alone
+            </h2>
+            <p class="text-lg text-[#cbd5e1] mb-8">
+                Reach out to one of our compassionate professionals today. Your discovery call is free, confidential, and without obligation.
+            </p>
+            <button class="inline-block bg-white text-[#0a0a0a] font-semibold py-4 px-8 rounded-xl hover:bg-[#f1f5f9] transition-colors duration-200">
+                Start Your Journey Now
+            </button>
+        </div>
+    </section>
+
+</body>
+</html>

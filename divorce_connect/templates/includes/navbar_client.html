@@ -1,18 +1,68 @@
+
+<!--NEW Notification Bell code -->
+
+<style>
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .pulse-dot { animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    .notification-dropdown { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .notification-dropdown.hidden { opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; }
+    .notification-dropdown:not(.hidden) { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+    .notifications-list { max-height: 400px; overflow-y: auto; }
+    .notifications-list::-webkit-scrollbar { width: 4px; }
+    .notifications-list::-webkit-scrollbar-track { background: #f8fafc; }
+    .notifications-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+    .notification-item { transition: background-color 0.15s ease; }
+    .notification-item:hover { background-color: #f8fafc; }
+    .unread-indicator { width: 6px; height: 6px; background-color: #0a0a0a; border-radius: 50%; margin-right: 8px; }
+</style>
+
 <!-- Client Navbar - Desktop -->
 <nav class="flex items-center gap-6">
     <a href="/dashboard/" class="text-link">Home</a>
-    <a href="#" class="text-link">Lawyer Section</a>
-    <a href="#" class="text-link">Counseling</a>
-    <a href="#" class="text-link">About</a>
-    <a href="#" class="text-link">Support</a>
-    <a href="#" class="text-link">Contact</a>
+    <a href="/lawyers/" class="text-link">Lawyer Section</a>
+    <a href="/counseling/" class="text-link">Counseling</a>
+    <a href="/about/" class="text-link">About</a>
+    <a href="/support/" class="text-link">Support</a>
+    <a href="/contact/" class="text-link">Contact</a>
 
-    <!-- Notification Bell -->
-    <button class="relative" onclick="alert('No new notifications')">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+    <!--NEW Notification Bell -->
+   <div class="relative">
+    <button id="notification-bell" class="relative p-2 text-black hover:bg-gray-50 rounded-lg transition-colors duration-150" aria-label="Notifications" aria-expanded="false">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
+        <span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full pulse-dot"></span>
     </button>
+
+    <div id="notification-dropdown" class="notification-dropdown hidden absolute right-0 mt-2 w-96 bg-white rounded-xl border border-gray-100 shadow-xl z-50">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <h3 class="text-sm font-bold text-black">Notifications</h3>
+            <button id="mark-all-read" class="text-xs text-gray-500 hover:text-black font-medium transition-colors duration-150">Mark all as read</button>
+        </div>
+        <div class="notifications-list">
+            <div class="notification-item px-5 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100">
+                <div class="flex items-start gap-3">
+                    <div class="unread-indicator mt-1"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-black leading-snug">Advocate Sharma accepted your consultation request.</p>
+                        <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-item px-5 py-3 bg-white border-b border-gray-100 cursor-pointer">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-700 leading-snug">Your profile update was saved successfully.</p>
+                        <p class="text-xs text-gray-500 mt-1">Yesterday</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-5 py-3 border-t border-gray-100 sticky bottom-0 bg-white rounded-b-xl">
+            <button class="w-full text-center text-sm font-medium text-black hover:text-gray-700 transition-colors duration-150 py-2">View all notifications</button>
+        </div>
+    </div>
+</div>
 
     <!-- Profile Dropdown -->
     <div class="relative">
@@ -28,9 +78,43 @@
         <div id="clientDropdown" class="dropdown-menu">
             <a href="/dashboard/" class="dropdown-item">Dashboard</a>
             <a href="/profile/" class="dropdown-item">My Profile</a>
-            <a href="#" class="dropdown-item">Support</a>
-            <a href="#" class="dropdown-item">Report Lawyer</a>
+            <a href="/support/" class="dropdown-item">Support</a>
+            <a href="{% url 'report_lawyer' %}" class="dropdown-item">Report Lawyer</a>
             <a href="/api/auth/logout/" class="dropdown-item logout-item">Logout</a>
         </div>
     </div>
 </nav>
+
+<!--NEW Notification Bell code -->
+
+<script>
+    (function() {
+        const bellButton = document.getElementById('notification-bell');
+        const dropdown = document.getElementById('notification-dropdown');
+        const markAllReadBtn = document.getElementById('mark-all-read');
+        const notificationItems = document.querySelectorAll('.notification-item');
+
+        bellButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && e.target !== bellButton && !bellButton.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        markAllReadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            notificationItems.forEach(item => {
+                item.classList.remove('bg-gray-50');
+                item.classList.add('bg-white');
+                const indicator = item.querySelector('.unread-indicator');
+                if (indicator) indicator.remove();
+            });
+            const redDot = bellButton.querySelector('.pulse-dot');
+            if (redDot) redDot.style.display = 'none';
+        });
+    })();
+</script>

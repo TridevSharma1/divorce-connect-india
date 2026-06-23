@@ -1,0 +1,854 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Professionals - DivorceConnect India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #0a0a0a;
+        }
+
+        .serif-font {
+            font-family: 'Georgia', 'Garamond', serif;
+        }
+
+        .sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid #e4e4e7;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .filter-section {
+            margin-bottom: 1.75rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .filter-section:last-child {
+            border-bottom: none;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #0a0a0a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.875rem;
+            display: block;
+        }
+
+        .search-input, .location-input, .fee-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e4e4e7;
+            background-color: #f4f4f5;
+            color: #0a0a0a;
+            font-size: 0.9375rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus, .location-input:focus, .fee-input:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: #0a0a0a;
+            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 1.5px solid #0a0a0a;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            margin-right: 0.75rem;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background-color: #0a0a0a;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:hover {
+            border-color: #0a0a0a;
+            background-color: #f4f4f5;
+        }
+
+        .checkbox-wrapper label {
+            cursor: pointer;
+            font-size: 0.9375rem;
+            color: #0a0a0a;
+            user-select: none;
+        }
+
+        .radio-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .radio-wrapper input[type="radio"] {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 1.5px solid #0a0a0a;
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            margin-right: 0.75rem;
+        }
+
+        .radio-wrapper input[type="radio"]:checked {
+            background-color: #0a0a0a;
+            box-shadow: inset 0 0 0 3px #ffffff;
+        }
+
+        .radio-wrapper input[type="radio"]:hover {
+            border-color: #0a0a0a;
+            background-color: #f4f4f5;
+        }
+
+        .radio-wrapper label {
+            cursor: pointer;
+            font-size: 0.9375rem;
+            color: #0a0a0a;
+            user-select: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-primary:hover {
+            background-color: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .clear-filters {
+            display: block;
+            width: 100%;
+            text-align: center;
+            color: #0a0a0a;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: opacity 0.2s ease;
+            font-weight: 500;
+        }
+
+        .clear-filters:hover {
+            opacity: 0.7;
+        }
+
+        .lawyer-card {
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .lawyer-card:hover {
+            border-color: #0a0a0a;
+            box-shadow: 0 8px 24px rgba(10, 10, 10, 0.08);
+        }
+
+        .lawyer-header {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .lawyer-photo {
+            width: 4.5rem;
+            height: 4.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e4e4e7 0%, #f4f4f5 100%);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.875rem;
+            color: #a1a1a3;
+            border: 1px solid #e4e4e7;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: -0.5rem;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #0a0a0a;
+            border-radius: 50%;
+            width: 1.75rem;
+            height: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
+        }
+
+        .verified-badge svg {
+            width: 1rem;
+            height: 1rem;
+            color: #0a0a0a;
+        }
+
+        .lawyer-info {
+            flex: 1;
+        }
+
+        .lawyer-name {
+            font-size: 1.1875rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            margin-bottom: 0.375rem;
+            line-height: 1.3;
+        }
+
+        .lawyer-specialization {
+            font-size: 0.875rem;
+            color: #666666;
+            margin-bottom: 0.75rem;
+        }
+
+        .lawyer-location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #0a0a0a;
+            margin-bottom: 0.75rem;
+        }
+
+        .lawyer-location svg {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+
+        .lawyer-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .stars {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .star {
+            width: 0.875rem;
+            height: 0.875rem;
+            color: #0a0a0a;
+        }
+
+        .rating-value {
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+
+        .rating-count {
+            color: #999999;
+        }
+
+        .lawyer-fee {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .lawyer-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-book {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .btn-book:hover {
+            background-color: #1a1a1a;
+        }
+
+        .btn-view {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background-color: transparent;
+            color: #0a0a0a;
+            border: 1.5px solid #0a0a0a;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .btn-view:hover {
+            background-color: #f4f4f5;
+            border-color: #0a0a0a;
+        }
+
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.5rem;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state.active {
+            display: block;
+        }
+
+        .empty-state-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1.5rem;
+            color: #d4d4d8;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0a0a0a;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-text {
+            font-size: 0.9375rem;
+            color: #666666;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-clear {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: transparent;
+            color: #0a0a0a;
+            border: 1.5px solid #0a0a0a;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear:hover {
+            background-color: #f4f4f5;
+        }
+
+        @media (max-width: 1024px) {
+            .container-main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lawyer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lawyer-actions {
+                flex-direction: column;
+            }
+
+            .btn-book, .btn-view {
+                min-width: auto;
+            }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0a0a0a;
+        }
+
+        .sort-dropdown {
+            padding: 0.5rem 1rem;
+            background-color: #f4f4f5;
+            border: 1px solid #e4e4e7;
+            border-radius: 0.375rem;
+            color: #0a0a0a;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sort-dropdown:hover, .sort-dropdown:focus {
+            background-color: #ffffff;
+            border-color: #0a0a0a;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="min-h-screen bg-white px-4 py-8 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-black mb-2">Legal Professionals</h1>
+                <p class="text-gray-600">Find verified legal experts on DivorceConnect India</p>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 container-main">
+
+                <!-- LEFT SIDEBAR: FILTERS -->
+                <aside class="lg:col-span-1 sidebar">
+                    <div class="filter-container">
+
+                        <!-- Search Bar -->
+                        <div class="filter-section">
+                            <label class="filter-label">Search</label>
+                            <input
+                                type="text"
+                                class="search-input"
+                                placeholder="Search by name or keyword..."
+                                id="searchInput"
+                            >
+                        </div>
+
+                        <!-- Specialization -->
+                        <div class="filter-section">
+                            <label class="filter-label">Specialization</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="custody" name="specialization" value="Child Custody">
+                                <label for="custody">Child Custody</label>
+                            </div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="alimony" name="specialization" value="Alimony">
+                                <label for="alimony">Alimony</label>
+                            </div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="consent" name="specialization" value="Mutual Consent">
+                                <label for="consent">Mutual Consent</label>
+                            </div>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="violence" name="specialization" value="Domestic Violence">
+                                <label for="violence">Domestic Violence</label>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="filter-section">
+                            <label class="filter-label">Location</label>
+                            <input
+                                type="text"
+                                class="location-input"
+                                placeholder="City / State"
+                                id="locationInput"
+                            >
+                        </div>
+
+                        <!-- Years of Experience -->
+                        <div class="filter-section">
+                            <label class="filter-label">Years of Experience</label>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="exp0" name="experience" value="0-5">
+                                <label for="exp0">0-5 years</label>
+                            </div>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="exp1" name="experience" value="5-10">
+                                <label for="exp1">5-10 years</label>
+                            </div>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="exp2" name="experience" value="10+">
+                                <label for="exp2">10+ years</label>
+                            </div>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="filter-section">
+                            <label class="filter-label">Gender</label>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="genderM" name="gender" value="Male">
+                                <label for="genderM">Male</label>
+                            </div>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="genderF" name="gender" value="Female">
+                                <label for="genderF">Female</label>
+                            </div>
+                            <div class="radio-wrapper">
+                                <input type="radio" id="genderA" name="gender" value="Any">
+                                <label for="genderA">Any</label>
+                            </div>
+                        </div>
+
+                        <!-- Consultation Fees -->
+                        <div class="filter-section">
+                            <label class="filter-label">Consultation Fees (₹)</label>
+                            <div class="flex gap-2 mb-2">
+                                <input
+                                    type="number"
+                                    class="fee-input flex-1"
+                                    placeholder="Min"
+                                    id="minFee"
+                                    min="0"
+                                >
+                                <input
+                                    type="number"
+                                    class="fee-input flex-1"
+                                    placeholder="Max"
+                                    id="maxFee"
+                                    min="0"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <button class="btn-primary">Apply Filters</button>
+                        <a href="#" class="clear-filters">Clear All</a>
+                    </div>
+                </aside>
+
+                <!-- RIGHT SECTION: LAWYER DIRECTORY -->
+                <main class="lg:col-span-3">
+
+                    <!-- Header with count and sort -->
+                    <div class="section-header">
+                        <h2 class="header-title" id="lawyerCount">Showing 12 verified legal experts</h2>
+                        <select class="sort-dropdown">
+                            <option value="relevant">Most Relevant</option>
+                            <option value="rating">Highest Rated</option>
+                            <option value="experience">Most Experienced</option>
+                            <option value="fee-low">Fee: Low to High</option>
+                            <option value="fee-high">Fee: High to Low</option>
+                        </select>
+                    </div>
+
+                    <!-- Lawyer Grid -->
+                    <div class="lawyer-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- Lawyer Card 1 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👨‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Priya Sharma</div>
+                                    <div class="lawyer-specialization">Child Custody Specialist</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Mumbai, Maharashtra</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">4.9</span>
+                                <span class="rating-count">(148 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹1,500</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Lawyer Card 2 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👩‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Anjali Verma</div>
+                                    <div class="lawyer-specialization">Domestic Violence Advocate</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Delhi, NCR</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">4.8</span>
+                                <span class="rating-count">(92 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹2,000</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Lawyer Card 3 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👨‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Rajesh Gupta</div>
+                                    <div class="lawyer-specialization">Alimony & Support Laws</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Bangalore, Karnataka</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">4.7</span>
+                                <span class="rating-count">(156 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹1,200</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Lawyer Card 4 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👩‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Meera Kapoor</div>
+                                    <div class="lawyer-specialization">Mutual Consent Divorce</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Chennai, Tamil Nadu</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">5.0</span>
+                                <span class="rating-count">(203 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹1,800</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Lawyer Card 5 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👨‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Vikram Singh</div>
+                                    <div class="lawyer-specialization">Family Law Specialist</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Pune, Maharashtra</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">4.6</span>
+                                <span class="rating-count">(87 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹1,500</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Lawyer Card 6 -->
+                        <div class="lawyer-card">
+                            <div class="lawyer-header">
+                                <div class="lawyer-photo">👩‍⚖️</div>
+                                <div class="verified-badge">
+                                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="lawyer-info">
+                                    <div class="lawyer-name serif-font">Divya Patel</div>
+                                    <div class="lawyer-specialization">Child Support Expert</div>
+                                </div>
+                            </div>
+
+                            <div class="lawyer-location">
+                                <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span>Hyderabad, Telangana</span>
+                            </div>
+
+                            <div class="lawyer-rating">
+                                <div class="stars">
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="star" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </div>
+                                <span class="rating-value">4.9</span>
+                                <span class="rating-count">(175 reviews)</span>
+                            </div>
+
+                            <div class="lawyer-fee">Consultation: ₹1,700</div>
+
+                            <div class="lawyer-actions">
+                                <button class="btn-book">Book Consultation</button>
+                                <button class="btn-view">View Profile</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- EMPTY STATE (Hidden by default - Uncomment to show) -->
+                    <!--
+                    <div class="empty-state active">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <h3 class="empty-state-title">No legal professionals found</h3>
+                        <p class="empty-state-text">No legal professionals found matching your exact criteria. Try adjusting your filters to broaden your search.</p>
+                        <button class="btn-clear">Clear All Filters</button>
+                    </div>
+                    -->
+
+                </main>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

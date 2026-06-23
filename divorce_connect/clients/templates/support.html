@@ -1,0 +1,422 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - DivorceConnect India</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* Search Input Styling */
+        .search-input {
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #0a0a0a;
+            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
+            outline: none;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+        }
+
+        /* Quick Category Cards */
+        .category-card {
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: #0a0a0a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            opacity: 0.8;
+        }
+
+        /* FAQ Accordion Styling */
+        details {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.5rem 0;
+        }
+
+        details:last-child {
+            border-bottom: none;
+        }
+
+        summary {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #0a0a0a;
+            font-size: 1rem;
+            line-height: 1.5;
+            transition: color 0.2s ease;
+            user-select: none;
+        }
+
+        summary:hover {
+            color: #404040;
+        }
+
+        summary::marker {
+            content: "";
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            opacity: 0.6;
+        }
+
+        details[open] .chevron {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            margin-top: 1rem;
+            color: #475569;
+            line-height: 1.7;
+            padding-right: 2rem;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .cta-button:hover {
+            background-color: #1a1a1a;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+        }
+
+        /* Category Section Heading */
+        .category-section-heading {
+            font-family: 'Playfair Display', serif;
+            color: #0a0a0a;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Hero Search Section -->
+    <section class="bg-gradient-to-b from-gray-50 to-white py-24">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Hero Headline -->
+            <h1 class="hero-title text-center text-4xl sm:text-5xl text-black mb-12">
+                How can we help you today?
+            </h1>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <input
+                    type="text"
+                    placeholder="Search for articles, guides, or FAQs..."
+                    class="search-input w-full px-6 py-4 pr-14 text-base rounded-lg bg-white border"
+                />
+                <svg class="search-icon absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Categories Grid -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 mb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Billing & Payments -->
+            <div class="category-card p-6 rounded-lg text-center">
+                <svg class="category-icon mx-auto mb-4 text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6z"></path>
+                    <path d="M7 12a1 1 0 100-2 1 1 0 000 2z" fill="white"></path>
+                    <path d="M17 12a1 1 0 100-2 1 1 0 000 2z" fill="white"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-black">Billing & Payments</h3>
+                <p class="text-sm text-gray-600 mt-2">Fees, invoices, and payment methods</p>
+            </div>
+
+            <!-- How to Hire a Lawyer -->
+            <div class="category-card p-6 rounded-lg text-center">
+                <svg class="category-icon mx-auto mb-4 text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-black">How to Hire a Lawyer</h3>
+                <p class="text-sm text-gray-600 mt-2">Finding and selecting the right lawyer</p>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="category-card p-6 rounded-lg text-center">
+                <svg class="category-icon mx-auto mb-4 text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" fill="white"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-black">Account Settings</h3>
+                <p class="text-sm text-gray-600 mt-2">Profile, preferences, and security</p>
+            </div>
+
+            <!-- Privacy Rules -->
+            <div class="category-card p-6 rounded-lg text-center">
+                <svg class="category-icon mx-auto mb-4 text-black" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-black">Privacy Rules</h3>
+                <p class="text-sm text-gray-600 mt-2">Data protection and compliance</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Accordions -->
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <!-- Billing & Payments FAQs -->
+        <h2 class="category-section-heading">Billing & Payments</h2>
+        <div class="space-y-0">
+            <details>
+                <summary>
+                    How are my consultation fees held in escrow?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>When you engage a lawyer through DivorceConnect India, your consultation fees are securely held in our trust escrow account until the consultation is complete. This protects both you and the lawyer, ensuring payment is only released once the agreed services have been rendered. You'll receive a receipt and transaction confirmation via email within 24 hours.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    What payment methods do you accept?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>We accept all major payment methods including credit cards (Visa, Mastercard, American Express), debit cards, UPI, net banking, and digital wallets. All transactions are encrypted using industry-standard SSL 256-bit encryption for your security. We do not store your full card details on our servers.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    Can I get an invoice or receipt for my payment?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Yes, a detailed invoice is automatically generated and sent to your registered email address within 24 hours of payment. You can also download invoices directly from your Account Dashboard under the "Billing History" section. Invoices are issued in compliance with GST regulations and include all transaction details.</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- How to Hire a Lawyer FAQs -->
+        <h2 class="category-section-heading">How to Hire a Lawyer</h2>
+        <div class="space-y-0">
+            <details>
+                <summary>
+                    How do I securely upload documents to my lawyer?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>All document uploads on DivorceConnect India are encrypted end-to-end. Navigate to your case workspace, click "Upload Documents," select files from your device (PDF, Word, images, and ZIP files supported), and they are immediately encrypted before transmission. Your lawyer receives a secure link to view and download files. Original documents remain on our encrypted servers for compliance and record-keeping.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    What qualifications do DivorceConnect India lawyers have?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>All lawyers on our platform are verified and licensed to practice in India. Each profile displays their Bar Council registration, years of experience, area of specialization, educational credentials, and verified client reviews. We manually verify every lawyer's credentials before they join our network to ensure the highest professional standards.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    How do I schedule a consultation with a lawyer?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Browse lawyer profiles, select one that matches your needs, and click "Schedule Consultation." Choose your preferred date and time from their available slots, and the lawyer will receive a booking request. You'll be notified once they confirm. Consultations are conducted via secure video call, phone, or email—choose what suits you best.</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- Account Settings FAQs -->
+        <h2 class="category-section-heading">Account Settings</h2>
+        <div class="space-y-0">
+            <details>
+                <summary>
+                    How do I update my personal information?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Log into your account and navigate to "Account Settings" > "Personal Information." Update your name, contact number, email address, and address as needed. Click "Save Changes" to confirm. All changes are logged for security purposes, and you'll receive a confirmation email. Some fields like registered email require verification for security.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    How do I enable two-factor authentication (2FA)?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Go to "Account Settings" > "Security" and toggle "Enable Two-Factor Authentication." Choose your preferred method: SMS OTP or authenticator app (Google Authenticator, Authy, Microsoft Authenticator). Follow the setup wizard to scan the QR code or enter the secret key. Store your backup codes in a safe place—you'll need them if you lose access to your 2FA device.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    How do I delete my account?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Account deletion is available under "Account Settings" > "Advanced Options" > "Delete Account." Please note: deleted accounts cannot be recovered, and all associated case data will be permanently removed after 90 days. If you have active legal engagements, please contact our support team before deletion. A confirmation email will be sent before the deletion becomes irreversible.</p>
+                </div>
+            </details>
+        </div>
+
+        <!-- Privacy Rules FAQs -->
+        <h2 class="category-section-heading">Privacy Rules</h2>
+        <div class="space-y-0">
+            <details>
+                <summary>
+                    How is my personal data protected?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>DivorceConnect India employs enterprise-grade security measures including AES 256-bit encryption for data at rest, TLS 1.3 encryption for data in transit, regular security audits, and compliance with the Information Technology Act, 2000, and Digital Personal Data Protection Act, 2023. All servers are hosted in India with secure access controls and multi-factor authentication for staff.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    Will my case details be shared with third parties?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>No. Your case details are shared only with the lawyer you hire, as necessary to provide legal services. We will never sell, rent, or lease your data to third parties. Sharing only occurs when legally required (court orders, regulatory compliance) or with your explicit written consent. Your communication with lawyers is protected by attorney-client privilege.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>
+                    Do you comply with Indian data protection laws?
+                    <svg class="chevron text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </summary>
+                <div class="faq-answer">
+                    <p>Yes, DivorceConnect India is fully compliant with the Digital Personal Data Protection Act, 2023 (DPDPA), Information Technology Act, 2000, and relevant Reserve Bank of India (RBI) guidelines for payment processing. We maintain detailed data processing agreements, conduct regular compliance audits, and provide transparent privacy notices. Our Data Protection Officer can be contacted at privacy@divorceconnectindia.com.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- Support CTA Section -->
+    <section class="bg-black text-white py-20">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-4" style="font-family: 'Playfair Display', serif;">
+                Can't find what you're looking for?
+            </h2>
+            <p class="text-xl text-gray-300 mb-10">
+                Our dedicated support team is available 24/7 to assist you.
+            </p>
+            <a href="#" class="cta-button inline-block px-8 py-4 text-lg rounded-lg">
+                Submit a Request
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 bg-white py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h4 class="font-semibold text-black mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-black transition">Find a Lawyer</a></li>
+                        <li><a href="#" class="hover:text-black transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-black transition">How It Works</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-black mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-black transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-black transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-black transition">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-black mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-black transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-black transition">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-black transition">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-8 text-center text-gray-600 text-sm">
+                <p>&copy; 2026 DivorceConnect India. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

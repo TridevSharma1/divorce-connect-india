@@ -1,8 +1,8 @@
 <!-- Lawyer Navbar - Mobile -->
 <nav class="flex flex-col gap-3">
     <a href="/lawyers/dashboard/" class="nav-link">Home</a>
-    <a href="#" class="nav-link">Earning Dashboard</a>
-    <a href="#" class="nav-link">Case Order</a>
+    <a href="{% url 'lawyer_earnings' %}" class="text-link">Earning Dashboard</a>
+    <a href="{% url 'lawyer_case_orders' %}" class="text-link">Case Order</a>
     <a href="#" class="nav-link">Case Status</a>
     <a href="#" class="nav-link">Account Settings</a>
     <a href="#" class="nav-link">Billing & Payment</a>
