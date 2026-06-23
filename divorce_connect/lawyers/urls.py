@@ -12,5 +12,15 @@ urlpatterns = [
     path('earnings/', views.earning_dashboard_view, name='lawyer_earnings'),
     # Add this to your urlpatterns inside lawyers/urls.py
     path('orders/', views.case_order_view, name='lawyer_case_orders'),
+    # Add this to your urlpatterns inside lawyers/urls.py
+    path('status/', views.case_status_view, name='lawyer_case_status'),
+    # Add this to your urlpatterns inside lawyers/urls.py
+    path('settings/', views.account_settings_view, name='lawyer_settings'),
+    # Add this to your urlpatterns inside lawyers/urls.py
+    path('billing/', views.billing_payment_view, name='lawyer_billing'),
+    # Add this to your urlpatterns inside lawyers/urls.py
+    path('support/', views.support_lawyer_view, name='lawyer_support'),
+    # Add this to your urlpatterns inside lawyers/urls.py
+    path('report-client/', views.report_client_view, name='lawyer_report_client'),
 
 ]

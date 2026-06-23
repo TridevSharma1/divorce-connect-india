@@ -3,15 +3,15 @@
     <a href="/lawyers/dashboard/" class="nav-link">Home</a>
     <a href="{% url 'lawyer_earnings' %}" class="text-link">Earning Dashboard</a>
     <a href="{% url 'lawyer_case_orders' %}" class="text-link">Case Order</a>
-    <a href="#" class="nav-link">Case Status</a>
-    <a href="#" class="nav-link">Account Settings</a>
-    <a href="#" class="nav-link">Billing & Payment</a>
+    <a href="{% url 'lawyer_case_status' %}" class="text-link">Case Status</a>
+    <a href="{% url 'lawyer_settings' %}" class="text-link">Account Settings</a>
+    <a href="{% url 'lawyer_billing' %}" class="text-link">Billing & Payment</a>
 
     <div class="border-t pt-3 mt-3">
         <a href="/lawyers/dashboard/" class="nav-link">Dashboard</a>
         <a href="/lawyers/profile/" class="nav-link">My Profile</a>
-        <a href="#" class="nav-link">Support</a>
-        <a href="#" class="nav-link">Report Client</a>
+        <a href="{% url 'lawyer_support' %}" class="dropdown-item">Support</a>
+        <a href="{% url 'lawyer_report_client' %}" class="dropdown-item">Report Client</a>
         <a href="/api/auth/logout/" class="nav-link logout-item">Logout</a>
     </div>
 </nav>

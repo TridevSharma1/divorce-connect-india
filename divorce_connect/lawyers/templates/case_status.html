@@ -1,0 +1,325 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Roster & Case Status - DivorceConnect India</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Imports: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #0a0a0a;
+        }
+        h1, h2, h3, .heading {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- Page Header -->
+    <div class="py-8 px-6 border-b border-gray-200">
+        <h1 class="text-4xl font-bold text-black mb-2">Client Roster & Case Status</h1>
+        <p class="text-gray-500 text-base">Track milestones, communicate, and manage your active client portfolio.</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="border-b border-gray-200 bg-white">
+        <div class="flex px-6">
+            <button class="tab-button active-tab py-4 px-6 text-black font-bold border-b-2 border-black -mb-px transition-all" data-tab="active">
+                Active Cases
+            </button>
+            <button class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors" data-tab="pending">
+                Pending Client Action
+            </button>
+            <button class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors" data-tab="completed">
+                Completed / Archived
+            </button>
+        </div>
+    </div>
+
+    <!-- Client Roster Table -->
+    <div class="px-6 py-8">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <table class="w-full">
+                <!-- Table Header -->
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Client Details</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Case Type</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Next Milestone</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Last Communication</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-black">Actions</th>
+                    </tr>
+                </thead>
+
+                <!-- Tab 1: Active Cases (Default Visible) -->
+                <tbody class="tab-content" id="active-content">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Priya Sharma</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8892</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Mutual Consent Divorce</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Drafting Petition</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Today, 10:00 AM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Rajesh Kumar</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8891</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Child Custody & Support</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Awaiting Signatures</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 22, 2024, 2:30 PM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Ananya Patel</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8890</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Alimony Modification</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Court Hearing Nov 15</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 20, 2024, 11:15 AM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+                <!-- Tab 2: Pending Client Action (Hidden by Default) -->
+                <tbody class="tab-content hidden" id="pending-content">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Vikram Singh</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8889</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Contested Divorce</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Client Review</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 18, 2024, 4:45 PM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Meera Desai</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8888</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Property Settlement</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Awaiting Approval</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 16, 2024, 9:20 AM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+                <!-- Tab 3: Completed / Archived (Hidden by Default) -->
+                <tbody class="tab-content hidden" id="completed-content">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Ajay Reddy</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8887</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Mutual Consent Divorce</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Decree Issued</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 10, 2024, 3:00 PM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">Sonia Verma</div>
+                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8886</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">Child Custody & Support</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Case Closed</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">Oct 5, 2024, 1:30 PM</td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex justify-end gap-1">
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
+                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Vanilla JS: Tab Switching Logic -->
+    <script>
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Remove active styling from all tab buttons
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active-tab', 'text-black', 'font-bold', 'border-b-2', 'border-black', '-mb-px');
+                    btn.classList.add('inactive-tab', 'text-gray-500', 'font-medium');
+                });
+
+                // Add active styling to the clicked button
+                this.classList.remove('inactive-tab', 'text-gray-500', 'font-medium');
+                this.classList.add('active-tab', 'text-black', 'font-bold', 'border-b-2', 'border-black', '-mb-px');
+
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+
+                // Show the selected tab content
+                const tabContent = document.getElementById(tabName + '-content');
+                if (tabContent) {
+                    tabContent.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

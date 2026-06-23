@@ -1,0 +1,346 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Support Center - DivorceConnect India</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Native HTML5 Accordion Styling */
+        details {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        details:last-child {
+            border-bottom: none;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 500;
+            color: #0a0a0a;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            transition: color 0.2s ease;
+        }
+
+        summary:hover {
+            color: #4b5563;
+        }
+
+        summary::marker {
+            content: '';
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            font-weight: 300;
+            line-height: 1;
+            transition: transform 0.3s ease;
+            color: #0a0a0a;
+        }
+
+        details[open] summary::after {
+            content: '−';
+            transform: rotate(0deg);
+        }
+
+        details > div {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Input Styling */
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0a0a0a;
+            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
+        }
+
+        /* File Upload Drop Zone */
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-color: #f8fafc;
+        }
+
+        .drop-zone:hover {
+            border-color: #0a0a0a;
+            background-color: #f1f5f9;
+        }
+
+        .drop-zone.dragover {
+            border-color: #0a0a0a;
+            background-color: #f1f5f9;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-white text-[#0a0a0a]">
+
+    <!-- Header Section -->
+    <header class="bg-white border-b border-[#e2e8f0] py-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl font-bold text-[#0a0a0a] mb-2">Partner Support Center</h1>
+            <p class="text-gray-500 text-lg font-light">Find answers to common operational questions or submit a priority ticket to the admin team.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+            <!-- Column 1: FAQ Section -->
+            <section class="faq-section">
+                <h2 class="text-xl font-bold text-[#0a0a0a] mb-8">Frequently Asked Questions</h2>
+
+                <!-- FAQ 1 -->
+                <details class="mb-2">
+                    <summary>How do platform fees and payouts work?</summary>
+                    <div class="pb-4 text-gray-600 leading-relaxed">
+                        <p class="mb-3">DivorceConnect India operates on a transparent commission model:</p>
+                        <ul class="space-y-2 text-sm">
+                            <li><strong class="text-[#0a0a0a]">Commission Structure:</strong> 15% per consultation (deducted from client payments)</li>
+                            <li><strong class="text-[#0a0a0a]">Escrow System:</strong> Client payments are held in secure escrow for 48 hours post-consultation to ensure quality and dispute resolution</li>
+                            <li><strong class="text-[#0a0a0a]">Automated Clearing:</strong> After the 48-hour period, funds are automatically transferred to your registered bank account</li>
+                            <li><strong class="text-[#0a0a0a]">Withdrawal:</strong> Payouts occur weekly on Fridays. Track all transactions in your Finance Dashboard</li>
+                            <li><strong class="text-[#0a0a0a]">Invoice & Tax:</strong> Detailed invoices are generated for every payout for your records</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details class="mb-2">
+                    <summary>How do I handle a no-show client?</summary>
+                    <div class="pb-4 text-gray-600 leading-relaxed">
+                        <p class="mb-3">Our platform protects your time with clear no-show policies:</p>
+                        <ul class="space-y-2 text-sm">
+                            <li><strong class="text-[#0a0a0a]">15-Minute Grace Period:</strong> Clients have 15 minutes from the scheduled time to join</li>
+                            <li><strong class="text-[#0a0a0a]">Auto-Cancellation:</strong> After 15 minutes, the consultation is automatically marked as "No-Show"</li>
+                            <li><strong class="text-[#0a0a0a]">Payment Held:</strong> The consultation fee remains in escrow pending resolution</li>
+                            <li><strong class="text-[#0a0a0a]">Dispute Process:</strong> File a dispute claim with screenshots of wait time evidence</li>
+                            <li><strong class="text-[#0a0a0a]">Resolution Timeline:</strong> Support team reviews within 4 hours; approved claims are settled within 48 hours</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details class="mb-2">
+                    <summary>How do I update my legal credentials or Bar Council ID?</summary>
+                    <div class="pb-4 text-gray-600 leading-relaxed">
+                        <p class="mb-3">Keeping your credentials current is essential for trust and compliance:</p>
+                        <ul class="space-y-2 text-sm">
+                            <li><strong class="text-[#0a0a0a]">Profile Settings:</strong> Go to Settings → Professional Credentials</li>
+                            <li><strong class="text-[#0a0a0a]">Upload Documents:</strong> Re-upload your latest Bar Council registration certificate or practice license</li>
+                            <li><strong class="text-[#0a0a0a]">Verification Queue:</strong> Updated documents are reviewed by our compliance team within 24 hours</li>
+                            <li><strong class="text-[#0a0a0a]">Active Status:</strong> Your profile remains active during verification unless compliance issues arise</li>
+                            <li><strong class="text-[#0a0a0a]">Confirmation:</strong> Email notification received once credentials are verified</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details>
+                    <summary>How do I pause my profile if I'm on vacation?</summary>
+                    <div class="pb-4 text-gray-600 leading-relaxed">
+                        <p class="mb-3">Take a break without losing your professional standing:</p>
+                        <ul class="space-y-2 text-sm">
+                            <li><strong class="text-[#0a0a0a]">Pause Feature:</strong> Navigate to Profile Settings → Availability</li>
+                            <li><strong class="text-[#0a0a0a]">Set Dates:</strong> Select your vacation start and end dates</li>
+                            <li><strong class="text-[#0a0a0a]">Client Visibility:</strong> Your profile is hidden from client search during this period</li>
+                            <li><strong class="text-[#0a0a0a]">No Penalties:</strong> Pausing doesn't affect your ratings, reviews, or platform standing</li>
+                            <li><strong class="text-[#0a0a0a]">Auto-Resume:</strong> Your profile automatically goes live on your return date</li>
+                        </ul>
+                    </div>
+                </details>
+
+            </section>
+
+            <!-- Column 2: Ticketing Form -->
+            <section class="ticketing-section">
+                <div class="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-8">
+                    <h2 class="text-xl font-bold text-[#0a0a0a] mb-2">Submit a Priority Ticket</h2>
+                    <p class="text-gray-500 text-sm mb-6">Our partner support team typically responds within 2 hours.</p>
+
+                    <form method="POST" action="" enctype="multipart/form-data" class="space-y-5">
+                        {% csrf_token %}
+
+                        <!-- Category Dropdown -->
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-[#0a0a0a] mb-2">
+                                Category <span class="text-red-500">*</span>
+                            </label>
+                            <select
+                                id="category"
+                                name="category"
+                                required
+                                class="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg bg-white text-[#0a0a0a] text-sm focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a]"
+                            >
+                                <option value="">Select a category</option>
+                                <option value="billing">Billing & Payouts</option>
+                                <option value="dispute">Client Dispute</option>
+                                <option value="technical">Technical Issue</option>
+                                <option value="profile">Profile Update</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Subject Line -->
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-[#0a0a0a] mb-2">
+                                Subject <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="subject"
+                                name="subject"
+                                required
+                                placeholder="Briefly describe your issue"
+                                class="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg bg-white text-[#0a0a0a] text-sm placeholder-gray-400 focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a]"
+                            >
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-[#0a0a0a] mb-2">
+                                Description <span class="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="5"
+                                required
+                                placeholder="Please provide specific details, including Case IDs if applicable..."
+                                class="w-full px-4 py-3 border border-[#e2e8f0] rounded-lg bg-white text-[#0a0a0a] text-sm placeholder-gray-400 focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] resize-none"
+                            ></textarea>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div>
+                            <label class="block text-sm font-medium text-[#0a0a0a] mb-2">Attachment (Optional)</label>
+                            <div class="drop-zone" onclick="document.getElementById('fileInput').click();">
+                                <input
+                                    type="file"
+                                    id="fileInput"
+                                    name="attachment"
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                >
+                                <div class="pointer-events-none">
+                                    <p class="text-[#0a0a0a] font-medium text-sm">Drop files here or click to upload</p>
+                                    <p class="text-gray-500 text-xs mt-2">Supported: PDF, JPG, PNG, DOC, DOCX (Max 5MB)</p>
+                                </div>
+                            </div>
+                            <p id="fileName" class="text-xs text-gray-500 mt-2"></p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                            type="submit"
+                            class="w-full bg-[#0a0a0a] text-white py-3 rounded-lg font-semibold text-sm hover:bg-gray-900 transition-colors duration-200 mt-6"
+                        >
+                            Submit Priority Ticket
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#e2e8f0] mt-12 py-8 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>For urgent issues, contact <a href="mailto:support@divorceconnect.in" class="text-[#0a0a0a] hover:underline">support@divorceconnect.in</a></p>
+        </div>
+    </footer>
+
+    <!-- Minimal Vanilla JS for File Upload -->
+    <script>
+        const dropZone = document.querySelector('.drop-zone');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+
+        // Click to upload
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName();
+            }
+        });
+
+        // File selection
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            if (fileInput.files.length) {
+                fileName.textContent = `Selected: ${fileInput.files[0].name}`;
+            } else {
+                fileName.textContent = '';
+            }
+        }
+    </script>
+
+</body>
+</html>

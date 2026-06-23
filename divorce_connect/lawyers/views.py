@@ -36,3 +36,43 @@ def case_order_view(request):
     if not hasattr(request.user, 'lawyer_profile'):
         return redirect('/api/auth/login/')
     return render(request, 'case_order.html')
+
+# Add this in lawyers/views.py
+@login_required(login_url='/api/auth/login/')
+def case_status_view(request):
+    """Operational CRM view for lawyers to manage active clients."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+    return render(request, 'case_status.html')
+
+# Add this in lawyers/views.py
+@login_required(login_url='/api/auth/login/')
+def account_settings_view(request):
+    """Backend settings for lawyer availability, security, and notifications."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+    return render(request, 'account_settings.html')
+
+# Add this in lawyers/views.py
+@login_required(login_url='/api/auth/login/')
+def billing_payment_view(request):
+    """Secure page for lawyer payouts, taxes, and invoices."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+    return render(request, 'billing_payment.html')
+
+# Add this in lawyers/views.py
+@login_required(login_url='/api/auth/login/')
+def support_lawyer_view(request):
+    """Priority help center and ticketing for lawyers."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+    return render(request, 'support_lawyer.html')
+
+# Add this in lawyers/views.py
+@login_required(login_url='/api/auth/login/')
+def report_client_view(request):
+    """Trust and safety page for lawyers to report abusive clients."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+    return render(request, 'report_client.html')

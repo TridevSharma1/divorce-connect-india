@@ -3,16 +3,124 @@
     <a href="/lawyers/dashboard/" class="text-link">Home</a>
     <a href="{% url 'lawyer_earnings' %}" class="text-link">Earning Dashboard</a>
     <a href="{% url 'lawyer_case_orders' %}" class="text-link">Case Order</a>
-    <a href="#" class="text-link">Case Status</a>
-    <a href="#" class="text-link">Account Settings</a>
-    <a href="#" class="text-link">Billing & Payment</a>
+    <a href="{% url 'lawyer_case_status' %}" class="text-link">Case Status</a>
+    <a href="{% url 'lawyer_settings' %}" class="text-link">Account Settings</a>
+    <a href="{% url 'lawyer_billing' %}" class="text-link">Billing & Payment</a>
 
     <!-- Notification Bell -->
-    <button class="relative" onclick="alert('No new notifications')">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-        </svg>
-    </button>
+
+    <div class="relative" id="notificationContainer">
+  <!-- Bell Icon Trigger Button -->
+  <button
+    id="notificationBell"
+    class="relative p-2 text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+    aria-label="Notifications"
+    aria-expanded="false"
+    aria-haspopup="true"
+  >
+    <!-- Bell SVG -->
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+
+    <!-- Pulsing Red Unread Indicator Dot -->
+    <span
+      id="notificationDot"
+      class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-lg"
+    ></span>
+  </button>
+
+  <!-- Dropdown Panel -->
+  <div
+    id="notificationPanel"
+    class="hidden absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+    style="font-family: 'Inter', sans-serif;"
+  >
+    <!-- Header -->
+    <div class="px-4 py-3 border-b border-gray-100 bg-white flex items-center justify-between">
+      <h3 class="text-sm font-bold text-gray-900">Notifications</h3>
+      <button
+        id="markAllRead"
+        class="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-150 font-medium"
+        aria-label="Mark all notifications as read"
+      >
+        Mark all as read
+      </button>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="max-h-96 overflow-y-auto">
+      <!-- Unread: New Consultation Request -->
+      <div
+        class="notification-item px-4 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+        data-read="false"
+      >
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></span>
+              <p class="text-sm font-medium text-gray-900">New consultation requested by Anonymous Client #1042.</p>
+            </div>
+            <p class="text-xs text-gray-500 mt-1.5">Just now</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unread: Upcoming Meeting -->
+      <div
+        class="notification-item px-4 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+        data-read="false"
+      >
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></span>
+              <p class="text-sm font-medium text-gray-900">Upcoming meeting: Discovery Call with Priya Sharma in 15 minutes.</p>
+            </div>
+            <p class="text-xs text-gray-500 mt-1.5">2 hours ago</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Read: Payout Processed -->
+      <div
+        class="notification-item px-4 py-3 bg-white border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors duration-150"
+        data-read="true"
+      >
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Your payout of ₹5,000 has been processed successfully.</p>
+            <p class="text-xs text-gray-500 mt-1.5">Yesterday</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Read: Profile Verification -->
+      <div
+        class="notification-item px-4 py-3 bg-white border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors duration-150"
+        data-read="true"
+      >
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Admin verified your Bar Council ID. Your profile is now live.</p>
+            <p class="text-xs text-gray-500 mt-1.5">2 days ago</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 py-3 bg-white border-t border-gray-100 text-center">
+      <a
+        href="#"
+        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors duration-150"
+        aria-label="View all notifications"
+      >
+        View all notifications
+      </a>
+    </div>
+  </div>
+</div>
 
     <!-- Profile Dropdown -->
     <div class="relative">
@@ -28,9 +136,94 @@
         <div id="lawyerDropdown" class="dropdown-menu">
             <a href="/lawyers/dashboard/" class="dropdown-item">Dashboard</a>
             <a href="/lawyers/profile/" class="dropdown-item">My Profile</a>
-            <a href="#" class="dropdown-item">Support</a>
-            <a href="#" class="dropdown-item">Report Client</a>
+            <a href="{% url 'lawyer_support' %}" class="dropdown-item">Support</a>
+            <a href="{% url 'lawyer_report_client' %}" class="dropdown-item">Report Client</a>
             <a href="/api/auth/logout/" class="dropdown-item logout-item">Logout</a>
         </div>
     </div>
 </nav>
+
+<!-- Vanilla JavaScript Toggle Logic for notification bell -->
+<script>
+  (function() {
+    const notificationContainer = document.getElementById('notificationContainer');
+    const notificationBell = document.getElementById('notificationBell');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const notificationDot = document.getElementById('notificationDot');
+    const markAllReadBtn = document.getElementById('markAllRead');
+    const notificationItems = document.querySelectorAll('.notification-item');
+
+    // Toggle dropdown on bell click
+    notificationBell.addEventListener('click', function(event) {
+      event.stopPropagation();
+      notificationPanel.classList.toggle('hidden');
+      notificationBell.setAttribute('aria-expanded', !notificationPanel.classList.contains('hidden'));
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      if (!notificationContainer.contains(event.target)) {
+        notificationPanel.classList.add('hidden');
+        notificationBell.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Mark individual notification as read
+    notificationItems.forEach(function(item) {
+      item.addEventListener('click', function(event) {
+        if (event.target === markAllReadBtn) return;
+        markItemAsRead(this);
+      });
+    });
+
+    // Mark all as read
+    markAllReadBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      notificationItems.forEach(function(item) {
+        if (item.getAttribute('data-read') === 'false') {
+          markItemAsRead(item);
+        }
+      });
+      updateNotificationDot();
+    });
+
+    // Helper function to mark item as read
+    function markItemAsRead(item) {
+      item.setAttribute('data-read', 'true');
+      item.classList.remove('bg-gray-50');
+      item.classList.add('bg-white');
+
+      const unreadDot = item.querySelector('.w-2.h-2.bg-red-500');
+      if (unreadDot) {
+        unreadDot.remove();
+      }
+
+      updateNotificationDot();
+    }
+
+    // Update notification dot visibility
+    function updateNotificationDot() {
+      const hasUnread = Array.from(notificationItems).some(function(item) {
+        return item.getAttribute('data-read') === 'false';
+      });
+
+      if (hasUnread) {
+        notificationDot.classList.remove('hidden');
+      } else {
+        notificationDot.classList.add('hidden');
+      }
+    }
+
+    // Initialize notification dot visibility
+    updateNotificationDot();
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && !notificationPanel.classList.contains('hidden')) {
+        notificationPanel.classList.add('hidden');
+        notificationBell.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Client — DivorceConnect India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+
+    <!-- Header Section -->
+    <header class="py-12 text-center border-b border-gray-100">
+        <h1 class="font-playfair text-5xl font-bold text-black mb-2">Report a Client</h1>
+        <p class="text-gray-600 text-sm max-w-2xl mx-auto">Help us maintain a safe and trustworthy platform.</p>
+    </header>
+
+    <!-- Warning Banner -->
+    <section class="bg-red-50 border-t border-b border-red-100 py-8 px-6">
+        <div class="max-w-4xl mx-auto flex items-start gap-4">
+            <!-- Shield Icon -->
+            <svg class="w-6 h-6 text-red-800 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2.166 4.999a11.954 11.954 0 0010-8.457 11.954 11.954 0 0010 8.457V9.5c0 5.55-3.84 10.74-9 12.02-5.16-1.28-9-6.47-9-12.02V4.999z" clip-rule="evenodd" />
+            </svg>
+            <div>
+                <h2 class="font-semibold text-red-900 mb-1">Trust & Safety Policy</h2>
+                <p class="text-red-800 text-sm leading-relaxed">
+                    DivorceConnect India enforces a strict zero-tolerance policy for abuse and fraud. Please use this form to report abusive language, deliberate no-shows, or chargeback fraud. All reports are investigated by our Trust & Safety team within 24–48 hours.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-12 px-6 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <!-- Report Form Card -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+                <form id="reportForm" class="space-y-6">
+
+                    <!-- Field 1: Select Client -->
+                    <div>
+                        <label for="clientSelect" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
+                            Which client are you reporting?
+                        </label>
+                        <select id="clientSelect" name="client" required class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm">
+                            <option value="">— Select a client —</option>
+                            <option value="client_1042">Anonymous Client #1042</option>
+                            <option value="priya_sharma">Priya Sharma — Case #DC-8892</option>
+                            <option value="rajesh_kumar">Rajesh Kumar — Case #DC-7651</option>
+                        </select>
+                    </div>
+
+                    <!-- Field 2: Reason for Report -->
+                    <div>
+                        <label for="reasonSelect" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
+                            Primary Reason
+                        </label>
+                        <select id="reasonSelect" name="reason" required class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm">
+                            <option value="">— Select a reason —</option>
+                            <option value="abusive_language">Abusive Language / Harassment</option>
+                            <option value="no_show">Deliberate No-Show</option>
+                            <option value="fraud">Fraud / Chargeback Attempt</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Field 3: Detailed Description -->
+                    <div>
+                        <label for="detailsTextarea" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
+                            Incident Details
+                        </label>
+                        <textarea
+                            id="detailsTextarea"
+                            name="details"
+                            rows="6"
+                            required
+                            placeholder="Please provide a factual timeline of the events and quote any specific messages if applicable..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm resize-vertical">
+                        </textarea>
+                        <p class="text-gray-500 text-xs mt-1">Min. 20 characters. Be specific and factual.</p>
+                    </div>
+
+                    <!-- Field 4: Evidence Upload -->
+                    <div>
+                        <label class="block font-inter font-600 text-gray-900 mb-3 text-sm">
+                            Attach Evidence
+                        </label>
+                        <div id="uploadZone" class="relative border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 px-6 py-8 text-center cursor-pointer transition hover:border-gray-400 hover:bg-gray-100">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <p class="font-inter font-500 text-gray-900 text-sm mb-1">Upload screenshots, emails, or chat logs</p>
+                            <p class="text-gray-500 text-xs">Max 5MB. Supports JPG, PNG, PDF.</p>
+                            <input
+                                type="file"
+                                id="fileInput"
+                                name="evidence"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                class="absolute inset-0 opacity-0 cursor-pointer"
+                                aria-label="File upload">
+                        </div>
+                        <div id="fileNameDisplay" class="mt-2 text-sm text-gray-600 hidden">
+                            <span class="font-inter font-500">File:</span> <span id="fileName" class="text-gray-900"></span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end items-center gap-3 pt-6 border-t border-gray-100">
+                        <button type="button" onclick="document.getElementById('reportForm').reset(); document.getElementById('fileNameDisplay').classList.add('hidden');" class="px-6 py-2.5 text-gray-900 font-inter font-500 text-sm hover:text-black transition">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-6 py-2.5 bg-black text-white font-inter font-600 text-sm rounded-md hover:bg-gray-900 transition shadow-sm">
+                            Submit Official Report
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Confirmation Modal (Hidden by Default) -->
+    <div id="confirmationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+            <!-- Checkmark Icon -->
+            <svg class="w-12 h-12 mx-auto mb-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 class="font-playfair text-2xl font-bold text-black mb-2">Report Submitted</h2>
+            <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                Our Trust & Safety team has received your evidence and will review the client's account immediately.
+            </p>
+            <button
+                onclick="closeModal()"
+                class="w-full px-6 py-2.5 bg-black text-white font-inter font-600 text-sm rounded-md hover:bg-gray-900 transition">
+                Return to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Vanilla JS -->
+    <script>
+        // Form submission handler
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Show confirmation modal
+            document.getElementById('confirmationModal').classList.remove('hidden');
+        });
+
+        // File upload display
+        document.getElementById('uploadZone').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '';
+            if (fileName) {
+                document.getElementById('fileName').textContent = fileName;
+                document.getElementById('fileNameDisplay').classList.remove('hidden');
+            } else {
+                document.getElementById('fileNameDisplay').classList.add('hidden');
+            }
+        });
+
+        // Drag-and-drop support
+        const uploadZone = document.getElementById('uploadZone');
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-gray-400', 'bg-gray-100');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                const fileName = files[0].name;
+                document.getElementById('fileName').textContent = fileName;
+                document.getElementById('fileNameDisplay').classList.remove('hidden');
+            }
+        });
+
+        // Modal close function
+        function closeModal() {
+            document.getElementById('confirmationModal').classList.add('hidden');
+            document.getElementById('reportForm').reset();
+            document.getElementById('fileNameDisplay').classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>
