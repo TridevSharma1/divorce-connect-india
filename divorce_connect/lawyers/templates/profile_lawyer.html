@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Lawyer Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Header -->
+    <div class="mb-12">
+        <h1 class="text-5xl font-bold serif-heading mb-3">Edit Profile</h1>
+        <p class="text-gray-600 text-lg">Manage your professional information and account settings</p>
+    </div>
+
+    <!-- Profile Form -->
+    <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 p-8 max-w-4xl">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Full Name -->
+            <div>
+                <label for="fullName" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Full Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="fullName"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    value="{{ user.get_full_name }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                    required
+                >
+            </div>
+
+            <!-- Email (Read-Only) -->
+            <div>
+                <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Email Address
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="user@example.com"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+                    disabled
+                    value="{{ user.email }}"
+                >
+                <p class="text-xs text-gray-600 mt-1">This field cannot be changed</p>
+            </div>
+
+            <!-- Phone Numbers -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="mobileNumber" class="block text-sm font-semibold text-gray-900 mb-2">
+                        Mobile Number <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="tel"
+                        id="mobileNumber"
+                        name="mobile_number"
+                        placeholder="+91 98765 43210"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="barRegistration" class="block text-sm font-semibold text-gray-900 mb-2">
+                        Bar Registration Number <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="barRegistration"
+                        name="bar_registration_number"
+                        placeholder="e.g., BAR/2015/12345"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                    >
+                </div>
+            </div>
+
+            <!-- State Bar Council -->
+            <div>
+                <label for="stateBarCouncil" class="block text-sm font-semibold text-gray-900 mb-2">
+                    State Bar Council
+                </label>
+                <input
+                    type="text"
+                    id="stateBarCouncil"
+                    name="state_bar_council"
+                    placeholder="e.g., Bar Council of Delhi"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                >
+            </div>
+
+            <!-- Specialization and Experience -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="specialization" class="block text-sm font-semibold text-gray-900 mb-2">
+                        Specialization
+                    </label>
+                    <input
+                        type="text"
+                        id="specialization"
+                        name="specialization"
+                        placeholder="e.g., Family Law, Divorce Cases"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="experience" class="block text-sm font-semibold text-gray-900 mb-2">
+                        Years of Experience
+                    </label>
+                    <input
+                        type="number"
+                        id="experience"
+                        name="experience"
+                        placeholder="e.g., 10"
+                        min="0"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                    >
+                </div>
+            </div>
+
+            <!-- Consultation Fee -->
+            <div>
+                <label for="consultationFee" class="block text-sm font-semibold text-gray-900 mb-2">
+                    Consultation Fee (₹)
+                </label>
+                <input
+                    type="number"
+                    id="consultationFee"
+                    name="consultation_fee"
+                    placeholder="e.g., 500"
+                    min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                >
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-6 border-t border-gray-200">
+                <button
+                    type="submit"
+                    class="bg-black text-white font-semibold px-8 py-3 rounded-lg hover:bg-gray-800 transition"
+                >
+                    Save Changes
+                </button>
+                <a href="/lawyers/dashboard/" class="text-gray-700 font-semibold px-8 py-3 rounded-lg border-2 border-gray-300 hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-4xl">
+        <p class="text-sm text-blue-900">
+            <strong>Note:</strong> Your email cannot be modified. To change your email or bar registration number, please contact our support team.
+        </p>
+    </div>
+</div>
+{% endblock %}

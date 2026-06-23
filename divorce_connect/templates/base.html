@@ -1,0 +1,318 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DivorceConnect India{% endblock %}</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --deep-black: #0a0a0a;
+            --pure-white: #ffffff;
+            --subtle-gray: #f4f4f5;
+            --slate-gray: #e4e4e7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--deep-black);
+            background-color: var(--pure-white);
+        }
+
+        h1, h2, h3, .serif-heading {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: var(--pure-white);
+            border-bottom: 2px solid #f0f0f0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--deep-black);
+            color: var(--pure-white);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: #1a1a1a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--deep-black);
+            color: var(--deep-black);
+            background-color: transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--deep-black);
+            color: var(--pure-white);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .text-link {
+            color: var(--deep-black);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .text-link:hover {
+            opacity: 0.7;
+        }
+
+        .nav-link {
+            color: var(--deep-black);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .nav-link:hover {
+            background-color: var(--subtle-gray);
+            color: var(--deep-black);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--pure-white);
+            border: 1px solid var(--slate-gray);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 40;
+            margin-top: 0.25rem;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            color: var(--deep-black);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            display: block;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid var(--slate-gray);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--subtle-gray);
+        }
+
+        .logout-item {
+            color: #dc2626;
+        }
+
+        .logout-item:hover {
+            background-color: #fee2e2;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--pure-white);
+            border-bottom: 2px solid #f0f0f0;
+            padding: 1rem;
+            z-index: 40;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-toggle {
+                display: none;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="header-sticky">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-12 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-8">
+                    {% if user.is_authenticated %}
+                        {% if user_role == 'client' %}
+                            {% include 'includes/navbar_client.html' %}
+                        {% elif user_role == 'lawyer' %}
+                            {% include 'includes/navbar_lawyer.html' %}
+                        {% elif user_role == 'admin' %}
+                            {% include 'includes/navbar_admin.html' %}
+                        {% endif %}
+                    {% else %}
+                        <a href="/" class="text-link">Home</a>
+                        <a href="/api/auth/login/" class="text-link">Login</a>
+                        <a href="/api/auth/register/" class="btn-primary">Get Started</a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Toggle -->
+                <button class="mobile-toggle md:hidden flex items-center gap-2" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Navigation -->
+            <div class="mobile-menu md:hidden" id="mobileMenu">
+                {% if user.is_authenticated %}
+                    {% if user_role == 'client' %}
+                        {% include 'includes/navbar_client_mobile.html' %}
+                    {% elif user_role == 'lawyer' %}
+                        {% include 'includes/navbar_lawyer_mobile.html' %}
+                    {% elif user_role == 'admin' %}
+                        {% include 'includes/navbar_admin_mobile.html' %}
+                    {% endif %}
+                {% else %}
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="http://localhost:8000/api/auth/login/" class="nav-link">Login</a>
+                    <a href="http://localhost:8000/api/auth/register/" class="nav-link btn-primary mt-2">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer style="background-color: #0a0a0a;" class="text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
+                <div>
+                    <h4 class="text-lg font-bold serif-heading mb-4">DivorceConnect</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        India's most trusted platform for legal professionals and individuals seeking guidance.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-semibold mb-4">Quick Links</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Find a Lawyer</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Become an Expert</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-semibold mb-4">Support</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-semibold mb-4">Legal</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8">
+                <p class="text-gray-400 text-sm text-center">
+                    &copy; 2025 DivorceConnect India. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            dropdown.classList.toggle('active');
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.relative')) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
