@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def edit_profile_admin_view(request):
+    return render(request, 'profile_admin.html')

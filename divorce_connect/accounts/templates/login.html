@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DivorceConnect India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-black: #1a1a1a;
+            --accent-blue: #0066cc;
+            --focus-blue: #0052a3;
+            --border-gray: #e0e0e0;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        input:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-black);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--focus-blue);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.25);
+        }
+
+        .form-input {
+            border: 1px solid var(--border-gray);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:hover {
+            border-color: #bbb;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center py-8 px-4">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+        <!-- Logo Section -->
+        <div class="text-center mb-8">
+            <div class="mb-4">
+                <svg width="80" height="80" viewBox="0 0 200 200" class="mx-auto" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Circle -->
+                    <circle cx="100" cy="100" r="95" fill="none" stroke="#1a1a1a" stroke-width="8"/>
+
+                    <!-- Two figures -->
+                    <circle cx="70" cy="50" r="12" fill="#1a1a1a"/>
+                    <path d="M 60 65 Q 55 80 50 95 L 90 95 Q 85 80 80 65 Z" fill="#1a1a1a"/>
+
+                    <circle cx="130" cy="50" r="12" fill="#1a1a1a"/>
+                    <path d="M 140 65 Q 145 80 150 95 L 110 95 Q 115 80 120 65 Z" fill="#1a1a1a"/>
+
+                    <!-- Heart connecting -->
+                    <path d="M 85 110 Q 90 115 100 120 Q 110 115 115 110" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+
+                    <!-- Scales of justice -->
+                    <line x1="100" y1="125" x2="100" y2="155" stroke="#1a1a1a" stroke-width="2"/>
+                    <line x1="85" y1="135" x2="115" y2="135" stroke="#1a1a1a" stroke-width="2"/>
+                    <circle cx="80" cy="140" r="8" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+                    <circle cx="120" cy="140" r="8" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">DivorceConnect India</h1>
+            <p class="text-sm text-gray-600 mt-1">Online Divorce & Lawyer Marketplace</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="space-y-5">
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-semibold text-gray-900 mb-1">Email Address *</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="you@example.com"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm"
+                >
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-semibold text-gray-900 mb-1">Password *</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    placeholder="••••••••"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm"
+                >
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        name="remember"
+                        class="w-4 h-4 rounded border-gray-300"
+                        style="accent-color: #0066cc;"
+                    >
+                    <span class="ml-2 text-gray-700">Remember me</span>
+                </label>
+                <a href="#" class="text-blue-600 hover:text-blue-800 font-medium transition">
+                    Forgot password?
+                </a>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                class="w-full btn-primary py-2 rounded-lg font-semibold text-base mt-6"
+            >
+                Sign In
+            </button>
+        </form>
+
+        <!-- Registration Link -->
+        <p class="text-center text-sm text-gray-600 mt-6">
+            Don't have an account?
+            <a href="register.html" class="text-blue-600 hover:text-blue-800 font-semibold transition">
+                Create one now
+            </a>
+        </p>
+
+        <!-- Security Note -->
+        <div class="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <p class="text-xs text-blue-800 text-center">
+                🔒 Your data is encrypted and secure. We never share your information.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
