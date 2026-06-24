@@ -1,529 +1,234 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Profile - DivorceConnect India</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-navy: #1a3a52;
-            --primary-gold: #b8860b;
-            --accent-blue: #0066cc;
-            --dark-text: #1a1a1a;
-            --light-gray: #f8f9fa;
-            --border-gray: #e8ecf1;
-        }
+{% block title %}My Profile - Admin{% endblock %}
 
-        * {
-            transition: all 0.3s ease;
-        }
+{% block content %}
 
-        body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #f0f3f7 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<div class="min-h-screen bg-gray-100 py-10">
 
-        .primary-blue {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #0052a3 100%);
-        }
+```
+<div class="max-w-7xl mx-auto px-4">
 
-        .primary-blue-text {
-            color: var(--accent-blue);
-        }
-
-        .sidebar-active {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #0052a3 100%);
-            color: white;
-            border-left: 4px solid white;
-            border-radius: 8px;
-        }
-
-        .form-input-readonly {
-            background-color: var(--light-gray);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .premium-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--border-gray);
-            transition: all 0.3s ease;
-        }
-
-        .premium-card:hover {
-            box-shadow: 0 8px 30px rgba(0, 102, 204, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .premium-input {
-            border: 2px solid var(--border-gray);
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .premium-input:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-            outline: none;
-        }
-
-        .premium-button {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #0052a3 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 28px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-
-        .premium-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
-        }
-
-        .premium-button:active {
-            transform: translateY(0);
-        }
-
-        .sidebar-nav-item {
-            border-radius: 8px;
-            margin-bottom: 4px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar-nav-item:hover:not(.sidebar-active) {
-            background-color: rgba(0, 102, 204, 0.05);
-            color: var(--accent-blue);
-        }
-
-        .header-gradient {
-            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--accent-blue) 100%);
-        }
-
-        .logo-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 4px;
-        }
-
-        .logo-img {
-            max-width: 45px;
-            height: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        .badge-premium {
-            background: linear-gradient(135deg, var(--primary-gold) 0%, #d4af37 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .verification-badge {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #10b981;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-navy);
-            position: relative;
-            padding-bottom: 12px;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--primary-gold));
-            border-radius: 2px;
-        }
-    </style>
-</head>
-<body>
-    <div class="flex h-screen bg-gray-50">
-        <!-- Premium Sidebar -->
-        <aside class="w-72 bg-white shadow-2xl border-r-2 border-gray-100 flex flex-col">
-            <!-- Logo Section -->
-            <div class="px-6 py-8 border-b-2 border-gray-100 bg-gradient-to-b from-gray-50 to-white">
-                <div class="logo-container">
-                    <img src="{% static 'images/logo.png' %}" alt="Divorce Connect India" class="logo-img">
-                    <div class="text-center flex-1">
-                        <p class="text-xs text-gray-500 uppercase tracking-wider font-bold">Admin Portal</p>
-                        <p class="text-xs text-gray-600 mt-1">DivorceConnect India</p>
-                    </div>
-                </div>
-                <div class="flex justify-center mt-3">
-                    <span class="badge-premium">Verified Admin</span>
-                </div>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="mt-6 space-y-1 px-4 flex-1 overflow-y-auto">
-                <!-- Dashboard -->
-                <a href="#" class="sidebar-nav-item flex items-center px-4 py-3 text-gray-700 hover:text-accent-blue font-medium">
-                    <i class="fas fa-chart-line w-5 h-5 mr-4 text-gray-400"></i>
-                    <span>Dashboard</span>
-                </a>
-
-                <!-- Profile (Active) -->
-                <a href="#" class="sidebar-nav-item sidebar-active flex items-center px-4 py-3 text-white font-medium">
-                    <i class="fas fa-user-circle w-5 h-5 mr-4"></i>
-                    <span>Profile</span>
-                </a>
-
-                <!-- Pending Verifications -->
-                <a href="#" class="sidebar-nav-item flex items-center px-4 py-3 text-gray-700 hover:text-accent-blue font-medium relative">
-                    <i class="fas fa-clipboard-check w-5 h-5 mr-4 text-gray-400"></i>
-                    <span>Pending Verifications</span>
-                    <span class="ml-auto bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-md">5</span>
-                </a>
-
-                <!-- Settings -->
-                <a href="#" class="sidebar-nav-item flex items-center px-4 py-3 text-gray-700 hover:text-accent-blue font-medium">
-                    <i class="fas fa-cog w-5 h-5 mr-4 text-gray-400"></i>
-                    <span>Settings</span>
-                </a>
-
-                <!-- Separator -->
-                <div class="border-t border-gray-200 my-3"></div>
-
-                <!-- Activity Log -->
-                <a href="#" class="sidebar-nav-item flex items-center px-4 py-3 text-gray-700 hover:text-accent-blue font-medium text-sm">
-                    <i class="fas fa-history w-5 h-5 mr-4 text-gray-400"></i>
-                    <span>Activity Log</span>
-                </a>
-            </nav>
-
-            <!-- Logout -->
-            <div class="p-4 border-t-2 border-gray-100 bg-gradient-to-b from-white to-gray-50">
-                <a href="#" class="premium-button w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
-                </a>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 overflow-auto">
-            <!-- Premium Header -->
-            <div class="header-gradient text-white px-8 py-8 shadow-lg">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <h2 class="text-4xl font-bold">Admin Profile</h2>
-                            <span class="badge-premium" style="background: rgba(255, 255, 255, 0.2); color: white;">Active</span>
-                        </div>
-                        <p class="text-gray-100 text-sm font-light">Manage your account information and verification status</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="flex items-center justify-end space-x-4">
-                            <div>
-                                <p class="text-xs text-gray-200 uppercase tracking-wider">Welcome back,</p>
-                                <p class="text-lg font-bold">Rajesh Kumar</p>
-                            </div>
-                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                <i class="fas fa-user text-white text-lg"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Section -->
-            <div class="p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Main Form -->
-                    <div class="lg:col-span-2">
-                        <div class="premium-card p-8">
-                            <h3 class="section-title mb-8">Account Information</h3>
-
-                            <!-- Form -->
-                            <form id="adminProfileForm" class="space-y-6">
-                                <!-- Full Name -->
-                                <div>
-                                    <label for="fullName" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-user text-accent-blue mr-2"></i>Full Name <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="fullName"
-                                        name="fullName"
-                                        placeholder="Enter your full name"
-                                        class="w-full premium-input text-gray-900"
-                                        value="Rajesh Kumar"
-                                    >
-                                </div>
-
-                                <!-- Email (Read-Only) -->
-                                <div>
-                                    <label for="email" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-envelope text-accent-blue mr-2"></i>Email Address
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        disabled
-                                        class="w-full premium-input text-gray-700 form-input-readonly"
-                                        value="rajesh.admin@divorceconnect.in"
-                                    >
-                                    <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i>Email cannot be changed. Contact support for assistance.</p>
-                                </div>
-
-                                <!-- Date of Join (Read-Only) -->
-                                <div>
-                                    <label for="dateOfJoin" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-calendar text-accent-blue mr-2"></i>Date of Joining
-                                    </label>
-                                    <input
-                                        type="date"
-                                        id="dateOfJoin"
-                                        name="dateOfJoin"
-                                        disabled
-                                        class="w-full premium-input text-gray-700 form-input-readonly"
-                                        value="2024-03-15"
-                                    >
-                                    <p class="text-xs text-gray-500 mt-2"><i class="fas fa-lock mr-1"></i>Fixed upon account creation.</p>
-                                </div>
-
-                                <!-- Mobile Number -->
-                                <div>
-                                    <label for="mobile" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-phone text-accent-blue mr-2"></i>Mobile Number <span class="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        id="mobile"
-                                        name="mobile"
-                                        placeholder="+91 9876543210"
-                                        class="w-full premium-input text-gray-900"
-                                        value="+91 9876543210"
-                                    >
-                                </div>
-
-                                <!-- Alternate Mobile Number -->
-                                <div>
-                                    <label for="alternateMobile" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-phone text-accent-blue mr-2"></i>Alternate Mobile Number
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        id="alternateMobile"
-                                        name="alternateMobile"
-                                        placeholder="+91 9876543211 (Optional)"
-                                        class="w-full premium-input text-gray-900"
-                                        value="+91 9876543211"
-                                    >
-                                </div>
-
-                                <!-- Gender -->
-                                <div>
-                                    <label for="gender" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-venus-mars text-accent-blue mr-2"></i>Gender
-                                    </label>
-                                    <select
-                                        id="gender"
-                                        name="gender"
-                                        class="w-full premium-input text-gray-900 bg-white"
-                                    >
-                                        <option value="">Select Gender</option>
-                                        <option value="male" selected>Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                        <option value="prefer_not">Prefer Not to Say</option>
-                                    </select>
-                                </div>
-
-                                <!-- Date of Birth -->
-                                <div>
-                                    <label for="dateOfBirth" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        <i class="fas fa-birthday-cake text-accent-blue mr-2"></i>Date of Birth
-                                    </label>
-                                    <input
-                                        type="date"
-                                        id="dateOfBirth"
-                                        name="dateOfBirth"
-                                        class="w-full premium-input text-gray-900"
-                                        value="1988-06-15"
-                                    >
-                                </div>
-
-                                <!-- Verification Status (Read-Only) -->
-                                <div class="verification-badge rounded-lg p-6 border-2 border-opacity-20 border-green-300">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <label class="block text-sm font-semibold text-white">
-                                            <i class="fas fa-check-circle mr-2"></i>Superuser Admin Verification Status
-                                        </label>
-                                        <span class="status-indicator"></span>
-                                    </div>
-                                    <div class="flex items-center space-x-3 mb-3">
-                                        <input
-                                            type="checkbox"
-                                            id="verifyStatus"
-                                            name="verifyStatus"
-                                            disabled
-                                            checked
-                                            class="w-5 h-5 rounded form-input-readonly"
-                                        >
-                                        <label for="verifyStatus" class="text-sm text-white font-medium">Verified Administrator</label>
-                                    </div>
-                                    <p class="text-xs text-green-50"><i class="fas fa-shield-alt mr-2"></i>Your admin account is active and verified. Status changes require superuser approval.</p>
-                                </div>
-
-                                <!-- Save Button -->
-                                <div class="flex justify-end space-x-4 pt-8 border-t-2 border-gray-100">
-                                    <button
-                                        type="reset"
-                                        class="px-8 py-3 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        class="premium-button flex items-center gap-2"
-                                    >
-                                        <i class="fas fa-save"></i>
-                                        Save Profile
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Sidebar Info Cards -->
-                    <div class="space-y-6">
-                        <!-- Admin Status Card -->
-                        <div class="premium-card p-6">
-                            <div class="flex items-center justify-between mb-6">
-                                <h4 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <i class="fas fa-shield-alt text-accent-blue"></i>Admin Status
-                                </h4>
-                                <span class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-full">
-                                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="space-y-4 border-t border-gray-100 pt-4">
-                                <div>
-                                    <p class="text-xs text-gray-600 uppercase tracking-widest font-bold">Role</p>
-                                    <p class="text-sm text-gray-900 font-semibold mt-1 flex items-center gap-2">
-                                        <i class="fas fa-crown text-accent-blue"></i>Superuser Administrator
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-600 uppercase tracking-widest font-bold">Account Status</p>
-                                    <p class="text-sm text-green-600 font-semibold mt-1 flex items-center gap-2">
-                                        <span class="status-indicator"></span>Active
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-600 uppercase tracking-widest font-bold">Permission Level</p>
-                                    <p class="text-sm text-gray-900 font-semibold mt-1 flex items-center gap-2">
-                                        <i class="fas fa-unlock text-accent-blue"></i>Full Access
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <div class="premium-card p-6">
-                            <h4 class="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
-                                <i class="fas fa-lightning-bolt text-accent-blue"></i>Quick Actions
-                            </h4>
-                            <div class="space-y-3">
-                                <a href="#" class="block w-full text-center px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-900 rounded-lg hover:from-blue-100 hover:to-indigo-100 transition font-medium text-sm border border-blue-100 hover:border-blue-300">
-                                    <i class="fas fa-key mr-2"></i>Change Password
-                                </a>
-                                <a href="#" class="block w-full text-center px-4 py-3 bg-gradient-to-r from-purple-50 to-pink-50 text-gray-900 rounded-lg hover:from-purple-100 hover:to-pink-100 transition font-medium text-sm border border-purple-100 hover:border-purple-300">
-                                    <i class="fas fa-mobile-alt mr-2"></i>Two-Factor Auth
-                                </a>
-                                <a href="#" class="block w-full text-center px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 text-gray-900 rounded-lg hover:from-green-100 hover:to-emerald-100 transition font-medium text-sm border border-green-100 hover:border-green-300">
-                                    <i class="fas fa-history mr-2"></i>Activity Log
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- System Info -->
-                        <div class="premium-card p-6 bg-gradient-to-br from-gray-900 to-gray-800 border-0">
-                            <div class="flex items-start justify-between mb-4">
-                                <h4 class="text-sm font-bold text-white flex items-center gap-2">
-                                    <i class="fas fa-info-circle text-accent-blue"></i>Portal Information
-                                </h4>
-                                <span class="text-xs bg-accent-blue text-white px-2 py-1 rounded font-semibold">v1.0.0</span>
-                            </div>
-                            <p class="text-xs text-gray-300 leading-relaxed mb-4">
-                                This secure portal manages administrator accounts and verification workflows for the DivorceConnect India platform with enterprise-grade security.
-                            </p>
-                            <div class="border-t border-gray-700 pt-3 space-y-1 text-xs text-gray-400">
-                                <p><strong class="text-gray-200">Last Updated:</strong> 2026-06-23</p>
-                                <p><strong class="text-gray-200">Security:</strong> TLS 1.3 | 256-bit Encryption</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'admin_dashboard' %}"
+           class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+            ← Back to Dashboard
+        </a>
     </div>
 
-    <!-- Form Submission Handler -->
-    <script>
-        document.getElementById('adminProfileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    <!-- Profile Header -->
+    <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-8">
 
-            // Collect form data
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                mobile: document.getElementById('mobile').value,
-                alternateMobile: document.getElementById('alternateMobile').value,
-                gender: document.getElementById('gender').value,
-                dateOfBirth: document.getElementById('dateOfBirth').value
-            };
+        <!-- Cover -->
+        <div class="h-48 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
 
-            // Log form data (replace with actual API call)
-            console.log('Profile Update Data:', formData);
+        <div class="px-8 pb-8">
 
-            // Show success message
-            alert('Profile updated successfully!');
-        });
-    </script>
-</body>
-</html>
+            <div class="flex flex-col md:flex-row items-center md:items-end -mt-16">
+
+                <!-- Profile Image -->
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}"
+                         alt="{{ profile.full_name }}"
+                         class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-xl">
+                {% else %}
+                    <div class="w-32 h-32 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center text-4xl font-bold text-blue-600">
+                        {{ profile.full_name|first|upper }}
+                    </div>
+                {% endif %}
+
+                <!-- User Info -->
+                <div class="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
+
+                    <h1 class="text-4xl font-bold text-gray-900">
+                        {{ profile.full_name }}
+                    </h1>
+
+                    <p class="text-gray-500 text-lg">
+                        {{ user.email }}
+                    </p>
+
+                    <div class="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+
+                        {% if profile.is_verified_by_superuser %}
+                            <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                ✓ Verified Admin
+                            </span>
+                        {% else %}
+                            <span class="bg-yellow-100 text-yellow-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                ⏳ Pending Verification
+                            </span>
+                        {% endif %}
+
+                        {% if user.is_staff %}
+                            <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                Staff Member
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Information Cards -->
+    <div class="grid lg:grid-cols-2 gap-8">
+
+        <!-- Personal Information -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+
+            <h2 class="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
+                Personal Information
+            </h2>
+
+            <div class="space-y-5">
+
+                <div>
+                    <p class="text-gray-500 text-sm">Full Name</p>
+                    <p class="font-semibold text-lg">
+                        {{ profile.full_name }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 text-sm">Email Address</p>
+                    <p class="font-semibold text-lg">
+                        {{ user.email }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 text-sm">Gender</p>
+                    <p class="font-semibold text-lg">
+                        {{ profile.get_gender_display }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 text-sm">Date of Birth</p>
+                    <p class="font-semibold text-lg">
+                        {% if profile.date_of_birth %}
+                            {{ profile.date_of_birth|date:"d M Y" }}
+                        {% else %}
+                            Not Available
+                        {% endif %}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Contact Information -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+
+            <h2 class="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
+                Contact Information
+            </h2>
+
+            <div class="space-y-5">
+
+                <div>
+                    <p class="text-gray-500 text-sm">Primary Mobile</p>
+                    <p class="font-semibold text-lg">
+                        {{ profile.mobile_number|default:"Not Provided" }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-500 text-sm">Alternate Mobile</p>
+                    <p class="font-semibold text-lg">
+                        {{ profile.alternate_mobile_number|default:"Not Provided" }}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Status Cards -->
+    <div class="grid md:grid-cols-3 gap-6 mt-8">
+
+        <!-- Profile Status -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+
+            <div class="text-gray-500 text-sm mb-2">
+                Profile Completion
+            </div>
+
+            {% if profile.is_profile_complete %}
+                <div class="text-2xl font-bold text-green-600">
+                    ✓ Complete
+                </div>
+            {% else %}
+                <div class="text-2xl font-bold text-red-600">
+                    ✗ Incomplete
+                </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Verification -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+
+            <div class="text-gray-500 text-sm mb-2">
+                Verification Status
+            </div>
+
+            {% if profile.is_verified_by_superuser %}
+                <div class="text-2xl font-bold text-green-600">
+                    ✓ Verified
+                </div>
+            {% else %}
+                <div class="text-2xl font-bold text-yellow-600">
+                    Pending
+                </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Staff Status -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+
+            <div class="text-gray-500 text-sm mb-2">
+                Staff Access
+            </div>
+
+            {% if user.is_staff %}
+                <div class="text-2xl font-bold text-green-600">
+                    ✓ Active
+                </div>
+            {% else %}
+                <div class="text-2xl font-bold text-red-600">
+                    ✗ Inactive
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Action Button -->
+    <div class="text-center mt-10">
+
+        <a href="{% url 'admin_profile_edit' %}"
+           class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg transition duration-300">
+            ✏️ Edit Profile
+        </a>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+{% endblock %}

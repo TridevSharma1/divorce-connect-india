@@ -2,6 +2,11 @@ from django.db import models
 from django.core.validators import RegexValidator
 from accounts.models import BaseUser
 
+phone_regex = RegexValidator(
+    regex=r'^(\+91|0)?[6-9]\d{9}$',
+    message="Phone number must be in Indian format (10 digits starting with 6-9, or +91..."
+)
+
 
 class Gender(models.TextChoices):
     """Gender choices for all user profiles."""
@@ -113,11 +118,6 @@ class AdminPanelProfile(models.Model):
     )
 
     # Contact Information
-    phone_regex = RegexValidator(
-        regex=r'^(\+91|0)?[6-9]\d{9}$',
-        message="Phone number must be in Indian format (10 digits starting with 6-9, or +91..."
-    )
-
     mobile_number = models.CharField(
         max_length=13,
         validators=[phone_regex],
@@ -181,3 +181,74 @@ class AdminPanelProfile(models.Model):
         self.user.is_staff = self.is_verified_by_superuser
         self.user.save(update_fields=['is_staff'])
         super().save(*args, **kwargs)
+
+
+class AdminPanelProfileUpdateRequest(models.Model):
+    """Holds pending admin profile edits waiting for superuser approval."""
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending Review'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    admin_profile = models.ForeignKey(
+        AdminPanelProfile,
+        on_delete=models.CASCADE,
+        related_name='update_requests',
+        help_text='Admin profile requesting an update.'
+    )
+
+    full_name = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    mobile_number = models.CharField(
+        max_length=13,
+        validators=[phone_regex],
+        blank=True,
+        null=True,
+        help_text='Admin primary mobile number for pending updates.'
+    )
+    alternate_mobile_number = models.CharField(
+        max_length=13,
+        validators=[phone_regex],
+        blank=True,
+        null=True,
+        help_text='Admin alternate mobile number for pending updates.'
+    )
+    profile_picture = models.ImageField(
+        upload_to='admin_update_requests/',
+        null=True,
+        blank=True,
+        help_text='Updated profile picture submitted for approval.'
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        help_text='Current review status for this update request.'
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        BaseUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_admin_profile_updates',
+        help_text='Superuser who reviewed this update request.'
+    )
+    admin_notes = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Notes for the superuser review, especially rejection reason.'
+    )
+
+    class Meta:
+        verbose_name = 'Admin Profile Update Request'
+        verbose_name_plural = 'Admin Profile Update Requests'
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"Update request for {self.admin_profile.full_name} - {self.get_status_display()}"

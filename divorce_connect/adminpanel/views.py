@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from adminpanel.forms import AdminProfileEditForm
-from adminpanel.models import LawyerVerificationRequest
+from adminpanel.models import LawyerVerificationRequest, AdminPanelProfileUpdateRequest
 from lawyers.models import LawyerProfile
 
 
@@ -23,15 +23,42 @@ def admin_profile_edit_view(request):
     if request.method == 'POST':
         form = AdminProfileEditForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save(commit=False)
-            profile.is_profile_complete = True
-            profile.save()
-            messages.success(request, 'Profile submitted successfully! Awaiting superuser verification.')
-            return redirect('/adminpanel/dashboard/')
+            if profile.is_verified_by_superuser:
+                pending_request = AdminPanelProfileUpdateRequest.objects.filter(
+                    admin_profile=profile,
+                    status='PENDING'
+                ).first()
+                if pending_request:
+                    messages.warning(request, 'You already have a pending profile update request. Please wait for approval.')
+                    return redirect('admin_profile_edit')
+
+                update_request = AdminPanelProfileUpdateRequest(
+                    admin_profile=profile,
+                    full_name=form.cleaned_data.get('full_name'),
+                    gender=form.cleaned_data.get('gender'),
+                    date_of_birth=form.cleaned_data.get('date_of_birth'),
+                    mobile_number=form.cleaned_data.get('mobile_number'),
+                    alternate_mobile_number=form.cleaned_data.get('alternate_mobile_number') or None,
+                )
+                if form.cleaned_data.get('profile_picture'):
+                    update_request.profile_picture = form.cleaned_data.get('profile_picture')
+                update_request.save()
+
+                profile.is_verified_by_superuser = False
+                profile.save()
+                messages.success(request, 'Profile update request submitted. Your admin access is paused until superuser approves the updated profile.')
+                return redirect('admin_dashboard')
+
+            updated_profile = form.save(commit=False)
+            updated_profile.is_profile_complete = True
+            updated_profile.is_verified_by_superuser = False
+            updated_profile.save()
+            messages.success(request, 'Profile submitted successfully! Your admin access is paused until superuser verifies your updated profile.')
+            return redirect('admin_dashboard')
     else:
         form = AdminProfileEditForm(instance=profile)
 
-    return render(request, 'admin_profile_edit.html', {'form': form})
+    return render(request, 'admin_profile_edit.html', {'form': form, 'user': request.user})
 
 
 @login_required(login_url='/api/auth/login/')
@@ -39,7 +66,7 @@ def admin_profile_view(request):
     if not hasattr(request.user, 'admin_profile'):
         return redirect('/api/auth/login/')
     profile = request.user.admin_profile
-    return render(request, 'profile_admin.html', {'profile': profile})
+    return render(request, 'profile_admin.html', {'profile': profile, 'user': request.user})
 
 
 @login_required(login_url='/api/auth/login/')
@@ -60,6 +87,7 @@ def admin_dashboard_view(request):
 
     context = {
         'profile': profile,
+        'user': request.user,
         'is_verified': profile.is_verified_by_superuser,
         'is_complete': profile.is_profile_complete,
         'pending_requests': pending_requests,
@@ -90,7 +118,7 @@ def lawyer_verification_detail_view(request, lawyer_id):
             lawyer.save()
 
             messages.success(request, f'✓ {lawyer.full_name} has been verified successfully!')
-            return redirect('/adminpanel/dashboard/')
+            return redirect('admin_dashboard')
 
         elif action == 'reject':
             rejection_reason = request.POST.get('rejection_reason', '')
@@ -103,7 +131,7 @@ def lawyer_verification_detail_view(request, lawyer_id):
             verification_request.save()
 
             messages.warning(request, f'✗ {lawyer.full_name} verification has been rejected.')
-            return redirect('/adminpanel/dashboard/')
+            return redirect('admin_dashboard')
 
     context = {
         'lawyer': lawyer,

@@ -7,8 +7,8 @@
     <a href="#" class="nav-link">Report</a>
 
     <div class="border-t pt-3 mt-3">
-        <a href="/adminpanel/dashboard/" class="nav-link">Dashboard</a>
-        <a href="/adminpanel/profile/" class="nav-link">My Profile</a>
+        <a href="{% url 'admin_dashboard' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'admin_profile' %}" class="nav-link">My Profile</a>
         <a href="#" class="nav-link">Support</a>
         <a href="#" class="nav-link">Report Issue</a>
         <a href="/api/auth/logout/" class="nav-link logout-item">Logout</a>

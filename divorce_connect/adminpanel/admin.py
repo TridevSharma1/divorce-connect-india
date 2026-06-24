@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.safestring import mark_safe
-from .models import AdminPanelProfile
+from .models import AdminPanelProfile, AdminPanelProfileUpdateRequest
 
 
 @admin.register(AdminPanelProfile)
@@ -99,3 +100,101 @@ class AdminPanelProfileAdmin(admin.ModelAdmin):
 			obj.save()
 		self.message_user(request, f'{count} admin account(s) deactivated.')
 	unverify_admin_accounts.short_description = 'Deactivate selected admin accounts'
+
+@admin.register(AdminPanelProfileUpdateRequest)
+class AdminPanelProfileUpdateRequestAdmin(admin.ModelAdmin):
+    """Superuser admin interface for reviewing admin profile update requests."""
+
+    fieldsets = (
+        ('Request Information', {
+            'fields': ('admin_profile', 'status', 'submitted_at', 'reviewed_at', 'reviewed_by'),
+            'description': 'Pending admin profile edit request details.'
+        }),
+        ('Personal Information Updates', {
+            'fields': ('full_name', 'gender', 'date_of_birth'),
+        }),
+        ('Contact Information Updates', {
+            'fields': ('mobile_number', 'alternate_mobile_number'),
+        }),
+        ('Profile Picture Update', {
+            'fields': ('profile_picture',),
+        }),
+        ('Admin Review', {
+            'fields': ('admin_notes',),
+            'description': 'Add notes for the review, especially a rejection reason.',
+        }),
+    )
+
+    readonly_fields = ('admin_profile', 'submitted_at', 'reviewed_at', 'reviewed_by')
+
+    list_display = (
+        'get_admin_name',
+        'status',
+        'submitted_at',
+        'reviewed_at',
+    )
+
+    list_filter = ('status', 'submitted_at', 'reviewed_at')
+    search_fields = ('admin_profile__full_name', 'admin_profile__user__email')
+    ordering = ('-submitted_at',)
+    actions = ['approve_requests', 'reject_requests']
+
+    def get_admin_name(self, obj):
+        return obj.admin_profile.full_name
+    get_admin_name.short_description = 'Admin'
+
+    def apply_request(self, request_obj):
+        profile = request_obj.admin_profile
+        if request_obj.full_name:
+            profile.full_name = request_obj.full_name
+        if request_obj.gender:
+            profile.gender = request_obj.gender
+        if request_obj.date_of_birth:
+            profile.date_of_birth = request_obj.date_of_birth
+        if request_obj.mobile_number:
+            profile.mobile_number = request_obj.mobile_number
+        if request_obj.alternate_mobile_number is not None:
+            profile.alternate_mobile_number = request_obj.alternate_mobile_number
+        if request_obj.profile_picture:
+            profile.profile_picture = request_obj.profile_picture
+        profile.is_verified_by_superuser = True
+        profile.save()
+
+    def save_model(self, request, obj, form, change):
+        if change and obj.status == 'APPROVED':
+            obj.reviewed_by = request.user
+            obj.reviewed_at = obj.reviewed_at or timezone.now()
+            super().save_model(request, obj, form, change)
+            self.apply_request(obj)
+            return
+
+        if change and obj.status == 'REJECTED':
+            obj.reviewed_by = request.user
+            obj.reviewed_at = obj.reviewed_at or timezone.now()
+            super().save_model(request, obj, form, change)
+            return
+
+        super().save_model(request, obj, form, change)
+
+    def approve_requests(self, request, queryset):
+        count = 0
+        for obj in queryset:
+            obj.status = 'APPROVED'
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+            obj.save()
+            self.apply_request(obj)
+            count += 1
+        self.message_user(request, f'{count} update request(s) approved.')
+    approve_requests.short_description = 'Approve selected requests'
+
+    def reject_requests(self, request, queryset):
+        count = 0
+        for obj in queryset:
+            obj.status = 'REJECTED'
+            obj.reviewed_by = request.user
+            obj.reviewed_at = timezone.now()
+            obj.save()
+            count += 1
+        self.message_user(request, f'{count} update request(s) rejected.')
+    reject_requests.short_description = 'Reject selected requests'

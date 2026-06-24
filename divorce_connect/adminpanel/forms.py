@@ -205,6 +205,8 @@ class AdminProfileEditForm(forms.ModelForm):
 		self.fields['gender'].required = True
 		self.fields['date_of_birth'].required = True
 		self.fields['mobile_number'].required = True
+		if self.instance and self.instance.profile_picture:
+			self.fields['profile_picture'].required = False
 
 
 class AdminVerificationForm(forms.ModelForm):
