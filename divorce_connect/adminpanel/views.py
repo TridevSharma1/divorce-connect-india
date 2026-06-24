@@ -49,6 +49,10 @@ def admin_dashboard_view(request):
 
     profile = request.user.admin_profile
 
+    if not profile.is_profile_complete:
+        messages.warning(request, 'Please complete your admin profile before accessing the dashboard.')
+        return redirect('admin_profile_edit')
+
     # Get pending verification requests
     pending_requests = LawyerVerificationRequest.objects.filter(
         status='pending'

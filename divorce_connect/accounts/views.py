@@ -100,10 +100,15 @@ def register_view(request):
                 full_name=f"{first_name} {last_name}",
                 mobile_number=''
             )
-            # Show success page for admin users (pending approval)
+            # Log admin user in immediately so they can complete profile details.
+            user = authenticate(username=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('/adminpanel/profile/edit/')
             return render(request, 'registration_success.html', {
                 'email': email,
-                'first_name': first_name
+                'first_name': first_name,
+                'message': 'Registration complete. Please sign in to submit your profile details.'
             })
 
     return render(request, 'register.html')

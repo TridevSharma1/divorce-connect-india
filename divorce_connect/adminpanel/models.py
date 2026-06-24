@@ -174,9 +174,10 @@ class AdminPanelProfile(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override save to ensure staff and is_active status are synced with is_verified_by_superuser.
+        Override save to ensure staff status is synced with is_verified_by_superuser.
+        Admin users must remain active so they can log in, complete profile details,
+        and wait for superuser verification.
         """
         self.user.is_staff = self.is_verified_by_superuser
-        self.user.is_active = self.is_verified_by_superuser
-        self.user.save(update_fields=['is_staff', 'is_active'])
+        self.user.save(update_fields=['is_staff'])
         super().save(*args, **kwargs)
