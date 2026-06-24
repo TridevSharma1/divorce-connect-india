@@ -15,12 +15,18 @@ class Specialization(models.TextChoices):
     BANKRUPTCY = "bankruptcy", "Bankruptcy Law"
     OTHER = "other", "Other"
 
+# --- Put this at the top, above your models ---
 
 class Gender(models.TextChoices):
-    """Gender choices for all user profiles."""
     MALE = "male", "Male"
     FEMALE = "female", "Female"
     OTHER = "other", "Other"
+
+# NEW: Global Validator
+indian_phone_validator = RegexValidator(
+    regex=r'^(\+91|0)?[6-9]\d{9}$',
+    message="Phone number must be in Indian format (10 digits starting with 6-9, or +91..."
+)
 
 
 class LawyerProfile(models.Model):
@@ -83,6 +89,28 @@ class LawyerProfile(models.Model):
         help_text="Primary area of legal specialization"
     )
 
+    # Professional Profile Details
+    bio = models.TextField(
+        blank=True,
+        max_length=500,
+        help_text="Professional biography and background"
+    )
+
+    consultation_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="Hourly consultation fee in rupees"
+    )
+
+    office_city = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="City where the lawyer's office is located"
+    )
+
     # Ratings and Verification
     rating = models.FloatField(
         default=0.0,
@@ -96,21 +124,17 @@ class LawyerProfile(models.Model):
     )
 
     # Contact Information
-    phone_regex = RegexValidator(
-        regex=r'^(\+91|0)?[6-9]\d{9}$',
-        message="Phone number must be in Indian format (10 digits starting with 6-9, or +91..."
-    )
 
     mobile_number = models.CharField(
         max_length=13,
-        validators=[phone_regex],
+        validators=[indian_phone_validator],
         blank=True,
         help_text="Lawyer's primary mobile number (10 digits)"
     )
 
     alternate_mobile_number = models.CharField(
         max_length=13,
-        validators=[phone_regex],
+        validators=[indian_phone_validator],
         blank=True,
         null=True,
         help_text="Lawyer's alternate mobile number (optional)"
@@ -152,3 +176,36 @@ class LawyerProfile(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.user.email})"
+
+
+class LawyerProfileUpdateRequest(models.Model):
+    """Holds profile edits waiting for Admin approval."""
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending Review'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    lawyer = models.ForeignKey('LawyerProfile', on_delete=models.CASCADE, related_name='update_requests')
+
+    full_name = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    years_of_experience = models.PositiveIntegerField(null=True, blank=True)
+    specialization = models.CharField(max_length=50, choices=Specialization.choices, blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
+    consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    office_city = models.CharField(max_length=100, blank=True, null=True)
+
+    mobile_number = models.CharField(max_length=13, validators=[indian_phone_validator], blank=True, null=True)
+    alternate_mobile_number = models.CharField(max_length=13, validators=[indian_phone_validator], blank=True, null=True)
+
+    profile_picture = models.ImageField(upload_to='lawyer_updates/', blank=True, null=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    admin_notes = models.TextField(blank=True, null=True, help_text="Reason for rejection, if applicable.")
+
+    def __str__(self):
+        return f"Update Request by {self.lawyer.full_name} - {self.status}"

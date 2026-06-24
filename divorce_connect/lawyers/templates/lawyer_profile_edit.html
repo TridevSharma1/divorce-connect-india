@@ -114,6 +114,41 @@
                             <div class="text-red-600 text-sm mt-1">{{ form.specialization.errors.0 }}</div>
                         {% endif %}
                     </div>
+
+                    <!-- Consultation Fee -->
+                    <div>
+                        <label for="{{ form.consultation_fee.id_for_label }}" class="block text-sm font-semibold text-gray-900 mb-2">
+                            {{ form.consultation_fee.label }}
+                        </label>
+                        {{ form.consultation_fee }}
+                        {% if form.consultation_fee.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.consultation_fee.errors.0 }}</div>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">Hourly rate in rupees (optional)</p>
+                    </div>
+
+                    <!-- Office City -->
+                    <div>
+                        <label for="{{ form.office_city.id_for_label }}" class="block text-sm font-semibold text-gray-900 mb-2">
+                            {{ form.office_city.label }}
+                        </label>
+                        {{ form.office_city }}
+                        {% if form.office_city.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.office_city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.bio.id_for_label }}" class="block text-sm font-semibold text-gray-900 mb-2">
+                            {{ form.bio.label }}
+                        </label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.bio.errors.0 }}</div>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">Professional biography (max 500 characters)</p>
+                    </div>
                 </div>
             </div>
 
