@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Lawyer Verification - DivorceConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="{% url 'admin_dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Dashboard</a>
+        <h1 class="text-5xl font-bold serif-heading mb-2">Lawyer Verification Review</h1>
+        <p class="text-gray-600">Review and verify lawyer credentials</p>
+    </div>
+
+    <!-- Verification Status Alert -->
+    <div class="mb-8 p-6 {% if verification_request.status == 'pending' %}bg-yellow-50 border-2 border-yellow-300{% elif verification_request.status == 'approved' %}bg-green-50 border-2 border-green-300{% else %}bg-red-50 border-2 border-red-300{% endif %} rounded-lg">
+        <div class="flex items-center gap-3">
+            {% if verification_request.status == 'pending' %}
+                <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+                </svg>
+                <div>
+                    <p class="text-yellow-900 font-bold">Status: Pending Review</p>
+                    <p class="text-yellow-800 text-sm">Submitted on {{ verification_request.submitted_at|date:"d M, Y \a\t H:i" }}</p>
+                </div>
+            {% elif verification_request.status == 'approved' %}
+                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                </svg>
+                <div>
+                    <p class="text-green-900 font-bold">Status: Approved ✓</p>
+                    <p class="text-green-800 text-sm">Approved on {{ verification_request.reviewed_at|date:"d M, Y \a\t H:i" }}</p>
+                </div>
+            {% else %}
+                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                </svg>
+                <div>
+                    <p class="text-red-900 font-bold">Status: Rejected ✗</p>
+                    <p class="text-red-800 text-sm">Rejected on {{ verification_request.reviewed_at|date:"d M, Y \a\t H:i" }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <!-- Lawyer Information -->
+        <div class="lg:col-span-2">
+            <!-- Personal Information -->
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Personal Information</h2>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Full Name</label>
+                        <p class="text-lg font-semibold">{{ lawyer.full_name }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Email</label>
+                        <p class="text-lg font-semibold">{{ user_obj.email }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Gender</label>
+                        <p class="text-lg font-semibold">{{ lawyer.get_gender_display }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Date of Birth</label>
+                        <p class="text-lg font-semibold">{{ lawyer.date_of_birth|date:"d M, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information -->
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Professional Details</h2>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="col-span-2">
+                        <label class="text-gray-600 text-sm font-semibold">Bar Registration Number</label>
+                        <p class="text-xl font-bold text-blue-600">{{ lawyer.bar_registration_number }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">State Bar Council</label>
+                        <p class="text-lg font-semibold">{{ lawyer.state_bar_council }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Years of Experience</label>
+                        <p class="text-lg font-semibold">{{ lawyer.years_of_experience }} years</p>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-gray-600 text-sm font-semibold">Specialization</label>
+                        <p class="text-lg font-semibold">{{ lawyer.get_specialization_display }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Contact Information</h2>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Primary Mobile</label>
+                        <p class="text-lg font-semibold">{{ lawyer.mobile_number }}</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Alternate Mobile</label>
+                        <p class="text-lg font-semibold">{{ lawyer.alternate_mobile_number|default:"Not provided" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture -->
+            {% if lawyer.profile_picture %}
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8">
+                <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Profile Picture</h2>
+                <img src="{{ lawyer.profile_picture.url }}" alt="{{ lawyer.full_name }}" class="w-full max-w-md rounded-lg border-2 border-gray-300">
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Sidebar -->
+        <div>
+            <!-- Quick Actions -->
+            {% if verification_request.status == 'pending' %}
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8 sticky top-20">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Actions</h2>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+
+                    <!-- Notes -->
+                    <div>
+                        <label class="text-gray-700 text-sm font-semibold mb-2 block">Admin Notes (Optional)</label>
+                        <textarea name="notes" rows="4" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none" placeholder="Add any notes about this review..."></textarea>
+                    </div>
+
+                    <!-- Approve Button -->
+                    <button type="submit" name="action" value="approve" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                        </svg>
+                        Approve Lawyer
+                    </button>
+
+                    <!-- Reject Button -->
+                    <button type="button" class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2" onclick="document.getElementById('rejectForm').style.display='block'">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                        </svg>
+                        Reject Lawyer
+                    </button>
+                </form>
+
+                <!-- Reject Form Modal -->
+                <div id="rejectForm" class="hidden mt-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <label class="text-gray-700 text-sm font-semibold mb-2 block">Rejection Reason *</label>
+                        <textarea name="rejection_reason" rows="4" class="w-full p-3 border-2 border-red-300 rounded-lg focus:border-red-600 focus:outline-none mb-4" placeholder="Please specify why this lawyer cannot be verified..." required></textarea>
+
+                        <textarea name="notes" rows="2" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none mb-4" placeholder="Additional admin notes..."></textarea>
+
+                        <div class="flex gap-3">
+                            <button type="submit" name="action" value="reject" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition">Confirm Reject</button>
+                            <button type="button" class="flex-1 bg-gray-300 text-black py-2 rounded-lg font-semibold hover:bg-gray-400 transition" onclick="document.getElementById('rejectForm').style.display='none'">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-white p-8 rounded-lg border-2 border-gray-200 sticky top-20">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Review Details</h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Reviewed By</label>
+                        <p class="text-lg font-semibold">{{ verification_request.reviewed_by.email }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Reviewed On</label>
+                        <p class="text-lg font-semibold">{{ verification_request.reviewed_at|date:"d M, Y H:i" }}</p>
+                    </div>
+
+                    {% if verification_request.notes %}
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Admin Notes</label>
+                        <p class="text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-blue-500">{{ verification_request.notes }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if verification_request.rejection_reason %}
+                    <div>
+                        <label class="text-gray-600 text-sm font-semibold">Rejection Reason</label>
+                        <p class="text-gray-700 bg-red-50 p-3 rounded border-l-4 border-red-500">{{ verification_request.rejection_reason }}</p>
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'admin_dashboard' %}" class="block w-full text-center bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

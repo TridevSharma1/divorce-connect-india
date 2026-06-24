@@ -76,7 +76,7 @@ def register_view(request):
                 user=user,
                 first_name=first_name,
                 last_name=last_name,
-                mobile_number='+91'
+                mobile_number=''
             )
             # Log user in and redirect for clients
             user = authenticate(username=email, password=password)
@@ -86,9 +86,9 @@ def register_view(request):
             LawyerProfile.objects.create(
                 user=user,
                 full_name=f"{first_name} {last_name}",
-                mobile_number='+91',
-                bar_registration_number=f"BAR-{user.id}",
-                state_bar_council="Not Specified"
+                mobile_number='',
+                bar_registration_number='PENDING',
+                state_bar_council=''
             )
             # Log user in and redirect for lawyers
             user = authenticate(username=email, password=password)
@@ -98,7 +98,7 @@ def register_view(request):
             AdminPanelProfile.objects.create(
                 user=user,
                 full_name=f"{first_name} {last_name}",
-                mobile_number='+91'
+                mobile_number=''
             )
             # Show success page for admin users (pending approval)
             return render(request, 'registration_success.html', {
@@ -111,12 +111,16 @@ def register_view(request):
 
 def redirect_to_dashboard(user):
     """Redirect user to their role-specific dashboard"""
-    if hasattr(user, 'client_profile'):
-        return redirect('/dashboard/')
-    elif hasattr(user, 'lawyer_profile'):
+    if hasattr(user, 'lawyer_profile'):
+        if not user.lawyer_profile.is_profile_complete:
+            return redirect('/lawyers/profile/edit/')
         return redirect('/lawyers/dashboard/')
     elif hasattr(user, 'admin_profile'):
+        if not user.admin_profile.is_profile_complete:
+            return redirect('/adminpanel/profile/edit/')
         return redirect('/adminpanel/dashboard/')
+    elif hasattr(user, 'client_profile'):
+        return redirect('/dashboard/')
     else:
         return redirect('/api/auth/register/')
 

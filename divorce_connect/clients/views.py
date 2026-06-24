@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from clients.forms import ClientProfileUpdateForm
 
 
 def landing_page_view(request):
@@ -24,7 +26,45 @@ def client_dashboard_view(request):
 def client_profile_view(request):
     if not hasattr(request.user, 'client_profile'):
         return redirect('/api/auth/login/')
-    return render(request, 'profile_client.html')
+
+    profile = request.user.client_profile
+
+    if request.method == 'POST':
+        form = ClientProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('/profile/')
+    else:
+        form = ClientProfileUpdateForm(instance=profile)
+
+    return render(request, 'profile_client.html', {'form': form, 'profile': profile})
+
+
+def counseling_view(request):
+    """Page for emotional and financial support services."""
+    return render(request, 'counseling.html')
+
+
+def about_view(request):
+    """About us page for brand authority and trust."""
+    return render(request, 'about.html')
+
+
+def support_view(request):
+    """Self-serve help center for users."""
+    return render(request, 'support.html')
+
+
+def contact_view(request):
+    """Public contact page for general inquiries."""
+    return render(request, 'contact.html')
+
+
+@login_required(login_url='/api/auth/login/')
+def report_lawyer_view(request):
+    """Trust and safety page for reporting professionals."""
+    return render(request, 'report_lawyer.html')
 
 # --- NEW COUNSELING VIEW ---
 def counseling_view(request):

@@ -60,11 +60,13 @@ class LawyerProfile(models.Model):
     bar_registration_number = models.CharField(
         max_length=50,
         unique=True,
-        help_text="Bar council registration/license number"
+        blank=False,
+        help_text="Bar council registration/license number - Must be entered by user"
     )
 
     state_bar_council = models.CharField(
         max_length=100,
+        blank=True,
         help_text="Name of the state bar council where registered"
     )
 
@@ -95,22 +97,37 @@ class LawyerProfile(models.Model):
 
     # Contact Information
     phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+        regex=r'^(\+91|0)?[6-9]\d{9}$',
+        message="Phone number must be in Indian format (10 digits starting with 6-9, or +91..."
     )
 
     mobile_number = models.CharField(
-        max_length=17,
+        max_length=13,
         validators=[phone_regex],
-        help_text="Lawyer's primary mobile number"
+        blank=True,
+        help_text="Lawyer's primary mobile number (10 digits)"
     )
 
     alternate_mobile_number = models.CharField(
-        max_length=17,
+        max_length=13,
         validators=[phone_regex],
         blank=True,
         null=True,
         help_text="Lawyer's alternate mobile number (optional)"
+    )
+
+    # Profile Picture
+    profile_picture = models.ImageField(
+        upload_to='lawyer_pictures/',
+        null=True,
+        blank=True,
+        help_text="Lawyer's profile picture"
+    )
+
+    # Profile Completion & Verification Status
+    is_profile_complete = models.BooleanField(
+        default=False,
+        help_text="Has lawyer completed their profile and submitted for verification?"
     )
 
     # Timestamps

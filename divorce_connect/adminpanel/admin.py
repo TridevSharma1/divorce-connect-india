@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from .models import AdminPanelProfile
 
 
@@ -66,22 +66,22 @@ class AdminPanelProfileAdmin(admin.ModelAdmin):
 
 	def get_verification_status(self, obj):
 		if obj.is_verified_by_superuser:
-			return format_html(
+			return mark_safe(
 				'<span style="color: green; font-weight: bold;">✓ Verified</span>'
 			)
 		else:
-			return format_html(
+			return mark_safe(
 				'<span style="color: red; font-weight: bold;">✗ Unverified</span>'
 			)
 	get_verification_status.short_description = 'Verification Status'
 
 	def get_staff_status(self, obj):
 		if obj.user.is_staff:
-			return format_html(
+			return mark_safe(
 				'<span style="color: green; font-weight: bold;">Staff</span>'
 			)
 		else:
-			return format_html(
+			return mark_safe(
 				'<span style="color: gray;">Not Staff</span>'
 			)
 	get_staff_status.short_description = 'Staff Status'
