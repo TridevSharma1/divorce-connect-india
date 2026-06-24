@@ -145,11 +145,37 @@
     input[type="number"],
     select,
     textarea {
-        @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #D1D5DB;
+        border-radius: 0.5rem;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
     input[type="file"] {
-        @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #D1D5DB;
+        border-radius: 0.5rem;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="file"]:focus {
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 </style>
 {% endblock %}

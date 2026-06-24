@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.utils import timezone
 from accounts.models import BaseUser
 
 
@@ -165,6 +166,17 @@ class LawyerProfile(models.Model):
         help_text="Last update timestamp"
     )
 
+    is_deleted = models.BooleanField(
+        default=False,
+        help_text="Soft delete flag for a lawyer profile"
+    )
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the lawyer profile was soft deleted"
+    )
+
     class Meta:
         verbose_name = "Lawyer Profile"
         verbose_name_plural = "Lawyer Profiles"
@@ -176,6 +188,21 @@ class LawyerProfile(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.user.email})"
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.user.is_active = False
+        self.user.is_staff = False
+        self.user.save(update_fields=['is_active', 'is_staff'])
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+
+class DeletedLawyerProfile(LawyerProfile):
+    class Meta:
+        proxy = True
+        verbose_name = 'Deleted Lawyer Profile'
+        verbose_name_plural = 'Deleted Lawyer Profiles'
 
 
 class LawyerProfileUpdateRequest(models.Model):

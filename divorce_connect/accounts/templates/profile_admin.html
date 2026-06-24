@@ -216,13 +216,22 @@
 
     </div>
 
-    <!-- Action Button -->
-    <div class="text-center mt-10">
+    <!-- Action Buttons -->
+    <div class="text-center mt-10 space-y-4">
 
         <a href="{% url 'admin_profile_edit' %}"
            class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg transition duration-300">
             ✏️ Edit Profile
         </a>
+
+        <form method="post" action="{% url 'admin_profile_delete' %}" class="inline-block">
+            {% csrf_token %}
+            <button type="submit"
+                    onclick="return confirm('Are you sure you want to delete your admin profile? This is a soft delete and will suspend your access.')"
+                    class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg transition duration-300">
+                🗑️ Delete Profile
+            </button>
+        </form>
 
     </div>
 

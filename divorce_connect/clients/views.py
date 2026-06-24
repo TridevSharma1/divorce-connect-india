@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ClientProfile
@@ -59,9 +60,11 @@ def edit_profile_client_view(request):
 def delete_client_account_view(request):
     if request.method == 'POST':
         user = request.user
-        user.delete() # This deletes the BaseUser and cascades to ClientProfile automatically
-        messages.success(request, "Your account has been permanently deleted.")
-        return redirect('landing_page')
+        if hasattr(user, 'client_profile'):
+            user.client_profile.soft_delete()
+            logout(request)
+            messages.success(request, "Your account has been deleted. Contact support to reactivate it.")
+            return redirect('landing_page')
     return redirect('client_profile')
 
 

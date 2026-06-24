@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from lawyers.forms import LawyerProfileEditForm
@@ -106,8 +107,9 @@ def lawyer_delete_account_view(request):
     if request.method == 'POST':
         user = request.user
         if hasattr(user, 'lawyer_profile'):
-            user.delete() # Automatically cascades to LawyerProfile and UpdateRequests
-            messages.success(request, "Your practice account has been permanently closed.")
+            user.lawyer_profile.soft_delete()
+            logout(request)
+            messages.success(request, "Your practice account has been deleted. Contact support to reactivate it.")
             return redirect('/')
     return redirect('/lawyers/profile/edit/')
 

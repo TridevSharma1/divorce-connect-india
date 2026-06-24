@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import LawyerProfile, LawyerProfileUpdateRequest
+from .models import LawyerProfile, DeletedLawyerProfile, LawyerProfileUpdateRequest
 
 
 @admin.register(LawyerProfile)
@@ -42,12 +42,12 @@ class LawyerProfileAdmin(admin.ModelAdmin):
 			'fields': ('mobile_number', 'alternate_mobile_number'),
 		}),
 		('Metadata', {
-			'fields': ('date_joined', 'updated_at'),
+			'fields': ('date_joined', 'updated_at', 'deleted_at'),
 			'classes': ('collapse',),
 		}),
 	)
 
-	readonly_fields = ('date_joined', 'updated_at')
+	readonly_fields = ('date_joined', 'updated_at', 'deleted_at')
 
 	list_display = (
 		'full_name',
@@ -57,13 +57,15 @@ class LawyerProfileAdmin(admin.ModelAdmin):
 		'years_of_experience',
 		'rating',
 		'verified',
+		'is_deleted',
+		'deleted_at',
 		'date_joined'
 	)
 
-	list_filter = ('specialization', 'verified', 'rating', 'date_joined', 'years_of_experience', 'is_profile_complete')
+	list_filter = ('specialization', 'verified', 'rating', 'date_joined', 'years_of_experience', 'is_profile_complete', 'is_deleted')
 	search_fields = ('full_name', 'user__email', 'bar_registration_number', 'state_bar_council', 'office_city')
 	ordering = ('-date_joined',)
-	actions = ['mark_verified', 'mark_unverified']
+	actions = ['mark_verified', 'mark_unverified', 'soft_delete_lawyers', 'restore_lawyers']
 
 	def get_email(self, obj):
 		return obj.user.email
@@ -78,6 +80,49 @@ class LawyerProfileAdmin(admin.ModelAdmin):
 		count = queryset.update(verified=False)
 		self.message_user(request, f'{count} lawyer(s) marked as unverified.')
 	mark_unverified.short_description = 'Mark selected lawyers as unverified'
+
+	def soft_delete_lawyers(self, request, queryset):
+		count = 0
+		for profile in queryset:
+			profile.soft_delete()
+			count += 1
+		self.message_user(request, f'{count} lawyer profile(s) soft deleted.')
+	soft_delete_lawyers.short_description = 'Soft delete selected lawyer profiles'
+
+	def restore_lawyers(self, request, queryset):
+		count = 0
+		for profile in queryset:
+			profile.is_deleted = False
+			profile.deleted_at = None
+			profile.user.is_active = True
+			profile.user.save(update_fields=['is_active'])
+			profile.save(update_fields=['is_deleted', 'deleted_at'])
+			count += 1
+		self.message_user(request, f'{count} lawyer profile(s) restored.')
+	restore_lawyers.short_description = 'Restore selected lawyer profiles'
+
+
+@admin.register(DeletedLawyerProfile)
+class DeletedLawyerProfileAdmin(LawyerProfileAdmin):
+	"""Admin view for soft deleted lawyer profiles."""
+
+	def get_queryset(self, request):
+		return super().get_queryset(request).filter(is_deleted=True)
+
+	actions = ['restore_lawyers']
+	list_display = (
+		'full_name',
+		'get_email',
+		'specialization',
+		'consultation_fee',
+		'years_of_experience',
+		'rating',
+		'verified',
+		'deleted_at',
+		'date_joined'
+	)
+
+	list_filter = ('specialization', 'verified', 'rating', 'date_joined', 'years_of_experience', 'is_profile_complete')
 
 
 @admin.register(LawyerProfileUpdateRequest)

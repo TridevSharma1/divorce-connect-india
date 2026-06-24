@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.utils import timezone
 from accounts.models import BaseUser
 
 
@@ -104,6 +105,17 @@ class ClientProfile(models.Model):
         help_text="Last update timestamp"
     )
 
+    is_deleted = models.BooleanField(
+        default=False,
+        help_text="Soft delete flag for a client profile"
+    )
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the client profile was soft deleted"
+    )
+
     class Meta:
         verbose_name = "Client Profile"
         verbose_name_plural = "Client Profiles"
@@ -115,3 +127,17 @@ class ClientProfile(models.Model):
     def get_full_name(self):
         """Return the client's full name."""
         return f"{self.first_name} {self.last_name}".strip()
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+
+class DeletedClientProfile(ClientProfile):
+    class Meta:
+        proxy = True
+        verbose_name = 'Deleted Client Profile'
+        verbose_name_plural = 'Deleted Client Profiles'

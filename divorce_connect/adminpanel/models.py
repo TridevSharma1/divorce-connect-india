@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.utils import timezone
 from accounts.models import BaseUser
 
 phone_regex = RegexValidator(
@@ -164,6 +165,17 @@ class AdminPanelProfile(models.Model):
         help_text="Last update timestamp"
     )
 
+    is_deleted = models.BooleanField(
+        default=False,
+        help_text="Soft delete flag for an admin panel user profile"
+    )
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the admin profile was soft deleted"
+    )
+
     class Meta:
         verbose_name = "Admin Panel Profile"
         verbose_name_plural = "Admin Panel Profiles"
@@ -181,6 +193,21 @@ class AdminPanelProfile(models.Model):
         self.user.is_staff = self.is_verified_by_superuser
         self.user.save(update_fields=['is_staff'])
         super().save(*args, **kwargs)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.user.is_active = False
+        self.user.is_staff = False
+        self.user.save(update_fields=['is_active', 'is_staff'])
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+
+class DeletedAdminPanelProfile(AdminPanelProfile):
+    class Meta:
+        proxy = True
+        verbose_name = 'Deleted Admin Panel Profile'
+        verbose_name_plural = 'Deleted Admin Panel Profiles'
 
 
 class AdminPanelProfileUpdateRequest(models.Model):

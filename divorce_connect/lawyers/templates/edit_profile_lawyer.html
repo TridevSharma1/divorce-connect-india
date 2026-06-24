@@ -338,7 +338,7 @@
         <div class="mt-16 pt-8 border-t border-red-200">
             <div class="border-2 border-red-200 rounded-lg p-8 bg-red-50">
                 <h2 class="serif-heading text-xl font-bold text-red-900 mb-2">Danger Zone</h2>
-                <p class="text-sm text-red-800 mb-6">Permanently delete your practice account. This action cannot be undone.</p>
+                <p class="text-sm text-red-800 mb-6">Soft delete your practice account. This will suspend access and preserve your profile for reactivation.</p>
 
                 <button
                     type="button"
@@ -355,7 +355,7 @@
     <dialog id="deleteModal" class="rounded-lg shadow-2xl max-w-md w-full p-0">
         <div class="p-8">
             <h3 class="serif-heading text-2xl font-bold text-gray-900 mb-4">Delete Account?</h3>
-            <p class="text-gray-600 mb-2">This will permanently delete your practice account and all associated data. This action cannot be undone.</p>
+            <p class="text-gray-600 mb-2">This will soft delete your practice account and suspend access. Your data will be preserved for reactivation by support.</p>
             <p class="text-sm text-red-600 font-medium mb-6">Please type your email to confirm: <span class="font-bold">{{ profile.user.email }}</span></p>
 
             <form method="POST" action="{% url 'lawyer_delete_account' %}" class="space-y-4">

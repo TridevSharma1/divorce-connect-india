@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
@@ -59,6 +60,21 @@ def admin_profile_edit_view(request):
         form = AdminProfileEditForm(instance=profile)
 
     return render(request, 'admin_profile_edit.html', {'form': form, 'user': request.user})
+
+
+@login_required(login_url='/api/auth/login/')
+def admin_profile_delete_view(request):
+    if not hasattr(request.user, 'admin_profile'):
+        return redirect('/api/auth/login/')
+
+    if request.method != 'POST':
+        return redirect('admin_profile')
+
+    profile = request.user.admin_profile
+    profile.soft_delete()
+    logout(request)
+    messages.success(request, 'Your admin profile has been deleted. You can reactivate it by contacting support.')
+    return redirect('/')
 
 
 @login_required(login_url='/api/auth/login/')
