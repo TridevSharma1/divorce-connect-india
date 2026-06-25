@@ -1,44 +1,33 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | DivorceConnect India</title>
+{% extends 'base.html' %}
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Contact Us | DivorceConnect India{% endblock %}
 
-    <!-- Google Fonts: Playfair Display & Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% block extra_css %}
+<style>
+    * {
+        font-family: 'Inter', sans-serif;
+    }
 
-    <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
+    .playfair {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+    }
 
-        .playfair {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-        }
+    input, textarea {
+        transition: all 0.2s ease;
+    }
 
-        input, textarea {
-            transition: all 0.2s ease;
-        }
+    input:focus, textarea:focus {
+        outline: none;
+    }
 
-        input:focus, textarea:focus {
-            outline: none;
-        }
+    .map-grayscale {
+        filter: grayscale(100%) contrast(1.1);
+    }
+</style>
+{% endblock %}
 
-        .map-grayscale {
-            filter: grayscale(100%) contrast(1.1);
-        }
-    </style>
-</head>
-<body class="bg-white">
-
+{% block content %}
     <!-- Header Section -->
     <section class="py-20">
         <div class="max-w-4xl mx-auto px-6 text-center">
@@ -197,6 +186,4 @@
             </div>
         </div>
     </section>
-
-</body>
-</html>
+{% endblock %}

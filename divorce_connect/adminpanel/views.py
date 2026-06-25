@@ -49,15 +49,17 @@ def admin_profile_edit_view(request):
 
                 profile.is_verified_by_superuser = False
                 profile.save()
-                messages.success(request, 'Profile update request submitted. Your admin access is paused until superuser approves the updated profile.')
-                return redirect('admin_dashboard')
+                messages.success(request, 'Profile submitted successfully! Admin will review your request soon.')
+                messages.warning(request, 'Your profile is pending verification by admin. You will have full access once verified.')
+                return redirect('admin_profile_edit')
 
             updated_profile = form.save(commit=False)
             updated_profile.is_profile_complete = True
             updated_profile.is_verified_by_superuser = False
             updated_profile.save()
-            messages.success(request, 'Profile submitted successfully! Your admin access is paused until superuser verifies your updated profile.')
-            return redirect('admin_dashboard')
+            messages.success(request, 'Profile submitted successfully! Admin will review your request soon.')
+            messages.warning(request, 'Your profile is pending verification by admin. You will have full access once verified.')
+            return redirect('admin_profile_edit')
     else:
         form = AdminProfileEditForm(instance=profile)
 

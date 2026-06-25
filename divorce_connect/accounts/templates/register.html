@@ -132,7 +132,7 @@
                     name="first_name"
                     required
                     placeholder="John"
-                    value="{{ form.first_name.value }}"
+                    value="{{ form.first_name.value|default_if_none:'' }}"
                     class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.first_name.errors %}error-input{% endif %}"
                 >
                 {% if form.first_name.errors %}
@@ -149,7 +149,7 @@
                     name="last_name"
                     required
                     placeholder="Doe"
-                    value="{{ form.last_name.value }}"
+                    value="{{ form.last_name.value|default_if_none:'' }}"
                     class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.last_name.errors %}error-input{% endif %}"
                 >
                 {% if form.last_name.errors %}
@@ -166,7 +166,7 @@
                     name="email"
                     required
                     placeholder="you@example.com"
-                    value="{{ form.email.value }}"
+                    value="{{ form.email.value|default_if_none:'' }}"
                     class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.email.errors %}error-input{% endif %}"
                 >
                 {% if form.email.errors %}

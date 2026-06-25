@@ -1,144 +1,139 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Center - DivorceConnect India</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
+{% extends 'base.html' %}
 
-        h1, h2, h3, .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-        }
+{% block title %}Help Center - DivorceConnect India{% endblock %}
 
-        /* Search Input Styling */
-        .search-input {
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            transition: all 0.3s ease;
-        }
+{% block extra_css %}
+<style>
+    * {
+        font-family: 'Inter', sans-serif;
+    }
 
-        .search-input:focus {
-            border-color: #0a0a0a;
-            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
-            outline: none;
-        }
+    h1, h2, h3, .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+    }
 
-        .search-icon {
-            width: 20px;
-            height: 20px;
-            opacity: 0.6;
-        }
+    /* Search Input Styling */
+    .search-input {
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+    }
 
-        /* Quick Category Cards */
-        .category-card {
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+    .search-input:focus {
+        border-color: #0a0a0a;
+        box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
+        outline: none;
+    }
 
-        .category-card:hover {
-            transform: translateY(-4px);
-            border-color: #0a0a0a;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
+    .search-icon {
+        width: 20px;
+        height: 20px;
+        opacity: 0.6;
+    }
 
-        .category-icon {
-            width: 32px;
-            height: 32px;
-            opacity: 0.8;
-        }
+    /* Quick Category Cards */
+    .category-card {
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
 
-        /* FAQ Accordion Styling */
-        details {
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1.5rem 0;
-        }
+    .category-card:hover {
+        transform: translateY(-4px);
+        border-color: #0a0a0a;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
 
-        details:last-child {
-            border-bottom: none;
-        }
+    .category-icon {
+        width: 32px;
+        height: 32px;
+        opacity: 0.8;
+    }
 
-        summary {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            color: #0a0a0a;
-            font-size: 1rem;
-            line-height: 1.5;
-            transition: color 0.2s ease;
-            user-select: none;
-        }
+    /* FAQ Accordion Styling */
+    details {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.5rem 0;
+    }
 
-        summary:hover {
-            color: #404040;
-        }
+    details:last-child {
+        border-bottom: none;
+    }
 
-        summary::marker {
-            content: "";
-        }
+    summary {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: #0a0a0a;
+        font-size: 1rem;
+        line-height: 1.5;
+        transition: color 0.2s ease;
+        user-select: none;
+    }
 
-        .chevron {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
-            opacity: 0.6;
-        }
+    summary:hover {
+        color: #404040;
+    }
 
-        details[open] .chevron {
-            transform: rotate(180deg);
-        }
+    summary::marker {
+        content: "";
+    }
 
-        .faq-answer {
-            margin-top: 1rem;
-            color: #475569;
-            line-height: 1.7;
-            padding-right: 2rem;
-        }
+    .chevron {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+        opacity: 0.6;
+    }
 
-        /* CTA Button */
-        .cta-button {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
+    details[open] .chevron {
+        transform: rotate(180deg);
+    }
 
-        .cta-button:hover {
-            background-color: #1a1a1a;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
+    .faq-answer {
+        margin-top: 1rem;
+        color: #475569;
+        line-height: 1.7;
+        padding-right: 2rem;
+    }
 
-        .cta-button:active {
-            transform: translateY(0);
-        }
+    /* CTA Button */
+    .cta-button {
+        background-color: #0a0a0a;
+        color: #ffffff;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
 
-        /* Category Section Heading */
-        .category-section-heading {
-            font-family: 'Playfair Display', serif;
-            color: #0a0a0a;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            padding-top: 1rem;
-        }
-    </style>
-</head>
-<body class="bg-white">
+    .cta-button:hover {
+        background-color: #1a1a1a;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .cta-button:active {
+        transform: translateY(0);
+    }
+
+    /* Category Section Heading */
+    .category-section-heading {
+        font-family: 'Playfair Display', serif;
+        color: #0a0a0a;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        padding-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
     <!-- Hero Search Section -->
     <section class="bg-gradient-to-b from-gray-50 to-white py-24">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -382,41 +377,4 @@
             </a>
         </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 bg-white py-12">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div>
-                    <h4 class="font-semibold text-black mb-4">Product</h4>
-                    <ul class="space-y-2 text-gray-600">
-                        <li><a href="{% url 'lawyers_section' %}" class="hover:text-black transition">Find a Lawyer</a></li>
-                        <li><a href="{% url 'support' %}" class="hover:text-black transition">Pricing</a></li>
-                        <li><a href="{% url 'landing_page' %}" class="hover:text-black transition">How It Works</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-black mb-4">Company</h4>
-                    <ul class="space-y-2 text-gray-600">
-                        <li><a href="{% url 'about' %}" class="hover:text-black transition">About Us</a></li>
-                        <li><a href="{% url 'support' %}" class="hover:text-black transition">Blog</a></li>
-                        <li><a href="{% url 'support' %}" class="hover:text-black transition">Careers</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-black mb-4">Legal</h4>
-                    <ul class="space-y-2 text-gray-600">
-                        <li><a href="{% url 'contact' %}" class="hover:text-black transition">Privacy Policy</a></li>
-                        <li><a href="{% url 'contact' %}" class="hover:text-black transition">Terms of Service</a></li>
-                        <li><a href="{% url 'contact' %}" class="hover:text-black transition">Disclaimer</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-200 pt-8 text-center text-gray-600 text-sm">
-                <p>&copy; 2026 DivorceConnect India. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+{% endblock %}

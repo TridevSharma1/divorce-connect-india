@@ -1,229 +1,685 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Case Details - Admin Panel{% endblock %}
+{% block title %}Case Details — DivorceConnect Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Page shell ── */
+    .cd-page {
+        background: #f7f7f7;
+        min-height: 100vh;
+        padding: 3rem 1rem 5rem;
+    }
+
+    /* ── Hero banner ── */
+    .cd-hero {
+        background: #0a0a0a;
+        border-radius: 1rem;
+        padding: 2.25rem 2.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .cd-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+    .cd-hero p {
+        color: #a1a1aa;
+        font-size: 0.95rem;
+        margin: 0.3rem 0 0;
+    }
+    .cd-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffffff;
+        padding: 0.55rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.15s;
+        white-space: nowrap;
+    }
+    .cd-back-btn:hover {
+        background: rgba(255,255,255,0.18);
+        transform: translateX(-2px);
+    }
+
+    /* ── Case info card ── */
+    .cd-info-card {
+        background: #ffffff;
+        border: 2px solid #e4e4e7;
+        border-radius: 1rem;
+        padding: 0;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .cd-info-header {
+        background: #f4f4f5;
+        border-bottom: 2px solid #e4e4e7;
+        padding: 0.9rem 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .cd-info-header span {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #71717a;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+    }
+    .cd-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0;
+    }
+    .cd-info-cell {
+        padding: 1.4rem 1.75rem;
+        border-right: 1px solid #f4f4f5;
+    }
+    .cd-info-cell:last-child { border-right: none; }
+    .cd-info-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #a1a1aa;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        margin: 0 0 0.4rem;
+    }
+    .cd-info-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0a0a0a;
+        margin: 0;
+        line-height: 1.3;
+    }
+    .cd-info-sub {
+        font-size: 0.78rem;
+        color: #71717a;
+        margin: 0.2rem 0 0;
+    }
+
+    /* Case status inline badges */
+    .cd-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+    .cd-status-badge.review   { background: #fef9c3; color: #854d0e; }
+    .cd-status-badge.verified { background: #dcfce7; color: #14532d; }
+    .cd-status-badge.accepted { background: #dcfce7; color: #14532d; }
+    .cd-status-badge.default  { background: #f4f4f5; color: #52525b; }
+
+    /* ── Section heading ── */
+    .cd-section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #71717a;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+        margin-bottom: 1rem;
+    }
+
+    /* ── Document cards grid ── */
+    .cd-docs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    .cd-doc-card {
+        background: #ffffff;
+        border: 2px solid #e4e4e7;
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .cd-doc-card:hover {
+        border-color: #a1a1aa;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+
+    /* Doc card header */
+    .cd-doc-header {
+        background: #0a0a0a;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+    .cd-doc-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    /* Doc status badge */
+    .cd-doc-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .cd-doc-badge.pending     { background: #fef9c3; color: #854d0e; }
+    .cd-doc-badge.verified    { background: #dcfce7; color: #14532d; }
+    .cd-doc-badge.rejected    { background: #fee2e2; color: #7f1d1d; }
+    .cd-doc-badge.not-started { background: rgba(255,255,255,0.15); color: #d4d4d8; }
+
+    /* Doc body */
+    .cd-doc-body {
+        padding: 1.1rem 1.25rem;
+        flex: 1;
+    }
+    .cd-doc-meta {
+        font-size: 0.8rem;
+        color: #71717a;
+        margin: 0 0 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .cd-doc-meta strong { color: #3f3f46; }
+    .cd-doc-filename {
+        font-size: 0.75rem;
+        color: #a1a1aa;
+        font-family: monospace;
+        background: #f4f4f5;
+        border-radius: 4px;
+        padding: 0.2rem 0.5rem;
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Verified by strip */
+    .cd-verified-strip {
+        margin: 0 1.25rem;
+        padding: 0.6rem 0.85rem;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.78rem;
+        color: #166534;
+    }
+    .cd-verified-strip strong { color: #14532d; }
+
+    /* Rejection strip */
+    .cd-rejection-strip {
+        margin: 0 1.25rem;
+        padding: 0.6rem 0.85rem;
+        background: #fff1f2;
+        border-left: 4px solid #f43f5e;
+        border-radius: 0 0.5rem 0.5rem 0;
+        margin-bottom: 0.75rem;
+        font-size: 0.78rem;
+        color: #881337;
+    }
+    .cd-rejection-strip strong { color: #9f1239; }
+
+    /* Doc action footer */
+    .cd-doc-footer {
+        padding: 0.85rem 1.25rem;
+        background: #f9f9f9;
+        border-top: 1px solid #f4f4f5;
+        display: flex;
+        gap: 0.5rem;
+    }
+    .cd-btn {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .cd-btn-download {
+        background: #f4f4f5;
+        color: #0a0a0a;
+        border: 1px solid #e4e4e7;
+    }
+    .cd-btn-download:hover {
+        background: #e4e4e7;
+        border-color: #a1a1aa;
+    }
+    .cd-btn-review {
+        background: #0a0a0a;
+        color: #ffffff;
+        border: 1px solid #0a0a0a;
+    }
+    .cd-btn-review:hover {
+        background: #1a1a1a;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+    }
+
+    /* ── Empty state ── */
+    .cd-empty {
+        background: #ffffff;
+        border: 2px dashed #d4d4d8;
+        border-radius: 1rem;
+        padding: 3.5rem 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .cd-empty-icon {
+        width: 4.5rem;
+        height: 4.5rem;
+        background: #0a0a0a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+    }
+    .cd-empty h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0a0a0a;
+        margin: 0 0 0.4rem;
+    }
+    .cd-empty p { color: #71717a; font-size: 0.9rem; margin: 0; }
+
+    /* ── Verification Summary card ── */
+    .cd-summary-card {
+        background: #ffffff;
+        border: 2px solid #e4e4e7;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .cd-summary-header {
+        background: #0a0a0a;
+        padding: 1rem 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .cd-summary-header h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+    }
+    .cd-summary-body { padding: 1.5rem 1.75rem; }
+
+    /* Summary stat tiles */
+    .cd-sum-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+    .cd-sum-tile {
+        background: #f9f9f9;
+        border: 2px solid #e4e4e7;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        text-align: center;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .cd-sum-tile:hover { border-color: #0a0a0a; transform: translateY(-2px); }
+    .cd-sum-tile-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #71717a;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin: 0 0 0.35rem;
+    }
+    .cd-sum-tile-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0a0a0a;
+        line-height: 1;
+    }
+    .cd-sum-tile-value.green  { color: #16a34a; }
+    .cd-sum-tile-value.red    { color: #dc2626; }
+    .cd-sum-tile-value.yellow { color: #d97706; }
+
+    /* Progress bar */
+    .cd-progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #52525b;
+        margin-bottom: 0.4rem;
+    }
+    .cd-progress-track {
+        width: 100%;
+        height: 8px;
+        background: #e4e4e7;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .cd-progress-bar {
+        height: 100%;
+        background: linear-gradient(to right, #0a0a0a, #3f3f46);
+        border-radius: 999px;
+        transition: width 0.6s ease;
+    }
+
+    /* Status pill row */
+    .cd-status-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+    }
+    .cd-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+    .cd-status-pill.all-ok     { background: #dcfce7; color: #14532d; }
+    .cd-status-pill.has-reject { background: #fee2e2; color: #7f1d1d; }
+    .cd-status-pill.in-review  { background: #fef9c3; color: #854d0e; }
+    .cd-status-pill.no-docs    { background: #f4f4f5; color: #52525b; }
+    .cd-status-note { font-size: 0.8rem; color: #71717a; margin: 0.2rem 0 0; }
+
+    /* Next action box */
+    .cd-next-action {
+        background: #f4f4f5;
+        border-left: 4px solid #0a0a0a;
+        border-radius: 0 0.5rem 0.5rem 0;
+        padding: 0.85rem 1.1rem;
+    }
+    .cd-next-action strong { font-size: 0.8rem; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cd-next-action p { font-size: 0.85rem; color: #3f3f46; margin: 0.3rem 0 0; }
+    .cd-next-action p.green  { color: #15803d; }
+    .cd-next-action p.red    { color: #b91c1c; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8 flex items-center justify-between">
-            <div>
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">
-                    Case Details
-                </h1>
-                <p class="text-lg text-gray-600">
-                    Review all documents for this case
+<div class="cd-page">
+<div class="max-w-6xl mx-auto">
+
+    <!-- ── Hero ── -->
+    <div class="cd-hero">
+        <div>
+            <h1>Case Details</h1>
+            <p>Review all submitted documents for this case</p>
+        </div>
+        <a href="{% url 'case_documents_verification_list' %}" class="cd-back-btn">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to List
+        </a>
+    </div>
+
+    <!-- ── Case Info ── -->
+    <div class="cd-info-card">
+        <div class="cd-info-header">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Case Overview</span>
+        </div>
+        <div class="cd-info-grid">
+            <!-- Client -->
+            <div class="cd-info-cell">
+                <p class="cd-info-label">Client</p>
+                <p class="cd-info-value">{{ case_request.client.get_full_name }}</p>
+                <p class="cd-info-sub">{{ case_request.client.user.email }}</p>
+            </div>
+            <!-- Lawyer -->
+            <div class="cd-info-cell">
+                <p class="cd-info-label">Lawyer</p>
+                <p class="cd-info-value">{{ case_request.lawyer.full_name }}</p>
+                <p class="cd-info-sub">{{ case_request.lawyer.user.email }}</p>
+            </div>
+            <!-- Case Status -->
+            <div class="cd-info-cell">
+                <p class="cd-info-label">Case Status</p>
+                <p class="cd-info-value" style="margin-top:0.25rem;">
+                    {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
+                        <span class="cd-status-badge review">⏳ Under Review</span>
+                    {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
+                        <span class="cd-status-badge verified">✓ All Verified</span>
+                    {% elif case_request.status == 'ACCEPTED' %}
+                        <span class="cd-status-badge accepted">✓ Accepted</span>
+                    {% else %}
+                        <span class="cd-status-badge default">{{ case_request.get_status_display }}</span>
+                    {% endif %}
                 </p>
             </div>
-            <a href="{% url 'case_documents_verification_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to List
-            </a>
-        </div>
-
-        <!-- Case Info -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Client</h3>
-                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ case_request.client.get_full_name }}</p>
-                    <p class="text-sm text-gray-600">{{ case_request.client.user.email }}</p>
-                </div>
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Lawyer</h3>
-                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ case_request.lawyer.full_name }}</p>
-                    <p class="text-sm text-gray-600">{{ case_request.lawyer.user.email }}</p>
-                </div>
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Case Status</h3>
-                    <p class="mt-2 text-lg font-semibold">
-                        {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
-                        <span class="text-yellow-600">⏳ Under Review</span>
-                        {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
-                        <span class="text-green-600">✓ All Verified</span>
-                        {% elif case_request.status == 'ACCEPTED' %}
-                        <span class="text-green-600">✓ Accepted</span>
-                        {% else %}
-                        <span class="text-gray-600">{{ case_request.get_status_display }}</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div>
-                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Documents</h3>
-                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ documents.count }}</p>
-                    <p class="text-sm text-gray-600">Total Submitted</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documents Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {% for document in documents %}
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-                <!-- Document Header -->
-                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ document.get_document_type_display }}</h3>
-                    
-                    <!-- Status Badge -->
-                    {% if document.casedocumentverification %}
-                        {% if document.casedocumentverification.status == 'VERIFIED' %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                            ✓ Verified
-                        </span>
-                        {% elif document.casedocumentverification.status == 'PENDING' %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                            ⏳ Pending
-                        </span>
-                        {% elif document.casedocumentverification.status == 'REJECTED' %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                            ✗ Rejected
-                        </span>
-                        {% endif %}
-                    {% else %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                        ⏳ Not Started
-                    </span>
-                    {% endif %}
-                </div>
-
-                <!-- Document Info -->
-                <div class="px-6 py-4 space-y-2">
-                    <p class="text-sm text-gray-600">
-                        <strong>Uploaded:</strong> {{ document.uploaded_at|date:"F d, Y H:i" }}
-                    </p>
-                    <p class="text-sm text-gray-600">
-                        <strong>File:</strong> {{ document.document_file.name|slice:"20:" }}...
-                    </p>
-                </div>
-
-                <!-- Verification Info -->
-                {% if document.casedocumentverification.verified_by %}
-                <div class="px-6 py-3 bg-blue-50 border-t border-gray-200 text-sm text-blue-800">
-                    <strong>Verified by:</strong> {{ document.casedocumentverification.verified_by.email }}
-                    <br>
-                    <strong>Date:</strong> {{ document.casedocumentverification.verified_at|date:"F d, Y H:i" }}
-                </div>
-                {% endif %}
-
-                <!-- Rejection Reason -->
-                {% if document.casedocumentverification.rejection_reason %}
-                <div class="px-6 py-3 bg-red-50 border-t border-gray-200 text-sm text-red-800">
-                    <strong>Rejection Reason:</strong><br>
-                    {{ document.casedocumentverification.rejection_reason }}
-                </div>
-                {% endif %}
-
-                <!-- Action Buttons -->
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2">
-                    <a href="{{ document.document_file.url }}" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition text-sm" download>
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Download
-                    </a>
-                    {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
-                    <a href="{% url 'case_document_verify' document.id %}" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition text-sm">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Review
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        {% if not documents %}
-        <!-- Empty State -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 py-12 px-6 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">No Documents Found</h3>
-            <p class="mt-1 text-sm text-gray-500">
-                This case has no submitted documents yet.
-            </p>
-        </div>
-        {% endif %}
-
-        <!-- Summary -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 class="text-lg font-medium text-blue-900 mb-3">Verification Summary</h3>
-            
-            <!-- Statistics Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mb-4">
-                <div class="bg-white p-3 rounded border border-blue-200">
-                    <strong class="text-blue-900">Total Documents:</strong> 
-                    <span class="text-lg font-bold text-blue-600">{{ total_docs }}</span>
-                </div>
-                <div class="bg-white p-3 rounded border border-green-200">
-                    <strong class="text-green-900">✓ Verified:</strong> 
-                    <span class="text-lg font-bold text-green-600">{{ verified_docs }}</span>
-                </div>
-                <div class="bg-white p-3 rounded border border-red-200">
-                    <strong class="text-red-900">✗ Rejected:</strong> 
-                    <span class="text-lg font-bold text-red-600">{{ rejected_docs }}</span>
-                </div>
-                <div class="bg-white p-3 rounded border border-yellow-200">
-                    <strong class="text-yellow-900">⏳ Pending:</strong> 
-                    <span class="text-lg font-bold text-yellow-600">{{ pending_docs }}</span>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            {% if total_docs > 0 %}
-            <div class="mb-4">
-                <div class="flex justify-between text-xs text-blue-800 mb-1">
-                    <span>Verification Progress</span>
-                    <span>{{ verified_docs }}/{{ total_docs }} documents verified</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    {% if verified_docs > 0 %}
-                    <div class="bg-green-500 h-2 rounded-full" style="width: {% widthratio verified_docs total_docs 100 %}%"></div>
-                    {% else %}
-                    <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Status -->
-            <div class="text-sm text-blue-800">
-                <strong>Status:</strong>
-                {% if all_verified %}
-                    <span class="inline-block bg-green-200 text-green-800 px-3 py-1 rounded-full">✓ All Verified - Ready</span>
-                    <p class="text-xs text-green-700 mt-1">All documents have been verified. The lawyer can now accept and work on the case.</p>
-                {% elif any_rejected %}
-                    <span class="inline-block bg-red-200 text-red-800 px-3 py-1 rounded-full">✗ Resubmission Required</span>
-                    <p class="text-xs text-red-700 mt-1">{{ rejected_docs }} document(s) were rejected. Client must resubmit or fix issues.</p>
-                {% elif pending_docs > 0 %}
-                    <span class="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full">⏳ Pending Review</span>
-                    <p class="text-xs text-yellow-700 mt-1">{{ pending_docs }} document(s) are still pending verification.</p>
-                {% else %}
-                    <span class="inline-block bg-gray-200 text-gray-800 px-3 py-1 rounded-full">No Documents</span>
-                {% endif %}
-            </div>
-
-            <!-- Next Action -->
-            <div class="mt-4 p-3 bg-white rounded border-l-4 border-blue-500">
-                <strong class="text-blue-900">Next Action:</strong>
-                {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
-                    {% if pending_docs > 0 %}
-                        <p class="text-sm text-gray-700 mt-1">Review the {{ pending_docs }} remaining document(s)</p>
-                    {% elif rejected_docs > 0 %}
-                        <p class="text-sm text-red-700 mt-1">Notify client to resubmit or fix the {{ rejected_docs }} rejected document(s)</p>
-                    {% endif %}
-                {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
-                    <p class="text-sm text-green-700 mt-1">Awaiting lawyer to accept the case and begin work</p>
-                {% else %}
-                    <p class="text-sm text-gray-700 mt-1">{{ case_request.get_status_display }}</p>
-                {% endif %}
+            <!-- Documents count -->
+            <div class="cd-info-cell">
+                <p class="cd-info-label">Documents</p>
+                <p class="cd-info-value">{{ documents.count }}</p>
+                <p class="cd-info-sub">Total Submitted</p>
             </div>
         </div>
     </div>
+
+    <!-- ── Documents Grid ── -->
+    {% if documents %}
+    <p class="cd-section-label">Submitted Documents</p>
+    <div class="cd-docs-grid">
+        {% for document in documents %}
+        <div class="cd-doc-card">
+
+            <!-- Header -->
+            <div class="cd-doc-header">
+                <p class="cd-doc-title">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    {{ document.get_document_type_display }}
+                </p>
+                <!-- Status badge -->
+                {% if document.casedocumentverification %}
+                    {% if document.casedocumentverification.status == 'VERIFIED' %}
+                    <span class="cd-doc-badge verified">✓ Verified</span>
+                    {% elif document.casedocumentverification.status == 'PENDING' %}
+                    <span class="cd-doc-badge pending">⏳ Pending</span>
+                    {% elif document.casedocumentverification.status == 'REJECTED' %}
+                    <span class="cd-doc-badge rejected">✗ Rejected</span>
+                    {% endif %}
+                {% else %}
+                <span class="cd-doc-badge not-started">⏳ Not Started</span>
+                {% endif %}
+            </div>
+
+            <!-- Body -->
+            <div class="cd-doc-body">
+                <p class="cd-doc-meta">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <strong>Uploaded:</strong> {{ document.uploaded_at|date:"F d, Y · H:i" }}
+                </p>
+                <span class="cd-doc-filename">{{ document.document_file.name|slice:"20:" }}…</span>
+            </div>
+
+            <!-- Verified by -->
+            {% if document.casedocumentverification.verified_by %}
+            <div class="cd-verified-strip">
+                <strong>Verified by:</strong> {{ document.casedocumentverification.verified_by.email }}<br>
+                <strong>Date:</strong> {{ document.casedocumentverification.verified_at|date:"F d, Y · H:i" }}
+            </div>
+            {% endif %}
+
+            <!-- Rejection reason -->
+            {% if document.casedocumentverification.rejection_reason %}
+            <div class="cd-rejection-strip">
+                <strong>Rejection Reason:</strong><br>
+                {{ document.casedocumentverification.rejection_reason }}
+            </div>
+            {% endif %}
+
+            <!-- Footer actions -->
+            <div class="cd-doc-footer">
+                <a href="{{ document.document_file.url }}" class="cd-btn cd-btn-download" download>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Download
+                </a>
+                {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
+                <a href="{% url 'case_document_verify' document.id %}" class="cd-btn cd-btn-review">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Review
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- ── Empty State ── -->
+    <div class="cd-empty">
+        <div class="cd-empty-icon">
+            <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+        <h3>No Documents Found</h3>
+        <p>This case has no submitted documents yet.</p>
+    </div>
+    {% endif %}
+
+    <!-- ── Verification Summary ── -->
+    <div class="cd-summary-card">
+        <div class="cd-summary-header">
+            <svg class="w-5 h-5 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <h3>Verification Summary</h3>
+        </div>
+        <div class="cd-summary-body">
+
+            <!-- Stat tiles -->
+            <div class="cd-sum-grid">
+                <div class="cd-sum-tile">
+                    <p class="cd-sum-tile-label">Total</p>
+                    <p class="cd-sum-tile-value">{{ total_docs }}</p>
+                </div>
+                <div class="cd-sum-tile">
+                    <p class="cd-sum-tile-label">Verified</p>
+                    <p class="cd-sum-tile-value green">{{ verified_docs }}</p>
+                </div>
+                <div class="cd-sum-tile">
+                    <p class="cd-sum-tile-label">Rejected</p>
+                    <p class="cd-sum-tile-value red">{{ rejected_docs }}</p>
+                </div>
+                <div class="cd-sum-tile">
+                    <p class="cd-sum-tile-label">Pending</p>
+                    <p class="cd-sum-tile-value yellow">{{ pending_docs }}</p>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            {% if total_docs > 0 %}
+            <div class="cd-progress-label">
+                <span>Verification Progress</span>
+                <span>{{ verified_docs }} / {{ total_docs }} documents verified</span>
+            </div>
+            <div class="cd-progress-track">
+                {% if verified_docs > 0 %}
+                <div class="cd-progress-bar" id="cdProgressBar" data-width="{% widthratio verified_docs total_docs 100 %}"></div>
+                {% else %}
+                <div class="cd-progress-bar" id="cdProgressBar" data-width="0"></div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Overall status -->
+            <div class="cd-status-row">
+                {% if all_verified %}
+                    <span class="cd-status-pill all-ok">✓ All Verified — Ready</span>
+                    <p class="cd-status-note">All documents have been verified. The lawyer can now accept and begin work on the case.</p>
+                {% elif any_rejected %}
+                    <span class="cd-status-pill has-reject">✗ Resubmission Required</span>
+                    <p class="cd-status-note">{{ rejected_docs }} document(s) were rejected. The client must resubmit or resolve the issues.</p>
+                {% elif pending_docs > 0 %}
+                    <span class="cd-status-pill in-review">⏳ Pending Review</span>
+                    <p class="cd-status-note">{{ pending_docs }} document(s) are still awaiting verification.</p>
+                {% else %}
+                    <span class="cd-status-pill no-docs">No Documents</span>
+                {% endif %}
+            </div>
+
+            <!-- Next action -->
+            <div class="cd-next-action">
+                <strong>Next Action</strong>
+                {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
+                    {% if pending_docs > 0 %}
+                        <p>Review the {{ pending_docs }} remaining document(s) using the buttons above.</p>
+                    {% elif rejected_docs > 0 %}
+                        <p class="red">Notify the client to resubmit or correct the {{ rejected_docs }} rejected document(s).</p>
+                    {% endif %}
+                {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
+                    <p class="green">Awaiting the lawyer to accept the case and begin work.</p>
+                {% else %}
+                    <p>{{ case_request.get_status_display }}</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
 </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var bar = document.getElementById('cdProgressBar');
+        if (bar) { bar.style.width = (bar.dataset.width || '0') + '%'; }
+    });
+</script>
 {% endblock %}

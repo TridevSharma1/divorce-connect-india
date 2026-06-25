@@ -94,7 +94,7 @@
                     type="email"
                     id="{{ form.email.id_for_label }}"
                     name="email"
-                    value="{{ form.email.value }}"
+                    value="{{ form.email.value|default_if_none:'' }}"
                     required
                     placeholder="you@example.com"
                     class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.email.errors %}error-input{% endif %}"
