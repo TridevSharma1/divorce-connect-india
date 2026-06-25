@@ -178,35 +178,37 @@
             <div class="lg:col-span-2 bg-white p-8 rounded-lg border-2 border-gray-200">
                 <h2 class="text-2xl font-bold serif-heading mb-6">Case Requests</h2>
                 <div class="space-y-4">
+                    {% for req in pending_requests %}
                     <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold">Divorce Settlement Case</h4>
-                            <span
-                                class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
+                            <h4 class="font-semibold">{{ req.client.get_full_name }}</h4>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
                         </div>
-                        <p class="text-gray-600 text-sm mb-3">Client requesting consultation for asset division</p>
-                        <button class="text-link font-semibold text-sm">View Request →</button>
+                        <p class="text-gray-600 text-sm mb-3">Requested {{ req.created_at|timesince }} ago{% if req.message %} · {{ req.message|truncatechars:60 }}{% endif %}</p>
+                        <a href="{% url 'lawyer_case_orders' %}" class="text-link font-semibold text-sm">View Request →</a>
                     </div>
+                    {% endfor %}
 
+                    {% for case in ready_cases %}
                     <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                         <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold">Custody Matter</h4>
-                            <span
-                                class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold">Pending</span>
+                            <h4 class="font-semibold">{{ case.client.get_full_name }}</h4>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Ready to Accept</span>
                         </div>
-                        <p class="text-gray-600 text-sm mb-3">Client seeking legal advice on custody arrangements</p>
-                        <button class="text-link font-semibold text-sm">View Request →</button>
+                        <p class="text-gray-600 text-sm mb-3">Documents verified · Updated {{ case.updated_at|timesince }} ago</p>
+                        <a href="{% url 'lawyer_case_status' %}" class="text-link font-semibold text-sm">View Details →</a>
                     </div>
+                    {% endfor %}
 
-                    <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold">Documentation Review</h4>
-                            <span
-                                class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Client wants document review for legal compliance</p>
-                        <button class="text-link font-semibold text-sm">View Details →</button>
+                    {% if not pending_requests and not ready_cases %}
+                    <div class="text-center py-8 text-gray-400">
+                        <svg class="w-10 h-10 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <p class="text-sm font-medium">No pending case requests</p>
+                        <p class="text-xs mt-1">New requests will appear here automatically.</p>
                     </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -329,33 +331,37 @@
         <div class="lg:col-span-2 bg-white p-8 rounded-lg border-2 border-gray-200">
             <h2 class="text-2xl font-bold serif-heading mb-6">Case Requests</h2>
             <div class="space-y-4">
+                {% for req in pending_requests %}
                 <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">Divorce Settlement Case</h4>
+                        <h4 class="font-semibold">{{ req.client.get_full_name }}</h4>
                         <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
                     </div>
-                    <p class="text-gray-600 text-sm mb-3">Client requesting consultation for asset division</p>
-                    <button class="text-link font-semibold text-sm">View Request →</button>
+                    <p class="text-gray-600 text-sm mb-3">Requested {{ req.created_at|timesince }} ago{% if req.message %} · {{ req.message|truncatechars:60 }}{% endif %}</p>
+                    <a href="{% url 'lawyer_case_orders' %}" class="text-link font-semibold text-sm">View Request →</a>
                 </div>
+                {% endfor %}
 
+                {% for case in ready_cases %}
                 <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                     <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">Custody Matter</h4>
-                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold">Pending</span>
+                        <h4 class="font-semibold">{{ case.client.get_full_name }}</h4>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Ready to Accept</span>
                     </div>
-                    <p class="text-gray-600 text-sm mb-3">Client seeking legal advice on custody arrangements</p>
-                    <button class="text-link font-semibold text-sm">View Request →</button>
+                    <p class="text-gray-600 text-sm mb-3">Documents verified · Updated {{ case.updated_at|timesince }} ago</p>
+                    <a href="{% url 'lawyer_case_status' %}" class="text-link font-semibold text-sm">View Details →</a>
                 </div>
+                {% endfor %}
 
-                <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">Documentation Review</h4>
-                        <span
-                            class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Client wants document review for legal compliance</p>
-                    <button class="text-link font-semibold text-sm">View Details →</button>
+                {% if not pending_requests and not ready_cases %}
+                <div class="text-center py-8 text-gray-400">
+                    <svg class="w-10 h-10 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <p class="text-sm font-medium">No pending case requests</p>
+                    <p class="text-xs mt-1">New requests will appear here automatically.</p>
                 </div>
+                {% endif %}
             </div>
         </div>
 

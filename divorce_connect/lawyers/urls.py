@@ -24,6 +24,7 @@ urlpatterns = [
 
     # Case Document Routes
     path('case/<int:case_request_id>/view-documents/', views.lawyer_view_case_documents, name='lawyer_view_case_documents'),
+    path('case/<int:case_id>/detail/', views.lawyer_case_detail_view, name='lawyer_case_detail'),
     path('case/<int:case_request_id>/accept/', views.lawyer_accept_case_view, name='lawyer_accept_case'),
     path('case/<int:case_request_id>/advance-stage/', views.lawyer_advance_case_stage_view, name='lawyer_advance_case_stage'),
 

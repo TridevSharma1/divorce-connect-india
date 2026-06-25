@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.landing_page_view, name='landing_page'),
     path('dashboard/', views.client_dashboard_view, name='client_dashboard'),
     path('cases/', views.client_cases_view, name='client_cases'),
+    path('cases/<int:case_id>/', views.client_case_detail_view, name='client_case_detail'),
     
     # The new counseling section
     path('counseling/', views.counseling_view, name='counseling'),

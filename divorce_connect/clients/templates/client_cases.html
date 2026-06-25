@@ -6,66 +6,34 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="mb-8">
         <h1 class="text-4xl font-bold serif-heading mb-2">My Cases</h1>
-        <p class="text-gray-600">Review the status of requests you've sent and see updates from lawyers.</p>
+        <p class="text-gray-600">Review the status of requests you've sent and communicate with your lawyers.</p>
     </div>
 
     {% if case_requests.exists %}
-        <div class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {% for request in case_requests %}
-                <div class="bg-white shadow-sm rounded-3xl border border-gray-200 p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="bg-white shadow-sm rounded-3xl border border-gray-200 p-6 flex flex-col">
+                    <div class="flex items-start justify-between mb-4">
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-900">{{ request.lawyer.full_name }}</h2>
-                            <p class="text-sm text-gray-500">Requested on {{ request.created_at|date:"M d, Y" }}</p>
+                            <h2 class="text-xl font-bold text-gray-900">{{ request.lawyer.full_name }}</h2>
+                            <p class="text-sm text-gray-500">Requested {{ request.created_at|date:"M d, Y" }}</p>
                         </div>
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold"
-                              style="background-color: {% if request.status == 'PENDING' %}#f8fafc{% elif request.status == 'ACCEPTED' %}#d1fae5{% else %}#fee2e2{% endif %}; color: {% if request.status == 'PENDING' %}#0f172a{% elif request.status == 'ACCEPTED' %}#065f46{% else %}#b91c1c{% endif %};">
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider
+                            {% if request.status == 'PENDING' or request.status == 'DOCUMENTS_PENDING' %}bg-amber-100 text-amber-800
+                            {% elif request.status == 'ACCEPTED' or request.status == 'COMPLETED' %}bg-emerald-100 text-emerald-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
                             {{ request.get_status_display }}
                         </span>
                     </div>
 
-                    <div class="mt-5 grid gap-4 md:grid-cols-2">
-                        <div class="rounded-2xl bg-slate-50 p-4">
-                            <p class="text-sm font-medium text-gray-700 mb-2">Your request</p>
-                            <p class="text-sm text-gray-600 whitespace-pre-line">{{ request.message|default:'No additional details provided.' }}</p>
-                        </div>
-                        <div class="rounded-2xl bg-slate-50 p-4">
-                            <p class="text-sm font-medium text-gray-700 mb-2">Lawyer response</p>
-                            {% if request.response_message %}
-                                <p class="text-sm text-gray-600 whitespace-pre-line">{{ request.response_message }}</p>
-                            {% else %}
-                                <p class="text-sm text-gray-500">No response yet.</p>
-                            {% endif %}
-                        </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-700 mb-1">Current Stage</p>
+                        <p class="text-sm text-gray-900 mb-4">{{ request.get_workflow_stage_display }}</p>
                     </div>
 
-                    <div class="mt-5 grid gap-2 md:grid-cols-2">
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-700 mb-2">Case tracking</h3>
-                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
-                                {% for step in request.workflow_progress %}
-                                <div class="rounded-2xl px-3 py-2 {% if step.completed %}bg-emerald-100 text-emerald-900{% elif step.active %}bg-blue-100 text-blue-900{% else %}bg-gray-100 text-gray-500{% endif %}">
-                                    {{ step.label }}
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">Current stage</p>
-                            <p class="text-base font-semibold text-gray-900">{{ request.get_workflow_stage_display }}</p>
-                        </div>
-                    </div>
-                    <div class="mt-5 text-right">
-                        {% if request.status == 'DOCUMENTS_PENDING' %}
-                            <a href="{% url 'case_document_upload' request.id %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition mr-3">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Upload Documents
-                            </a>
-                        {% endif %}
-                        <a href="{% url 'lawyer_detail' request.lawyer.id %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold">
-                            View lawyer profile →
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                        <a href="{% url 'client_case_detail' request.id %}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition w-full text-center">
+                            Open Chat & Details
                         </a>
                     </div>
                 </div>
@@ -75,7 +43,9 @@
         <div class="bg-white shadow-sm rounded-3xl border border-gray-200 p-12 text-center">
             <h2 class="text-2xl font-semibold text-gray-900 mb-3">No case requests yet</h2>
             <p class="text-gray-600 mb-6">You haven't requested to hire a lawyer yet. Find a lawyer and submit a hire request from their profile page.</p>
-            <a href="{% url 'lawyers_section' %}" class="btn-primary">Browse Lawyers</a>
+            <a href="{% url 'lawyers_section' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+                Browse Lawyers
+            </a>
         </div>
     {% endif %}
 </div>

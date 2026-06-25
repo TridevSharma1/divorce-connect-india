@@ -3,7 +3,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ClientProfile
-from lawyers.models import LawyerProfile
+from lawyers.models import LawyerProfile, CaseRequest, CaseMessage
 from adminpanel.models import TrustReport
 from accounts.models import Notification
 
@@ -30,9 +30,54 @@ def client_cases_view(request):
     if not hasattr(request.user, 'client_profile'):
         return redirect('/api/auth/login/')
 
-    case_requests = request.user.client_profile.sent_case_requests.select_related('lawyer', 'lawyer__user').order_by('-created_at')
+    client_profile = request.user.client_profile
+    case_requests = client_profile.sent_case_requests.select_related('lawyer', 'lawyer__user').order_by('-created_at')
+
     return render(request, 'client_cases.html', {
         'case_requests': case_requests,
+    })
+
+
+@login_required(login_url='/api/auth/login/')
+def client_case_detail_view(request, case_id):
+    if not hasattr(request.user, 'client_profile'):
+        return redirect('/api/auth/login/')
+
+    client_profile = request.user.client_profile
+    active_case = get_object_or_404(
+        CaseRequest, 
+        id=case_id, 
+        client=client_profile
+    )
+
+    messages_list = []
+    if active_case.status in ['ACCEPTED', 'COMPLETED']:
+        messages_list = active_case.messages.all().select_related('sender_user')
+
+    if request.method == 'POST' and active_case.status == 'ACCEPTED':
+        message_text = request.POST.get('message', '').strip()
+        attachment = request.FILES.get('attachment')
+        
+        if message_text or attachment:
+            CaseMessage.objects.create(
+                case=active_case,
+                sender_type='CLIENT',
+                sender_user=request.user,
+                text=message_text,
+                attachment=attachment
+            )
+            # Notify the lawyer
+            Notification.objects.create(
+                user=active_case.lawyer.user,
+                title='New message from your client',
+                message=f'You have a new message from {client_profile.get_full_name()} regarding Case #{active_case.id}',
+                url=f'/lawyers/case/{active_case.id}/detail/'
+            )
+        return redirect('client_case_detail', case_id=active_case.id)
+
+    return render(request, 'client_case_detail.html', {
+        'active_case': active_case,
+        'messages': messages_list,
     })
 
 

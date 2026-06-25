@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Case Details - DivorceConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background-color: #f7f7f7; }
+    
+    .lc-page {
+        padding: 3rem 1rem 5rem;
+    }
+    
+    .lc-hero {
+        background: #0a0a0a;
+        border-radius: 1rem;
+        padding: 2rem 2.5rem;
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .lc-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+    .lc-hero p { color: #a1a1aa; font-size: 0.9rem; margin: 0.3rem 0 0; }
+    
+    .lc-badge {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: #fff;
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+    }
+
+    .lc-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    @media (min-width: 1024px) {
+        .lc-grid { grid-template-columns: 1fr 400px; }
+    }
+
+    /* Left Column: Documents & Info */
+    .lc-card {
+        background: #ffffff;
+        border: 2px solid #e4e4e7;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    .lc-card-header {
+        background: #f4f4f5;
+        padding: 1rem 1.5rem;
+        border-bottom: 2px solid #e4e4e7;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .lc-card-header h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0a0a0a;
+        margin: 0;
+    }
+    .lc-card-body {
+        padding: 1.5rem;
+    }
+
+    .doc-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border: 1px solid #e4e4e7;
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .doc-item:hover {
+        border-color: #a1a1aa;
+        background: #fafafa;
+    }
+    .doc-info { display: flex; align-items: center; gap: 0.75rem; }
+    .doc-icon {
+        width: 2.5rem; height: 2.5rem;
+        background: #f4f4f5;
+        border-radius: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        color: #52525b;
+    }
+    .doc-name { font-size: 0.85rem; font-weight: 600; color: #0a0a0a; margin: 0; }
+    .doc-meta { font-size: 0.75rem; color: #71717a; margin: 0; }
+    .doc-actions a {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem; font-weight: 600;
+        text-decoration: none;
+    }
+    .btn-view { background: #0a0a0a; color: #fff; }
+    .btn-view:hover { background: #27272a; }
+
+    /* Right Column: Chat System */
+    .lc-chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 600px; /* Fixed height for chat window */
+        background: #ffffff;
+        border: 2px solid #e4e4e7;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 1.5rem;
+    }
+    .lc-chat-header {
+        background: #0a0a0a;
+        padding: 1rem 1.5rem;
+        color: #fff;
+    }
+    .lc-chat-header h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0 0 0.2rem;
+    }
+    .lc-chat-header p { font-size: 0.75rem; color: #a1a1aa; margin: 0; }
+    
+    .lc-chat-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        background: #fafafa;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* Message Bubbles */
+    .msg-wrap { display: flex; flex-direction: column; max-width: 85%; }
+    .msg-wrap.lawyer { align-self: flex-end; align-items: flex-end; }
+    .msg-wrap.client { align-self: flex-start; align-items: flex-start; }
+    
+    .msg-bubble {
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        position: relative;
+    }
+    .msg-wrap.lawyer .msg-bubble {
+        background: #0a0a0a;
+        color: #ffffff;
+        border-bottom-right-radius: 0.25rem;
+    }
+    .msg-wrap.client .msg-bubble {
+        background: #ffffff;
+        color: #0a0a0a;
+        border: 1px solid #e4e4e7;
+        border-bottom-left-radius: 0.25rem;
+    }
+    
+    .msg-meta {
+        font-size: 0.65rem;
+        color: #a1a1aa;
+        margin-top: 0.3rem;
+        font-weight: 600;
+    }
+
+    .msg-bubble a { color: inherit; text-decoration: underline; font-weight: 600; }
+    
+    .msg-attachment {
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    .msg-attachment img { max-width: 100%; max-height: 250px; display: block; }
+    .msg-attachment-file {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem; background: rgba(0,0,0,0.05);
+        color: inherit; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+    }
+
+    /* Chat Input */
+    .lc-chat-input {
+        padding: 1rem;
+        background: #ffffff;
+        border-top: 1px solid #e4e4e7;
+    }
+    .chat-form {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-end;
+    }
+    
+    .file-upload-wrapper { position: relative; }
+    .file-upload-wrapper input[type="file"] { display: none; }
+    .file-upload-btn {
+        width: 3rem; height: 3rem; border-radius: 50%;
+        background: #f4f4f5; color: #52525b;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s; border: 1px solid #e4e4e7;
+    }
+    .file-upload-btn:hover { background: #e4e4e7; color: #0a0a0a; }
+    .file-name-preview {
+        position: absolute; bottom: 100%; left: 0; margin-bottom: 0.5rem;
+        background: #0a0a0a; color: #fff; padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem; font-size: 0.7rem; white-space: nowrap;
+        display: none;
+    }
+
+    .chat-textarea {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e4e4e7;
+        border-radius: 1.5rem;
+        font-size: 0.85rem;
+        resize: none;
+        outline: none;
+        background: #f4f4f5;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.2s, background 0.2s;
+        max-height: 120px; overflow-y: auto;
+    }
+    .chat-textarea:focus {
+        border-color: #0a0a0a;
+        background: #ffffff;
+    }
+    .chat-btn {
+        background: #0a0a0a;
+        color: #fff;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.15s, background 0.2s;
+        flex-shrink: 0;
+    }
+    .chat-btn:hover {
+        background: #27272a;
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lc-page max-w-7xl mx-auto">
+    <!-- Hero -->
+    <div class="lc-hero">
+        <div>
+            <h1>Case Details: {{ case_request.client.get_full_name }}</h1>
+            <p>Case ID #{{ case_request.id }} &nbsp;·&nbsp; Started on {{ case_request.created_at|date:'M d, Y' }}</p>
+        </div>
+        <span class="lc-badge">Status: {{ case_request.get_status_display }}</span>
+    </div>
+
+    <div class="lc-grid">
+        <!-- Left Column: Case Info & Documents -->
+        <div>
+            <!-- Case Info Card -->
+            <div class="lc-card">
+                <div class="lc-card-header">
+                    <h2>Client Information</h2>
+                </div>
+                <div class="lc-card-body grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <strong class="block text-gray-500 uppercase text-xs tracking-wide mb-1">Name</strong>
+                        <span>{{ case_request.client.get_full_name }}</span>
+                    </div>
+                    <div>
+                        <strong class="block text-gray-500 uppercase text-xs tracking-wide mb-1">Email</strong>
+                        <span>{{ case_request.client.user.email }}</span>
+                    </div>
+                    <div>
+                        <strong class="block text-gray-500 uppercase text-xs tracking-wide mb-1">Phone</strong>
+                        <span>{{ case_request.client.mobile_number }}</span>
+                    </div>
+                    <div>
+                        <strong class="block text-gray-500 uppercase text-xs tracking-wide mb-1">City</strong>
+                        <span>{{ case_request.client.city }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Card -->
+            <div class="lc-card">
+                <div class="lc-card-header">
+                    <h2>Verified Documents</h2>
+                </div>
+                <div class="lc-card-body">
+                    {% if verified_documents %}
+                        {% for doc in verified_documents %}
+                        <div class="doc-item">
+                            <div class="doc-info">
+                                <div class="doc-icon">📄</div>
+                                <div>
+                                    <p class="doc-name">{{ doc.get_document_type_display }}</p>
+                                    <p class="doc-meta">{{ doc.document_file.name|slice:"15:"|truncatechars:30 }}</p>
+                                </div>
+                            </div>
+                            <div class="doc-actions">
+                                <a href="{{ doc.document_file.url }}" target="_blank" class="btn-view">View</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-6 text-gray-500">
+                            <p class="text-sm">No verified documents available for this case.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Chat Interface -->
+        <div>
+            <div class="lc-chat-container">
+                <div class="lc-chat-header">
+                    <h3>Client Chat</h3>
+                    <p>Secure conversation with {{ case_request.client.get_full_name }}</p>
+                </div>
+                
+                <div class="lc-chat-messages" id="chatMessages">
+                    {% for msg in messages %}
+                        <div class="msg-wrap {% if msg.sender_type == 'LAWYER' %}lawyer{% else %}client{% endif %}">
+                            <div class="msg-bubble">
+                                {% if msg.text %}
+                                    {{ msg.text|linebreaksbr|urlize }}
+                                {% endif %}
+                                
+                                {% if msg.attachment %}
+                                    <div class="msg-attachment">
+                                        {% if msg.is_image %}
+                                            <a href="{{ msg.attachment.url }}" target="_blank">
+                                                <img src="{{ msg.attachment.url }}" alt="Attached Image">
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ msg.attachment.url }}" target="_blank" class="msg-attachment-file">
+                                                📄 {{ msg.file_extension|upper }} Document
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <span class="msg-meta">{{ msg.created_at|date:'M d, h:i A' }}</span>
+                        </div>
+                    {% empty %}
+                        <div class="text-center text-gray-400 my-auto">
+                            <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <p class="text-sm">No messages yet.<br>Start the conversation!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="lc-chat-input">
+                    <form method="POST" enctype="multipart/form-data" class="chat-form">
+                        {% csrf_token %}
+                        <!-- File Upload -->
+                        <div class="file-upload-wrapper">
+                            <div class="file-name-preview" id="fileNamePreview"></div>
+                            <label for="chatAttachment" class="file-upload-btn" title="Attach file">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                            </label>
+                            <input type="file" id="chatAttachment" name="attachment" onchange="updateFileName(this)">
+                        </div>
+
+                        <textarea 
+                            name="message" 
+                            rows="1" 
+                            class="chat-textarea" 
+                            placeholder="Type a message or share a link..." 
+                            oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 100) + 'px'"
+                        ></textarea>
+                        <button type="submit" class="chat-btn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll chat to bottom on load
+    document.addEventListener("DOMContentLoaded", function() {
+        const chatBox = document.getElementById('chatMessages');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    });
+
+    // File upload preview
+    function updateFileName(input) {
+        const preview = document.getElementById('fileNamePreview');
+        if (input.files && input.files.length > 0) {
+            preview.textContent = input.files[0].name;
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    // Submit form on Enter key (Shift+Enter for new line)
+    const textarea = document.querySelector('.chat-textarea');
+    if (textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const fileInput = document.getElementById('chatAttachment');
+                if (this.value.trim() !== '' || (fileInput && fileInput.files.length > 0)) {
+                    this.closest('form').submit();
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

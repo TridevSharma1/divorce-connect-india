@@ -127,7 +127,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{% url 'client_cases' %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                            <a href="{% url 'lawyer_case_detail' case.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                         </td>
                     </tr>
                     {% empty %}

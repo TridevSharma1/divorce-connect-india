@@ -248,6 +248,9 @@ class CaseRequest(models.Model):
     documents_submitted_at = models.DateTimeField(null=True, blank=True, help_text='When documents were submitted')
     documents_verified_at = models.DateTimeField(null=True, blank=True, help_text='When documents were verified by admin')
 
+    def __str__(self):
+        return f"Case Request #{self.id}: {self.client} to {self.lawyer}"
+
     WORKFLOW_STAGES = [
         ('CASE_CREATED', 'Case Created'),
         ('DOCUMENT_VERIFICATION', 'Document Verification'),
@@ -365,6 +368,46 @@ class CaseRequest(models.Model):
                 'active': index == current_index,
             })
         return progress
+
+
+class CaseMessage(models.Model):
+    """Chat messages between Client and Lawyer for an accepted case."""
+    SENDER_CHOICES = [
+        ('CLIENT', 'Client'),
+        ('LAWYER', 'Lawyer'),
+    ]
+
+    case = models.ForeignKey(CaseRequest, on_delete=models.CASCADE, related_name='messages')
+    sender_type = models.CharField(max_length=10, choices=SENDER_CHOICES)
+    sender_user = models.ForeignKey(
+        BaseUser, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='case_messages'
+    )
+    text = models.TextField(blank=True) # allow blank if there's only an attachment
+    attachment = models.FileField(upload_to='chat_attachments/%Y/%m/%d/', blank=True, null=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Message {self.id} on Case #{self.case.id} from {self.sender_type}"
+
+    @property
+    def is_image(self):
+        if self.attachment:
+            ext = self.attachment.name.lower().split('.')[-1]
+            return ext in ['jpg', 'jpeg', 'png', 'gif', 'webp']
+        return False
+        
+    @property
+    def file_extension(self):
+        if self.attachment:
+            return self.attachment.name.lower().split('.')[-1]
+        return ''
 
 
 class CaseDocument(models.Model):

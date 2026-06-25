@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from lawyers.forms import LawyerProfileEditForm, CaseDocumentBulkUploadForm, DocumentVerificationForm
-from lawyers.models import LawyerProfile, LawyerProfileUpdateRequest, CaseRequest, CaseDocument, CaseDocumentVerification
+from lawyers.models import LawyerProfile, LawyerProfileUpdateRequest, CaseRequest, CaseDocument, CaseDocumentVerification, CaseMessage
 from clients.models import ClientProfile
 from adminpanel.models import TrustReport
 from accounts.models import Notification
@@ -238,13 +238,27 @@ def lawyer_dashboard_view(request):
         lawyer=profile,
         status='ACCEPTED'
     ).select_related('client', 'client__user').order_by('-updated_at')[:4]
-    
+
+    # New incoming case requests (PENDING — shown as "New" in dashboard)
+    pending_requests = CaseRequest.objects.filter(
+        lawyer=profile,
+        status='PENDING'
+    ).select_related('client', 'client__user').order_by('-created_at')[:5]
+
+    # Cases with all documents verified — ready for lawyer to accept
+    ready_cases = CaseRequest.objects.filter(
+        lawyer=profile,
+        status='DOCUMENTS_VERIFIED'
+    ).select_related('client', 'client__user').order_by('-updated_at')[:5]
+
     context = {
         'profile': profile,
         'is_verified': profile.verified,
         'is_complete': profile.is_profile_complete,
         'has_pending_update': has_pending_update,
         'recent_clients': recent_clients,
+        'pending_requests': pending_requests,
+        'ready_cases': ready_cases,
     }
     return render(request, 'lawyer_dashboard.html', context)
 
@@ -599,3 +613,56 @@ def lawyer_advance_case_stage_view(request, case_request_id):
         messages.success(request, f'Case progressed to {dict(case_request.WORKFLOW_STAGES).get(next_stage)}.')
 
     return redirect('lawyer_view_case_documents', case_request_id=case_request.id)
+
+
+@login_required(login_url='/api/auth/login/')
+@require_verified_profile(profile_type='lawyer')
+def lawyer_case_detail_view(request, case_id):
+    """Detailed view for an active case, showing verified documents and a chat interface."""
+    if not hasattr(request.user, 'lawyer_profile'):
+        return redirect('/api/auth/login/')
+
+    case_request = get_object_or_404(
+        CaseRequest, 
+        id=case_id, 
+        lawyer=request.user.lawyer_profile, 
+        status__in=['ACCEPTED', 'COMPLETED']
+    )
+
+    # Handle sending a new message
+    if request.method == 'POST':
+        message_text = request.POST.get('message', '').strip()
+        attachment = request.FILES.get('attachment')
+        
+        if message_text or attachment:
+            CaseMessage.objects.create(
+                case=case_request,
+                sender_type='LAWYER',
+                sender_user=request.user,
+                text=message_text,
+                attachment=attachment
+            )
+            # Create a notification for the client
+            Notification.objects.create(
+                user=case_request.client.user,
+                title='New message from your lawyer',
+                message=f'You have a new message regarding your case: {case_request.id}',
+                url=f'/cases/?active_case={case_request.id}' # Update URL to the new split-view
+            )
+        return redirect('lawyer_case_detail', case_id=case_id)
+
+    # Fetch ONLY verified documents
+    verified_documents = CaseDocument.objects.filter(
+        case_request=case_request,
+        casedocumentverification__status='VERIFIED'
+    )
+
+    # Fetch all messages for this case
+    messages_list = case_request.messages.all().select_related('sender_user')
+
+    context = {
+        'case_request': case_request,
+        'verified_documents': verified_documents,
+        'messages': messages_list,
+    }
+    return render(request, 'lawyer_case_detail.html', context)
