@@ -1,6 +1,6 @@
 <!-- Lawyer Navbar - Desktop -->
 <nav class="flex items-center gap-6">
-    <a href="/lawyers/dashboard/" class="text-link">Home</a>
+    <a href="{% url 'lawyer_dashboard' %}" class="text-link">Home</a>
     <a href="{% url 'lawyer_earnings' %}" class="text-link">Earning Dashboard</a>
     <a href="{% url 'lawyer_case_orders' %}" class="text-link">Case Order</a>
     <a href="{% url 'lawyer_case_status' %}" class="text-link">Case Status</a>
@@ -112,7 +112,7 @@
     <!-- Footer -->
     <div class="px-4 py-3 bg-white border-t border-gray-100 text-center">
       <a
-        href="#"
+        href="{% url 'lawyer_dashboard' %}"
         class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors duration-150"
         aria-label="View all notifications"
       >
@@ -134,11 +134,11 @@
         </button>
 
         <div id="lawyerDropdown" class="dropdown-menu">
-            <a href="/lawyers/dashboard/" class="dropdown-item">Dashboard</a>
-            <a href="/lawyers/profile/edit/" class="dropdown-item">My Profile</a>
+            <a href="{% url 'lawyer_dashboard' %}" class="dropdown-item">Dashboard</a>
+            <a href="{% url 'lawyer_profile_edit' %}" class="dropdown-item">My Profile</a>
             <a href="{% url 'lawyer_support' %}" class="dropdown-item">Support</a>
             <a href="{% url 'lawyer_report_client' %}" class="dropdown-item">Report Client</a>
-            <a href="/api/auth/logout/" class="dropdown-item logout-item">Logout</a>
+            <a href="{% url 'logout' %}" class="dropdown-item logout-item">Logout</a>
         </div>
     </div>
 </nav>

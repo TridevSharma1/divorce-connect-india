@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Case Documents - Divorce Connect{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                Case Documents
+            </h1>
+            <p class="text-lg text-gray-600">
+                Client: {{ case_request.client.get_full_name }}
+            </p>
+        </div>
+
+        <!-- Workflow Tracker -->
+        <div class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Case workflow</h3>
+                    <p class="text-sm text-slate-600">Current stage: <strong>{{ case_request.get_workflow_stage_display }}</strong></p>
+                </div>
+                {% if case_request.workflow_stage_updated_at %}
+                <span class="text-xs text-slate-500">Updated {{ case_request.workflow_stage_updated_at|date:'M d, Y' }}</span>
+                {% endif %}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {% for step in case_request.workflow_progress %}
+                <div class="rounded-2xl p-3 text-sm font-semibold {% if step.completed %}bg-emerald-100 text-emerald-900{% elif step.active %}bg-blue-100 text-blue-900{% else %}bg-gray-100 text-gray-600{% endif %}">
+                    {{ step.label }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Status Alert -->
+        {% if case_request.status == 'DOCUMENTS_VERIFIED' %}
+        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                    <h3 class="text-lg font-medium text-green-900">All Documents Verified</h3>
+                    <p class="text-sm text-green-800">You can now access all documents and proceed with the case.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-yellow-600 mr-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <h3 class="text-lg font-medium text-yellow-900">Pending Verification</h3>
+                    <p class="text-sm text-yellow-800">Documents are currently under review. You cannot access them until verification is complete.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Documents List -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-2xl font-bold text-gray-900">Submitted Documents ({{ documents.count }})</h2>
+            </div>
+
+            {% if documents %}
+            <div class="divide-y divide-gray-200">
+                {% for document in documents %}
+                <div class="px-6 py-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-medium text-gray-900">
+                                {{ document.get_document_type_display }}
+                            </h3>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Submitted on {{ document.uploaded_at|date:"M d, Y \a\t H:i" }}
+                            </p>
+                        </div>
+
+                        <!-- Verification Status Badge -->
+                        <div class="ml-4">
+                            {% if document.casedocumentverification %}
+                                {% if document.casedocumentverification.status == 'VERIFIED' %}
+                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    Verified
+                                </span>
+                                {% elif document.casedocumentverification.status == 'PENDING' %}
+                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                    <svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Pending Review
+                                </span>
+                                {% elif document.casedocumentverification.status == 'REJECTED' %}
+                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                    Rejected
+                                </span>
+                                {% endif %}
+                            {% else %}
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                Not Started
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if document.casedocumentverification and document.casedocumentverification.rejection_reason %}
+                    <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                        <p class="text-sm text-red-800">
+                            <strong>Rejection Reason:</strong> {{ document.casedocumentverification.rejection_reason }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Download Link (visible only if verified) -->
+                    {% if document.casedocumentverification and document.casedocumentverification.status == 'VERIFIED' and case_request.status == 'DOCUMENTS_VERIFIED' %}
+                    <div class="mt-3">
+                        <a href="{{ document.document_file.url }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium" download>
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download Document
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-lg font-medium text-gray-900">No documents submitted</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Client has not yet uploaded any documents
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-8 flex flex-col gap-4 md:flex-row">
+            {% if case_request.status == 'DOCUMENTS_VERIFIED' and case_request.status != 'ACCEPTED' %}
+            <a href="{% url 'lawyer_accept_case' case_request.id %}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+                Accept Case
+            </a>
+            {% endif %}
+
+            {% if case_request.status == 'ACCEPTED' and case_request.workflow_stage != 'COMPLETED' %}
+            <form action="{% url 'lawyer_advance_case_stage' case_request.id %}" method="post" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    {% if case_request.workflow_stage == 'DECREE_ISSUED' %}
+                        Mark Case as Completed
+                    {% else %}
+                        Advance to {{ case_request.get_next_workflow_stage_display }}
+                    {% endif %}
+                </button>
+            </form>
+            {% endif %}
+
+            <a href="{% url 'lawyer_case_orders' %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+                Back to Orders
+            </a>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-2">ℹ️ How It Works</h3>
+            <ol class="list-decimal list-inside space-y-2 text-sm text-blue-800">
+                <li>Documents are currently under admin review</li>
+                <li>Once all documents are verified, you'll be able to download and review them</li>
+                <li>After reviewing, you can officially accept the case to proceed</li>
+                <li>You can then contact the client and continue with the case proceedings</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,17 +1,17 @@
 <!-- Client Navbar - Mobile -->
 <nav class="flex flex-col gap-3">
-    <a href="/dashboard/" class="nav-link">Home</a>
-    <a href="/lawyers/" class="text-link">Lawyer Section</a>
-    <a href="/counseling/" class="text-link">Counseling</a>
-    <a href="/about/" class="text-link">About</a>
-    <a href="/support/" class="text-link">Support</a>
-    <a href="/contact/" class="text-link">Contact</a>
+    <a href="{% url 'client_dashboard' %}" class="nav-link">Home</a>
+    <a href="{% url 'lawyers_section' %}" class="text-link">Lawyer Section</a>
+    <a href="{% url 'counseling' %}" class="text-link">Counseling</a>
+    <a href="{% url 'about' %}" class="text-link">About</a>
+    <a href="{% url 'support' %}" class="text-link">Support</a>
+    <a href="{% url 'contact' %}" class="text-link">Contact</a>
 
     <div class="border-t pt-3 mt-3">
-        <a href="/dashboard/" class="nav-link">Dashboard</a>
-        <a href="/profile/edit/" class="nav-link">My Profile</a>
-        <a href="#" class="nav-link">Support</a>
-        <a href="#" class="nav-link">Report Lawyer</a>
-        <a href="/api/auth/logout/" class="nav-link logout-item">Logout</a>
+        <a href="{% url 'client_dashboard' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'client_profile' %}" class="nav-link">My Profile</a>
+        <a href="{% url 'support' %}" class="nav-link">Support</a>
+        <a href="{% url 'report_lawyer' %}" class="nav-link">Report Lawyer</a>
+        <a href="{% url 'logout' %}" class="nav-link logout-item">Logout</a>
     </div>
 </nav>

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,25 @@
     <!-- Font Imports: Playfair Display & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
             color: #0a0a0a;
         }
-        h1, h2, h3, .heading {
+
+        h1,
+        h2,
+        h3,
+        .heading {
             font-family: 'Playfair Display', serif;
         }
     </style>
 </head>
+
 <body class="bg-white">
 
     <!-- Page Header -->
@@ -34,15 +42,30 @@
 
     <!-- Tab Navigation -->
     <div class="border-b border-gray-200 bg-white">
-        <div class="flex px-6">
-            <button class="tab-button active-tab py-4 px-6 text-black font-bold border-b-2 border-black -mb-px transition-all" data-tab="active">
+        <div class="flex px-6 overflow-x-auto">
+            <button
+                class="tab-button active-tab py-4 px-6 text-black font-bold border-b-2 border-black -mb-px transition-all whitespace-nowrap"
+                data-tab="ready">
+                Ready to Accept
+                {% if ready_cases.count > 0 %}<span class="ml-2 bg-green-500 text-white rounded-full px-2 py-1 text-xs">{{ ready_cases.count }}</span>{% endif %}
+            </button>
+            <button
+                class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors whitespace-nowrap"
+                data-tab="active">
                 Active Cases
+                {% if active_cases.count > 0 %}<span class="ml-2 bg-blue-500 text-white rounded-full px-2 py-1 text-xs">{{ active_cases.count }}</span>{% endif %}
             </button>
-            <button class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors" data-tab="pending">
-                Pending Client Action
+            <button
+                class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors whitespace-nowrap"
+                data-tab="pending">
+                Pending Verification
+                {% if pending_verification_cases.count > 0 %}<span class="ml-2 bg-yellow-500 text-white rounded-full px-2 py-1 text-xs">{{ pending_verification_cases.count }}</span>{% endif %}
             </button>
-            <button class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors" data-tab="completed">
-                Completed / Archived
+            <button
+                class="tab-button inactive-tab py-4 px-6 text-gray-500 font-medium hover:text-black transition-colors whitespace-nowrap"
+                data-tab="rejected">
+                Rejected
+                {% if rejected_cases.count > 0 %}<span class="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">{{ rejected_cases.count }}</span>{% endif %}
             </button>
         </div>
     </div>
@@ -55,237 +78,124 @@
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-200">
                         <th class="px-6 py-4 text-left text-sm font-semibold text-black">Client Details</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Case Type</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Next Milestone</th>
-                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Last Communication</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Status</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Documents</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-black">Submitted</th>
                         <th class="px-6 py-4 text-right text-sm font-semibold text-black">Actions</th>
                     </tr>
                 </thead>
 
-                <!-- Tab 1: Active Cases (Default Visible) -->
-                <tbody class="tab-content" id="active-content">
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                <!-- Ready to Accept Tab -->
+                <tbody class="tab-content" id="ready-content">
+                    {% for case in ready_cases %}
+                    <tr class="border-b border-gray-200 hover:bg-green-50 transition-colors">
                         <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Priya Sharma</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8892</div>
+                            <div class="font-semibold text-black">{{ case.client.get_full_name }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ case.client.user.email }}</div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-black">Mutual Consent Divorce</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Drafting Petition</span>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex rounded-full bg-green-100 text-green-800 px-3 py-1 text-xs font-semibold">✓ Ready to Accept</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Today, 10:00 AM</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex rounded-full bg-green-50 text-green-700 px-3 py-1 text-xs font-semibold">✓ All Verified</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <a href="{% url 'lawyer_accept_case' case.id %}" class="text-green-600 hover:text-green-800 font-semibold">Accept Case</a>
                         </td>
                     </tr>
-
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Rajesh Kumar</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8891</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-black">Child Custody & Support</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Awaiting Signatures</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 22, 2024, 2:30 PM</td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">No cases ready to accept. When all documents are verified, cases will appear here.</td>
                     </tr>
-
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Ananya Patel</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8890</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-black">Alimony Modification</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Court Hearing Nov 15</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 20, 2024, 11:15 AM</td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
 
-                <!-- Tab 2: Pending Client Action (Hidden by Default) -->
+                <!-- Active Cases Tab -->
+                <tbody class="tab-content hidden" id="active-content">
+                    {% for case in active_cases %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-semibold text-black">{{ case.client.get_full_name }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ case.client.user.email }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-black">
+                            <span class="inline-flex rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-semibold">✓ Accepted</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-xs font-semibold">✓ Verified</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'client_cases' %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">No active cases yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <!-- Pending Verification Tab -->
                 <tbody class="tab-content hidden" id="pending-content">
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                    {% for case in pending_verification_cases %}
+                    <tr class="border-b border-gray-200 hover:bg-yellow-50 transition-colors">
                         <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Vikram Singh</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8889</div>
+                            <div class="font-semibold text-black">{{ case.client.get_full_name }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ case.client.user.email }}</div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-black">Contested Divorce</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Client Review</span>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex rounded-full bg-yellow-100 text-yellow-800 px-3 py-1 text-xs font-semibold">⏳ Pending</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 18, 2024, 4:45 PM</td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-gray-600">{{ case.documents_verified_count }}/{{ case.total_documents_count }}</span>
+                                <div class="w-24 bg-gray-200 rounded-full h-2">
+                                    {% if case.documents_verified_count > 0 %}
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: {% widthratio case.documents_verified_count case.total_documents_count 100 %}%"></div>
+                                    {% else %}
+                                    <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </td>
-                    </tr>
-
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Meera Desai</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8888</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-black">Property Settlement</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Awaiting Approval</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 16, 2024, 9:20 AM</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <a href="{% url 'lawyer_view_case_documents' case.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                         </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">No cases pending verification.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
 
-                <!-- Tab 3: Completed / Archived (Hidden by Default) -->
-                <tbody class="tab-content hidden" id="completed-content">
+                <!-- Rejected Cases Tab -->
+                <tbody class="tab-content hidden" id="rejected-content">
+                    {% for case in rejected_cases %}
                     <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Ajay Reddy</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8887</div>
+                            <div class="font-semibold text-black">{{ case.client.get_full_name }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ case.client.user.email }}</div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-black">Mutual Consent Divorce</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Decree Issued</span>
+                        <td class="px-6 py-4 text-sm text-black">
+                            <span class="inline-flex rounded-full bg-red-100 text-red-800 px-3 py-1 text-xs font-semibold">✗ Rejected</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 10, 2024, 3:00 PM</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="text-gray-500">-</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <span class="text-gray-500 font-semibold">No action</span>
                         </td>
                     </tr>
-
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-black">Sonia Verma</div>
-                            <div class="text-xs text-gray-500 mt-1">ID: #DC-8886</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-black">Child Custody & Support</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block bg-gray-100 text-black text-xs font-bold py-2 px-3 rounded-full">Case Closed</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">Oct 5, 2024, 1:30 PM</td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-1">
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Send Message">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Upload Document">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 rounded transition-colors" title="Close Case">
-                                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">No rejected cases.</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -294,7 +204,7 @@
     <!-- Vanilla JS: Tab Switching Logic -->
     <script>
         document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const tabName = this.getAttribute('data-tab');
 
                 // Remove active styling from all tab buttons
@@ -322,4 +232,5 @@
     </script>
 
 </body>
+
 </html>

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Case Details - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                    Case Details
+                </h1>
+                <p class="text-lg text-gray-600">
+                    Review all documents for this case
+                </p>
+            </div>
+            <a href="{% url 'case_documents_verification_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to List
+            </a>
+        </div>
+
+        <!-- Case Info -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Client</h3>
+                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ case_request.client.get_full_name }}</p>
+                    <p class="text-sm text-gray-600">{{ case_request.client.user.email }}</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Lawyer</h3>
+                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ case_request.lawyer.full_name }}</p>
+                    <p class="text-sm text-gray-600">{{ case_request.lawyer.user.email }}</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Case Status</h3>
+                    <p class="mt-2 text-lg font-semibold">
+                        {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
+                        <span class="text-yellow-600">⏳ Under Review</span>
+                        {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
+                        <span class="text-green-600">✓ All Verified</span>
+                        {% elif case_request.status == 'ACCEPTED' %}
+                        <span class="text-green-600">✓ Accepted</span>
+                        {% else %}
+                        <span class="text-gray-600">{{ case_request.get_status_display }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Documents</h3>
+                    <p class="mt-2 text-lg font-semibold text-gray-900">{{ documents.count }}</p>
+                    <p class="text-sm text-gray-600">Total Submitted</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {% for document in documents %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
+                <!-- Document Header -->
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">{{ document.get_document_type_display }}</h3>
+                    
+                    <!-- Status Badge -->
+                    {% if document.casedocumentverification %}
+                        {% if document.casedocumentverification.status == 'VERIFIED' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            ✓ Verified
+                        </span>
+                        {% elif document.casedocumentverification.status == 'PENDING' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            ⏳ Pending
+                        </span>
+                        {% elif document.casedocumentverification.status == 'REJECTED' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            ✗ Rejected
+                        </span>
+                        {% endif %}
+                    {% else %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                        ⏳ Not Started
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Document Info -->
+                <div class="px-6 py-4 space-y-2">
+                    <p class="text-sm text-gray-600">
+                        <strong>Uploaded:</strong> {{ document.uploaded_at|date:"F d, Y H:i" }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        <strong>File:</strong> {{ document.document_file.name|slice:"20:" }}...
+                    </p>
+                </div>
+
+                <!-- Verification Info -->
+                {% if document.casedocumentverification.verified_by %}
+                <div class="px-6 py-3 bg-blue-50 border-t border-gray-200 text-sm text-blue-800">
+                    <strong>Verified by:</strong> {{ document.casedocumentverification.verified_by.email }}
+                    <br>
+                    <strong>Date:</strong> {{ document.casedocumentverification.verified_at|date:"F d, Y H:i" }}
+                </div>
+                {% endif %}
+
+                <!-- Rejection Reason -->
+                {% if document.casedocumentverification.rejection_reason %}
+                <div class="px-6 py-3 bg-red-50 border-t border-gray-200 text-sm text-red-800">
+                    <strong>Rejection Reason:</strong><br>
+                    {{ document.casedocumentverification.rejection_reason }}
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-2">
+                    <a href="{{ document.document_file.url }}" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition text-sm" download>
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download
+                    </a>
+                    {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
+                    <a href="{% url 'case_document_verify' document.id %}" class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Review
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not documents %}
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 py-12 px-6 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">No Documents Found</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                This case has no submitted documents yet.
+            </p>
+        </div>
+        {% endif %}
+
+        <!-- Summary -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-3">Verification Summary</h3>
+            
+            <!-- Statistics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mb-4">
+                <div class="bg-white p-3 rounded border border-blue-200">
+                    <strong class="text-blue-900">Total Documents:</strong> 
+                    <span class="text-lg font-bold text-blue-600">{{ total_docs }}</span>
+                </div>
+                <div class="bg-white p-3 rounded border border-green-200">
+                    <strong class="text-green-900">✓ Verified:</strong> 
+                    <span class="text-lg font-bold text-green-600">{{ verified_docs }}</span>
+                </div>
+                <div class="bg-white p-3 rounded border border-red-200">
+                    <strong class="text-red-900">✗ Rejected:</strong> 
+                    <span class="text-lg font-bold text-red-600">{{ rejected_docs }}</span>
+                </div>
+                <div class="bg-white p-3 rounded border border-yellow-200">
+                    <strong class="text-yellow-900">⏳ Pending:</strong> 
+                    <span class="text-lg font-bold text-yellow-600">{{ pending_docs }}</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            {% if total_docs > 0 %}
+            <div class="mb-4">
+                <div class="flex justify-between text-xs text-blue-800 mb-1">
+                    <span>Verification Progress</span>
+                    <span>{{ verified_docs }}/{{ total_docs }} documents verified</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    {% if verified_docs > 0 %}
+                    <div class="bg-green-500 h-2 rounded-full" style="width: {% widthratio verified_docs total_docs 100 %}%"></div>
+                    {% else %}
+                    <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Status -->
+            <div class="text-sm text-blue-800">
+                <strong>Status:</strong>
+                {% if all_verified %}
+                    <span class="inline-block bg-green-200 text-green-800 px-3 py-1 rounded-full">✓ All Verified - Ready</span>
+                    <p class="text-xs text-green-700 mt-1">All documents have been verified. The lawyer can now accept and work on the case.</p>
+                {% elif any_rejected %}
+                    <span class="inline-block bg-red-200 text-red-800 px-3 py-1 rounded-full">✗ Resubmission Required</span>
+                    <p class="text-xs text-red-700 mt-1">{{ rejected_docs }} document(s) were rejected. Client must resubmit or fix issues.</p>
+                {% elif pending_docs > 0 %}
+                    <span class="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full">⏳ Pending Review</span>
+                    <p class="text-xs text-yellow-700 mt-1">{{ pending_docs }} document(s) are still pending verification.</p>
+                {% else %}
+                    <span class="inline-block bg-gray-200 text-gray-800 px-3 py-1 rounded-full">No Documents</span>
+                {% endif %}
+            </div>
+
+            <!-- Next Action -->
+            <div class="mt-4 p-3 bg-white rounded border-l-4 border-blue-500">
+                <strong class="text-blue-900">Next Action:</strong>
+                {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
+                    {% if pending_docs > 0 %}
+                        <p class="text-sm text-gray-700 mt-1">Review the {{ pending_docs }} remaining document(s)</p>
+                    {% elif rejected_docs > 0 %}
+                        <p class="text-sm text-red-700 mt-1">Notify client to resubmit or fix the {{ rejected_docs }} rejected document(s)</p>
+                    {% endif %}
+                {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
+                    <p class="text-sm text-green-700 mt-1">Awaiting lawyer to accept the case and begin work</p>
+                {% else %}
+                    <p class="text-sm text-gray-700 mt-1">{{ case_request.get_status_display }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

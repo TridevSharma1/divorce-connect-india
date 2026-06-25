@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Document Verification - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                Document Verification
+            </h1>
+            <p class="text-lg text-gray-600">
+                Review and verify case documents from clients
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-yellow-600 text-white">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Pending Documents</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ total_pending }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Cases to Review</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ cases_with_pending_docs|length }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-green-600 text-white">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Cases</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ cases_with_pending_docs|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cases List -->
+        {% if cases_with_pending_docs %}
+        <div class="space-y-6">
+            {% for case_data in cases_with_pending_docs %}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <!-- Case Header -->
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                {{ case_data.case_request.client.get_full_name }} → {{ case_data.case_request.lawyer.full_name }}
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Case ID: #{{ case_data.case_request.id }} | 
+                                Submitted: {{ case_data.case_request.documents_submitted_at|date:"M d, Y H:i" }}
+                            </p>
+                        </div>
+                        <a href="{% url 'case_details_for_admin' case_data.case_request.id %}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
+                            View All
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Documents List -->
+                <div class="divide-y divide-gray-200">
+                    {% for document in case_data.documents %}
+                    <div class="px-6 py-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h4 class="text-base font-medium text-gray-900">
+                                    {{ document.get_document_type_display }}
+                                </h4>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Uploaded: {{ document.uploaded_at|date:"M d, Y H:i" }}
+                                </p>
+                            </div>
+
+                            <!-- Status Badge -->
+                            <div class="ml-4 mr-4">
+                                {% if document.casedocumentverification %}
+                                    {% if document.casedocumentverification.status == 'PENDING' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                        ⏳ Pending
+                                    </span>
+                                    {% elif document.casedocumentverification.status == 'VERIFIED' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        ✓ Verified
+                                    </span>
+                                    {% elif document.casedocumentverification.status == 'REJECTED' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                        ✗ Rejected
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                    ⏳ Not Started
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <a href="{{ document.document_file.url }}" class="inline-flex items-center px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition text-sm" download>
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Download
+                                </a>
+                                {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
+                                <a href="{% url 'case_document_verify' document.id %}" class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition text-sm">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if document.casedocumentverification and document.casedocumentverification.rejection_reason %}
+                        <div class="mt-3 p-2 bg-red-50 border border-red-200 rounded-md text-xs">
+                            <strong class="text-red-900">Rejection Reason:</strong> 
+                            <span class="text-red-800">{{ document.casedocumentverification.rejection_reason }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 py-12 px-6 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">No Pending Documents</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                All submitted documents have been reviewed!
+            </p>
+            <a href="{% url 'admin_dashboard' %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition">
+                Back to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

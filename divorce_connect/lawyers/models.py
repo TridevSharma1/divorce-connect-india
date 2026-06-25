@@ -189,6 +189,16 @@ class LawyerProfile(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.user.email})"
 
+    @property
+    def report_count(self):
+        """Return the number of reports filed against this lawyer."""
+        return self.received_reports.count()
+
+    @property
+    def is_ban_eligible(self):
+        """Return True when the lawyer has reached ban eligibility threshold."""
+        return self.report_count >= 3
+
     def soft_delete(self):
         self.is_deleted = True
         self.deleted_at = timezone.now()
@@ -203,6 +213,274 @@ class DeletedLawyerProfile(LawyerProfile):
         proxy = True
         verbose_name = 'Deleted Lawyer Profile'
         verbose_name_plural = 'Deleted Lawyer Profiles'
+
+
+class CaseRequest(models.Model):
+    """Represents a client request to hire a lawyer."""
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('DOCUMENTS_PENDING', 'Waiting for Documents'),
+        ('DOCUMENTS_SUBMITTED', 'Documents Submitted'),
+        ('DOCUMENTS_VERIFIED', 'Documents Verified'),
+        ('ACCEPTED', 'Accepted'),
+        ('COMPLETED', 'Completed'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    client = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.CASCADE,
+        related_name='sent_case_requests',
+        help_text='Client who sent this request'
+    )
+    lawyer = models.ForeignKey(
+        LawyerProfile,
+        on_delete=models.CASCADE,
+        related_name='case_requests',
+        help_text='Lawyer who is requested'
+    )
+    message = models.TextField(blank=True, help_text='Client message or summary of the request')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    response_message = models.TextField(blank=True, null=True, help_text='Optional lawyer response message')
+    documents_submitted_at = models.DateTimeField(null=True, blank=True, help_text='When documents were submitted')
+    documents_verified_at = models.DateTimeField(null=True, blank=True, help_text='When documents were verified by admin')
+
+    WORKFLOW_STAGES = [
+        ('CASE_CREATED', 'Case Created'),
+        ('DOCUMENT_VERIFICATION', 'Document Verification'),
+        ('LAWYER_ASSIGNED', 'Lawyer Assigned'),
+        ('PETITION_DRAFTED', 'Petition Drafted'),
+        ('PETITION_FILED', 'Petition Filed'),
+        ('FIRST_MOTION', 'First Motion'),
+        ('SECOND_MOTION', 'Second Motion'),
+        ('DECREE_ISSUED', 'Decree Issued'),
+        ('COMPLETED', 'Completed'),
+    ]
+
+    workflow_stage = models.CharField(
+        max_length=30,
+        choices=WORKFLOW_STAGES,
+        default='CASE_CREATED',
+        help_text='Latest completed workflow milestone for the case'
+    )
+    workflow_stage_updated_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When the workflow stage was last updated'
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Case Request'
+        verbose_name_plural = 'Case Requests'
+
+    def __str__(self):
+        return f"Case request from {self.client.get_full_name()} to {self.lawyer.full_name} ({self.status})"
+
+    @property
+    def is_documents_verified(self):
+        """Check if all documents are verified"""
+        return self.status == 'DOCUMENTS_VERIFIED'
+
+    @property
+    def documents_pending_count(self):
+        """Get count of pending documents"""
+        return self.case_documents.filter(
+            casedocumentverification__status='PENDING'
+        ).count()
+
+    @property
+    def documents_verified_count(self):
+        """Get count of verified documents"""
+        return self.case_documents.filter(
+            casedocumentverification__status='VERIFIED'
+        ).count()
+
+    @property
+    def documents_rejected_count(self):
+        """Get count of rejected documents"""
+        return self.case_documents.filter(
+            casedocumentverification__status='REJECTED'
+        ).count()
+
+    @property
+    def total_documents_count(self):
+        """Get total count of documents for this case"""
+        return self.case_documents.count()
+
+    @property
+    def all_documents_verified(self):
+        """Check if all documents are verified (no pending or rejected)"""
+        if self.total_documents_count == 0:
+            return False
+        return self.documents_verified_count == self.total_documents_count
+
+    @property
+    def all_documents_reviewed(self):
+        """Check if all documents have been reviewed (verified or rejected, no pending)"""
+        if self.total_documents_count == 0:
+            return False
+        pending = self.documents_pending_count
+        return pending == 0
+
+    @property
+    def workflow_stage_order(self):
+        return [stage[0] for stage in self.WORKFLOW_STAGES]
+
+    @property
+    def next_workflow_stage(self):
+        order = self.workflow_stage_order
+        try:
+            current_index = order.index(self.workflow_stage)
+        except ValueError:
+            return None
+        return order[current_index + 1] if current_index + 1 < len(order) else None
+
+    @property
+    def get_next_workflow_stage_display(self):
+        next_stage = self.next_workflow_stage
+        return dict(self.WORKFLOW_STAGES).get(next_stage)
+
+    @property
+    def get_workflow_stage_display(self):
+        return dict(self.WORKFLOW_STAGES).get(self.workflow_stage, self.workflow_stage)
+
+    @property
+    def workflow_progress(self):
+        order = self.workflow_stage_order
+        try:
+            current_index = order.index(self.workflow_stage)
+        except ValueError:
+            current_index = 0
+
+        progress = []
+        for index, (key, label) in enumerate(self.WORKFLOW_STAGES):
+            progress.append({
+                'key': key,
+                'label': label,
+                'completed': index <= current_index,
+                'active': index == current_index,
+            })
+        return progress
+
+
+class CaseDocument(models.Model):
+    """Store documents uploaded by clients for a case."""
+
+    DOCUMENT_TYPES = [
+        ('aadhaar', 'Aadhaar Card'),
+        ('pan', 'PAN Card'),
+        ('marriage_cert', 'Marriage Certificate'),
+        ('address_proof', 'Address Proof'),
+        ('income_proof', 'Income Proof'),
+        ('passport', 'Passport'),
+        ('affidavit', 'Affidavits'),
+    ]
+
+    case_request = models.ForeignKey(
+        CaseRequest,
+        on_delete=models.CASCADE,
+        related_name='case_documents',
+        help_text='Associated case request'
+    )
+
+    document_type = models.CharField(
+        max_length=20,
+        choices=DOCUMENT_TYPES,
+        help_text='Type of document'
+    )
+
+    document_file = models.FileField(
+        upload_to='case_documents/%Y/%m/%d/',
+        help_text='Uploaded document file'
+    )
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text='When document was uploaded'
+    )
+
+    class Meta:
+        ordering = ['-uploaded_at']
+        verbose_name = 'Case Document'
+        verbose_name_plural = 'Case Documents'
+        unique_together = ['case_request', 'document_type']
+
+    def __str__(self):
+        return f"{self.get_document_type_display()} - {self.case_request}"
+
+    @property
+    def file_extension(self):
+        """Get file extension in lowercase."""
+        if self.document_file:
+            return self.document_file.name.lower().split('.')[-1]
+        return ''
+
+    @property
+    def is_pdf(self):
+        """Check if document is a PDF."""
+        return self.file_extension == 'pdf'
+
+    @property
+    def is_image(self):
+        """Check if document is an image."""
+        return self.file_extension in ['jpg', 'jpeg', 'png', 'gif', 'webp']
+
+
+class CaseDocumentVerification(models.Model):
+    """Track admin verification of case documents."""
+
+    VERIFICATION_STATUS = [
+        ('PENDING', 'Pending Review'),
+        ('VERIFIED', 'Verified'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    document = models.OneToOneField(
+        CaseDocument,
+        on_delete=models.CASCADE,
+        related_name='casedocumentverification',
+        help_text='Associated document'
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_STATUS,
+        default='PENDING',
+        help_text='Verification status'
+    )
+
+    verified_by = models.ForeignKey(
+        BaseUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='verified_case_documents',
+        help_text='Admin who verified this document'
+    )
+
+    verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When document was verified'
+    )
+
+    rejection_reason = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Reason for rejection if applicable'
+    )
+
+    class Meta:
+        ordering = ['-verified_at']
+        verbose_name = 'Case Document Verification'
+        verbose_name_plural = 'Case Document Verifications'
+
+    def __str__(self):
+        return f"Verification of {self.document.get_document_type_display()} - {self.status}"
 
 
 class LawyerProfileUpdateRequest(models.Model):

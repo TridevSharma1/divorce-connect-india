@@ -124,6 +124,16 @@ class ClientProfile(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.user.email})"
 
+    @property
+    def report_count(self):
+        """Return the number of reports filed against this client."""
+        return self.received_reports.count()
+
+    @property
+    def is_ban_eligible(self):
+        """Return True when the client has reached ban eligibility threshold."""
+        return self.report_count >= 3
+
     def get_full_name(self):
         """Return the client's full name."""
         return f"{self.first_name} {self.last_name}".strip()

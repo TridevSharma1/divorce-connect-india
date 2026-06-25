@@ -46,21 +46,23 @@
     <!-- Main Report Form Card -->
     <div class="mx-auto max-w-3xl mb-16">
         <div class="bg-white border border-e2e8f0 rounded-lg shadow-sm p-8">
-            <form id="reportForm" class="space-y-6">
+                <form id="reportForm" method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
 
-                <!-- Select Professional -->
-                <div>
-                    <label for="professional" class="block text-sm font-medium text-gray-900 mb-2">
-                        Which professional are you reporting?
-                    </label>
-                    <select id="professional" name="professional" required class="w-full px-4 py-3 border border-e2e8f0 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
-                        <option value="">-- Select a Professional --</option>
-                        <option value="advocate-rajesh-sharma">Advocate Rajesh Sharma</option>
-                        <option value="mediator-priya-patel">Mediator Priya Patel</option>
-                        <option value="advocate-vikram-singh">Advocate Vikram Singh</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+                    <!-- Select Professional -->
+                    <div>
+                        <label for="professional" class="block text-sm font-medium text-gray-900 mb-2">
+                            Which lawyer are you reporting?
+                        </label>
+                        <select id="professional" name="lawyer" required class="w-full px-4 py-3 border border-e2e8f0 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent">
+                            <option value="">-- Select a Lawyer --</option>
+                            {% for lawyer in lawyers %}
+                                <option value="{{ lawyer.id }}">{{ lawyer.full_name }}{% if lawyer.specialization %} — {{ lawyer.get_specialization_display }}{% endif %}</option>
+                            {% empty %}
+                                <option value="" disabled>No lawyers available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                 <!-- Reason for Report -->
                 <div>
@@ -180,13 +182,6 @@
                 fileList.innerHTML = `<span class="text-green-700 font-medium">✓ ${fileName} (${fileSize} KB)</span>`;
             }
         }
-
-        // Form submission
-        reportForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Show modal
-            confirmationModal.classList.remove('hidden');
-        });
 
         // Cancel button
         cancelBtn.addEventListener('click', () => {

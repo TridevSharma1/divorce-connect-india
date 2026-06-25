@@ -1,7 +1,7 @@
 from django import forms
 from accounts.models import BaseUser
 from accounts.forms import BaseUserCreationForm
-from .models import LawyerProfile, Specialization, Gender
+from .models import LawyerProfile, Specialization, Gender, CaseDocument, CaseDocumentVerification, CaseRequest
 from core_utils import validate_profile_picture
 
 
@@ -296,3 +296,145 @@ class LawyerProfileEditForm(forms.ModelForm):
         self.fields['years_of_experience'].required = True
         self.fields['specialization'].required = True
         self.fields['mobile_number'].required = True
+
+
+class CaseDocumentUploadForm(forms.ModelForm):
+    """Form for uploading case documents."""
+
+    class Meta:
+        model = CaseDocument
+        fields = ['document_type', 'document_file']
+        widgets = {
+            'document_type': forms.Select(attrs={
+                'class': 'form-control',
+                'disabled': True
+            }),
+            'document_file': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.case_request = kwargs.pop('case_request', None)
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['document_type'].disabled = True
+            self.fields['document_type'].widget = forms.HiddenInput()
+
+
+class CaseDocumentBulkUploadForm(forms.Form):
+    """Form for bulk uploading multiple case documents."""
+
+    aadhaar = forms.FileField(
+        required=False,
+        label="Aadhaar Card",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    pan = forms.FileField(
+        required=False,
+        label="PAN Card",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    marriage_cert = forms.FileField(
+        required=False,
+        label="Marriage Certificate",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    address_proof = forms.FileField(
+        required=False,
+        label="Address Proof",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    income_proof = forms.FileField(
+        required=False,
+        label="Income Proof",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    passport = forms.FileField(
+        required=False,
+        label="Passport",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    affidavit = forms.FileField(
+        required=False,
+        label="Affidavits",
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': '.pdf,.jpg,.jpeg,.png,.docx'
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.case_request = kwargs.pop('case_request', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Check if at least one document is uploaded
+        document_types = ['aadhaar', 'pan', 'marriage_cert', 'address_proof', 'income_proof', 'passport', 'affidavit']
+        documents_uploaded = any(
+            cleaned_data.get(doc_type) for doc_type in document_types
+        )
+        if not documents_uploaded:
+            raise forms.ValidationError("Please upload at least one document.")
+        return cleaned_data
+
+
+class DocumentVerificationForm(forms.ModelForm):
+    """Form for admin to verify case documents."""
+
+    class Meta:
+        model = CaseDocumentVerification
+        fields = ['status', 'rejection_reason']
+        widgets = {
+            'status': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'rejection_reason': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Explain reason for rejection (if applicable)'
+            })
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hide rejection reason field if status is not rejection
+        if self.instance.status != 'REJECTED':
+            self.fields['rejection_reason'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        rejection_reason = cleaned_data.get('rejection_reason')
+
+        if status == 'REJECTED' and not rejection_reason:
+            raise forms.ValidationError(
+                "Please provide a rejection reason when rejecting a document."
+            )
+        return cleaned_data

@@ -1,8 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ClientProfile
+from lawyers.models import LawyerProfile
+from adminpanel.models import TrustReport
+from accounts.models import Notification
 
 def landing_page_view(request):
     if request.user.is_authenticated:
@@ -20,6 +23,18 @@ def client_dashboard_view(request):
     if not hasattr(request.user, 'client_profile'):
         return redirect('/api/auth/login/')
     return render(request, 'client_dashboard.html')
+
+
+@login_required(login_url='/api/auth/login/')
+def client_cases_view(request):
+    if not hasattr(request.user, 'client_profile'):
+        return redirect('/api/auth/login/')
+
+    case_requests = request.user.client_profile.sent_case_requests.select_related('lawyer', 'lawyer__user').order_by('-created_at')
+    return render(request, 'client_cases.html', {
+        'case_requests': case_requests,
+    })
+
 
 @login_required(login_url='/api/auth/login/')
 def edit_profile_client_view(request):
@@ -92,4 +107,60 @@ def contact_view(request):
 @login_required(login_url='/api/auth/login/')
 def report_lawyer_view(request):
     """Trust and safety page for reporting professionals."""
-    return render(request, 'report_lawyer.html')
+    if not hasattr(request.user, 'client_profile'):
+        return redirect('/api/auth/login/')
+
+    current_client = request.user.client_profile
+    available_lawyers = LawyerProfile.objects.filter(
+        case_requests__client=current_client
+    ).distinct().order_by('-rating')
+
+    if not available_lawyers.exists():
+        available_lawyers = LawyerProfile.objects.filter(
+            verified=True,
+            is_profile_complete=True
+        ).order_by('-rating')[:50]
+
+    if request.method == 'POST':
+        lawyer_id = request.POST.get('lawyer')
+        reason = request.POST.get('reason', '').strip()
+        description = request.POST.get('description', '').strip()
+        evidence = request.FILES.get('evidence')
+
+        if not lawyer_id or not reason or not description:
+            messages.error(request, 'Please select a lawyer and provide a reason and incident description.')
+            return render(request, 'report_lawyer.html', {
+                'lawyers': available_lawyers,
+            })
+
+        reported_lawyer = get_object_or_404(LawyerProfile, id=lawyer_id)
+        TrustReport.objects.create(
+            reporter=request.user,
+            reported_lawyer=reported_lawyer,
+            reason=reason,
+            description=description,
+            evidence=evidence
+        )
+
+        Notification.objects.create(
+            user=request.user,
+            title='Report Submitted',
+            message=f'Your report against {reported_lawyer.full_name} has been received and is under review.',
+            url='/dashboard/'
+        )
+        Notification.objects.create(
+            user=reported_lawyer.user,
+            title='A report has been filed against you',
+            message=f'{current_client.get_full_name()} has submitted a report. Admin will review and take action.',
+            url='/lawyers/dashboard/'
+        )
+
+        if reported_lawyer.report_count >= 3:
+            messages.warning(request, 'This lawyer now has 3 or more reports and is eligible for ban review by the admin.')
+
+        messages.success(request, 'Your report has been submitted successfully. Thank you for keeping the community safe.')
+        return redirect('client_dashboard')
+
+    return render(request, 'report_lawyer.html', {
+        'lawyers': available_lawyers,
+    })

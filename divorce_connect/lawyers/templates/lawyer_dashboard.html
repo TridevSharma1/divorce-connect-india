@@ -6,21 +6,31 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
     <!-- Profile Verification Status & Details Section -->
-    {% if not is_verified or not is_complete %}
+    {% if not is_verified or not is_complete or has_pending_update %}
     <div class="mb-12 p-6 bg-amber-50 border-2 border-amber-300 rounded-lg">
         <div class="flex items-start gap-4">
             <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z">
+                </path>
             </svg>
             <div>
                 <h3 class="text-lg font-bold text-amber-900 mb-2">Profile Verification Required</h3>
                 {% if not is_complete %}
-                    <p class="text-amber-800 mb-2"><strong>Status:</strong> Profile incomplete</p>
-                    <p class="text-amber-700 text-sm mb-3">Please complete your profile to proceed. Go to <strong>Profile Edit</strong> and fill in all required fields.</p>
-                    <a href="{% url 'lawyer_profile_edit' %}" class="inline-block bg-amber-600 text-white px-4 py-2 rounded font-semibold hover:bg-amber-700 transition">Complete Profile</a>
+                <p class="text-amber-800 mb-2"><strong>Status:</strong> Profile incomplete</p>
+                <p class="text-amber-700 text-sm mb-3">Please complete your profile to proceed. Go to <strong>Profile
+                        Edit</strong> and fill in all required fields.</p>
+                <a href="{% url 'lawyer_profile_edit' %}"
+                    class="inline-block bg-amber-600 text-white px-4 py-2 rounded font-semibold hover:bg-amber-700 transition">Complete
+                    Profile</a>
                 {% elif not is_verified %}
-                    <p class="text-amber-800 mb-2"><strong>Status:</strong> Pending admin verification</p>
-                    <p class="text-amber-700 text-sm">Your profile has been submitted. Admin will verify your details and credentials within 24-48 hours. Dashboard features are disabled until verification is complete.</p>
+                <p class="text-amber-800 mb-2"><strong>Status:</strong> Pending admin verification</p>
+                <p class="text-amber-700 text-sm">Your profile has been submitted. Admin will verify your details and
+                    credentials within 24-48 hours. Dashboard features are disabled until verification is complete.</p>
+                {% elif has_pending_update %}
+                <p class="text-amber-800 mb-2"><strong>Status:</strong> Pending profile update approval</p>
+                <p class="text-amber-700 text-sm">Your requested profile changes are under review. Full access is paused
+                    until the update request is approved.</p>
                 {% endif %}
             </div>
         </div>
@@ -29,32 +39,11 @@
 
     <!-- Profile Information Section -->
     <div class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Personal Details -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Personal Information</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Full Name</label>
-                    <p class="text-lg font-semibold">{{ profile.full_name }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Email</label>
-                    <p class="text-lg font-semibold">{{ user.email }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Gender</label>
-                    <p class="text-lg font-semibold">{{ profile.get_gender_display }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Date of Birth</label>
-                    <p class="text-lg font-semibold">{{ profile.date_of_birth|date:"d M, Y" }}</p>
-                </div>
-            </div>
-        </div>
 
         <!-- Professional Details -->
         <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Professional Information</h2>
+            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Professional Information
+            </h2>
             <div class="space-y-4">
                 <div>
                     <label class="text-gray-600 text-sm font-semibold">Bar Registration Number</label>
@@ -75,21 +64,6 @@
             </div>
         </div>
 
-        <!-- Contact Details -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Contact Information</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Mobile Number</label>
-                    <p class="text-lg font-semibold">{{ profile.mobile_number }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Alternate Mobile</label>
-                    <p class="text-lg font-semibold">{{ profile.alternate_mobile_number|default:"Not provided" }}</p>
-                </div>
-            </div>
-        </div>
-
         <!-- Verification Status -->
         <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
             <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Verification Status</h2>
@@ -98,9 +72,9 @@
                     <label class="text-gray-600 text-sm font-semibold">Profile Status</label>
                     <p class="text-lg font-semibold">
                         {% if is_complete %}
-                            <span class="text-green-600">✓ Complete</span>
+                        <span class="text-green-600">✓ Complete</span>
                         {% else %}
-                            <span class="text-red-600">✗ Incomplete</span>
+                        <span class="text-red-600">✗ Incomplete</span>
                         {% endif %}
                     </p>
                 </div>
@@ -108,9 +82,9 @@
                     <label class="text-gray-600 text-sm font-semibold">Verification</label>
                     <p class="text-lg font-semibold">
                         {% if is_verified %}
-                            <span class="text-green-600">✓ Verified</span>
+                        <span class="text-green-600">✓ Verified</span>
                         {% else %}
-                            <span class="text-amber-600">⏳ Pending</span>
+                        <span class="text-amber-600">⏳ Pending</span>
                         {% endif %}
                     </p>
                 </div>
@@ -118,7 +92,8 @@
                 <div>
                     <label class="text-gray-600 text-sm font-semibold">Profile Picture</label>
                     <div class="mt-2">
-                        <img src="{{ profile.profile_picture.url }}" alt="Profile" class="w-24 h-24 rounded-lg object-cover border-2 border-gray-300">
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile"
+                            class="w-24 h-24 rounded-lg object-cover border-2 border-gray-300">
                     </div>
                 </div>
                 {% endif %}
@@ -127,13 +102,14 @@
     </div>
 
     <!-- Disabled Overlay if not verified -->
-    {% if not is_verified or not is_complete %}
+    {% if not is_verified or not is_complete or has_pending_update %}
     <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-40 pointer-events-none"></div>
 
     <div class="relative opacity-50 pointer-events-none">
         <!-- Welcome Section -->
         <div class="mb-12">
-            <h1 class="text-5xl font-bold serif-heading mb-3">Welcome back, {{ user.get_full_name|default:user.email }}</h1>
+            <h1 class="text-5xl font-bold serif-heading mb-3">Welcome back, {{ user.get_full_name|default:user.email }}
+            </h1>
             <p class="text-gray-600 text-lg">Your practice dashboard</p>
         </div>
 
@@ -160,7 +136,9 @@
                         <h3 class="text-3xl font-bold">₹4.2L</h3>
                     </div>
                     <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                        <path
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
+                        </path>
                     </svg>
                 </div>
             </div>
@@ -173,7 +151,9 @@
                         <h3 class="text-3xl font-bold">₹35K</h3>
                     </div>
                     <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                        <path
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
+                        </path>
                     </svg>
                 </div>
             </div>
@@ -201,7 +181,8 @@
                     <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="font-semibold">Divorce Settlement Case</h4>
-                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
+                            <span
+                                class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
                         </div>
                         <p class="text-gray-600 text-sm mb-3">Client requesting consultation for asset division</p>
                         <button class="text-link font-semibold text-sm">View Request →</button>
@@ -210,7 +191,8 @@
                     <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="font-semibold">Custody Matter</h4>
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold">Pending</span>
+                            <span
+                                class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold">Pending</span>
                         </div>
                         <p class="text-gray-600 text-sm mb-3">Client seeking legal advice on custody arrangements</p>
                         <button class="text-link font-semibold text-sm">View Request →</button>
@@ -219,7 +201,8 @@
                     <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="font-semibold">Documentation Review</h4>
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
+                            <span
+                                class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
                         </div>
                         <p class="text-gray-600 text-sm mb-3">Client wants document review for legal compliance</p>
                         <button class="text-link font-semibold text-sm">View Details →</button>
@@ -230,47 +213,44 @@
             <!-- Client Details Section -->
             <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
                 <h2 class="text-2xl font-bold serif-heading mb-6">Recent Clients</h2>
-                <div class="space-y-4">
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-sm mb-1">Priya Singh</p>
-                        <p class="text-gray-600 text-xs mb-2">Divorce Settlement</p>
-                        <span class="text-xs font-semibold text-green-600">Active</span>
+                {% if recent_clients %}
+                    <div class="space-y-4">
+                        {% for case in recent_clients %}
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
+                                <p class="font-semibold text-sm mb-1">{{ case.client.get_full_name }}</p>
+                                <p class="text-gray-600 text-xs mb-2">Hired on {{ case.updated_at|date:'M d, Y' }}</p>
+                                {% if case.message %}
+                                    <p class="text-gray-600 text-xs mb-2 italic truncate">{{ case.message }}</p>
+                                {% endif %}
+                                <span class="text-xs font-semibold text-green-600">✓ Active</span>
+                            </div>
+                        {% endfor %}
                     </div>
-
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-sm mb-1">Rajesh Kumar</p>
-                        <p class="text-gray-600 text-xs mb-2">Custody Matter</p>
-                        <span class="text-xs font-semibold text-blue-600">In Progress</span>
+                {% else %}
+                    <div class="text-center py-6 text-gray-500">
+                        <p class="text-sm">No accepted cases yet</p>
+                        <a href="{% url 'lawyer_case_orders' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">View pending requests →</a>
                     </div>
-
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-sm mb-1">Anjali Patel</p>
-                        <p class="text-gray-600 text-xs mb-2">Legal Consultation</p>
-                        <span class="text-xs font-semibold text-purple-600">Completed</span>
-                    </div>
-
-                    <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="font-semibold text-sm mb-1">Vikram Sharma</p>
-                        <p class="text-gray-600 text-xs mb-2">Document Review</p>
-                        <span class="text-xs font-semibold text-orange-600">Pending</span>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="#" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+            <a href="#"
+                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
                 <h3 class="font-bold mb-2">View Case Orders</h3>
                 <p class="text-gray-600 text-sm">Browse all your active case orders</p>
             </a>
 
-            <a href="#" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+            <a href="#"
+                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
                 <h3 class="font-bold mb-2">Earning Reports</h3>
                 <p class="text-gray-600 text-sm">View detailed earning analytics</p>
             </a>
 
-            <a href="#" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+            <a href="#"
+                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
                 <h3 class="font-bold mb-2">Account Settings</h3>
                 <p class="text-gray-600 text-sm">Update your profile and preferences</p>
             </a>
@@ -307,7 +287,9 @@
                     <h3 class="text-3xl font-bold">₹4.2L</h3>
                 </div>
                 <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                    <path
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
+                    </path>
                 </svg>
             </div>
         </div>
@@ -320,7 +302,9 @@
                     <h3 class="text-3xl font-bold">₹35K</h3>
                 </div>
                 <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                    <path
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
+                    </path>
                 </svg>
             </div>
         </div>
@@ -366,7 +350,8 @@
                 <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
                     <div class="flex justify-between items-start mb-2">
                         <h4 class="font-semibold">Documentation Review</h4>
-                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
+                        <span
+                            class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Accepted</span>
                     </div>
                     <p class="text-gray-600 text-sm mb-3">Client wants document review for legal compliance</p>
                     <button class="text-link font-semibold text-sm">View Details →</button>
@@ -377,47 +362,44 @@
         <!-- Client Details Section -->
         <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
             <h2 class="text-2xl font-bold serif-heading mb-6">Recent Clients</h2>
-            <div class="space-y-4">
-                <div class="p-4 bg-gray-50 rounded-lg">
-                    <p class="font-semibold text-sm mb-1">Priya Singh</p>
-                    <p class="text-gray-600 text-xs mb-2">Divorce Settlement</p>
-                    <span class="text-xs font-semibold text-green-600">Active</span>
+            {% if recent_clients %}
+                <div class="space-y-4">
+                    {% for case in recent_clients %}
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
+                            <p class="font-semibold text-sm mb-1">{{ case.client.get_full_name }}</p>
+                            <p class="text-gray-600 text-xs mb-2">Hired on {{ case.updated_at|date:'M d, Y' }}</p>
+                            {% if case.message %}
+                                <p class="text-gray-600 text-xs mb-2 italic truncate">{{ case.message }}</p>
+                            {% endif %}
+                            <span class="text-xs font-semibold text-green-600">✓ Active</span>
+                        </div>
+                    {% endfor %}
                 </div>
-
-                <div class="p-4 bg-gray-50 rounded-lg">
-                    <p class="font-semibold text-sm mb-1">Rajesh Kumar</p>
-                    <p class="text-gray-600 text-xs mb-2">Custody Matter</p>
-                    <span class="text-xs font-semibold text-blue-600">In Progress</span>
+            {% else %}
+                <div class="text-center py-6 text-gray-500">
+                    <p class="text-sm">No accepted cases yet</p>
+                    <a href="{% url 'lawyer_case_orders' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">View pending requests →</a>
                 </div>
-
-                <div class="p-4 bg-gray-50 rounded-lg">
-                    <p class="font-semibold text-sm mb-1">Anjali Patel</p>
-                    <p class="text-gray-600 text-xs mb-2">Legal Consultation</p>
-                    <span class="text-xs font-semibold text-purple-600">Completed</span>
-                </div>
-
-                <div class="p-4 bg-gray-50 rounded-lg">
-                    <p class="font-semibold text-sm mb-1">Vikram Sharma</p>
-                    <p class="text-gray-600 text-xs mb-2">Document Review</p>
-                    <span class="text-xs font-semibold text-orange-600">Pending</span>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <a href="{% url 'lawyer_case_orders' %}" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+        <a href="{% url 'lawyer_case_orders' %}"
+            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
             <h3 class="font-bold mb-2">View Case Orders</h3>
             <p class="text-gray-600 text-sm">Browse all your active case orders</p>
         </a>
 
-        <a href="{% url 'lawyer_earnings' %}" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+        <a href="{% url 'lawyer_earnings' %}"
+            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
             <h3 class="font-bold mb-2">Earning Reports</h3>
             <p class="text-gray-600 text-sm">View detailed earning analytics</p>
         </a>
 
-        <a href="{% url 'lawyer_settings' %}" class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
+        <a href="{% url 'lawyer_settings' %}"
+            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
             <h3 class="font-bold mb-2">Account Settings</h3>
             <p class="text-gray-600 text-sm">Update your profile and preferences</p>
         </a>

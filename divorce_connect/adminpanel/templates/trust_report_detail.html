@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Trust Report Detail - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <a href="{% url 'trust_report_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold">← Back to Reports</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-4">Trust Report #{{ report.id }}</h1>
+        <p class="text-gray-600 mt-2">Review details and take action for this report.</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">Reporter</h2>
+                <p class="text-gray-700 mt-2">{{ report.reporter.get_full_name|default:report.reporter.email }}</p>
+                <p class="text-gray-500 text-sm mt-1">Submitted {{ report.created_at|date:"d M, Y H:i" }}</p>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">Reported User</h2>
+                {% if report.reported_client %}
+                <p class="text-gray-700 mt-2">Client: {{ report.reported_client.get_full_name }}</p>
+                {% elif report.reported_lawyer %}
+                <p class="text-gray-700 mt-2">Lawyer: {{ report.reported_lawyer.full_name }}</p>
+                {% endif %}
+                <p class="text-gray-500 text-sm mt-1">Current report status: {{ report.get_status_display }}</p>
+            </div>
+        </div>
+
+        <div class="space-y-4 mb-8">
+            <div>
+                <h3 class="text-md font-semibold text-gray-900">Reason</h3>
+                <p class="text-gray-700 mt-2">{{ report.reason }}</p>
+            </div>
+            <div>
+                <h3 class="text-md font-semibold text-gray-900">Description</h3>
+                <p class="text-gray-700 mt-2 whitespace-pre-line">{{ report.description }}</p>
+            </div>
+            {% if report.evidence %}
+            <div>
+                <h3 class="text-md font-semibold text-gray-900">Evidence</h3>
+                <a href="{{ report.evidence.url }}" target="_blank" class="inline-flex items-center gap-2 mt-2 text-blue-600 hover:text-blue-800 font-medium">
+                    View attached evidence
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="admin_notes" class="block text-sm font-medium text-gray-900">Admin Notes</label>
+                <textarea id="admin_notes" name="admin_notes" rows="5" class="mt-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Add review notes, warning details, or ban justification.">{{ report.admin_notes }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+                <button type="submit" name="action" value="approve" class="w-full rounded-lg bg-green-600 text-white px-4 py-3 hover:bg-green-700 transition">Approve</button>
+                <button type="submit" name="action" value="warn" class="w-full rounded-lg bg-yellow-500 text-white px-4 py-3 hover:bg-yellow-600 transition">Warn</button>
+                <button type="submit" name="action" value="ban" class="w-full rounded-lg bg-red-600 text-white px-4 py-3 hover:bg-red-700 transition">Ban</button>
+                <button type="submit" name="action" value="reject" class="w-full rounded-lg bg-gray-600 text-white px-4 py-3 hover:bg-gray-700 transition">Reject</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

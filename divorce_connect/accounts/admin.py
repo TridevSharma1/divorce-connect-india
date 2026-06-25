@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import BaseUser
+from .models import BaseUser, Notification
 from .forms import BaseUserCreationForm, BaseUserChangeForm
 
 
@@ -33,3 +33,13 @@ class BaseUserAdmin(BaseUserAdmin):
 	search_fields = ('email', 'first_name', 'last_name')
 	ordering = ('-created_at',)
 	readonly_fields = ('created_at', 'updated_at', 'last_login', 'date_joined')
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    """Admin configuration for user notifications."""
+
+    list_display = ('user', 'title', 'is_read', 'created_at')
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('user__email', 'title', 'message')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)

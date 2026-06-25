@@ -27,6 +27,10 @@ def require_verified_profile(profile_type='lawyer'):
                     messages.warning(request, 'Your profile is pending verification by admin. You will have full access once verified.')
                     return redirect('/lawyers/dashboard/')
 
+                if profile.update_requests.filter(status='PENDING').exists():
+                    messages.warning(request, 'Your profile update request is under review. Full access is paused until approval.')
+                    return redirect('/lawyers/dashboard/')
+
             elif profile_type == 'admin':
                 if not hasattr(request.user, 'admin_profile'):
                     return redirect('/api/auth/login/')

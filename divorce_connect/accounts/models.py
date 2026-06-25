@@ -76,3 +76,28 @@ class BaseUser(AbstractUser):
     def get_short_name(self):
         """Return the user's first name."""
         return self.first_name
+
+
+class Notification(models.Model):
+    """User-visible notification messages for clients, lawyers, and admins."""
+
+    user = models.ForeignKey(
+        BaseUser,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        help_text='User who receives this notification'
+    )
+    title = models.CharField(max_length=120)
+    message = models.TextField()
+    url = models.CharField(max_length=255, blank=True, null=True,
+                           help_text='Optional URL for the notification action')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
+
+    def __str__(self):
+        return f"{self.user.email}: {self.title}"

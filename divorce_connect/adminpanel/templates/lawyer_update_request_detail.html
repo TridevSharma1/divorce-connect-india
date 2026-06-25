@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Lawyer Profile Update - DivorceConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-10">
+        <a href="{% url 'admin_dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold">← Back to Dashboard</a>
+        <h1 class="text-5xl font-bold serif-heading mt-4">Review Lawyer Profile Update</h1>
+        <p class="text-gray-600 mt-2">Compare requested changes and approve or reject the lawyer's profile update.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-8 rounded-lg border border-gray-200">
+                <h2 class="text-2xl font-bold mb-5">Requested Changes</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-500">Full Name</p>
+                        <p class="text-lg font-semibold">{{ update_request.full_name|default:lawyer.full_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Gender</p>
+                        <p class="text-lg font-semibold">{{ update_request.get_gender_display|default:lawyer.get_gender_display }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Date of Birth</p>
+                        <p class="text-lg font-semibold">{{ update_request.date_of_birth|date:'d M, Y'|default:lawyer.date_of_birth|date:'d M, Y' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Years of Experience</p>
+                        <p class="text-lg font-semibold">{{ update_request.years_of_experience|default:lawyer.years_of_experience }} years</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-gray-500">Specialization</p>
+                        <p class="text-lg font-semibold">{{ update_request.get_specialization_display|default:lawyer.get_specialization_display }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-gray-500">Bio</p>
+                        <p class="text-lg font-semibold whitespace-pre-line">{{ update_request.bio|default:lawyer.bio|default:'No bio provided' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Consultation Fee</p>
+                        <p class="text-lg font-semibold">₹{{ update_request.consultation_fee|default:lawyer.consultation_fee|default:'0.00' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Office City</p>
+                        <p class="text-lg font-semibold">{{ update_request.office_city|default:lawyer.office_city|default:'Not provided' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Mobile Number</p>
+                        <p class="text-lg font-semibold">{{ update_request.mobile_number|default:lawyer.mobile_number }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Alternate Mobile</p>
+                        <p class="text-lg font-semibold">{{ update_request.alternate_mobile_number|default:lawyer.alternate_mobile_number|default:'Not provided' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if update_request.profile_picture %}
+            <div class="bg-white p-8 rounded-lg border border-gray-200">
+                <h2 class="text-2xl font-bold mb-5">Updated Profile Picture</h2>
+                <img src="{{ update_request.profile_picture.url }}" alt="Updated Profile" class="w-full max-w-sm rounded-lg object-cover border border-gray-300" />
+            </div>
+            {% endif %}
+
+            <div class="bg-white p-8 rounded-lg border border-gray-200">
+                <h2 class="text-2xl font-bold mb-5">Current Lawyer Profile</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-500">Full Name</p>
+                        <p class="text-lg font-semibold">{{ lawyer.full_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="text-lg font-semibold">{{ user_obj.email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Bar Registration No.</p>
+                        <p class="text-lg font-semibold">{{ lawyer.bar_registration_number }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">State Bar Council</p>
+                        <p class="text-lg font-semibold">{{ lawyer.state_bar_council }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Years of Experience</p>
+                        <p class="text-lg font-semibold">{{ lawyer.years_of_experience }} years</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Specialization</p>
+                        <p class="text-lg font-semibold">{{ lawyer.get_specialization_display }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white p-8 rounded-lg border border-gray-200 sticky top-24">
+                <h2 class="text-2xl font-bold mb-5">Review Actions</h2>
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="text-gray-700 text-sm font-semibold mb-2 block">Admin Notes</label>
+                        <textarea name="notes" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Add optional review notes..."></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">Approve and Apply Changes</button>
+                </form>
+                <button type="button" onclick="document.getElementById('rejectPanel').classList.remove('hidden')" class="w-full mt-4 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">Reject Update</button>
+            </div>
+
+            <div id="rejectPanel" class="hidden bg-white p-8 rounded-lg border border-red-200">
+                <h2 class="text-2xl font-bold text-red-700 mb-5">Reject Update Request</h2>
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="text-gray-700 text-sm font-semibold mb-2 block">Rejection Reason</label>
+                        <textarea name="rejection_reason" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Explain why this update is rejected..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="text-gray-700 text-sm font-semibold mb-2 block">Additional Notes</label>
+                        <textarea name="notes" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Optional admin comments..."></textarea>
+                    </div>
+                    <button type="submit" name="action" value="reject" class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">Submit Rejection</button>
+                    <button type="button" onclick="document.getElementById('rejectPanel').classList.add('hidden')" class="w-full mt-2 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

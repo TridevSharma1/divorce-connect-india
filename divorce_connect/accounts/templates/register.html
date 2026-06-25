@@ -89,12 +89,10 @@
         </div>
 
         <!-- Error Messages -->
-        {% if errors %}
+        {% if form.non_field_errors %}
             <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                {% for field, error_list in errors.items %}
-                    {% for error in error_list %}
-                        <p class="text-red-600 text-sm">{{ field|title }}: {{ error }}</p>
-                    {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
                 {% endfor %}
             </div>
         {% endif %}
@@ -106,21 +104,23 @@
             <!-- Role Selection -->
             <div>
                 <label class="block text-sm font-semibold text-gray-900 mb-3">Select Your Role *</label>
-                <div class="radio-group space-y-2 p-3 bg-gray-50 rounded-lg border {% if errors.role %}border-red-600{% else %}border-gray-200{% endif %}">
+                <div class="radio-group space-y-2 p-3 bg-gray-50 rounded-lg border {% if form.role.errors %}border-red-600{% else %}border-gray-200{% endif %}">
                     <label>
-                        <input type="radio" name="role" value="client" {% if form_data.role == 'client' %}checked{% endif %} required>
+                        <input type="radio" name="role" value="client" {% if form.data.role == 'client' %}checked{% endif %} required>
                         <span class="ml-3 text-gray-700 font-medium">Client</span>
                     </label>
                     <label>
-                        <input type="radio" name="role" value="lawyer" {% if form_data.role == 'lawyer' %}checked{% endif %} required>
+                        <input type="radio" name="role" value="lawyer" {% if form.data.role == 'lawyer' %}checked{% endif %} required>
                         <span class="ml-3 text-gray-700 font-medium">Lawyer</span>
                     </label>
                     <label>
-                        <input type="radio" name="role" value="admin" {% if form_data.role == 'admin' %}checked{% endif %} required>
+                        <input type="radio" name="role" value="admin" {% if form.data.role == 'admin' %}checked{% endif %} required>
                         <span class="ml-3 text-gray-700 font-medium">Admin Panel</span>
                     </label>
                 </div>
-                {% if errors.role %}<div class="error-message">{{ errors.role }}</div>{% endif %}
+                {% if form.role.errors %}
+                    <div class="error-message">{{ form.role.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- First Name -->
@@ -132,10 +132,12 @@
                     name="first_name"
                     required
                     placeholder="John"
-                    value="{{ form_data.first_name }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if errors.first_name %}error-input{% endif %}"
+                    value="{{ form.first_name.value }}"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.first_name.errors %}error-input{% endif %}"
                 >
-                {% if errors.first_name %}<div class="error-message">{{ errors.first_name }}</div>{% endif %}
+                {% if form.first_name.errors %}
+                    <div class="error-message">{{ form.first_name.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- Last Name -->
@@ -147,10 +149,12 @@
                     name="last_name"
                     required
                     placeholder="Doe"
-                    value="{{ form_data.last_name }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if errors.last_name %}error-input{% endif %}"
+                    value="{{ form.last_name.value }}"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.last_name.errors %}error-input{% endif %}"
                 >
-                {% if errors.last_name %}<div class="error-message">{{ errors.last_name }}</div>{% endif %}
+                {% if form.last_name.errors %}
+                    <div class="error-message">{{ form.last_name.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- Email -->
@@ -162,39 +166,45 @@
                     name="email"
                     required
                     placeholder="you@example.com"
-                    value="{{ form_data.email }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if errors.email %}error-input{% endif %}"
+                    value="{{ form.email.value }}"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.email.errors %}error-input{% endif %}"
                 >
-                {% if errors.email %}<div class="error-message">{{ errors.email }}</div>{% endif %}
+                {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-sm font-semibold text-gray-900 mb-1">Password *</label>
+                <label for="password1" class="block text-sm font-semibold text-gray-900 mb-1">Password *</label>
                 <input
                     type="password"
-                    id="password"
-                    name="password"
+                    id="password1"
+                    name="password1"
                     required
                     placeholder="••••••••"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if errors.password %}error-input{% endif %}"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.password1.errors %}error-input{% endif %}"
                 >
                 <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-                {% if errors.password %}<div class="error-message">{{ errors.password }}</div>{% endif %}
+                {% if form.password1.errors %}
+                    <div class="error-message">{{ form.password1.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- Confirm Password -->
             <div>
-                <label for="confirm_password" class="block text-sm font-semibold text-gray-900 mb-1">Confirm Password *</label>
+                <label for="password2" class="block text-sm font-semibold text-gray-900 mb-1">Confirm Password *</label>
                 <input
                     type="password"
-                    id="confirm_password"
-                    name="confirm_password"
+                    id="password2"
+                    name="password2"
                     required
                     placeholder="••••••••"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if errors.confirm_password %}error-input{% endif %}"
+                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.password2.errors %}error-input{% endif %}"
                 >
-                {% if errors.confirm_password %}<div class="error-message">{{ errors.confirm_password }}</div>{% endif %}
+                {% if form.password2.errors %}
+                    <div class="error-message">{{ form.password2.errors.0 }}</div>
+                {% endif %}
             </div>
 
             <!-- Submit Button -->
@@ -209,7 +219,7 @@
         <!-- Login Link -->
         <p class="text-center text-sm text-gray-600 mt-6">
             Already have an account?
-            <a href="/api/auth/login/" class="text-blue-600 hover:text-blue-800 font-semibold transition">
+            <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-semibold transition">
                 Sign In
             </a>
         </p>

@@ -1,7 +1,13 @@
 from django.contrib import admin
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from .models import AdminPanelProfile, DeletedAdminPanelProfile, AdminPanelProfileUpdateRequest
+from .models import (
+    AdminPanelProfile,
+    DeletedAdminPanelProfile,
+    AdminPanelProfileUpdateRequest,
+    LawyerVerificationRequest,
+    TrustReport,
+)
 
 
 @admin.register(AdminPanelProfile)
@@ -240,3 +246,44 @@ class AdminPanelProfileUpdateRequestAdmin(admin.ModelAdmin):
 			count += 1
 		self.message_user(request, f'{count} update request(s) rejected.')
 	reject_requests.short_description = 'Reject selected requests'
+
+
+@admin.register(LawyerVerificationRequest)
+class LawyerVerificationRequestAdmin(admin.ModelAdmin):
+    """Admin interface for lawyer verification requests."""
+
+    list_display = (
+        'id',
+        'lawyer',
+        'status',
+        'submitted_at',
+        'reviewed_at',
+        'reviewed_by',
+    )
+    list_filter = ('status', 'submitted_at', 'reviewed_at')
+    search_fields = ('lawyer__full_name', 'lawyer__user__email', 'rejection_reason', 'notes')
+    ordering = ('-submitted_at',)
+
+
+@admin.register(TrustReport)
+class TrustReportAdmin(admin.ModelAdmin):
+    """Admin interface for trust and safety reports."""
+
+    list_display = (
+        'id',
+        'reporter',
+        'reported_client',
+        'reported_lawyer',
+        'status',
+        'created_at',
+        'updated_at',
+    )
+    list_filter = ('status', 'created_at', 'updated_at')
+    search_fields = (
+        'reporter__email',
+        'reported_client__user__email',
+        'reported_lawyer__user__email',
+        'reason',
+        'description',
+    )
+    ordering = ('-created_at',)

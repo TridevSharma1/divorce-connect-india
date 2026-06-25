@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Case Documents - Divorce Connect{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                Upload Required Documents
+            </h1>
+            <p class="text-lg text-gray-600">
+                {{ case_request.lawyer.full_name }} has asked you to upload documents to proceed with your case.
+            </p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-600 text-white">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Document Upload Status</h3>
+                    <p class="text-sm text-gray-500">Upload documents for verification</p>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} rounded-lg p-4 mb-4">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Create dictionary of uploaded documents -->
+        {% with uploaded_documents_dict=uploaded_documents|dictsort:"document_type" %}
+
+        <!-- Document Upload Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Required Documents</h2>
+                
+                <div class="space-y-6">
+                    <!-- Aadhaar Card -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Aadhaar Card
+                        </label>
+                        {% with uploaded=uploaded_documents|length %}
+                        <input type="file" name="aadhaar" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'aadhaar' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'aadhaar' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                        {% endwith %}
+                    </div>
+
+                    <!-- PAN Card -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            PAN Card
+                        </label>
+                        <input type="file" name="pan" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'pan' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'pan' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+
+                    <!-- Marriage Certificate -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Marriage Certificate
+                        </label>
+                        <input type="file" name="marriage_cert" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'marriage_cert' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'marriage_cert' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+
+                    <!-- Address Proof -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Address Proof
+                        </label>
+                        <input type="file" name="address_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'address_proof' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'address_proof' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+
+                    <!-- Income Proof -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Income Proof
+                        </label>
+                        <input type="file" name="income_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'income_proof' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'income_proof' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+
+                    <!-- Passport -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Passport
+                        </label>
+                        <input type="file" name="passport" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'passport' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'passport' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+
+                    <!-- Affidavits -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-900 mb-2">
+                            Affidavits
+                        </label>
+                        <input type="file" name="affidavit" accept=".pdf,.jpg,.jpeg,.png,.docx" 
+                               class="form-control w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               {% for doc in uploaded_documents %}{% if doc.document_type == 'affidavit' %}disabled{% endif %}{% endfor %}>
+                        {% for doc in uploaded_documents %}{% if doc.document_type == 'affidavit' %}
+                        <p class="text-sm text-green-600 mt-2">✓ Already uploaded</p>
+                        {% endif %}{% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    Upload Documents
+                </button>
+                <a href="{% url 'client_cases' %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+                    Back to Cases
+                </a>
+            </div>
+        </form>
+
+        {% endwith %}
+
+        <!-- Document Requirements Info -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-4">Document Requirements</h3>
+            <ul class="space-y-2 text-sm text-blue-800">
+                <li class="flex items-center">
+                    <span class="text-blue-600 mr-2">•</span>
+                    All documents must be in PDF, JPG, PNG, or DOCX format
+                </li>
+                <li class="flex items-center">
+                    <span class="text-blue-600 mr-2">•</span>
+                    Maximum file size: 5MB per document
+                </li>
+                <li class="flex items-center">
+                    <span class="text-blue-600 mr-2">•</span>
+                    You can upload at least one document initially
+                </li>
+                <li class="flex items-center">
+                    <span class="text-blue-600 mr-2">•</span>
+                    Your lawyer and admin will review your documents
+                </li>
+                <li class="flex items-center">
+                    <span class="text-blue-600 mr-2">•</span>
+                    Once verified, your lawyer can access them and proceed with your case
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

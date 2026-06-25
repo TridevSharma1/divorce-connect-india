@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import LawyerProfile, DeletedLawyerProfile, LawyerProfileUpdateRequest
+from .models import (
+    LawyerProfile,
+    DeletedLawyerProfile,
+    CaseRequest,
+    CaseDocument,
+    CaseDocumentVerification,
+    LawyerProfileUpdateRequest,
+)
 
 
 @admin.register(LawyerProfile)
@@ -188,20 +195,75 @@ class LawyerProfileUpdateRequestAdmin(admin.ModelAdmin):
 
 	def approve_requests(self, request, queryset):
 		from django.utils import timezone
-		count = queryset.update(status='APPROVED', reviewed_at=timezone.now())
-		self.message_user(request, f'{count} update request(s) approved.')
-	approve_requests.short_description = 'Approve selected requests'
-
-	def reject_requests(self, request, queryset):
 		count = 0
 		for obj in queryset:
-			if obj.admin_notes:  # Only reject if admin notes provided
-				obj.status = 'REJECTED'
+			if obj.status != 'APPROVED':
+				lawyer = obj.lawyer
+				lawyer.full_name = obj.full_name or lawyer.full_name
+				lawyer.gender = obj.gender or lawyer.gender
+				lawyer.date_of_birth = obj.date_of_birth or lawyer.date_of_birth
+				lawyer.years_of_experience = obj.years_of_experience if obj.years_of_experience is not None else lawyer.years_of_experience
+				lawyer.specialization = obj.specialization or lawyer.specialization
+				lawyer.bio = obj.bio or lawyer.bio
+				lawyer.consultation_fee = obj.consultation_fee if obj.consultation_fee is not None else lawyer.consultation_fee
+				lawyer.office_city = obj.office_city or lawyer.office_city
+				lawyer.mobile_number = obj.mobile_number or lawyer.mobile_number
+				lawyer.alternate_mobile_number = obj.alternate_mobile_number or lawyer.alternate_mobile_number
+				if obj.profile_picture:
+					lawyer.profile_picture = obj.profile_picture
+				lawyer.save()
+				obj.status = 'APPROVED'
 				obj.reviewed_at = timezone.now()
 				obj.save()
 				count += 1
-		if count > 0:
-			self.message_user(request, f'{count} update request(s) rejected.')
-		else:
-			self.message_user(request, 'Please add admin notes before rejecting.', level='warning')
-	reject_requests.short_description = 'Reject selected requests (requires admin notes)'
+		self.message_user(request, f'{count} update request(s) approved.')
+	approve_requests.short_description = 'Approve selected requests'
+
+
+@admin.register(CaseRequest)
+class CaseRequestAdmin(admin.ModelAdmin):
+    """Admin interface for case requests."""
+
+    list_display = (
+        'id',
+        'client',
+        'lawyer',
+        'status',
+        'workflow_stage',
+        'created_at',
+        'updated_at',
+    )
+    list_filter = ('status', 'workflow_stage', 'created_at', 'updated_at')
+    search_fields = ('client__user__email', 'lawyer__user__email', 'message', 'response_message')
+    ordering = ('-created_at',)
+
+
+@admin.register(CaseDocument)
+class CaseDocumentAdmin(admin.ModelAdmin):
+    """Admin interface for case documents."""
+
+    list_display = (
+        'id',
+        'case_request',
+        'document_type',
+        'uploaded_at',
+    )
+    list_filter = ('document_type', 'uploaded_at')
+    search_fields = ('case_request__client__user__email', 'case_request__lawyer__user__email')
+    ordering = ('-uploaded_at',)
+
+
+@admin.register(CaseDocumentVerification)
+class CaseDocumentVerificationAdmin(admin.ModelAdmin):
+    """Admin interface for case document verifications."""
+
+    list_display = (
+        'id',
+        'document',
+        'status',
+        'verified_by',
+        'verified_at',
+    )
+    list_filter = ('status', 'verified_at')
+    search_fields = ('document__case_request__client__user__email', 'document__case_request__lawyer__user__email')
+    ordering = ('-verified_at',)

@@ -84,6 +84,97 @@ class LawyerVerificationRequest(models.Model):
         return f"{self.lawyer.full_name} - {self.get_status_display()}"
 
 
+class TrustReport(models.Model):
+    """Trust and safety reports filed by clients or lawyers."""
+
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending Review'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+        ('WARNED', 'Warned'),
+        ('BANNED', 'Banned'),
+    ]
+
+    reporter = models.ForeignKey(
+        BaseUser,
+        on_delete=models.CASCADE,
+        related_name='submitted_reports',
+        help_text='User who submitted this report'
+    )
+    reported_client = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.CASCADE,
+        related_name='received_reports',
+        null=True,
+        blank=True,
+        help_text='Client being reported, if applicable'
+    )
+    reported_lawyer = models.ForeignKey(
+        'lawyers.LawyerProfile',
+        on_delete=models.CASCADE,
+        related_name='received_reports',
+        null=True,
+        blank=True,
+        help_text='Lawyer being reported, if applicable'
+    )
+    reason = models.CharField(
+        max_length=140,
+        help_text='Primary reason for filing the report'
+    )
+    description = models.TextField(
+        help_text='Detailed explanation of the incident leading to this report'
+    )
+    evidence = models.FileField(
+        upload_to='report_evidence/',
+        blank=True,
+        null=True,
+        help_text='Optional evidence file supporting the report'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        help_text='Admin review status for this report'
+    )
+    admin_notes = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Notes entered by the admin during review'
+    )
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When the report was reviewed by an admin'
+    )
+    reviewed_by = models.ForeignKey(
+        BaseUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_trust_reports',
+        help_text='Admin who reviewed this report'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Trust Report'
+        verbose_name_plural = 'Trust Reports'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        target = self.reported_client or self.reported_lawyer
+        return f"Report #{self.id} against {target} - {self.get_status_display()}"
+
+    @property
+    def target_name(self):
+        if self.reported_client:
+            return self.reported_client.get_full_name()
+        if self.reported_lawyer:
+            return self.reported_lawyer.full_name
+        return 'Unknown'
+
+
 class AdminPanelProfile(models.Model):
     """
     Admin panel user profile linked to BaseUser via OneToOneField.

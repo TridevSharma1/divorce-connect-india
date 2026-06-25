@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import BaseUserAuthenticationForm, BaseUserCreationForm
+from .forms import BaseUserAuthenticationForm, BaseUserRegistrationForm
 from .models import BaseUser
 from clients.models import ClientProfile
 from lawyers.models import LawyerProfile
@@ -29,89 +29,58 @@ def register_view(request):
         return redirect_to_dashboard(request.user)
 
     if request.method == 'POST':
-        role = request.POST.get('role')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        confirm_password = request.POST.get('confirm_password')
+        form = BaseUserRegistrationForm(request.POST)
+        if form.is_valid():
+            role = form.cleaned_data['role']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
 
-        errors = {}
-
-        if not role:
-            errors['role'] = 'Please select a role'
-        if not email:
-            errors['email'] = 'Email is required'
-        elif BaseUser.objects.filter(email=email).exists():
-            errors['email'] = 'Email already registered'
-        if not password:
-            errors['password'] = 'Password is required'
-        if password != confirm_password:
-            errors['confirm_password'] = 'Passwords do not match'
-        if len(password) < 8:
-            errors['password'] = 'Password must be at least 8 characters'
-        if not first_name:
-            errors['first_name'] = 'First name is required'
-        if not last_name:
-            errors['last_name'] = 'Last name is required'
-
-        if errors:
-            return render(request, 'register.html', {
-                'errors': errors,
-                'form_data': request.POST
-            })
-
-        # Create user
-        user = BaseUser.objects.create_user(
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            username=email
-        )
-
-        # Create profile based on role
-        if role == 'client':
-            ClientProfile.objects.create(
-                user=user,
+            user = BaseUser.objects.create_user(
+                email=email,
+                password=password,
                 first_name=first_name,
                 last_name=last_name,
-                mobile_number=''
+                username=email
             )
-            # Log user in and redirect for clients
-            user = authenticate(username=email, password=password)
-            login(request, user)
-            return redirect_to_dashboard(user)
-        elif role == 'lawyer':
-            LawyerProfile.objects.create(
-                user=user,
-                full_name=f"{first_name} {last_name}",
-                mobile_number='',
-                bar_registration_number='PENDING',
-                state_bar_council=''
-            )
-            # Log user in and redirect for lawyers
-            user = authenticate(username=email, password=password)
-            login(request, user)
-            return redirect_to_dashboard(user)
-        elif role == 'admin':
-            AdminPanelProfile.objects.create(
-                user=user,
-                full_name=f"{first_name} {last_name}",
-                mobile_number=''
-            )
-            # Log admin user in immediately so they can complete profile details.
+
+            if role == 'client':
+                ClientProfile.objects.create(
+                    user=user,
+                    first_name=first_name,
+                    last_name=last_name,
+                    mobile_number=''
+                )
+            elif role == 'lawyer':
+                LawyerProfile.objects.create(
+                    user=user,
+                    full_name=f"{first_name} {last_name}",
+                    mobile_number='',
+                    bar_registration_number='PENDING',
+                    state_bar_council=''
+                )
+            elif role == 'admin':
+                AdminPanelProfile.objects.create(
+                    user=user,
+                    full_name=f"{first_name} {last_name}",
+                    mobile_number=''
+                )
+
             user = authenticate(username=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('/adminpanel/profile/edit/')
-            return render(request, 'registration_success.html', {
-                'email': email,
-                'first_name': first_name,
-                'message': 'Registration complete. Please sign in to submit your profile details.'
-            })
+                if role == 'admin':
+                    return redirect('/adminpanel/profile/edit/')
+                return redirect_to_dashboard(user)
 
-    return render(request, 'register.html')
+            return redirect('/login/')
+        else:
+            return render(request, 'register.html', {'form': form})
+    else:
+        form = BaseUserRegistrationForm()
+
+    return render(request, 'register.html', {'form': form})
 
 
 def redirect_to_dashboard(user):
