@@ -96,6 +96,8 @@ def edit_profile_client_view(request):
         profile.marital_status = request.POST.get('marital_status', profile.marital_status)
         profile.mobile_number = request.POST.get('mobile_number', profile.mobile_number)
         profile.alternate_mobile_number = request.POST.get('alternate_mobile_number', profile.alternate_mobile_number)
+        profile.address = request.POST.get('address', profile.address)
+        profile.pincode = request.POST.get('pincode', profile.pincode)
         
         # Handle Date of Birth carefully (empty string crashes DateFields)
         dob = request.POST.get('date_of_birth')

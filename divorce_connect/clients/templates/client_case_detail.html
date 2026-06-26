@@ -1,345 +1,512 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Case Detail & Chat - DivorceConnect{% endblock %}
 
 {% block extra_css %}
 <style>
-    body { background-color: #f7f7f7; }
-    
+    body { background-color: #f3f4f6; }
+
     .lc-page {
-        padding: 2rem 1.5rem;
-        height: calc(100vh - 64px);
-        max-height: 1000px;
-        display: flex;
-        flex-direction: column;
+        padding: 2.5rem 1rem 3rem;
     }
-    
+
     .lc-hero {
-        background: #ffffff;
-        border: 1px solid #e4e4e7;
-        padding: 2rem 2.5rem;
+        background: linear-gradient(135deg, #111827, #0f172a);
         border-radius: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        display: flex;
-        justify-content: space-between;
+        padding: 2rem 2.25rem;
+        margin-bottom: 1.75rem;
+        color: #ffffff;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1.5rem;
         align-items: center;
-        flex-shrink: 0;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
     }
+
     .lc-hero h1 {
         font-family: 'Playfair Display', serif;
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         font-weight: 800;
-        color: #0a0a0a;
-        margin: 0 0 0.5rem;
-    }
-    .lc-hero p {
-        color: #71717a;
         margin: 0;
-        font-size: 1rem;
+        letter-spacing: -0.02em;
     }
+
+    .lc-hero p {
+        margin: 0.75rem 0 0;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.7;
+    }
+
     .lc-badge {
-        padding: 0.5rem 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.15rem;
         border-radius: 999px;
-        background: #f4f4f5;
-        color: #0a0a0a;
+        background: rgba(255, 255, 255, 0.12);
+        color: #f8fafc;
         font-weight: 700;
-        font-size: 0.9rem;
-        border: 1px solid #e4e4e7;
+        letter-spacing: 0.02em;
+        border: 1px solid rgba(255, 255, 255, 0.16);
     }
-    
+
+    .stat-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.25rem;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-card span {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #6b7280;
+    }
+
+    .stat-card strong {
+        display: block;
+        margin-top: 0.85rem;
+        font-size: 1.15rem;
+        color: #111827;
+    }
+
     .lc-grid {
         display: grid;
-        grid-template-columns: 350px 1fr;
+        grid-template-columns: minmax(0, 1fr) 430px;
         gap: 1.5rem;
-        flex: 1;
-        min-height: 0;
     }
-    @media (max-width: 1024px) {
+
+    @media (max-width: 1100px) {
         .lc-grid {
             grid-template-columns: 1fr;
-            flex: auto;
-            min-height: auto;
         }
-        .lc-page {
-            height: auto;
-            max-height: none;
+        .lc-hero {
+            grid-template-columns: 1fr;
         }
     }
-    
-    /* Left Column: Cards */
+
     .lc-card {
         background: #ffffff;
-        border: 1px solid #e4e4e7;
-        border-radius: 1rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        margin-bottom: 1.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 1.25rem;
         overflow: hidden;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
     }
+
     .lc-card-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid #e4e4e7;
-        background: #fafafa;
+        padding: 1.5rem 1.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: #f9fafb;
     }
+
     .lc-card-header h2 {
         font-family: 'Playfair Display', serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0a0a0a;
+        font-size: 1.3rem;
         margin: 0;
+        color: #111827;
     }
+
     .lc-card-body {
-        padding: 1.5rem;
+        padding: 1.5rem 1.75rem 1.75rem;
     }
-    
-    .info-row {
-        margin-bottom: 1.2rem;
+
+    .detail-block {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.25rem;
     }
-    .info-row:last-child { margin-bottom: 0; }
-    .info-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: #a1a1aa;
-        letter-spacing: 0.5px;
+
+    .detail-block h3 {
+        margin: 0 0 0.75rem;
+        font-size: 0.95rem;
+        color: #374151;
+    }
+
+    .detail-block p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.8;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 1.5rem;
+    }
+
+    .info-item {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1rem 1.15rem;
+    }
+
+    .info-item .info-label {
+        margin-bottom: 0.45rem;
+        color: #6b7280;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+    }
+
+    .info-item .info-value {
         font-weight: 700;
-        margin-bottom: 0.2rem;
+        color: #111827;
         display: block;
     }
-    .info-value {
-        font-size: 0.95rem;
-        color: #0a0a0a;
-        font-weight: 500;
-    }
-    
-    .workflow-step {
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.5rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-    }
-    .wf-completed { background: #dcfce7; color: #15803d; }
-    .wf-active { background: #dbeafe; color: #1e3a8a; border: 1px solid #bfdbfe; }
-    .wf-pending { color: #a1a1aa; }
 
-    /* Right Column: Chat */
+    .workflow-step {
+        padding: 0.9rem 1rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .wf-completed {
+        background: #ecfdf5;
+        color: #166534;
+    }
+
+    .wf-active {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    .wf-pending {
+        color: #6b7280;
+        background: #f8fafc;
+    }
+
     .lc-chat-container {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        min-height: 660px;
         background: #ffffff;
-        border: 1px solid #e4e4e7;
-        border-radius: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 1.25rem;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        position: sticky;
+        top: 1.5rem;
     }
+
     .lc-chat-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid #e4e4e7;
-        background: #fafafa;
+        padding: 1.5rem 1.75rem;
+        background: #111827;
+        color: #f8fafc;
     }
+
     .lc-chat-header h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0a0a0a;
-        margin: 0 0 0.2rem;
+        margin: 0 0 0.45rem;
+        font-size: 1.2rem;
     }
-    .lc-chat-header p { font-size: 0.75rem; color: #a1a1aa; margin: 0; }
-    
+
+    .lc-chat-header p {
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 0.92rem;
+    }
+
     .lc-chat-messages {
         flex: 1;
-        padding: 1.5rem;
         overflow-y: auto;
-        background: #fafafa;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        background: #f8fafc;
     }
-    
-    /* Message Bubbles */
-    .msg-wrap { display: flex; flex-direction: column; max-width: 85%; }
-    .msg-wrap.client { align-self: flex-end; align-items: flex-end; }
-    .msg-wrap.lawyer { align-self: flex-start; align-items: flex-start; }
-    
+
+    .msg-wrap {
+        display: flex;
+        flex-direction: column;
+        max-width: 82%;
+    }
+
+    .msg-wrap.client {
+        align-self: flex-end;
+        align-items: flex-end;
+    }
+
+    .msg-wrap.lawyer {
+        align-self: flex-start;
+        align-items: flex-start;
+    }
+
     .msg-bubble {
-        padding: 0.75rem 1rem;
-        border-radius: 1rem;
-        font-size: 0.85rem;
-        line-height: 1.5;
-        position: relative;
+        padding: 0.95rem 1.1rem;
+        border-radius: 1.25rem;
+        font-size: 0.9rem;
+        line-height: 1.75;
+        word-break: break-word;
     }
+
     .msg-wrap.client .msg-bubble {
-        background: #0a0a0a;
+        background: #111827;
         color: #ffffff;
-        border-bottom-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.5rem;
     }
+
     .msg-wrap.lawyer .msg-bubble {
         background: #ffffff;
-        color: #0a0a0a;
-        border: 1px solid #e4e4e7;
-        border-bottom-left-radius: 0.25rem;
+        color: #111827;
+        border: 1px solid #e5e7eb;
+        border-bottom-left-radius: 0.5rem;
     }
-    
+
     .msg-meta {
-        font-size: 0.65rem;
-        color: #a1a1aa;
-        margin-top: 0.3rem;
+        margin-top: 0.35rem;
+        font-size: 0.72rem;
+        color: #6b7280;
         font-weight: 600;
     }
 
-    .msg-bubble a { color: inherit; text-decoration: underline; font-weight: 600; }
-    
     .msg-attachment {
-        margin-top: 0.5rem;
-        border-radius: 0.5rem;
+        margin-top: 0.75rem;
+        border-radius: 1rem;
         overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.1);
-    }
-    .msg-attachment img { max-width: 100%; max-height: 250px; display: block; }
-    .msg-attachment-file {
-        display: flex; align-items: center; gap: 0.5rem;
-        padding: 0.75rem; background: rgba(0,0,0,0.05);
-        color: inherit; text-decoration: none; font-size: 0.85rem; font-weight: 600;
+        border: 1px solid rgba(15, 23, 42, 0.08);
     }
 
-    /* Chat Input */
-    .lc-chat-input {
-        padding: 1rem;
-        background: #ffffff;
-        border-top: 1px solid #e4e4e7;
+    .msg-attachment img {
+        width: 100%;
+        height: auto;
+        display: block;
     }
-    .chat-form {
+
+    .msg-attachment-file {
         display: flex;
         gap: 0.5rem;
+        align-items: center;
+        padding: 0.85rem 1rem;
+        background: #f8fafc;
+        color: #111827;
+        text-decoration: none;
+        border-radius: 0.95rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+
+    .lc-chat-input {
+        padding: 1.25rem 1.5rem;
+        background: #ffffff;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .chat-form {
+        display: flex;
+        gap: 0.75rem;
         align-items: flex-end;
     }
-    
-    .file-upload-wrapper { position: relative; }
-    .file-upload-wrapper input[type="file"] { display: none; }
-    .file-upload-btn {
-        width: 3rem; height: 3rem; border-radius: 50%;
-        background: #f4f4f5; color: #52525b;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: all 0.2s; border: 1px solid #e4e4e7;
+
+    .file-upload-wrapper {
+        position: relative;
     }
-    .file-upload-btn:hover { background: #e4e4e7; color: #0a0a0a; }
+
+    .file-upload-wrapper input[type="file"] {
+        display: none;
+    }
+
+    .file-upload-btn {
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: 50%;
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .file-upload-btn:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+    }
+
     .file-name-preview {
-        position: absolute; bottom: 100%; left: 0; margin-bottom: 0.5rem;
-        background: #0a0a0a; color: #fff; padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem; font-size: 0.7rem; white-space: nowrap;
+        position: absolute;
+        bottom: 110%;
+        left: 0;
+        background: #111827;
+        color: #f8fafc;
+        padding: 0.35rem 0.55rem;
+        border-radius: 0.35rem;
+        font-size: 0.72rem;
+        white-space: nowrap;
         display: none;
     }
 
     .chat-textarea {
         flex: 1;
-        padding: 0.75rem 1rem;
-        border: 1px solid #e4e4e7;
+        min-height: 3.5rem;
+        border: 1px solid #e5e7eb;
         border-radius: 1.5rem;
-        font-size: 0.85rem;
-        resize: none;
+        padding: 1rem 1.1rem;
+        background: #f8fafc;
+        font-size: 0.95rem;
         outline: none;
-        background: #f4f4f5;
-        font-family: 'Inter', sans-serif;
-        transition: border-color 0.2s, background 0.2s;
-        max-height: 120px; overflow-y: auto;
+        resize: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
     }
+
     .chat-textarea:focus {
-        border-color: #0a0a0a;
+        border-color: #111827;
         background: #ffffff;
     }
+
     .chat-btn {
-        background: #0a0a0a;
-        color: #fff;
-        width: 3rem;
-        height: 3rem;
+        width: 3.4rem;
+        height: 3.4rem;
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         border: none;
+        background: #111827;
+        color: #ffffff;
+        display: grid;
+        place-items: center;
         cursor: pointer;
-        transition: transform 0.15s, background 0.2s;
-        flex-shrink: 0;
+        transition: transform 0.15s ease, background 0.15s ease;
     }
+
     .chat-btn:hover {
+        transform: translateY(-1px);
         background: #27272a;
-        transform: scale(1.05);
     }
+
     .chat-disabled {
-        padding: 1.5rem; text-align: center; background: #fafafa;
-        border-top: 1px solid #e4e4e7; color: #71717a; font-size: 0.9rem;
+        padding: 1.75rem;
+        text-align: center;
+        background: #f8fafc;
+        border-top: 1px solid #e5e7eb;
+        color: #6b7280;
+        font-size: 0.95rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="lc-page max-w-7xl mx-auto">
-    
     <div class="mb-4">
         <a href="{% url 'client_cases' %}" class="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-gray-900">
             ← Back to My Cases
         </a>
     </div>
 
-    <!-- Hero -->
     <div class="lc-hero">
         <div>
-            <h1>{{ active_case.lawyer.full_name }}</h1>
-            <p>Case ID #{{ active_case.id }} &nbsp;·&nbsp; Requested on {{ active_case.created_at|date:'M d, Y' }}</p>
+            <p class="text-sm uppercase tracking-[0.24em] text-slate-300 mb-3">Your lawyer engagement</p>
+            <h1>Case with {{ active_case.lawyer.full_name }}</h1>
+            <p>Manage your case updates, documents, and communication in one place.</p>
         </div>
-        <span class="lc-badge">Status: {{ active_case.get_status_display }}</span>
+        <div class="text-right">
+            <span class="lc-badge">{{ active_case.get_status_display }}</span>
+            <p class="text-sm text-slate-300 mt-4">Requested on</p>
+            <p class="mt-1 text-lg font-semibold">{{ active_case.created_at|date:'M d, Y' }}</p>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <span>Case status</span>
+            <strong>{{ active_case.get_status_display }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Assigned lawyer</span>
+            <strong>{{ active_case.lawyer.full_name }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Requested</span>
+            <strong>{{ active_case.created_at|date:'M d, Y' }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Case ID</span>
+            <strong>#{{ active_case.id }}</strong>
+        </div>
     </div>
 
     <div class="lc-grid">
-        <!-- Left Column: Case Info -->
-        <div style="overflow-y: auto; padding-right: 0.5rem; display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 2rem;">
-            <!-- Case Info Card -->
-            <div class="lc-card" style="margin-bottom: 0;">
+        <div class="space-y-5">
+            <div class="lc-card">
                 <div class="lc-card-header">
-                    <h2>Case Details</h2>
+                    <h2>Case summary</h2>
                 </div>
                 <div class="lc-card-body">
-                    <div class="info-row">
-                        <span class="info-label">Your Initial Request</span>
-                        <span class="info-value italic text-gray-600">"{{ active_case.message|default:'No message provided.' }}"</span>
+                    <div class="detail-block">
+                        <h3>Request details</h3>
+                        <p>{{ active_case.message|default:'No message provided for this request.' }}</p>
                     </div>
 
-                    {% if active_case.status == 'DOCUMENTS_PENDING' %}
-                        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                            <p class="text-sm text-blue-800 font-semibold mb-2">Documents Required</p>
-                            <a href="{% url 'case_document_upload' active_case.id %}" class="block text-center w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-                                Upload Documents
-                            </a>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Lawyer</span>
+                            <span class="info-value">{{ active_case.lawyer.full_name }}</span>
                         </div>
-                    {% endif %}
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value">{{ active_case.get_status_display }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Requested on</span>
+                            <span class="info-value">{{ active_case.created_at|date:'M d, Y' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Case ID</span>
+                            <span class="info-value">#{{ active_case.id }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Case Progress Card -->
-            <div class="lc-card" style="margin-bottom: 0;">
+            <div class="lc-card">
                 <div class="lc-card-header">
-                    <h2>Progress Tracker</h2>
+                    <h2>Progress tracker</h2>
                 </div>
-                <div class="lc-card-body">
+                <div class="lc-card-body space-y-3">
                     {% for step in active_case.workflow_progress %}
                         <div class="workflow-step {% if step.completed and not step.active %}wf-completed{% elif step.active %}wf-active{% else %}wf-pending{% endif %}">
-                            {% if step.completed %}✓{% else %}○{% endif %} {{ step.label }}
+                            {% if step.completed %}✓{% else %}○{% endif %}
+                            {{ step.label }}
                         </div>
                     {% endfor %}
                 </div>
             </div>
+
+            {% if active_case.status == 'DOCUMENTS_PENDING' %}
+                <div class="lc-card border-blue-200 bg-blue-50">
+                    <div class="lc-card-header">
+                        <h2>Documents required</h2>
+                    </div>
+                    <div class="lc-card-body">
+                        <p class="text-sm text-blue-700 mb-4">Your lawyer needs supporting documents to progress this matter.</p>
+                        <a href="{% url 'case_document_upload' active_case.id %}" class="btn-primary w-full inline-flex justify-center">Upload documents</a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
-        <!-- Right Column: Chat Interface -->
         <div>
             <div class="lc-chat-container">
                 <div class="lc-chat-header">
                     <h3>Chat with {{ active_case.lawyer.full_name }}</h3>
-                    <p>Secure conversation</p>
+                    <p>Secure conversation for this case</p>
                 </div>
-                
+
                 {% if active_case.status == 'ACCEPTED' or active_case.status == 'COMPLETED' %}
                     <div class="lc-chat-messages" id="chatMessages">
                         {% for msg in messages %}
@@ -348,7 +515,6 @@
                                     {% if msg.text %}
                                         {{ msg.text|linebreaksbr|urlize }}
                                     {% endif %}
-                                    
                                     {% if msg.attachment %}
                                         <div class="msg-attachment">
                                             {% if msg.is_image %}
@@ -370,16 +536,15 @@
                                 <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                                 </svg>
-                                <p class="text-sm">No messages yet.<br>Start the conversation!</p>
+                                <p class="text-sm">No messages yet.<br>Start the conversation to keep your lawyer updated.</p>
                             </div>
                         {% endfor %}
                     </div>
-                    
+
                     {% if active_case.status == 'ACCEPTED' %}
                         <div class="lc-chat-input">
                             <form method="POST" enctype="multipart/form-data" class="chat-form">
                                 {% csrf_token %}
-                                <!-- File Upload -->
                                 <div class="file-upload-wrapper">
                                     <div class="file-name-preview" id="fileNamePreview"></div>
                                     <label for="chatAttachment" class="file-upload-btn" title="Attach file">
@@ -390,16 +555,16 @@
                                     <input type="file" id="chatAttachment" name="attachment" onchange="updateFileName(this)">
                                 </div>
 
-                                <textarea 
-                                    name="message" 
-                                    rows="1" 
-                                    class="chat-textarea" 
-                                    placeholder="Type a message or share a link..." 
-                                    oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 100) + 'px'"
+                                <textarea
+                                    name="message"
+                                    rows="1"
+                                    class="chat-textarea"
+                                    placeholder="Type a message or share a file..."
+                                    oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 120) + 'px'"
                                 ></textarea>
-                                <button type="submit" class="chat-btn">
+                                <button type="submit" class="chat-btn" aria-label="Send message">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                     </svg>
                                 </button>
                             </form>
@@ -412,7 +577,7 @@
                 {% else %}
                     <div class="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 bg-gray-50">
                         <svg class="w-16 h-16 mb-4 opacity-30" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z" />
                         </svg>
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">Chat Unavailable</h3>
                         <p>The chat feature will be unlocked once the lawyer accepts your case request.</p>
@@ -424,7 +589,6 @@
 </div>
 
 <script>
-    // Auto-scroll chat to bottom on load
     document.addEventListener("DOMContentLoaded", function() {
         const chatBox = document.getElementById('chatMessages');
         if (chatBox) {
@@ -432,7 +596,6 @@
         }
     });
 
-    // File upload preview
     function updateFileName(input) {
         const preview = document.getElementById('fileNamePreview');
         if (input.files && input.files.length > 0) {
@@ -443,7 +606,6 @@
         }
     }
 
-    // Submit form on Enter key (Shift+Enter for new line)
     const textarea = document.querySelector('.chat-textarea');
     if (textarea) {
         textarea.addEventListener('keydown', function(e) {

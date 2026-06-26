@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from lawyers.forms import LawyerProfileEditForm, CaseDocumentBulkUploadForm, DocumentVerificationForm
-from lawyers.models import LawyerProfile, LawyerProfileUpdateRequest, CaseRequest, CaseDocument, CaseDocumentVerification, CaseMessage
+from lawyers.models import LawyerProfile, LawyerProfileUpdateRequest, CaseRequest, CaseDocument, CaseDocumentVerification, CaseMessage, LawyerRating
 from clients.models import ClientProfile
 from adminpanel.models import TrustReport
 from accounts.models import Notification
@@ -34,14 +34,48 @@ def lawyer_detail_view(request, lawyer_id):
             lawyer=lawyer,
             status__in=['PENDING', 'ACCEPTED']
         ).order_by('-created_at').first()
+        has_rated = LawyerRating.objects.filter(
+            client=request.user.client_profile,
+            lawyer=lawyer
+        ).exists()
+    else:
+        has_rated = False
 
     if request.method == 'POST':
         if not is_client:
             return redirect('/api/auth/login/')
 
+        if request.POST.get('form_type') == 'rating':
+            rating_value = int(request.POST.get('rating', '0') or 0)
+            if rating_value < 1 or rating_value > 5:
+                messages.error(request, 'Please select a valid star rating before submitting.')
+                return redirect('lawyer_detail', lawyer_id=lawyer.id)
+
+            if has_rated:
+                messages.warning(request, 'You have already rated this lawyer.')
+                return redirect('lawyer_detail', lawyer_id=lawyer.id)
+
+            review_text = request.POST.get('review_text', '').strip()
+            LawyerRating.objects.create(
+                lawyer=lawyer,
+                client=request.user.client_profile,
+                score=rating_value,
+                review_text=review_text
+            )
+
+            lawyer.add_rating(rating_value)
+            messages.success(request, 'Thanks for rating this lawyer! Your star rating has been recorded.')
+            return redirect('lawyer_detail', lawyer_id=lawyer.id)
+
         if client_request:
             messages.warning(request, "You already have an active request with this lawyer.")
             return redirect('lawyer_detail', lawyer_id=lawyer.id)
+
+        # Check if client profile is complete (has address and pincode)
+        client_profile = request.user.client_profile
+        if not client_profile.address or not client_profile.pincode:
+            messages.error(request, 'Please complete your profile by adding your address and postal code before hiring a lawyer.')
+            return redirect('client_profile')
 
         message = request.POST.get('message', '').strip()
         case_request = CaseRequest.objects.create(
@@ -63,6 +97,7 @@ def lawyer_detail_view(request, lawyer_id):
     return render(request, 'lawyer_detail.html', {
         'lawyer': lawyer,
         'client_request': client_request,
+        'has_rated': has_rated,
     })
 
 

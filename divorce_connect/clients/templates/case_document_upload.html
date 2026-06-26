@@ -1,333 +1,293 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}Submit Case Documents - DivorceConnect{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <!-- Header Section -->
-    <div class="mb-12">
-        <h1 class="text-4xl font-bold serif-heading mb-2">Submit Case Documents</h1>
-        <p class="text-gray-600">Your lawyer has accepted your request. Please upload the required documents to proceed.</p>
+    <div class="mb-10">
+        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-700">Document Submission</p>
+        <h1 class="mt-4 text-4xl font-bold serif-heading text-slate-900">Submit Your Case Documents</h1>
+        <p class="mt-3 text-gray-600 max-w-2xl text-lg">To continue with your case, upload all required documents. This is compulsory before verification can proceed.</p>
     </div>
 
-    <!-- Status Indicator -->
-    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded-lg">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+    <div class="grid gap-8 lg:grid-cols-[2fr_1fr]">
+        <div class="space-y-6">
+            <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
+                <div class="flex items-start gap-4">
+                    <div class="mt-1 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Submission Required</p>
+                        <h2 class="mt-3 text-2xl font-semibold text-slate-900">All documents are mandatory</h2>
+                        <p class="mt-3 text-gray-600">Please upload each listed file below. Your case cannot move forward until every document has been submitted and verified.</p>
+                    </div>
+                </div>
+                <div class="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5">
+                    <p class="text-sm font-semibold text-amber-900">Important reminder</p>
+                    <ul class="mt-4 space-y-3 text-sm text-amber-900">
+                        <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-600 text-xs text-white">1</span>Upload every document listed below.</li>
+                        <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-600 text-xs text-white">2</span>Each upload is required to verify your case.</li>
+                        <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-600 text-xs text-white">3</span>Verification usually takes 2-3 business days.</li>
+                    </ul>
+                </div>
             </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium text-blue-800">
-                    Status: <span class="font-semibold">Waiting for Documents</span>
-                </p>
-                <p class="text-sm text-blue-700 mt-1">Once you submit these documents, our admin team will verify them before proceeding with your case.</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left Column: Details Section -->
-        <div class="lg:col-span-2">
-            <!-- Your Details -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Your Information
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Full Name</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ client_profile.get_full_name }}</p>
+            <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
+                <div class="mb-7 flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium">Email</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ user.email }}</p>
+                        <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Client Information</p>
+                        <h3 class="text-xl font-semibold text-slate-900">Your profile details</h3>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Mobile Number</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ client_profile.mobile_number|default:"Not provided" }}</p>
+                </div>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Full Name</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ client_profile.get_full_name }}</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Gender</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ client_profile.get_gender_display }}</p>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Email</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ user.email }}</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Date of Birth</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ client_profile.date_of_birth|date:"d M Y"|default:"Not provided" }}</p>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Mobile Number</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ client_profile.mobile_number|default:'Not provided' }}</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Marital Status</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ client_profile.get_marital_status_display }}</p>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Marital Status</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ client_profile.get_marital_status_display }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Case Details -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Case Details
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Lawyer Assigned</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ case_request.lawyer.full_name }}</p>
+            <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
+                <div class="mb-7 flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500 font-medium">Specialization</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ case_request.lawyer.get_specialization_display }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Case Created</p>
-                        <p class="text-lg text-gray-900 font-semibold">{{ case_request.created_at|date:"d M Y" }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Current Status</p>
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold" 
-                              style="background-color: #dbeafe; color: #1e40af;">
-                            {{ case_request.get_status_display }}
-                        </span>
+                        <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Case details</p>
+                        <h3 class="text-xl font-semibold text-slate-900">Lawyer and case status</h3>
                     </div>
                 </div>
-            </div>
-
-            <!-- Document Upload Form -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Upload Documents
-                </h2>
-                <p class="text-sm text-gray-600 mb-6">Please upload the documents listed below. You can upload PDF, JPG, PNG, or DOCX files.</p>
-
-                <form method="POST" enctype="multipart/form-data" id="documentForm" class="space-y-6">
-                    {% csrf_token %}
-
-                    <!-- Document Upload Fields -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Aadhaar Card -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="aadhaar" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Aadhaar Card</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="aadhaar" id="aadhaar" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="aadhaar-display"></div>
-                        </div>
-
-                        <!-- PAN Card -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="pan" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">PAN Card</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="pan" id="pan" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="pan-display"></div>
-                        </div>
-
-                        <!-- Marriage Certificate -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="marriage_cert" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Marriage Certificate</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="marriage_cert" id="marriage_cert" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="marriage_cert-display"></div>
-                        </div>
-
-                        <!-- Address Proof -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="address_proof" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Address Proof</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="address_proof" id="address_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="address_proof-display"></div>
-                        </div>
-
-                        <!-- Income Proof -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="income_proof" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Income Proof</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="income_proof" id="income_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="income_proof-display"></div>
-                        </div>
-
-                        <!-- Passport -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="passport" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Passport</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="passport" id="passport" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="passport-display"></div>
-                        </div>
-
-                        <!-- Affidavit -->
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition">
-                            <label for="affidavit" class="flex flex-col items-center cursor-pointer">
-                                <svg class="h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-900">Affidavits</span>
-                                <span class="text-xs text-gray-500">PDF, JPG, PNG, DOCX</span>
-                                <input type="file" name="affidavit" id="affidavit" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
-                            </label>
-                            <div class="mt-2 text-xs text-gray-600 filename-display" id="affidavit-display"></div>
-                        </div>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Lawyer Assigned</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ case_request.lawyer.full_name }}</p>
                     </div>
-
-                    <!-- Form Errors -->
-                    {% if form.errors %}
-                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                            <p class="text-sm font-semibold text-red-800 mb-2">Please fix the following errors:</p>
-                            {% for field, errors in form.errors.items %}
-                                <ul class="text-sm text-red-700 list-disc list-inside">
-                                    {% for error in errors %}
-                                        <li>{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-
-                    <!-- Submit Buttons -->
-                    <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200">
-                        <button type="submit" class="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
-                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                            </svg>
-                            Submit Documents
-                        </button>
-                        <a href="{% url 'client_cases' %}" class="flex-1 px-6 py-3 bg-gray-200 text-gray-900 font-semibold rounded-lg hover:bg-gray-300 transition flex items-center justify-center">
-                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                            Cancel
-                        </a>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Specialization</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ case_request.lawyer.get_specialization_display }}</p>
                     </div>
-                </form>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Created</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ case_request.created_at|date:'d M Y' }}</p>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 p-5">
+                        <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Current Status</p>
+                        <p class="mt-2 inline-flex rounded-full bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700">{{ case_request.get_status_display }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Right Column: Information Box -->
-        <div class="lg:col-span-1">
-            <!-- Important Notes -->
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 sticky top-20">
-                <h3 class="text-lg font-semibold text-amber-900 mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M8.228 8.228A7 7 0 018 12a7 7 0 1014 0 7 7 0 01-14 0z"></path>
-                    </svg>
-                    Important
-                </h3>
-                <ul class="space-y-3 text-sm text-amber-900">
-                    <li class="flex items-start">
-                        <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-600 text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">1</span>
-                        <span>Upload clear and legible copies of all documents</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-600 text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">2</span>
-                        <span>Ensure documents are in PDF, JPG, PNG, or DOCX format</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-600 text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">3</span>
-                        <span>Document verification typically takes 2-3 business days</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-600 text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">4</span>
-                        <span>You'll receive notifications about verification status</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-amber-600 text-white text-xs font-bold mr-2 flex-shrink-0 mt-0.5">5</span>
-                        <span>Upload only genuine and original documents</span>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Document Guidelines -->
-            <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 mt-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Document Guidelines</h3>
-                <div class="space-y-3 text-sm text-gray-600">
-                    <div>
-                        <p class="font-semibold text-gray-900">✓ Aadhaar Card</p>
-                        <p class="text-xs">Both sides required</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-gray-900">✓ PAN Card</p>
-                        <p class="text-xs">Clear copy with visible details</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-gray-900">✓ Marriage Certificate</p>
-                        <p class="text-xs">Original or certified copy</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-gray-900">✓ Address Proof</p>
-                        <p class="text-xs">Utility bill or postal address proof</p>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-gray-900">✓ Income Proof</p>
-                        <p class="text-xs">ITR, salary slip, or bank statement</p>
-                    </div>
+        <div class="space-y-6">
+            <form method="POST" enctype="multipart/form-data" id="documentForm" class="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
+                {% csrf_token %}
+                <div class="mb-7">
+                    <h2 class="text-2xl font-semibold text-slate-900">Upload required documents</h2>
+                    <p class="mt-2 text-sm text-slate-500">Every document below is required. Please attach files for each item.</p>
                 </div>
-            </div>
 
-            <!-- Lawyer Contact -->
-            <div class="bg-white border border-gray-200 rounded-xl p-6 mt-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Assigned Lawyer</h3>
-                <div class="space-y-3">
-                    {% if case_request.lawyer.profile_picture %}
-                        <img src="{{ case_request.lawyer.profile_picture.url }}" alt="{{ case_request.lawyer.full_name }}" class="w-16 h-16 rounded-full object-cover">
-                    {% else %}
-                        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    {% endif %}
-                    <div>
-                        <p class="font-semibold text-gray-900">{{ case_request.lawyer.full_name }}</p>
-                        <p class="text-sm text-gray-500">{{ case_request.lawyer.get_specialization_display }}</p>
-                        <div class="mt-2 flex items-center">
-                            <div class="flex text-yellow-400">
-                                {% for i in "12345" %}
-                                    {% if i|stringformat:"d" <= case_request.lawyer.rating %}
-                                        <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    {% endif %}
-                                {% endfor %}
+                <div class="grid gap-4">
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="aadhaar" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Aadhaar Card</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
                             </div>
-                            <span class="ml-2 text-sm font-semibold text-gray-700">{{ case_request.lawyer.rating|floatformat:1 }}/5</span>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="aadhaar" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="aadhaar-display" class="text-sm text-slate-500">No file selected</span>
                         </div>
+                        <input type="file" id="aadhaar" name="aadhaar" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="pan" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">PAN Card</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="pan" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="pan-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="pan" name="pan" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="marriage_cert" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Marriage Certificate</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="marriage_cert" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="marriage_cert-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="marriage_cert" name="marriage_cert" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="address_proof" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Address Proof</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="address_proof" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="address_proof-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="address_proof" name="address_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="income_proof" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Income Proof</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="income_proof" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="income_proof-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="income_proof" name="income_proof" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="passport" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Passport</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="passport" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="passport-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="passport" name="passport" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
+                    </div>
+
+                    <div class="group rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-400">
+                        <label for="affidavit" class="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-900">Affidavit</p>
+                                <p class="mt-1 text-xs text-slate-500">PDF, JPG, PNG, or DOCX</p>
+                            </div>
+                            <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Required</span>
+                        </label>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="affidavit" class="inline-flex items-center gap-2 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-blue-500 hover:text-blue-700">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Choose file
+                            </label>
+                            <span id="affidavit-display" class="text-sm text-slate-500">No file selected</span>
+                        </div>
+                        <input type="file" id="affidavit" name="affidavit" accept=".pdf,.jpg,.jpeg,.png,.docx" class="hidden" onchange="updateFileDisplay(this)">
                     </div>
                 </div>
+
+                {% if form.errors %}
+                    <div class="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                        <p class="font-semibold">Please fix the errors below before submitting:</p>
+                        <ul class="mt-3 list-disc space-y-2 pl-5">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+                    <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-3xl bg-blue-700 px-6 py-4 text-white transition hover:bg-blue-800">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        Submit all documents
+                    </button>
+                    <a href="{% url 'client_cases' %}" class="inline-flex w-full items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 px-6 py-4 text-slate-700 transition hover:border-slate-300">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">Document checklist</h3>
+                <ul class="mt-4 space-y-3 text-sm text-slate-700">
+                    <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold">✓</span>Upload valid, legible copies.</li>
+                    <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold">✓</span>One file per document type.</li>
+                    <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold">✓</span>Maximum file size applies.</li>
+                    <li class="flex items-start gap-3"><span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold">✓</span>Upload all required documents to proceed.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -335,34 +295,50 @@
 
 <script>
 function updateFileDisplay(input) {
-    const displayId = input.name + '-display';
-    const display = document.getElementById(displayId);
+    const display = document.getElementById(`${input.id}-display`);
     if (input.files && input.files[0]) {
         const file = input.files[0];
-        const fileSize = (file.size / 1024).toFixed(2); // Convert to KB
-        display.innerHTML = `<span class="text-green-600 font-semibold">✓ ${file.name} (${fileSize} KB)</span>`;
+        const sizeKB = (file.size / 1024).toFixed(1);
+        display.textContent = `${file.name} (${sizeKB} KB)`;
+        display.classList.remove('text-slate-500');
+        display.classList.add('text-slate-900');
     } else {
-        display.innerHTML = '';
+        display.textContent = 'No file selected';
+        display.classList.remove('text-slate-900');
+        display.classList.add('text-slate-500');
     }
 }
 
-// Form validation
-document.getElementById('documentForm').addEventListener('submit', function(e) {
-    const hasAnyFile = document.querySelectorAll('input[type="file"]').some(input => input.files.length > 0);
-    if (!hasAnyFile) {
-        e.preventDefault();
-        alert('Please upload at least one document.');
-    }
-});
+const form = document.getElementById('documentForm');
+if (form) {
+    form.addEventListener('submit', function(event) {
+        const requiredInputs = Array.from(form.querySelectorAll('input[type="file"]'));
+        const missing = requiredInputs.filter(input => !input.files.length);
+
+        requiredInputs.forEach(input => {
+            const display = document.getElementById(`${input.id}-display`);
+            if (!input.files.length) {
+                input.closest('div').classList.add('border-red-400');
+                if (display) {
+                    display.textContent = 'Required document missing';
+                    display.classList.add('text-red-600');
+                }
+            } else {
+                input.closest('div').classList.remove('border-red-400');
+            }
+        });
+
+        if (missing.length) {
+            event.preventDefault();
+            alert('All documents are mandatory. Please upload every required file before submitting.');
+        }
+    });
+}
 </script>
 
 <style>
-.filename-display {
-    min-height: 1.5rem;
-}
-
-label:hover {
-    cursor: pointer;
-}
+    label:hover {
+        cursor: pointer;
+    }
 </style>
 {% endblock %}

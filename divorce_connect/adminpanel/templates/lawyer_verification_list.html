@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}Lawyer Verification Queue - DivorceConnect{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div
+            class="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-slate-900 via-slate-800 to-black text-white shadow-2xl">
+
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_45%)]">
+            </div>
+
+            <div class="relative p-10 lg:p-14 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+
+                <div>
+                    <span
+                        class="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-4 py-1.5 text-xs font-semibold tracking-[0.25em] uppercase">
+                        Admin Panel
+                    </span>
+
+                    <h1 class="mt-6 text-4xl lg:text-5xl font-black tracking-tight">
+                        Lawyer Verification Queue
+                    </h1>
+
+                    <p class="mt-4 max-w-2xl text-gray-300 leading-relaxed text-lg">
+                        Review lawyer verification requests and profile updates before they become visible on the
+                        DivorceConnect platform.
+                    </p>
+                </div>
+
+                <div class="flex-shrink-0">
+                    <a href="{% url 'admin_dashboard' %}"
+                        class="inline-flex items-center gap-3 rounded-2xl bg-white text-slate-900 px-6 py-3 font-semibold shadow-lg transition duration-300 hover:scale-105 hover:shadow-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid gap-6 lg:grid-cols-3 mt-10">
+
+            <!-- Card -->
+            <div
+                class="group rounded-3xl bg-white border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+                <div class="flex items-center justify-between">
+
+                    <div>
+
+                        <p class="uppercase tracking-[0.25em] text-xs text-slate-500 font-semibold">
+                            Pending Verifications
+                        </p>
+
+                        <h2 class="mt-5 text-5xl font-black text-slate-900">
+                            {{ pending_count }}
+                        </h2>
+
+                    </div>
+
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-yellow-100 flex items-center justify-center group-hover:rotate-6 transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5 2A9 9 0 1112 3a9 9 0 019 9z" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-6 text-sm text-slate-500 leading-relaxed">
+                    Lawyers waiting for verification before appearing publicly.
+                </p>
+
+            </div>
+
+            <!-- Card -->
+            <div
+                class="group rounded-3xl bg-white border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+                <div class="flex items-center justify-between">
+
+                    <div>
+
+                        <p class="uppercase tracking-[0.25em] text-xs text-slate-500 font-semibold">
+                            Profile Updates
+                        </p>
+
+                        <h2 class="mt-5 text-5xl font-black text-slate-900">
+                            {{ pending_update_count }}
+                        </h2>
+
+                    </div>
+
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center group-hover:rotate-6 transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18 2l4 4-9 9H9v-4l9-9z" />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+                <p class="mt-6 text-sm text-slate-500 leading-relaxed">
+                    Lawyer profile modifications waiting for administrator approval.
+                </p>
+
+            </div>
+
+            <!-- Card -->
+            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-black text-white p-8 shadow-xl">
+
+                <p class="uppercase tracking-[0.25em] text-xs text-gray-300 font-semibold">
+                    Admin Action
+                </p>
+
+                <h2 class="mt-5 text-2xl font-bold">
+                    Review Requests
+                </h2>
+
+                <p class="mt-4 text-gray-300 leading-relaxed">
+                    Select any lawyer below to verify documents or approve profile changes.
+                </p>
+
+            </div>
+
+        </div>
+
+        {% if pending_requests or pending_update_requests %}
+
+        <div class="mt-12 space-y-6">
+            <!-- Pending Lawyer Verification Requests -->
+            {% for request in pending_requests %}
+
+            <a href="{% url 'lawyer_verification_detail' request.lawyer.id %}"
+                class="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-900 hover:shadow-2xl">
+
+                <div class="p-8">
+
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+                        <div class="flex items-center gap-6">
+
+                            <div
+                                class="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 text-2xl font-bold text-white shadow-lg">
+
+                                {{ request.lawyer.full_name|slice:":1" }}
+
+                            </div>
+
+                            <div>
+
+                                <p class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">
+                                    Lawyer Verification
+                                </p>
+
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900 transition group-hover:text-black">
+
+                                    {{ request.lawyer.full_name }}
+
+                                </h2>
+
+                                <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+
+                                    <span class="rounded-full bg-slate-100 px-3 py-1 font-medium">
+                                        {{ request.lawyer.get_specialization_display }}
+                                    </span>
+
+                                    <span class="rounded-full bg-slate-100 px-3 py-1 font-medium">
+                                        {{ request.lawyer.years_of_experience }} Years Experience
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex flex-col items-start lg:items-end gap-4">
+
+                            <span
+                                class="inline-flex items-center rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-800">
+
+                                <span class="mr-2 h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
+
+                                Pending Review
+
+                            </span>
+
+                            <p class="text-sm text-slate-500">
+
+                                Submitted
+
+                                <span class="font-semibold text-slate-700">
+                                    {{ request.submitted_at|date:"d M, Y H:i" }}
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+            <!-- Pending Update Requests -->
+
+            {% for update_request in pending_update_requests %}
+
+            <a href="{% url 'lawyer_update_request_detail' update_request.id %}"
+                class="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-600 hover:shadow-2xl">
+
+                <div class="p-8">
+
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+                        <div class="flex items-center gap-6">
+
+                            <div
+                                class="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-600 text-2xl font-bold text-white shadow-lg">
+
+                                {{ update_request.lawyer.full_name|slice:":1" }}
+
+                            </div>
+
+                            <div>
+
+                                <p class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">
+
+                                    Profile Update Request
+
+                                </p>
+
+                                <h2 class="mt-2 text-2xl font-bold text-slate-900 transition group-hover:text-blue-700">
+
+                                    {{ update_request.lawyer.full_name }}
+
+                                </h2>
+
+                                <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+
+                                    <span class="rounded-full bg-slate-100 px-3 py-1 font-medium">
+                                        {{ update_request.lawyer.get_specialization_display }}
+                                    </span>
+
+                                    <span class="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-700">
+
+                                        Update Requested
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex flex-col items-start lg:items-end gap-4">
+
+                            <span
+                                class="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
+
+                                <span class="mr-2 h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+
+                                Update Pending
+
+                            </span>
+
+                            <p class="text-sm text-slate-500">
+
+                                Submitted
+
+                                <span class="font-semibold text-slate-700">
+                                    {{ update_request.submitted_at|date:"d M, Y H:i" }}
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+        {% else %}
+
+        <div class="mt-12 overflow-hidden rounded-[32px] border border-dashed border-slate-300 bg-white shadow-sm">
+
+            <div class="px-10 py-20 text-center">
+
+                <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5 2A9 9 0 1112 3a9 9 0 019 9z" />
+
+                    </svg>
+
+                </div>
+
+                <h2 class="mt-8 text-3xl font-bold text-slate-900">
+                    No Pending Verifications
+                </h2>
+
+                <p class="mt-4 max-w-xl mx-auto text-slate-500 leading-relaxed">
+                    Great! There are currently no lawyer verification requests or profile update
+                    requests waiting for review. All submissions have been processed.
+                </p>
+
+                <a href="{% url 'admin_dashboard' %}"
+                    class="mt-10 inline-flex items-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 text-sm font-semibold text-white shadow-lg transition duration-300 hover:bg-black hover:shadow-xl">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+
+                    </svg>
+
+                    Back to Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

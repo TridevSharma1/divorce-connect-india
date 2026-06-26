@@ -118,6 +118,14 @@ def admin_dashboard_view(request):
         status='PENDING'
     ).select_related('reporter', 'reported_client__user', 'reported_lawyer__user').order_by('-created_at')
 
+    active_cases_count = CaseRequest.objects.filter(status='ACCEPTED').count()
+    pending_case_requests_count = CaseRequest.objects.filter(
+        status__in=['PENDING', 'DOCUMENTS_PENDING', 'DOCUMENTS_SUBMITTED']
+    ).count()
+    flagged_accounts_count = TrustReport.objects.filter(
+        status='PENDING'
+    ).values_list('reported_lawyer', 'reported_client').distinct().count()
+
     context = {
         'profile': profile,
         'user': request.user,
@@ -131,8 +139,33 @@ def admin_dashboard_view(request):
         'pending_documents_count': pending_documents.count(),
         'pending_reports': pending_reports,
         'pending_reports_count': pending_reports.count(),
+        'active_cases_count': active_cases_count,
+        'pending_case_requests_count': pending_case_requests_count,
+        'flagged_accounts_count': flagged_accounts_count,
     }
     return render(request, 'admin_dashboard.html', context)
+
+
+@login_required(login_url='/api/auth/login/')
+@user_passes_test(is_admin_staff, login_url='/api/auth/login/')
+def lawyer_verification_list_view(request):
+    """List all pending lawyer verification requests for admin review."""
+    pending_requests = LawyerVerificationRequest.objects.filter(
+        status='pending'
+    ).select_related('lawyer', 'lawyer__user').order_by('-submitted_at')
+
+    pending_update_requests = LawyerProfileUpdateRequest.objects.filter(
+        status='PENDING'
+    ).select_related('lawyer', 'lawyer__user').order_by('-submitted_at')
+
+    context = {
+        'pending_requests': pending_requests,
+        'pending_count': pending_requests.count(),
+        'pending_update_requests': pending_update_requests,
+        'pending_update_count': pending_update_requests.count(),
+        'user': request.user,
+    }
+    return render(request, 'lawyer_verification_list.html', context)
 
 
 @login_required(login_url='/api/auth/login/')

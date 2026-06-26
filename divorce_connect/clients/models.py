@@ -94,6 +94,21 @@ class ClientProfile(models.Model):
         help_text="Client's profile picture"
     )
 
+    # Address Information
+    address = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Client's residential address"
+    )
+
+    pincode = models.CharField(
+        max_length=6,
+        blank=True,
+        null=True,
+        help_text="Client's postal code (6 digits)"
+    )
+
     # Timestamps
     date_of_join = models.DateTimeField(
         auto_now_add=True,

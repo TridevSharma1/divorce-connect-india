@@ -134,6 +134,27 @@ class ClientProfileUpdateForm(forms.ModelForm):
         })
     )
 
+    address = forms.CharField(
+        max_length=255,
+        required=False,
+        label="Residential Address",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your residential address'
+        })
+    )
+
+    pincode = forms.CharField(
+        max_length=6,
+        required=False,
+        label="Postal Code (Pincode)",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '6-digit postal code',
+            'maxlength': '6'
+        })
+    )
+
     class Meta:
         model = ClientProfile
         fields = (
@@ -144,7 +165,9 @@ class ClientProfileUpdateForm(forms.ModelForm):
             'marital_status',
             'mobile_number',
             'alternate_mobile_number',
-            'profile_picture'
+            'profile_picture',
+            'address',
+            'pincode'
         )
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -157,6 +180,8 @@ class ClientProfileUpdateForm(forms.ModelForm):
             'marital_status': forms.Select(attrs={'class': 'form-control'}),
             'mobile_number': forms.TextInput(attrs={'class': 'form-control'}),
             'alternate_mobile_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'pincode': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

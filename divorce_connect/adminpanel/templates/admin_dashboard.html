@@ -105,8 +105,8 @@
             <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-lg border-2 border-red-200">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Pending Verifications</p>
-                        <h3 class="text-3xl font-bold">12</h3>
+                        <p class="text-gray-600 text-sm font-semibold mb-1">Pending Lawyer Verifications</p>
+                        <h3 class="text-3xl font-bold">{{ pending_count }}</h3>
                     </div>
                     <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -119,7 +119,7 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-gray-600 text-sm font-semibold mb-1">Active Cases</p>
-                        <h3 class="text-3xl font-bold">156</h3>
+                        <h3 class="text-3xl font-bold">{{ active_cases_count }}</h3>
                     </div>
                     <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
@@ -127,12 +127,12 @@
                 </div>
             </div>
 
-            <!-- Disputes Under Review -->
+            <!-- Documents Pending -->
             <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-lg border-2 border-yellow-200">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Disputes Pending</p>
-                        <h3 class="text-3xl font-bold">8</h3>
+                        <p class="text-gray-600 text-sm font-semibold mb-1">Documents Pending</p>
+                        <h3 class="text-3xl font-bold">{{ pending_documents_count }}</h3>
                     </div>
                     <svg class="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 9v2m0 4v2m0-11a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -144,8 +144,8 @@
             <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border-2 border-purple-200">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Fraud Alerts</p>
-                        <h3 class="text-3xl font-bold">3</h3>
+                        <p class="text-gray-600 text-sm font-semibold mb-1">Reported Accounts</p>
+                        <h3 class="text-3xl font-bold">{{ flagged_accounts_count }}</h3>
                     </div>
                     <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 9v2m0 4v2m0-11a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -200,7 +200,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-gray-600 text-sm font-semibold mb-1">Pending Verifications</p>
-                    <h3 class="text-3xl font-bold">12</h3>
+                    <h3 class="text-3xl font-bold">{{ pending_count }}</h3>
                 </div>
                 <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -213,7 +213,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-gray-600 text-sm font-semibold mb-1">Active Cases</p>
-                    <h3 class="text-3xl font-bold">156</h3>
+                    <h3 class="text-3xl font-bold">{{ active_cases_count }}</h3>
                 </div>
                 <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
@@ -221,12 +221,12 @@
             </div>
         </div>
 
-        <!-- Disputes Under Review -->
+        <!-- Pending Case Requests -->
         <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-lg border-2 border-yellow-200">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Disputes Pending</p>
-                    <h3 class="text-3xl font-bold">8</h3>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Pending Case Requests</p>
+                    <h3 class="text-3xl font-bold">{{ pending_case_requests_count }}</h3>
                 </div>
                 <svg class="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 9v2m0 4v2m0-11a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -234,12 +234,12 @@
             </div>
         </div>
 
-        <!-- Flagged Accounts -->
+        <!-- Documents Pending -->
         <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border-2 border-purple-200">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Fraud Alerts</p>
-                    <h3 class="text-3xl font-bold">3</h3>
+                    <p class="text-gray-600 text-sm font-semibold mb-1">Documents Pending</p>
+                    <h3 class="text-3xl font-bold">{{ pending_documents_count }}</h3>
                 </div>
                 <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 9v2m0 4v2m0-11a9 9 0 110 18 9 9 0 010-18z"></path>
@@ -252,11 +252,17 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Verify Lawyers Section -->
         <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200">
-                <h2 class="text-2xl font-bold serif-heading">Lawyer Verification Queue</h2>
-                {% if pending_count > 0 %}
-                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">{{ pending_count }} Pending</span>
-                {% endif %}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b-2 border-gray-200 gap-3">
+                <div>
+                    <h2 class="text-2xl font-bold serif-heading">Lawyer Verification Queue</h2>
+                    <p class="text-gray-600 text-sm mt-1">Review pending lawyer verification requests on the dedicated verification page.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    {% if pending_count > 0 %}
+                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">{{ pending_count }} Pending</span>
+                    {% endif %}
+                    <a href="{% url 'lawyer_verification_list' %}" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800">View full queue</a>
+                </div>
             </div>
 
             {% if pending_requests %}
@@ -315,6 +321,50 @@
             {% endif %}
         </div>
 
+        <!-- Document Verification Section -->
+        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 mb-8">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200">
+                <div>
+                    <h2 class="text-2xl font-bold serif-heading">Document Verification</h2>
+                    <p class="text-gray-600 text-sm">Review newly submitted case documents and verify them for lawyers.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    {% if pending_documents_count > 0 %}
+                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full font-bold">{{ pending_documents_count }} Pending</span>
+                    {% endif %}
+                    <a href="{% url 'case_documents_verification_list' %}" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800">View all documents</a>
+                </div>
+            </div>
+
+            {% if pending_documents %}
+                <div class="space-y-4">
+                    {% for verification in pending_documents|slice:":3" %}
+                    <a href="{% url 'case_document_verify' verification.document.id %}" class="p-4 border-2 border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-all cursor-pointer block">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">{{ verification.document.get_document_type_display }}</h4>
+                                <p class="text-gray-600 text-sm">Case #{{ verification.document.case_request.id }} • {{ verification.document.case_request.client.get_full_name|default:verification.document.case_request.client.user.email }}</p>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-xs font-semibold">Pending</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Uploaded: {{ verification.document.uploaded_at|date:"d M, Y H:i" }}</p>
+                        <div class="mt-3 flex items-center text-blue-600 font-semibold text-sm">
+                            Review Document →
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto text-green-500 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                    </svg>
+                    <p class="text-gray-600 font-semibold">No documents pending verification.</p>
+                    <p class="text-gray-500 text-sm">All submitted case documents are up to date.</p>
+                </div>
+            {% endif %}
+        </div>
+
         <!-- Trust & Safety Reports Section -->
         <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
             <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-gray-200">
@@ -335,21 +385,15 @@
                             </div>
                             <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-xs font-semibold">Pending</span>
                         </div>
-                        <p class="text-gray-600 text-sm mb-3">
-                            Reason: {{ report.reason }}
-                        </p>
-                        <div class="mt-3 flex items-center text-blue-600 font-semibold text-sm">
-                            Review Report →
-                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Reason: {{ report.reason }}</p>
+                        <div class="mt-3 flex items-center text-blue-600 font-semibold text-sm">Review Report →</div>
                     </a>
                     {% endfor %}
                 </div>
 
                 {% if pending_reports_count > 5 %}
                 <div class="mt-6 text-center">
-                    <a href="{% url 'trust_report_list' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition">
-                        View All {{ pending_reports_count }} Pending Reports
-                    </a>
+                    <a href="{% url 'trust_report_list' %}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition">View All {{ pending_reports_count }} Pending Reports</a>
                 </div>
                 {% endif %}
             {% else %}

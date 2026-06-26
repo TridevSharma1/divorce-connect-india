@@ -119,10 +119,38 @@ class LawyerProfile(models.Model):
         help_text="Professional rating (0.0 to 5.0 scale)"
     )
 
+    rating_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of client ratings received"
+    )
+
+    rating_total = models.PositiveIntegerField(
+        default=0,
+        help_text="Sum of all client rating values"
+    )
+
     verified = models.BooleanField(
         default=False,
         help_text="Is the lawyer's credentials verified by admin?"
     )
+
+    @property
+    def average_rating(self):
+        """Return the current average rating using total points and count."""
+        if self.rating_count > 0:
+            return round(self.rating_total / self.rating_count, 1)
+        return self.rating
+
+    @property
+    def rating_summary(self):
+        return f"{self.average_rating}/5.0 ({self.rating_count} reviews)" if self.rating_count else "New listing"
+
+    def add_rating(self, score: int):
+        """Update cumulative rating values when a new client rating is submitted."""
+        self.rating_count += 1
+        self.rating_total += score
+        self.rating = round(self.rating_total / self.rating_count, 1)
+        self.save(update_fields=['rating_count', 'rating_total', 'rating'])
 
     # Contact Information
 
@@ -213,6 +241,44 @@ class DeletedLawyerProfile(LawyerProfile):
         proxy = True
         verbose_name = 'Deleted Lawyer Profile'
         verbose_name_plural = 'Deleted Lawyer Profiles'
+
+
+class LawyerRating(models.Model):
+    """Client ratings and optional review text for lawyers."""
+
+    lawyer = models.ForeignKey(
+        LawyerProfile,
+        on_delete=models.CASCADE,
+        related_name='client_ratings',
+        help_text='Lawyer being rated'
+    )
+    client = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.CASCADE,
+        related_name='lawyer_ratings',
+        help_text='Client who submitted the rating'
+    )
+    score = models.PositiveSmallIntegerField(
+        choices=[(i, str(i)) for i in range(1, 6)],
+        help_text='Star rating value from 1 to 5'
+    )
+    review_text = models.TextField(
+        blank=True,
+        help_text='Optional review details from the client'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text='When the rating was submitted'
+    )
+
+    class Meta:
+        unique_together = ('lawyer', 'client')
+        ordering = ['-created_at']
+        verbose_name = 'Lawyer Rating'
+        verbose_name_plural = 'Lawyer Ratings'
+
+    def __str__(self):
+        return f"Rating {self.score} for {self.lawyer.full_name} by {self.client.get_full_name()}"
 
 
 class CaseRequest(models.Model):

@@ -318,7 +318,7 @@
                 </div>
 
                 <!-- Contact Info Section -->
-                <div class="mb-8">
+                <div class="mb-8 pb-8 border-b border-gray-200">
                     <label class="block text-sm font-semibold text-gray-900 mb-4">Contact Information</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -342,6 +342,40 @@
                                 value="{{ profile.alternate_mobile_number|default:'' }}"
                                 placeholder="+91 98766 43210"
                             >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Info Section -->
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-900 mb-4">Address Information</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Residential Address *</label>
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                class="form-input w-full"
+                                value="{{ profile.address|default:'' }}"
+                                placeholder="Enter your residential address"
+                                required
+                            >
+                            <p class="text-xs text-gray-500 mt-1">This is required to hire a lawyer</p>
+                        </div>
+                        <div>
+                            <label for="pincode" class="block text-sm font-medium text-gray-700 mb-2">Postal Code (Pincode) *</label>
+                            <input
+                                type="text"
+                                id="pincode"
+                                name="pincode"
+                                class="form-input w-full"
+                                value="{{ profile.pincode|default:'' }}"
+                                placeholder="6-digit postal code"
+                                maxlength="6"
+                                required
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Enter your 6-digit postal code</p>
                         </div>
                     </div>
                 </div>
