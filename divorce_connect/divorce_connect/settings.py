@@ -12,6 +12,28 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+# Dual SMTP configurations
+import os
+SMTP_AUTH = {
+    "HOST": "smtp.gmail.com",
+    "PORT": 587,
+    "USER": "sharikahmed731@gmail.com",
+    "PASSWORD": os.getenv("SMTP_AUTH_PASSWORD", "tqyo drfl lkax wmbk"),
+    "USE_TLS": True,
+}
+
+SMTP_OPERATIONS = {
+    "HOST": "smtp.gmail.com",
+    "PORT": 587,
+    "USER": "sharikahmed757@gmail.com",
+    "PASSWORD": os.getenv("SMTP_OPERATIONS_PASSWORD", "gpdm yosp ogcp iwcm"),
+    "USE_TLS": True,
+}
+
+# Default email backend (fallback)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = SMTP_AUTH["USER"]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.PurgeDeletedUsersMiddleware',
 ]
 
 ROOT_URLCONF = 'divorce_connect.urls'

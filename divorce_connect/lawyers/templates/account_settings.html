@@ -1,26 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account Settings - DivorceConnect India</title>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Account Settings - DivorceConnect India{% endblock %}
 
-  <!-- Font Imports -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+{% block extra_css %}
   <style>
-    * {
-      font-family: 'Inter', sans-serif;
-    }
-
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-    }
-
     /* Custom Toggle Switch Styling */
     .toggle-checkbox {
       position: relative;
@@ -43,9 +27,8 @@
       right: 0;
       bottom: 0;
       background-color: #e2e8f0;
-      transition: 0.3s ease;
+      transition: .4s;
       border-radius: 34px;
-      border: 2px solid #cbd5e1;
     }
 
     .toggle-slider:before {
@@ -53,25 +36,20 @@
       content: "";
       height: 24px;
       width: 24px;
-      left: 2px;
-      bottom: 2px;
-      background-color: #ffffff;
-      transition: 0.3s ease;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
       border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .toggle-checkbox input:checked + .toggle-slider {
+    input:checked + .toggle-slider {
       background-color: #0a0a0a;
-      border-color: #0a0a0a;
     }
 
-    .toggle-checkbox input:checked + .toggle-slider:before {
+    input:checked + .toggle-slider:before {
       transform: translateX(24px);
-    }
-
-    .toggle-slider:focus {
-      outline: 2px solid #0a0a0a;
-      outline-offset: 2px;
     }
 
     /* Input Focus States */
@@ -103,8 +81,9 @@
       z-index: 40;
     }
   </style>
-</head>
-<body class="bg-white">
+{% endblock %}
+
+{% block content %}
   <!-- Header Section -->
   <header class="py-8 px-4 border-b border-gray-200">
     <div class="max-w-4xl mx-auto">
@@ -316,7 +295,5 @@
       console.log('Settings saved');
       // Example: You can POST to your Django backend endpoint
       // fetch('/api/settings/', { method: 'POST', body: new FormData(this) })
-    });
   </script>
-</body>
-</html>
+{% endblock %}

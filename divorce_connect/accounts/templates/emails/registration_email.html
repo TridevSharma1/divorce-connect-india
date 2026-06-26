@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Welcome to DivorceConnect India</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#f4f4f5; font-family:'Inter',Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrapper { max-width:620px; margin:40px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 40px rgba(0,0,0,0.10); }
+  .header { background:#0a0a0a; padding:48px 48px 40px; text-align:center; }
+  .welcome-icon { font-size:40px; margin-bottom:16px; }
+  .header-logo { font-family:'Playfair Display',Georgia,serif; font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; }
+  .header-logo span { color:#d4af6a; }
+  .header-tagline { color:#9ca3af; font-size:12px; letter-spacing:2px; text-transform:uppercase; margin-top:6px; }
+  .hero-bar { height:4px; background:linear-gradient(90deg,#d4af6a 0%,#f5d694 50%,#d4af6a 100%); }
+  .body { padding:48px 48px 40px; }
+  .headline { font-family:'Playfair Display',Georgia,serif; font-size:28px; font-weight:800; color:#0a0a0a; line-height:1.25; margin-bottom:20px; letter-spacing:-0.5px; }
+  .headline span { color:#d4af6a; }
+  .intro { font-size:15px; color:#374151; line-height:1.75; margin-bottom:32px; }
+  .role-badge { display:inline-block; background:#0a0a0a; color:#d4af6a; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:6px 16px; border-radius:100px; margin-bottom:32px; }
+  .features { margin-bottom:36px; }
+  .feature-item { display:flex; align-items:flex-start; gap:14px; padding:16px 0; border-bottom:1px solid #e4e4e7; }
+  .feature-item:last-child { border-bottom:none; }
+  .feature-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+  .feature-text h4 { font-size:14px; font-weight:700; color:#0a0a0a; margin-bottom:4px; }
+  .feature-text p { font-size:13px; color:#6b7280; line-height:1.5; }
+  .cta-btn { display:block; background:#0a0a0a; color:#ffffff; text-decoration:none; text-align:center; font-size:15px; font-weight:700; letter-spacing:0.5px; padding:16px 32px; border-radius:10px; margin-bottom:28px; }
+  .divider { height:1px; background:#e4e4e7; margin:28px 0; }
+  .note { font-size:13px; color:#9ca3af; line-height:1.65; }
+  .footer { background:#f4f4f5; padding:28px 48px; text-align:center; border-top:1px solid #e4e4e7; }
+  .footer p { font-size:12px; color:#9ca3af; line-height:1.7; }
+  .footer a { color:#0a0a0a; text-decoration:none; font-weight:600; }
+  .security-badge { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e4e4e7; border-radius:100px; padding:6px 14px; font-size:11.5px; color:#374151; font-weight:500; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="welcome-icon">🎉</div>
+    <div class="header-logo">Divorce<span>Connect</span> India</div>
+    <div class="header-tagline">Trusted Legal Services</div>
+  </div>
+  <div class="hero-bar"></div>
+  <div class="body">
+    <h1 class="headline">Welcome,<br><span>{{ user_name }}</span></h1>
+    <p class="intro">Your DivorceConnect India account has been created successfully. You now have access to India's most trusted legal services platform for divorce and family law matters.</p>
+    <div class="role-badge">{{ role_label }}</div>
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">⚖️</div>
+        <div class="feature-text"><h4>Expert Legal Support</h4><p>Connect with verified divorce lawyers across India.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-text"><h4>Bank-Grade Security</h4><p>Your documents and data are encrypted end-to-end.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📋</div>
+        <div class="feature-text"><h4>Document Management</h4><p>Upload, track, and verify all case documents in one place.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text"><h4>Real-Time Communication</h4><p>Chat securely with your legal team anytime.</p></div>
+      </div>
+    </div>
+    <a class="cta-btn" href="http://127.0.0.1:8000/api/auth/login/">Go to My Dashboard →</a>
+    <div class="divider"></div>
+    <p class="note">If you didn't create this account, please contact us immediately at <a href="mailto:support@divorceconnect.in" style="color:#0a0a0a;font-weight:600;">support@divorceconnect.in</a>.</p>
+  </div>
+  <div class="footer">
+    <p>© 2025 DivorceConnect India — All rights reserved.<br>
+    <a href="https://divorceconnect.in">divorceconnect.in</a> &nbsp;·&nbsp; <a href="mailto:support@divorceconnect.in">support@divorceconnect.in</a></p>
+    <div class="security-badge">🔒 &nbsp; Secured &amp; Encrypted Communication</div>
+  </div>
+</div>
+</body>
+</html>

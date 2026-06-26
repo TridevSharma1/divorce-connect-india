@@ -5,4 +5,8 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
+    path('verify-otp/', views.verify_otp_view, name='verify_otp'),
+    path('verify-register-otp/', views.verify_register_otp_view, name='verify_register_otp'),
+    path('delete-account/', views.request_delete_account_view, name='request_delete_account'),
+    path('confirm-delete/<str:token>/', views.confirm_delete_account_view, name='confirm_delete_account'),
 ]

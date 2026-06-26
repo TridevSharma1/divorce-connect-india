@@ -10,6 +10,7 @@ from clients.models import ClientProfile
 from adminpanel.models import TrustReport
 from accounts.models import Notification
 from core_decorators import require_verified_profile
+from utils.email_utils import send_case_accepted_email, send_report_submitted_email
 
 def lawyer_section_view(request):
     """Public marketplace page where clients search for lawyers."""
@@ -71,10 +72,10 @@ def lawyer_detail_view(request, lawyer_id):
             messages.warning(request, "You already have an active request with this lawyer.")
             return redirect('lawyer_detail', lawyer_id=lawyer.id)
 
-        # Check if client profile is complete (has address and pincode)
+        # Check if client profile is complete
         client_profile = request.user.client_profile
-        if not client_profile.address or not client_profile.pincode:
-            messages.error(request, 'Please complete your profile by adding your address and postal code before hiring a lawyer.')
+        if not client_profile.first_name or not client_profile.mobile_number or not client_profile.address or not client_profile.pincode:
+            messages.warning(request, 'Profile Incomplete: Please provide your full name, mobile number, and address in your profile before submitting a hire request to a lawyer.')
             return redirect('client_profile')
 
         message = request.POST.get('message', '').strip()
@@ -243,15 +244,8 @@ def lawyer_profile_edit_view(request):
 
 @login_required(login_url='/api/auth/login/')
 def lawyer_delete_account_view(request):
-    """The 'Delete' part of RUD operations."""
-    if request.method == 'POST':
-        user = request.user
-        if hasattr(user, 'lawyer_profile'):
-            user.lawyer_profile.soft_delete()
-            logout(request)
-            messages.success(request, "Your practice account has been deleted. Contact support to reactivate it.")
-            return redirect('/')
-    return redirect('/lawyers/profile/edit/')
+    """Redirect to the unified email-confirmed account deletion flow."""
+    return redirect('/api/auth/delete-account/')
 
 
 @login_required(login_url='/api/auth/login/')
@@ -433,6 +427,17 @@ def report_client_view(request):
             url='/dashboard/'
         )
 
+        # Send confirmation email to the reporting lawyer
+        try:
+            send_report_submitted_email(
+                reporter_name=current_lawyer.full_name,
+                reporter_email=request.user.email,
+                reported_name=reported_client.get_full_name(),
+                report_reason=reason,
+            )
+        except Exception:
+            pass
+
         if reported_client.report_count >= 3:
             messages.warning(request, 'This client now has 3 or more reports and is eligible for ban review by the admin.')
 
@@ -599,6 +604,12 @@ def lawyer_accept_case_view(request, case_request_id):
             message=f'{request.user.lawyer_profile.full_name} has accepted your case and verified your documents.',
             url='/cases/'
         )
+
+        # Send operational email to client with lawyer details
+        try:
+            send_case_accepted_email(case_request)
+        except Exception:
+            pass
 
         messages.success(request, "Case accepted! You can now access all client documents.")
         return redirect('lawyer_case_status')

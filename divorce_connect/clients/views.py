@@ -6,6 +6,7 @@ from .models import ClientProfile
 from lawyers.models import LawyerProfile, CaseRequest, CaseMessage
 from adminpanel.models import TrustReport
 from accounts.models import Notification
+from utils.email_utils import send_report_submitted_email
 
 def landing_page_view(request):
     if request.user.is_authenticated:
@@ -120,14 +121,8 @@ def edit_profile_client_view(request):
 
 @login_required(login_url='/api/auth/login/')
 def delete_client_account_view(request):
-    if request.method == 'POST':
-        user = request.user
-        if hasattr(user, 'client_profile'):
-            user.client_profile.soft_delete()
-            logout(request)
-            messages.success(request, "Your account has been deleted. Contact support to reactivate it.")
-            return redirect('landing_page')
-    return redirect('client_profile')
+    """Redirect to the unified email-confirmed account deletion flow."""
+    return redirect('/api/auth/delete-account/')
 
 
 # --- NEW COUNSELING VIEW ---
@@ -201,6 +196,17 @@ def report_lawyer_view(request):
             message=f'{current_client.get_full_name()} has submitted a report. Admin will review and take action.',
             url='/lawyers/dashboard/'
         )
+
+        # Send confirmation email to the reporting client
+        try:
+            send_report_submitted_email(
+                reporter_name=current_client.get_full_name(),
+                reporter_email=request.user.email,
+                reported_name=reported_lawyer.full_name,
+                report_reason=reason,
+            )
+        except Exception:
+            pass
 
         if reported_lawyer.report_count >= 3:
             messages.warning(request, 'This lawyer now has 3 or more reports and is eligible for ban review by the admin.')

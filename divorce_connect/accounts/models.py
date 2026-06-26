@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.utils import timezone
+import random
+import string
 
 
 class BaseUserManager(BaseUserManager):
@@ -101,3 +104,70 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.user.email}: {self.title}"
+
+
+class OTPCode(models.Model):
+    """One-time password codes for login verification."""
+
+    user = models.ForeignKey(
+        BaseUser,
+        on_delete=models.CASCADE,
+        related_name='otp_codes'
+    )
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'OTP Code'
+        verbose_name_plural = 'OTP Codes'
+
+    def is_expired(self):
+        """OTP expires after 10 minutes."""
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
+
+    @classmethod
+    def generate_for_user(cls, user):
+        """Invalidate old OTPs and create a new one."""
+        cls.objects.filter(user=user, is_used=False).update(is_used=True)
+        code = ''.join(random.choices(string.digits, k=6))
+        return cls.objects.create(user=user, code=code)
+
+    def __str__(self):
+        return f"OTP for {self.user.email}: {self.code}"
+
+
+class DeleteAccountToken(models.Model):
+    """Secure, time-limited token used for account deletion confirmation via email."""
+    import uuid as _uuid
+
+    user = models.ForeignKey(
+        BaseUser,
+        on_delete=models.CASCADE,
+        related_name='delete_tokens',
+    )
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Delete Account Token'
+        verbose_name_plural = 'Delete Account Tokens'
+
+    def is_expired(self):
+        """Token expires after 30 minutes."""
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=30)
+
+    @classmethod
+    def generate_for_user(cls, user):
+        """Invalidate old tokens and create a fresh one."""
+        import uuid
+        cls.objects.filter(user=user, is_used=False).update(is_used=True)
+        token = uuid.uuid4().hex + uuid.uuid4().hex  # 64 hex chars
+        return cls.objects.create(user=user, token=token)
+
+    def __str__(self):
+        return f"DeleteToken for {self.user.email}"
+

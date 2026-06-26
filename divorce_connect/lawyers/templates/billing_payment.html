@@ -1,28 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing & Payment - DivorceConnect India Lawyer Portal</title>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Billing & Payment - DivorceConnect India Lawyer Portal{% endblock %}
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+{% block extra_css %}
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif;
-        }
-
         .mask-text {
             letter-spacing: 0.15em;
             font-weight: 500;
@@ -43,13 +25,15 @@
             height: 16px;
             stroke: currentColor;
             stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .invoice-item {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr;
             align-items: center;
-            padding: 1rem 0;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid #e2e8f0;
             transition: background-color 0.2s ease;
         }
@@ -140,10 +124,10 @@
             stroke: #94a3b8;
             stroke-width: 1.5;
             margin: 0 auto 0.75rem;
-        }
     </style>
-</head>
-<body class="bg-white">
+{% endblock %}
+
+{% block content %}
 
     <!-- Page Header -->
     <div class="py-8 px-4">
@@ -352,8 +336,5 @@
                 </div>
             </div>
 
-        </div>
     </div>
-
-</body>
-</html>
+{% endblock %}

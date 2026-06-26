@@ -8,6 +8,7 @@ from adminpanel.models import LawyerVerificationRequest, AdminPanelProfileUpdate
 from lawyers.models import LawyerProfile, LawyerProfileUpdateRequest, CaseRequest, CaseDocument, CaseDocumentVerification
 from lawyers.forms import DocumentVerificationForm
 from accounts.models import Notification
+from utils.email_utils import send_report_action_to_reporter, send_report_action_to_reported
 
 
 def is_admin_staff(user):
@@ -68,17 +69,10 @@ def admin_profile_edit_view(request):
 
 @login_required(login_url='/api/auth/login/')
 def admin_profile_delete_view(request):
+    """Redirect to the unified email-confirmed account deletion flow."""
     if not hasattr(request.user, 'admin_profile'):
         return redirect('/api/auth/login/')
-
-    if request.method != 'POST':
-        return redirect('admin_profile')
-
-    profile = request.user.admin_profile
-    profile.soft_delete()
-    logout(request)
-    messages.success(request, 'Your admin profile has been deleted. You can reactivate it by contacting support.')
-    return redirect('/')
+    return redirect('/api/auth/delete-account/')
 
 
 @login_required(login_url='/api/auth/login/')
@@ -247,6 +241,18 @@ def trust_report_detail_view(request, report_id):
             )
 
         report.save()
+
+        # Send action notification emails to both the reporter (client/lawyer) and the reported user (lawyer/client)
+        try:
+            send_report_action_to_reporter(report)
+        except Exception:
+            pass
+
+        try:
+            send_report_action_to_reported(report)
+        except Exception:
+            pass
+
         messages.success(request, 'Trust report updated successfully.')
         return redirect('trust_report_list')
 
