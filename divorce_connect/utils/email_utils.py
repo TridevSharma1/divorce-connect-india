@@ -1,7 +1,7 @@
 """
 Dual SMTP email utility.
 Auth emails  → sharikahmed731@gmail.com
-Operations emails → sharikahmed757@gmail.com
+Operations emails → tridevx9@gmail.com
 """
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string

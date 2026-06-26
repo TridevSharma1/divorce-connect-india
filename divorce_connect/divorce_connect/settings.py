@@ -25,8 +25,8 @@ SMTP_AUTH = {
 SMTP_OPERATIONS = {
     "HOST": "smtp.gmail.com",
     "PORT": 587,
-    "USER": "sharikahmed757@gmail.com",
-    "PASSWORD": os.getenv("SMTP_OPERATIONS_PASSWORD", "gpdm yosp ogcp iwcm"),
+    "USER": "tridevx9@gmail.com",
+    "PASSWORD": os.getenv("SMTP_OPERATIONS_PASSWORD", "ngwf ojdy iyde rlrx"),
     "USE_TLS": True,
 }
 
