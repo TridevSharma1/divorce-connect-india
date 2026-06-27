@@ -5,257 +5,622 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --dashboard-black: #0a0a0a;
+        --dashboard-dark: #18181b;
+        --dashboard-gray: #71717a;
+        --dashboard-light-gray: #f4f4f5;
+        --dashboard-border: #e4e4e7;
+        --dashboard-white: #ffffff;
+    }
+
+    .dashboard-page {
+        background:
+            radial-gradient(circle at top left, rgba(10, 10, 10, 0.06), transparent 30%),
+            linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+        min-height: 100vh;
+        padding: 3rem 0;
+    }
+
+    .dashboard-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
     .dashboard-hero {
-        background: linear-gradient(135deg, var(--deep-black) 0%, #27272a 100%);
-        color: var(--pure-white);
-        border-radius: 1.5rem;
-        padding: 3rem 4rem;
         position: relative;
         overflow: hidden;
-    }
-    
-    .dashboard-hero::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 60%);
-        pointer-events: none;
+        border-radius: 2rem;
+        background:
+            linear-gradient(135deg, #09090b 0%, #27272a 55%, #3f3f46 100%);
+        color: var(--dashboard-white);
+        padding: 3.5rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
     }
 
-    .stat-card {
-        background: var(--pure-white);
-        border: 1px solid var(--slate-gray);
-        border-radius: 1.25rem;
-        padding: 2rem;
-        transition: all 0.3s ease;
+    .dashboard-hero::before {
+        content: "";
+        position: absolute;
+        width: 22rem;
+        height: 22rem;
+        right: -6rem;
+        top: -8rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        filter: blur(2px);
+    }
+
+    .dashboard-hero::after {
+        content: "";
+        position: absolute;
+        width: 18rem;
+        height: 18rem;
+        left: 35%;
+        bottom: -10rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .dashboard-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.85rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        color: #d4d4d8;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .eyebrow-dot {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    }
+
+    .dashboard-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.3rem, 5vw, 4.25rem);
+        line-height: 1.05;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-subtitle {
+        color: #d4d4d8;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        max-width: 620px;
+    }
+
+    .hero-actions {
         display: flex;
         flex-direction: column;
+        gap: 0.85rem;
+        min-width: 220px;
+    }
+
+    .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        border-radius: 0.9rem;
+        padding: 0.95rem 1.35rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .hero-btn-primary {
+        background: #ffffff;
+        color: #09090b;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .hero-btn-primary:hover {
+        background: #f4f4f5;
+        transform: translateY(-2px);
+    }
+
+    .hero-btn-secondary {
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .dashboard-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .summary-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid var(--dashboard-border);
+        border-radius: 1.25rem;
+        padding: 1.35rem;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary-label {
+        color: var(--dashboard-gray);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.45rem;
+    }
+
+    .summary-value {
+        color: var(--dashboard-black);
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: flex-end;
         justify-content: space-between;
-        height: 100%;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .stat-card:hover {
-        border-color: var(--deep-black);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    .section-kicker {
+        color: var(--dashboard-gray);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 0.35rem;
     }
 
-    .icon-wrapper {
-        width: 3.5rem;
-        height: 3.5rem;
-        background-color: var(--subtle-gray);
-        border-radius: 1rem;
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--dashboard-black);
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin: 0;
+    }
+
+    .section-description {
+        color: var(--dashboard-gray);
+        font-size: 0.95rem;
+        max-width: 440px;
+        line-height: 1.6;
+    }
+
+    .service-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3.25rem;
+    }
+
+    .service-card {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 285px;
+        background: var(--dashboard-white);
+        border: 1px solid var(--dashboard-border);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 14px 35px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .service-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(10,10,10,0.05), transparent 42%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-7px);
+        border-color: #18181b;
+        box-shadow: 0 22px 55px rgba(0, 0, 0, 0.09);
+    }
+
+    .service-card:hover::before {
+        opacity: 1;
+    }
+
+    .service-card-content {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+
+    .service-icon {
+        width: 3.75rem;
+        height: 3.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1.5rem;
+        border-radius: 1.15rem;
+        background: var(--dashboard-light-gray);
+        color: var(--dashboard-black);
+        margin-bottom: 1.4rem;
         transition: all 0.3s ease;
     }
 
-    .stat-card:hover .icon-wrapper {
-        background-color: var(--deep-black);
-        color: var(--pure-white);
+    .service-card:hover .service-icon {
+        background: var(--dashboard-black);
+        color: var(--dashboard-white);
+        transform: scale(1.05);
     }
 
-    .card-title {
+    .service-icon svg {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .service-title {
         font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--deep-black);
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: var(--dashboard-black);
+        letter-spacing: -0.03em;
         margin-bottom: 0.75rem;
-        letter-spacing: -0.025em;
     }
 
-    .card-text {
-        color: #52525b; /* zinc-600 */
+    .service-text {
+        color: #52525b;
         font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 2rem;
-        flex-grow: 1;
+        line-height: 1.65;
+        margin-bottom: 1.5rem;
     }
 
-    .card-link {
+    .service-link {
+        position: relative;
+        z-index: 2;
         display: inline-flex;
         align-items: center;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--deep-black);
+        gap: 0.55rem;
+        color: var(--dashboard-black);
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        text-decoration: none;
-        transition: opacity 0.3s ease;
         margin-top: auto;
     }
 
-    .card-link svg {
-        margin-left: 0.5rem;
+    .service-link svg {
+        width: 1rem;
+        height: 1rem;
         transition: transform 0.3s ease;
     }
 
-    .stat-card:hover .card-link svg {
-        transform: translateX(4px);
+    .service-card:hover .service-link svg {
+        transform: translateX(5px);
     }
-    
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
+
+    @media (max-width: 1024px) {
+        .dashboard-hero {
+            padding: 2.75rem;
+        }
+
+        .dashboard-hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .hero-actions {
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-summary,
+        .service-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
-    
-    .section-title::after {
-        content: '';
-        height: 1px;
-        flex-grow: 1;
-        background-color: var(--slate-gray);
+
+    @media (max-width: 640px) {
+        .dashboard-page {
+            padding: 1.5rem 0;
+        }
+
+        .dashboard-hero {
+            padding: 2rem 1.5rem;
+            border-radius: 1.4rem;
+        }
+
+        .hero-actions {
+            flex-direction: column;
+        }
+
+        .hero-btn {
+            width: 100%;
+        }
+
+        .dashboard-summary,
+        .service-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .service-card {
+            min-height: auto;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="bg-[#fafafa] min-h-screen py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Hero / Welcome Section -->
-        <div class="dashboard-hero mb-12 shadow-xl">
-            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="dashboard-page">
+    <div class="dashboard-container">
+
+        <!-- Hero Section -->
+        <section class="dashboard-hero">
+            <div class="dashboard-hero-content">
                 <div>
-                    <span class="text-xs uppercase tracking-widest text-gray-300 font-medium mb-3 block">Client Portal</span>
-                    <h1 class="text-4xl md:text-5xl font-bold serif-heading mb-4">
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        Client Portal
+                    </div>
+
+                    <h1 class="dashboard-title">
                         Welcome, {{ user.get_full_name|default:user.email }}
                     </h1>
-                    <p class="text-gray-300 text-lg max-w-xl">
-                        Manage your legal matters efficiently with our premium platform resources.
+
+                    <p class="dashboard-subtitle">
+                        Manage your legal matters, connect with verified professionals,
+                        and access trusted divorce support resources in one secure dashboard.
                     </p>
                 </div>
-                <div>
-                    <a href="{% url 'client_profile' %}" class="inline-flex items-center justify-center bg-white text-[#0a0a0a] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors shadow-sm">
-                        Edit Profile Details
+
+                <div class="hero-actions">
+                    <a href="{% url 'client_profile' %}" class="hero-btn hero-btn-primary">
+                        Edit Profile
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
+                        </svg>
+                    </a>
+
+                    <a href="{% url 'client_cases' %}" class="hero-btn hero-btn-secondary">
+                        View My Cases
                     </a>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Quick Access Section -->
-        <div class="section-title">
-            <h2 class="text-2xl font-bold serif-heading text-[#0a0a0a]">Essential Services</h2>
-        </div>
+        <!-- Summary Row -->
+        <section class="dashboard-summary">
+            <div class="summary-card">
+                <div class="summary-label">Account Status</div>
+                <div class="summary-value">Active</div>
+            </div>
 
-        <!-- Services Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            
-            <!-- Find a Lawyer -->
-            <a href="{% url 'lawyers_section' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+            <div class="summary-card">
+                <div class="summary-label">Primary Support</div>
+                <div class="summary-value">Legal Assistance</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-label">Platform Access</div>
+                <div class="summary-value">Client</div>
+            </div>
+        </section>
+
+        <!-- Essential Services -->
+        <section>
+            <div class="section-header">
                 <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                    <div class="section-kicker">Quick Access</div>
+                    <h2 class="section-title">Essential Services</h2>
+                </div>
+
+                <p class="section-description">
+                    Start with the most important actions for consultation, counseling,
+                    and case progress tracking.
+                </p>
+            </div>
+
+            <div class="service-grid">
+
+                <a href="{% url 'lawyers_section' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 11c0 1.657-1.343 3-3 3S6 12.657 6 11s1.343-3 3-3 3 1.343 3 3zm6 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3zM4 20c.7-2.4 2.6-4 5-4s4.3 1.6 5 4M10 20c.7-2.4 2.6-4 5-4s4.3 1.6 5 4"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">Find a Lawyer</h3>
+                        <p class="service-text">
+                            Connect with verified matrimonial lawyers, review profiles,
+                            and book consultations based on your legal needs.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        Explore Directory
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Find a Lawyer</h3>
-                    <p class="card-text">Connect with verified matrimonial experts, explore profiles, and book consultations.</p>
-                </div>
-                <div class="card-link">
-                    Explore Directory
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+                </a>
 
-            <!-- Counseling Services -->
-            <a href="{% url 'counseling' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
-                <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                <a href="{% url 'counseling' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0-4v-4m0-4h.01M8.5 15.5c1-1 2.1-1.5 3.5-1.5s2.5.5 3.5 1.5"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">Counseling Services</h3>
+                        <p class="service-text">
+                            Access mediators, family counselors, and guided support
+                            to manage emotional and practical dispute resolution.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        Request Session
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Counseling Services</h3>
-                    <p class="card-text">Access professional mediators and family counselors to navigate dispute resolution gracefully.</p>
-                </div>
-                <div class="card-link">
-                    Request Session
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+                </a>
 
-            <!-- My Cases -->
-            <a href="{% url 'client_cases' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
-                <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <a href="{% url 'client_cases' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v14l-4-2-3 2-3-2-4 2V6a2 2 0 012-2z"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">My Cases</h3>
+                        <p class="service-text">
+                            Track active legal matters, upcoming updates, and important
+                            milestones related to your ongoing cases.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        View Cases
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">My Cases</h3>
-                    <p class="card-text">Track the progress of your active legal matters and view critical case updates in real-time.</p>
-                </div>
-                <div class="card-link">
-                    View Cases
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
-        </div>
+                </a>
 
-        <!-- Platform & Support Section -->
-        <div class="section-title">
-            <h2 class="text-2xl font-bold serif-heading text-[#0a0a0a]">Platform Resources</h2>
-        </div>
+            </div>
+        </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            <!-- About DivorceConnect -->
-            <a href="{% url 'about' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+        <!-- Platform Resources -->
+        <section>
+            <div class="section-header">
                 <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="section-kicker">Help & Information</div>
+                    <h2 class="section-title">Platform Resources</h2>
+                </div>
+
+                <p class="section-description">
+                    Learn about DivorceConnect India, get help, or contact the admin team
+                    for support and compliance questions.
+                </p>
+            </div>
+
+            <div class="service-grid">
+
+                <a href="{% url 'about' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M12 21a9 9 0 100-18 9 9 0 000 18z"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">About the Platform</h3>
+                        <p class="service-text">
+                            Understand our mission, lawyer verification process,
+                            privacy standards, and client-first platform approach.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        Read More
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">About the Platform</h3>
-                    <p class="card-text">Learn about our mission, privacy standards, and the stringent lawyer verification process.</p>
-                </div>
-                <div class="card-link">
-                    Read More
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+                </a>
 
-            <!-- Support & Help -->
-            <a href="{% url 'support' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
-                <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <a href="{% url 'support' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.228 9a4 4 0 117.544 2c-.884 1.5-2.772 1.2-3.272 3m-.5 3h.01M12 21a9 9 0 100-18 9 9 0 000 18z"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">Support Desk</h3>
+                        <p class="service-text">
+                            Browse FAQs, access help articles, or raise a priority support
+                            ticket for platform-related assistance.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        Get Help
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Support Desk</h3>
-                    <p class="card-text">Access our knowledge base, frequently asked questions, or raise a priority support ticket.</p>
-                </div>
-                <div class="card-link">
-                    Get Help
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+                </a>
 
-            <!-- Contact Us -->
-            <a href="{% url 'contact' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
-                <div>
-                    <div class="icon-wrapper text-[#0a0a0a]">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                <a href="{% url 'contact' %}" class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l9 6 9-6M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"></path>
+                            </svg>
+                        </div>
+
+                        <h3 class="service-title">Contact Admin</h3>
+                        <p class="service-text">
+                            Reach the DivorceConnect India administration team for billing,
+                            compliance, account, or service-related questions.
+                        </p>
+                    </div>
+
+                    <div class="service-link">
+                        Get In Touch
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </div>
-                    <h3 class="card-title">Contact Admin</h3>
-                    <p class="card-text">Reach out to the DivorceConnect India administration team directly for billing or compliance.</p>
-                </div>
-                <div class="card-link">
-                    Get In Touch
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
-        </div>
+                </a>
+
+            </div>
+        </section>
 
     </div>
 </div>

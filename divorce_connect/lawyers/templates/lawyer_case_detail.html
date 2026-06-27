@@ -5,214 +5,495 @@
 
 {% block extra_css %}
 <style>
-    body { background-color: #f7f7f7; }
-    .lc-page { padding: 3rem 1rem 5rem; }
-    .lc-hero { background: #0a0a0a; border-radius: 1rem; padding: 1.5rem 1.75rem; display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;box-shadow:0 8px 30px rgba(2,6,23,0.4); }
-    .lc-hero h1 { font-family: 'Playfair Display', serif; font-size:1.5rem; color:#fff; margin:0; }
-    .lc-hero p { color:#bfc5cc; margin:0; }
-    .lc-badge { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; padding:0.4rem 0.9rem; border-radius:999px; font-weight:700; }
+    .case-page {
+        background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 48%, #ffffff 100%);
+        min-height: 100vh;
+    }
 
-    .lc-card { background:#fff; border:1px solid #eef2f6; border-radius:12px; overflow:hidden; box-shadow:0 6px 20px rgba(11,15,22,0.04); margin-bottom:1rem; }
-    .lc-card-header { background:#fbfbfd; padding:0.9rem 1rem; border-bottom:1px solid #eef2f6; }
-    .lc-card-header h2 { margin:0; font-family:'Playfair Display',serif; font-size:1.05rem; }
-    .lc-card-body { padding:1rem; }
+    .case-header {
+        background: #111827;
+        border-radius: 1.75rem;
+        padding: 2rem 2.25rem;
+        box-shadow: 0 28px 90px rgba(15, 23, 42, 0.18);
+    }
 
-    .doc-item { display:flex; align-items:center; justify-content:space-between; padding:0.8rem; border:1px solid #f0f2f5; border-radius:8px; }
-    .doc-info { display:flex; gap:0.75rem; align-items:center; }
-    .doc-icon { width:40px; height:40px; border-radius:8px; background:#f7fafc; display:flex;align-items:center;justify-content:center; }
-    .doc-name { font-weight:600; }
-    .doc-meta { color:#6b7280; font-size:0.85rem; }
-    .btn-view { background:#0a0a0a; color:#fff; padding:0.45rem 0.65rem; border-radius:6px; text-decoration:none; }
+    .case-header .eyebrow {
+        display: inline-flex;
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.12);
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
 
-    /* Chat preview */
-    #chatPreview { max-height:220px; overflow:auto; }
+    .case-header h1,
+    .case-header h2 {
+        font-family: 'Playfair Display', serif;
+    }
 
-    .lc-chat-container { display:flex; flex-direction:column; height:600px; background:#fff; border-radius:12px; border:1px solid #eef2f6; }
-    .lc-chat-header { background:#0a0a0a; color:#fff; padding:0.9rem 1rem; }
-    .lc-chat-messages { padding:1rem; overflow:auto; flex:1; background:#fafafa; }
-    .lc-chat-input { padding:0.75rem; border-top:1px solid #eef2f6; }
-    .chat-form { display:flex; gap:0.5rem; align-items:flex-end; }
-    .chat-textarea { flex:1; padding:0.6rem 0.9rem; border:1px solid #e6e9ef; border-radius:999px; resize:none; }
-    .file-upload-btn { width:3rem; height:3rem; border-radius:999px; background:#f4f6f8; display:flex; align-items:center; justify-content:center; border:1px solid #eef2f6; }
+    .case-header h1 {
+        margin-top: 1rem;
+        font-size: clamp(2.5rem, 4vw, 3.5rem);
+        line-height: 1.02;
+        color: #ffffff;
+    }
 
-    @media (min-width: 1024px) { .sticky-top { position:sticky; top:1.5rem; } }
+    .case-header p.lead {
+        margin-top: 1rem;
+        max-width: 54rem;
+        color: #cbd5e1;
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+
+    .case-header .case-meta {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        color: #94a3b8;
+    }
+
+    .case-header .case-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.12);
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .case-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 9rem;
+        padding: 0.85rem 1.15rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    .section-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.5rem;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+    }
+
+    .section-card header {
+        padding: 1.5rem 1.75rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-card header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: -0.03em;
+    }
+
+    .section-card .section-body {
+        padding: 1.5rem 1.75rem;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .info-card {
+        border-radius: 1.25rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        padding: 1.25rem;
+    }
+
+    .info-card strong {
+        display: block;
+        font-size: 0.95rem;
+        color: #0f172a;
+        margin-bottom: 0.35rem;
+    }
+
+    .info-card span {
+        color: #475569;
+        font-size: 0.95rem;
+    }
+
+    .doc-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.15rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        background: #f8fafc;
+    }
+
+    .doc-card .doc-meta {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .doc-card a {
+        white-space: nowrap;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 520px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.5rem;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 1.25rem 1.5rem;
+        background: #111827;
+        color: #ffffff;
+    }
+
+    .chat-messages {
+        padding: 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+        background: #f8fafc;
+    }
+
+    .chat-message {
+        max-width: 80%;
+        margin-bottom: 1rem;
+        padding: 1rem 1.15rem;
+        border-radius: 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .chat-message.lawyer {
+        margin-left: auto;
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+    .chat-message .meta {
+        color: #64748b;
+        font-size: 0.82rem;
+        margin-bottom: 0.55rem;
+    }
+
+    .chat-input {
+        padding: 1.15rem 1.25rem;
+        border-top: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .chat-input form {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+    }
+
+    .chat-input textarea {
+        flex: 1;
+        min-height: 3.25rem;
+        max-height: 8rem;
+        resize: none;
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        padding: 0.95rem 1rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: #1f2937;
+        outline: none;
+        background: #f8fafc;
+    }
+
+    .upload-button,
+    .chat-submit {
+        width: 3.1rem;
+        height: 3.1rem;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        cursor: pointer;
+    }
+
+    .chat-submit {
+        background: #111827;
+        color: #ffffff;
+        border-color: transparent;
+    }
+
+    .aside-card .section-body {
+        padding-top: 1rem;
+    }
+
+    .sticky-card {
+        position: sticky;
+        top: 1.5rem;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.65rem 0.95rem;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #1d4ed8;
+        font-weight: 700;
+    }
+
+    .action-button {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border-radius: 1rem;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    @media (max-width: 1024px) {
+        .case-header,
+        .section-card {
+            border-radius: 1.25rem;
+        }
+
+        .chat-message,
+        .doc-card,
+        .info-card {
+            max-width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="lc-page max-w-7xl mx-auto px-4">
-    <div class="lc-hero">
-        <div>
-            <h1>Case Details</h1>
-            <p class="mt-1">{{ case_request.client.get_full_name }} • Case ID <span class="font-mono">#{{ case_request.id }}</span></p>
-            <p class="mt-1" style="color:#9aa1aa;font-size:0.9rem">Started {{ case_request.created_at|date:'M d, Y' }}</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="lc-badge">{{ case_request.get_status_display }}</span>
-            {% if case_request.lawyer %}
-            <div style="text-align:right;color:#d1d5db;font-size:0.85rem">
-                <div>Assigned to</div>
-                <div style="color:#fff;font-weight:700">{{ case_request.lawyer.full_name }}</div>
+<div class="case-page py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <section class="case-header grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-center">
+            <div>
+                <p class="text-sm uppercase tracking-[0.24em] text-slate-300">Active case</p>
+                <h1 class="mt-4 text-4xl font-semibold text-white">Case #{{ case_request.id }}</h1>
+                <p class="mt-3 max-w-2xl text-base leading-7 text-slate-300">Review client details, verified documents and ongoing communication in one place. Keep the case moving with clear next steps.</p>
+                <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-300">
+                    <span>{{ case_request.client.get_full_name }}</span>
+                    <span class="h-1 w-1 rounded-full bg-slate-300/70"></span>
+                    <span>Started {{ case_request.created_at|date:'M d, Y' }}</span>
+                </div>
             </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <main class="lg:col-span-2 space-y-4">
-            <section class="lc-card">
-                <div class="lc-card-header"><h2>Client Information</h2></div>
-                <div class="lc-card-body grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="rounded-3xl bg-slate-950/95 p-6 shadow-2xl border border-white/10">
+                <div class="flex items-center justify-between gap-4 mb-4">
                     <div>
-                        <div class="text-xs text-gray-500 uppercase">Name</div>
-                        <div class="font-semibold">{{ case_request.client.get_full_name }}</div>
+                        <p class="text-sm text-slate-400 uppercase tracking-[0.22em]">Assigned lawyer</p>
+                        {% if case_request.lawyer %}
+                            <p class="mt-2 text-lg font-semibold text-white">{{ case_request.lawyer.full_name }}</p>
+                        {% else %}
+                            <p class="mt-2 text-lg font-semibold text-white">Unassigned</p>
+                        {% endif %}
                     </div>
-                    <div>
-                        <div class="text-xs text-gray-500 uppercase">Email</div>
-                        <div>{{ case_request.client.user.email }}</div>
+                    <span class="case-status">{{ case_request.get_status_display }}</span>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-3xl bg-slate-900/80 p-4 text-sm text-slate-200">
+                        <p class="font-semibold">Client</p>
+                        <p class="mt-1 text-slate-300">{{ case_request.client.get_full_name }}</p>
                     </div>
-                    <div>
-                        <div class="text-xs text-gray-500 uppercase">Phone</div>
-                        <div>{{ case_request.client.mobile_number }}</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-gray-500 uppercase">City</div>
-                        <div>{{ case_request.client.city }}</div>
-                    </div>
-                    <div class="md:col-span-2">
-                        <div class="text-xs text-gray-500 uppercase">Client Message</div>
-                        <div class="mt-2 p-3 bg-gray-50 border border-gray-100 rounded">{{ case_request.message|default:"No message provided" }}</div>
+                    <div class="rounded-3xl bg-slate-900/80 p-4 text-sm text-slate-200">
+                        <p class="font-semibold">Email</p>
+                        <p class="mt-1 text-slate-300">{{ case_request.client.user.email }}</p>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="lc-card">
-                <div class="lc-card-header"><h2>Verified Documents</h2></div>
-                <div class="lc-card-body">
-                    {% if verified_documents %}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {% for doc in verified_documents %}
-                            <div class="doc-item">
-                                <div class="doc-info">
-                                    <div class="doc-icon">📄</div>
-                                    <div>
-                                        <div class="doc-name">{{ doc.get_document_type_display }}</div>
-                                        <div class="doc-meta">{{ doc.document_file.name|slice:"15:"|truncatechars:30 }}</div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn-view">View</a>
-                                </div>
+        <div class="grid gap-6 xl:grid-cols-[1.75fr_1fr]">
+            <main class="space-y-6">
+                        <section class="section-card">
+                    <header>
+                        <h2>Client information</h2>
+                    </header>
+                    <div class="section-body space-y-6 text-sm text-slate-700">
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="info-card">
+                                <strong>Name</strong>
+                                <span>{{ case_request.client.get_full_name }}</span>
                             </div>
-                        {% endfor %}
+                            <div class="info-card">
+                                <strong>Email</strong>
+                                <span>{{ case_request.client.user.email }}</span>
+                            </div>
+                            <div class="info-card">
+                                <strong>Phone</strong>
+                                <span>{{ case_request.client.mobile_number }}</span>
+                            </div>
+                            <div class="info-card">
+                                <strong>City</strong>
+                                <span>{{ case_request.client.city }}</span>
+                            </div>
                         </div>
-                    {% else %}
-                        <div class="text-center py-6 text-gray-500">No verified documents available for this case.</div>
-                    {% endif %}
-                </div>
-            </section>
+                        <div class="rounded-[1.375rem] border border-slate-200 bg-slate-50 p-6 text-slate-700">
+                            <p class="text-xs uppercase tracking-[0.24em] text-slate-500 mb-3">Client message</p>
+                            <p>{{ case_request.message|default:"No message provided" }}</p>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Full chat area -->
-            <section class="lc-card">
-                <div class="lc-card-header"><h2>Conversation</h2></div>
-                <div class="lc-card-body">
-                    <div class="lc-chat-container">
-                        <div class="lc-chat-header">
-                            <strong>Chat with {{ case_request.client.get_full_name }}</strong>
+                <section class="section-card">
+                    <header>
+                        <h2>Verified documents</h2>
+                    </header>
+                    <div class="section-body space-y-4">
+                        {% if verified_documents %}
+                            <div class="grid gap-4 sm:grid-cols-2">
+                            {% for doc in verified_documents %}
+                                <div class="doc-card">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-12 w-12 rounded-2xl bg-slate-100 grid place-items-center text-xl">📄</div>
+                                        <div>
+                                            <p class="font-semibold text-slate-900">{{ doc.get_document_type_display }}</p>
+                                            <p class="doc-meta">{{ doc.document_file.name|slice:"15:"|truncatechars:30 }}</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ doc.document_file.url }}" target="_blank" class="inline-flex items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">View</a>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="rounded-[1.375rem] border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-500">No verified documents available for this case.</div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="section-card">
+                    <header>
+                        <h2>Conversation</h2>
+                    </header>
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.24em] text-slate-300">Active thread</p>
+                                <h3 class="mt-2 text-xl font-semibold text-white">Chat with {{ case_request.client.get_full_name }}</h3>
+                            </div>
+                            <div class="case-pill">Latest update</div>
                         </div>
-                        <div class="lc-chat-messages" id="chatMessages">
+                        <div class="chat-messages" id="chatMessages">
                             {% for msg in messages %}
-                                <div class="mb-4">
-                                    <div class="text-xs text-gray-400">{{ msg.created_at|date:'M d, h:i A' }}</div>
-                                    <div class="mt-1 {% if msg.sender_type == 'LAWYER' %}font-semibold{% endif %}">{{ msg.text|linebreaksbr|urlize }}</div>
+                                <div class="chat-message {% if msg.sender_type == 'LAWYER' %}lawyer{% endif %}">
+                                    <div class="meta">{{ msg.created_at|date:'M d, h:i A' }} · {% if msg.sender_type == 'LAWYER' %}You{% else %}Client{% endif %}</div>
+                                    <div class="text-sm leading-6 text-slate-800">{{ msg.text|linebreaksbr|urlize }}</div>
                                     {% if msg.attachment %}
-                                        <div class="mt-2">
-                                            <a href="{{ msg.attachment.url }}" target="_blank">Attachment</a>
+                                        <div class="mt-3">
+                                            <a href="{{ msg.attachment.url }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold">Download attachment</a>
                                         </div>
                                     {% endif %}
                                 </div>
                             {% empty %}
-                                <div class="text-sm text-gray-500">No messages yet.</div>
+                                <div class="chat-message">
+                                    <p class="text-sm text-slate-600">No messages yet.</p>
+                                </div>
                             {% endfor %}
                         </div>
-                        <div class="lc-chat-input">
-                            <form method="POST" enctype="multipart/form-data" class="chat-form">
+                        <div class="chat-input">
+                            <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <label for="chatAttachment" class="file-upload-btn" title="Attach file">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                    </svg>
-                                </label>
-                                <input type="file" id="chatAttachment" name="attachment" style="display:none">
-                                <textarea name="message" rows="1" class="chat-textarea" placeholder="Type a message or share a link..." oninput="this.style.height='';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                                <button type="submit" class="chat-btn" style="background:#0a0a0a;color:#fff;border-radius:999px;width:3rem;height:3rem;border:none;display:flex;align-items:center;justify-content:center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                                </button>
+                                <div class="flex gap-3 items-end">
+                                    <label for="chatAttachment" class="upload-button" title="Attach file">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a4.15 4.15 0 01-5.87 0 4.14 4.14 0 010-5.86l9.2-9.19a2.76 2.76 0 013.9 0 2.76 2.76 0 010 3.9l-6.59 6.59a1.38 1.38 0 11-1.95-1.95l6.59-6.59"/></svg>
+                                    </label>
+                                    <input type="file" id="chatAttachment" name="attachment" class="sr-only">
+                                    <textarea name="message" rows="1" class="w-full" placeholder="Type a message or share a link..." oninput="this.style.height='';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                                    <button type="submit" class="chat-submit" title="Send message">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
 
-        <aside class="space-y-4">
-            <div class="lc-card sticky-top">
-                <div class="lc-card-header"><h2>Case Actions</h2></div>
-                <div class="lc-card-body">
-                    <div class="text-sm text-gray-600 mb-3">Status: <strong class="text-gray-900">{{ case_request.get_status_display }}</strong></div>
-                    {% if request.user.is_authenticated and request.user.lawyer_profile and request.user.lawyer_profile == case_request.lawyer %}
-                        {% if case_request.status == 'DOCUMENTS_VERIFIED' %}
-                            <form method="post" action="{% url 'lawyer_accept_case' case_request.id %}">
-                                {% csrf_token %}
-                                <textarea name="response_message" rows="2" class="w-full p-2 border border-gray-200 rounded mb-3" placeholder="Optional message to client"></textarea>
-                                <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded font-semibold">Accept Case</button>
-                            </form>
-                        {% elif case_request.status in 'ACCEPTED COMPLETED' %}
-                            <form method="post" action="{% url 'lawyer_advance_case_stage' case_request.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-semibold">Advance Case Stage</button>
-                            </form>
+            <aside class="space-y-6">
+                <section class="section-card aside-card sticky-card">
+                    <header>
+                        <h2>Case actions</h2>
+                    </header>
+                    <div class="section-body space-y-4">
+                        <div class="flex items-center justify-between gap-3 text-sm text-slate-500">
+                            <span>Current stage</span>
+                            <span class="status-chip">{{ case_request.get_status_display }}</span>
+                        </div>
+
+                        {% if request.user.is_authenticated and request.user.lawyer_profile and request.user.lawyer_profile == case_request.lawyer %}
+                            {% if case_request.status == 'DOCUMENTS_VERIFIED' %}
+                                <form method="post" action="{% url 'lawyer_accept_case' case_request.id %}" class="space-y-4">
+                                    {% csrf_token %}
+                                    <textarea name="response_message" rows="3" class="w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700" placeholder="Optional message to client"></textarea>
+                                    <button type="submit" class="action-button bg-emerald-600 text-white">Accept case</button>
+                                </form>
+                            {% elif case_request.status == 'ACCEPTED' or case_request.status == 'COMPLETED' %}
+                                <form method="post" action="{% url 'lawyer_advance_case_stage' case_request.id %}" class="space-y-4">
+                                    {% csrf_token %}
+                                    <button type="submit" class="action-button bg-blue-600 text-white">Advance case stage</button>
+                                </form>
+                            {% else %}
+                                <p class="text-sm text-slate-500">No actions available at this stage.</p>
+                            {% endif %}
                         {% else %}
-                            <div class="text-sm text-gray-500">No actions available at this stage.</div>
+                            <p class="text-sm text-slate-500">Only the assigned lawyer can perform case actions.</p>
                         {% endif %}
-                    {% else %}
-                        <div class="text-sm text-gray-500">Only the assigned lawyer can perform case actions.</div>
-                    {% endif %}
-                    <hr class="my-3">
-                    <a href="{% url 'lawyer_view_case_documents' case_request.id %}" class="block text-center border border-gray-200 rounded py-2 text-sm">View all documents</a>
-                </div>
-            </div>
 
-            <div class="lc-card">
-                <div class="lc-card-header"><h2>Chat Preview</h2></div>
-                <div class="lc-card-body">
-                    <div id="chatPreview">
-                        {% for msg in messages|slice:":6" %}
-                            <div class="mb-3">
-                                <div class="text-xs text-gray-400">{{ msg.created_at|date:'M d, h:i A' }}</div>
-                                <div class="mt-1 text-sm {% if msg.sender_type == 'LAWYER' %}font-semibold{% endif %}">{{ msg.text|truncatechars:120 }}</div>
-                            </div>
-                        {% empty %}
-                            <div class="text-sm text-gray-500">No messages yet.</div>
-                        {% endfor %}
+                        <div class="pt-4 border-t border-slate-200">
+                            <a href="{% url 'lawyer_view_case_documents' case_request.id %}" class="inline-flex w-full justify-center rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">View all documents</a>
+                        </div>
                     </div>
-                    <a href="{% url 'lawyer_case_detail' case_request.id %}" class="mt-3 inline-block w-full text-center bg-gray-100 py-2 rounded">Open full chat</a>
-                </div>
-            </div>
-        </aside>
+                </section>
+
+                <section class="section-card aside-card">
+                    <header>
+                        <h2>Recent chat</h2>
+                    </header>
+                    <div class="section-body space-y-4">
+                        <div id="chatPreview" class="space-y-4 max-h-72 overflow-y-auto pr-2">
+                            {% for msg in messages|slice:":6" %}
+                                <div class="rounded-[1.375rem] border border-slate-200 bg-slate-50 p-4">
+                                    <div class="text-xs text-slate-500">{{ msg.created_at|date:'M d, h:i A' }}</div>
+                                    <p class="mt-2 text-sm text-slate-700 {% if msg.sender_type == 'LAWYER' %}font-semibold{% endif %}">{{ msg.text|truncatechars:120 }}</p>
+                                </div>
+                            {% empty %}
+                                <div class="rounded-[1.375rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500">No messages yet.</div>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'lawyer_case_detail' case_request.id %}" class="inline-flex w-full justify-center rounded-3xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Open full chat</a>
+                    </div>
+                </section>
+            </aside>
+        </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    var p = document.getElementById('chatPreview'); if(p) p.scrollTop = p.scrollHeight;
-    var chatBox = document.getElementById('chatMessages'); if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    var preview = document.getElementById('chatPreview'); if (preview) { preview.scrollTop = preview.scrollHeight; }
+    var chatBox = document.getElementById('chatMessages'); if (chatBox) { chatBox.scrollTop = chatBox.scrollHeight; }
 });
-
-function updateFileName(input) {
-    var preview = document.getElementById('fileNamePreview'); if(!preview) return;
-    if (input.files && input.files.length > 0) { preview.textContent = input.files[0].name; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
-}
 </script>
 
 {% endblock %}

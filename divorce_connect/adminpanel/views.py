@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.db.models import Q
 from django.utils import timezone
 from adminpanel.forms import AdminProfileEditForm
 from adminpanel.models import LawyerVerificationRequest, AdminPanelProfileUpdateRequest, TrustReport
@@ -435,6 +436,32 @@ def case_documents_verification_list_view(request):
         'user': request.user,
     }
     return render(request, 'case_documents_verification_list.html', context)
+
+
+@login_required(login_url='/api/auth/login/')
+@user_passes_test(is_admin_staff, login_url='/api/auth/login/')
+def pending_cases_list_view(request):
+    """List all cases accepted by lawyers for admin review."""
+    query = request.GET.get('q', '').strip()
+    accepted_cases = CaseRequest.objects.filter(
+        status='ACCEPTED'
+    ).select_related('client', 'client__user', 'lawyer', 'lawyer__user').order_by('-updated_at')
+
+    if query:
+        if query.isdigit():
+            accepted_cases = accepted_cases.filter(
+                Q(id=query) | Q(client__id=query)
+            )
+        else:
+            accepted_cases = accepted_cases.none()
+
+    context = {
+        'accepted_cases': accepted_cases,
+        'query': query,
+        'count': accepted_cases.count(),
+        'user': request.user,
+    }
+    return render(request, 'pending_cases_list.html', context)
 
 
 @login_required(login_url='/api/auth/login/')

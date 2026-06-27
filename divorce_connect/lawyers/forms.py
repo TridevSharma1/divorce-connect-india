@@ -248,6 +248,18 @@ class LawyerProfileEditForm(forms.ModelForm):
         })
     )
 
+    consultation_fee = forms.DecimalField(
+        required=True,
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        label="Consultation Fee (₹)",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your hourly consultation fee in rupees'
+        })
+    )
+
     profile_picture = forms.ImageField(
         label="Profile Picture",
         required=True,
@@ -271,6 +283,7 @@ class LawyerProfileEditForm(forms.ModelForm):
             'specialization',
             'mobile_number',
             'alternate_mobile_number',
+            'consultation_fee',
             'profile_picture'
         )
         widgets = {
@@ -296,6 +309,7 @@ class LawyerProfileEditForm(forms.ModelForm):
         self.fields['years_of_experience'].required = True
         self.fields['specialization'].required = True
         self.fields['mobile_number'].required = True
+        self.fields['consultation_fee'].required = True
 
 
 class CaseDocumentUploadForm(forms.ModelForm):

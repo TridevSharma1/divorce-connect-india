@@ -12,6 +12,7 @@ urlpatterns = [
     
     # Case Document Verification Routes
     path('documents/verify/', views.case_documents_verification_list_view, name='case_documents_verification_list'),
+    path('pending-cases/', views.pending_cases_list_view, name='admin_pending_cases'),
     path('document/<int:document_id>/verify/', views.case_document_verify_view, name='case_document_verify'),
     path('case/<int:case_request_id>/details/', views.case_details_for_admin, name='case_details_for_admin'),
     path('reports/', views.trust_report_list_view, name='trust_report_list'),

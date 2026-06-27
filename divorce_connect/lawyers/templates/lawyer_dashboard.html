@@ -1,415 +1,244 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}Lawyer Dashboard - DivorceConnect{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
-    <!-- Profile Verification Status & Details Section -->
-    {% if not is_verified or not is_complete or has_pending_update %}
-    <div class="mb-12 p-6 bg-amber-50 border-2 border-amber-300 rounded-lg">
-        <div class="flex items-start gap-4">
-            <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z">
-                </path>
-            </svg>
+    {% if not is_complete or not is_verified or has_pending_update %}
+    <section class="mb-10 rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-                <h3 class="text-lg font-bold text-amber-900 mb-2">Profile Verification Required</h3>
+                <p class="text-sm font-semibold uppercase tracking-[0.26em] text-amber-700">Action required</p>
                 {% if not is_complete %}
-                <p class="text-amber-800 mb-2"><strong>Status:</strong> Profile incomplete</p>
-                <p class="text-amber-700 text-sm mb-3">Please complete your profile to proceed. Go to <strong>Profile
-                        Edit</strong> and fill in all required fields.</p>
-                <a href="{% url 'lawyer_profile_edit' %}"
-                    class="inline-block bg-amber-600 text-white px-4 py-2 rounded font-semibold hover:bg-amber-700 transition">Complete
-                    Profile</a>
+                <h2 class="mt-3 text-2xl font-bold text-amber-900">Complete your profile to unlock your dashboard</h2>
+                <p class="mt-2 text-sm leading-6 text-amber-800">Finish your lawyer profile so clients can hire you and you can access the full dashboard experience.</p>
                 {% elif not is_verified %}
-                <p class="text-amber-800 mb-2"><strong>Status:</strong> Pending admin verification</p>
-                <p class="text-amber-700 text-sm">Your profile has been submitted. Admin will verify your details and
-                    credentials within 24-48 hours. Dashboard features are disabled until verification is complete.</p>
+                <h2 class="mt-3 text-2xl font-bold text-amber-900">Verification in progress</h2>
+                <p class="mt-2 text-sm leading-6 text-amber-800">Your credentials are under review by our admin team. Most dashboard actions remain available while you wait.</p>
                 {% elif has_pending_update %}
-                <p class="text-amber-800 mb-2"><strong>Status:</strong> Pending profile update approval</p>
-                <p class="text-amber-700 text-sm">Your requested profile changes are under review. Full access is paused
-                    until the update request is approved.</p>
+                <h2 class="mt-3 text-2xl font-bold text-amber-900">Profile update pending approval</h2>
+                <p class="mt-2 text-sm leading-6 text-amber-800">We received your profile changes and are reviewing them now. You will be notified when the update is approved.</p>
                 {% endif %}
             </div>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <a href="{% url 'lawyer_profile_edit' %}" class="btn-primary inline-flex items-center justify-center">Edit Profile</a>
+                <a href="{% url 'lawyer_case_orders' %}" class="btn-secondary inline-flex items-center justify-center">View Requests</a>
+            </div>
         </div>
-    </div>
+    </section>
     {% endif %}
 
-    <!-- Profile Information Section -->
-    <div class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        <!-- Professional Details -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Professional Information
-            </h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Bar Registration Number</label>
-                    <p class="text-lg font-semibold">{{ profile.bar_registration_number }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">State Bar Council</label>
-                    <p class="text-lg font-semibold">{{ profile.state_bar_council }}</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Years of Experience</label>
-                    <p class="text-lg font-semibold">{{ profile.years_of_experience }} years</p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Specialization</label>
-                    <p class="text-lg font-semibold">{{ profile.get_specialization_display }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Verification Status -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6 pb-4 border-b-2 border-gray-200">Verification Status</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Profile Status</label>
-                    <p class="text-lg font-semibold">
-                        {% if is_complete %}
-                        <span class="text-green-600">✓ Complete</span>
-                        {% else %}
-                        <span class="text-red-600">✗ Incomplete</span>
-                        {% endif %}
-                    </p>
-                </div>
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Verification</label>
-                    <p class="text-lg font-semibold">
-                        {% if is_verified %}
-                        <span class="text-green-600">✓ Verified</span>
-                        {% else %}
-                        <span class="text-amber-600">⏳ Pending</span>
-                        {% endif %}
-                    </p>
-                </div>
-                {% if profile.profile_picture %}
-                <div>
-                    <label class="text-gray-600 text-sm font-semibold">Profile Picture</label>
-                    <div class="mt-2">
-                        <img src="{{ profile.profile_picture.url }}" alt="Profile"
-                            class="w-24 h-24 rounded-lg object-cover border-2 border-gray-300">
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Disabled Overlay if not verified -->
-    {% if not is_verified or not is_complete or has_pending_update %}
-    <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-40 pointer-events-none"></div>
-
-    <div class="relative opacity-50 pointer-events-none">
-        <!-- Welcome Section -->
-        <div class="mb-12">
-            <h1 class="text-5xl font-bold serif-heading mb-3">Welcome back, {{ user.get_full_name|default:user.email }}
-            </h1>
-            <p class="text-gray-600 text-lg">Your practice dashboard</p>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Total Cases -->
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border-2 border-blue-200">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Total Cases</p>
-                        <h3 class="text-3xl font-bold">24</h3>
-                    </div>
-                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Yearly Earnings -->
-            <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Yearly Earnings</p>
-                        <h3 class="text-3xl font-bold">₹4.2L</h3>
-                    </div>
-                    <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
-                        </path>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Monthly Earnings -->
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border-2 border-purple-200">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Monthly Earnings</p>
-                        <h3 class="text-3xl font-bold">₹35K</h3>
-                    </div>
-                    <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
-                        </path>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Pending Cases -->
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-lg border-2 border-orange-200">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold mb-1">Pending Cases</p>
-                        <h3 class="text-3xl font-bold">5</h3>
-                    </div>
-                    <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Case Requests Section -->
-            <div class="lg:col-span-2 bg-white p-8 rounded-lg border-2 border-gray-200">
-                <h2 class="text-2xl font-bold serif-heading mb-6">Case Requests</h2>
-                <div class="space-y-4">
-                    {% for req in pending_requests %}
-                    <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold">{{ req.client.get_full_name }}</h4>
-                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Requested {{ req.created_at|timesince }} ago{% if req.message %} · {{ req.message|truncatechars:60 }}{% endif %}</p>
-                        <a href="{% url 'lawyer_case_orders' %}" class="text-link font-semibold text-sm">View Request →</a>
-                    </div>
-                    {% endfor %}
-
-                    {% for case in ready_cases %}
-                    <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold">{{ case.client.get_full_name }}</h4>
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Ready to Accept</span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-3">Documents verified · Updated {{ case.updated_at|timesince }} ago</p>
-                        <a href="{% url 'lawyer_case_status' %}" class="text-link font-semibold text-sm">View Details →</a>
-                    </div>
-                    {% endfor %}
-
-                    {% if not pending_requests and not ready_cases %}
-                    <div class="text-center py-8 text-gray-400">
-                        <svg class="w-10 h-10 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <p class="text-sm font-medium">No pending case requests</p>
-                        <p class="text-xs mt-1">New requests will appear here automatically.</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Client Details Section -->
-            <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-                <h2 class="text-2xl font-bold serif-heading mb-6">Recent Clients</h2>
-                {% if recent_clients %}
-                    <div class="space-y-4">
-                        {% for case in recent_clients %}
-                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
-                                <p class="font-semibold text-sm mb-1">{{ case.client.get_full_name }}</p>
-                                <p class="text-gray-600 text-xs mb-2">Hired on {{ case.updated_at|date:'M d, Y' }}</p>
-                                {% if case.message %}
-                                    <p class="text-gray-600 text-xs mb-2 italic truncate">{{ case.message }}</p>
-                                {% endif %}
-                                <span class="text-xs font-semibold text-green-600">✓ Active</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-6 text-gray-500">
-                        <p class="text-sm">No accepted cases yet</p>
-                        <a href="{% url 'lawyer_case_orders' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">View pending requests →</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="#"
-                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-                <h3 class="font-bold mb-2">View Case Orders</h3>
-                <p class="text-gray-600 text-sm">Browse all your active case orders</p>
-            </a>
-
-            <a href="#"
-                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-                <h3 class="font-bold mb-2">Earning Reports</h3>
-                <p class="text-gray-600 text-sm">View detailed earning analytics</p>
-            </a>
-
-            <a href="#"
-                class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-                <h3 class="font-bold mb-2">Account Settings</h3>
-                <p class="text-gray-600 text-sm">Update your profile and preferences</p>
-            </a>
-        </div>
-    </div>
-    {% else %}
-    <!-- Normal Dashboard Content (when verified) -->
-    <!-- Welcome Section -->
-    <div class="mb-12">
-        <h1 class="text-5xl font-bold serif-heading mb-3">Welcome back, {{ user.get_full_name|default:user.email }}</h1>
-        <p class="text-gray-600 text-lg">Your practice dashboard</p>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <!-- Total Cases -->
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border-2 border-blue-200">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Total Cases</p>
-                    <h3 class="text-3xl font-bold">24</h3>
-                </div>
-                <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Yearly Earnings -->
-        <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg border-2 border-green-200">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Yearly Earnings</p>
-                    <h3 class="text-3xl font-bold">₹4.2L</h3>
-                </div>
-                <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
-                    </path>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Monthly Earnings -->
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border-2 border-purple-200">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Monthly Earnings</p>
-                    <h3 class="text-3xl font-bold">₹35K</h3>
-                </div>
-                <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0">
-                    </path>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Pending Cases -->
-        <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-lg border-2 border-orange-200">
-            <div class="flex items-start justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold mb-1">Pending Cases</p>
-                    <h3 class="text-3xl font-bold">5</h3>
-                </div>
-                <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Case Requests Section -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6">Case Requests</h2>
-            <div class="space-y-4">
-                {% for req in pending_requests %}
-                <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">{{ req.client.get_full_name }}</h4>
-                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-sm font-semibold">New</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Requested {{ req.created_at|timesince }} ago{% if req.message %} · {{ req.message|truncatechars:60 }}{% endif %}</p>
-                    <a href="{% url 'lawyer_case_orders' %}" class="text-link font-semibold text-sm">View Request →</a>
-                </div>
-                {% endfor %}
-
-                {% for case in ready_cases %}
-                <div class="p-4 border border-gray-200 rounded-lg hover:border-black transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">{{ case.client.get_full_name }}</h4>
-                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-semibold">Ready to Accept</span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-3">Documents verified · Updated {{ case.updated_at|timesince }} ago</p>
-                    <a href="{% url 'lawyer_case_status' %}" class="text-link font-semibold text-sm">View Details →</a>
-                </div>
-                {% endfor %}
-
-                {% if not pending_requests and not ready_cases %}
-                <div class="text-center py-8 text-gray-400">
-                    <svg class="w-10 h-10 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <p class="text-sm font-medium">No pending case requests</p>
-                    <p class="text-xs mt-1">New requests will appear here automatically.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Client Details Section -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200">
-            <h2 class="text-2xl font-bold serif-heading mb-6">Recent Clients</h2>
-            {% if recent_clients %}
-                <div class="space-y-4">
-                    {% for case in recent_clients %}
-                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition">
-                            <p class="font-semibold text-sm mb-1">{{ case.client.get_full_name }}</p>
-                            <p class="text-gray-600 text-xs mb-2">Hired on {{ case.updated_at|date:'M d, Y' }}</p>
-                            {% if case.message %}
-                                <p class="text-gray-600 text-xs mb-2 italic truncate">{{ case.message }}</p>
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <main class="space-y-10">
+            <section class="grid gap-6 lg:grid-cols-2">
+                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-700">
+                            {% if profile.profile_picture %}
+                            <img class="h-16 w-16 rounded-3xl object-cover" src="{{ profile.profile_picture.url }}" alt="{{ profile.full_name }}">
+                            {% else %}
+                            <svg class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 14a4 4 0 10-8 0m8 0v1a3 3 0 11-6 0v-1m6 0a2 2 0 00-2-2H8a2 2 0 00-2 2m12 0v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4" />
+                            </svg>
                             {% endif %}
-                            <span class="text-xs font-semibold text-green-600">✓ Active</span>
                         </div>
-                    {% endfor %}
+                        <div>
+                            <p class="text-sm font-semibold text-slate-500">Welcome back</p>
+                            <h1 class="text-3xl font-bold tracking-tight text-slate-900">{{ profile.full_name }}</h1>
+                            <p class="mt-2 text-sm text-slate-600">{{ profile.get_specialization_display }} · {{ profile.office_city|default:'Location not set' }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Rating</p>
+                            <p class="mt-3 text-xl font-semibold text-slate-900">{{ profile.rating_summary }}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Consultation fee</p>
+                            <p class="mt-3 text-xl font-semibold text-slate-900">₹{{ profile.consultation_fee|default:'0.00' }}</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-semibold text-slate-900">Practice overview</h2>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
+                            <div>
+                                <p class="text-sm text-slate-500">Profile status</p>
+                                <p class="mt-1 text-base font-semibold text-slate-900">{% if is_complete %}Complete{% else %}Incomplete{% endif %}</p>
+                            </div>
+                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">{% if is_complete %}Ready{% else %}Pending{% endif %}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
+                            <div>
+                                <p class="text-sm text-slate-500">Verification</p>
+                                <p class="mt-1 text-base font-semibold text-slate-900">{% if is_verified %}Verified{% else %}Pending Review{% endif %}</p>
+                            </div>
+                            <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">{% if is_verified %}Active{% else %}Review{% endif %}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
+                            <div>
+                                <p class="text-sm text-slate-500">Pending update</p>
+                                <p class="mt-1 text-base font-semibold text-slate-900">{% if has_pending_update %}Waiting for approval{% else %}None{% endif %}</p>
+                            </div>
+                            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{% if has_pending_update %}Review{% else %}Clear{% endif %}</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Total cases</p>
+                    <p class="mt-4 text-3xl font-bold text-slate-900">{{ stats.total_cases }}</p>
+                </article>
+                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Active cases</p>
+                    <p class="mt-4 text-3xl font-bold text-slate-900">{{ stats.active_cases }}</p>
+                </article>
+                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Pending requests</p>
+                    <p class="mt-4 text-3xl font-bold text-slate-900">{{ stats.pending_requests }}</p>
+                </article>
+                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Verified docs</p>
+                    <p class="mt-4 text-3xl font-bold text-slate-900">{{ stats.verified_documents }}</p>
+                </article>
+            </section>
+
+            <section class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-900">Revenue summary</h2>
+                        <p class="mt-2 text-sm text-slate-600">Estimated revenue based on accepted cases and current fee.</p>
+                    </div>
+                    <div class="rounded-3xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">Updated this month</div>
                 </div>
-            {% else %}
-                <div class="text-center py-6 text-gray-500">
-                    <p class="text-sm">No accepted cases yet</p>
-                    <a href="{% url 'lawyer_case_orders' %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">View pending requests →</a>
+                <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-3xl bg-slate-50 p-5">
+                        <p class="text-sm text-slate-500">Monthly estimate</p>
+                        <p class="mt-3 text-3xl font-bold text-slate-900">₹{{ stats.monthly_revenue|floatformat:0 }}</p>
+                    </div>
+                    <div class="rounded-3xl bg-slate-50 p-5">
+                        <p class="text-sm text-slate-500">Yearly estimate</p>
+                        <p class="mt-3 text-3xl font-bold text-slate-900">₹{{ stats.yearly_revenue|floatformat:0 }}</p>
+                    </div>
                 </div>
-            {% endif %}
-        </div>
+            </section>
+
+            <section class="grid gap-6 lg:grid-cols-2">
+                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-900">Incoming case requests</h2>
+                            <p class="mt-2 text-sm text-slate-600">Review and respond to new client requests.</p>
+                        </div>
+                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">{{ stats.pending_requests }} new</span>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        {% if pending_requests %}
+                            {% for req in pending_requests %}
+                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <p class="font-semibold text-slate-900">{{ req.client.get_full_name }}</p>
+                                        <p class="mt-1 text-sm text-slate-600">{{ req.created_at|date:'d M Y' }}</p>
+                                    </div>
+                                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">New</span>
+                                </div>
+                                <p class="mt-3 text-sm leading-6 text-slate-600">{{ req.message|truncatechars:90|default:'No summary provided.' }}</p>
+                                <a href="{% url 'lawyer_case_orders' %}" class="mt-4 inline-flex items-center text-sm font-semibold text-blue-700">Manage request →</a>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
+                                <p class="font-semibold">No new case requests yet.</p>
+                                <p class="mt-2 text-sm">Clients will appear here as they send requests.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+
+                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-900">Ready cases</h2>
+                            <p class="mt-2 text-sm text-slate-600">Cases with verified documents awaiting your approval.</p>
+                        </div>
+                        <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">{{ ready_cases|length }} ready</span>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        {% if ready_cases %}
+                            {% for case in ready_cases %}
+                            <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="font-semibold text-slate-900">{{ case.client.get_full_name }}</p>
+                                        <p class="mt-1 text-sm text-slate-500">Updated {{ case.updated_at|timesince }} ago</p>
+                                    </div>
+                                    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Verified</span>
+                                </div>
+                                <a href="{% url 'lawyer_case_status' %}" class="mt-4 inline-flex items-center text-sm font-semibold text-blue-700">Open case →</a>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
+                                <p class="font-semibold">No cases ready yet.</p>
+                                <p class="mt-2 text-sm">Document verification results will appear here.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <aside class="space-y-6">
+            <section class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-700">
+                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15a9.003 9.003 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Profile at a glance</p>
+                        <p class="mt-2 text-lg font-semibold text-slate-900">{{ profile.get_specialization_display }}</p>
+                    </div>
+                </div>
+                <div class="mt-6 space-y-4 text-sm text-slate-600">
+                    <div class="flex items-center justify-between">
+                        <span>Clients served</span>
+                        <span class="font-semibold text-slate-900">{{ stats.active_clients }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Accepted cases</span>
+                        <span class="font-semibold text-slate-900">{{ stats.active_cases }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Completed cases</span>
+                        <span class="font-semibold text-slate-900">{{ stats.completed_cases }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold text-slate-900">Quick actions</h2>
+                <div class="mt-6 grid gap-3">
+                    <a href="{% url 'lawyer_case_orders' %}" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Review case requests</a>
+                    <a href="{% url 'lawyer_earnings' %}" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">View earnings</a>
+                    <a href="{% url 'lawyer_settings' %}" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Account settings</a>
+                    <a href="{% url 'lawyer_billing' %}" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Billing & payments</a>
+                </div>
+            </section>
+
+            <section class="rounded-3xl bg-slate-950 p-8 text-white shadow-sm">
+                <h2 class="text-lg font-semibold">Support</h2>
+                <p class="mt-4 text-sm leading-6 text-slate-300">Need help with a case or verification? Reach out to our support team for fast assistance and updates.</p>
+                <a href="{% url 'lawyer_support' %}" class="mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-950">Contact support</a>
+            </section>
+        </aside>
     </div>
-
-    <!-- Quick Actions -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <a href="{% url 'lawyer_case_orders' %}"
-            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-            <h3 class="font-bold mb-2">View Case Orders</h3>
-            <p class="text-gray-600 text-sm">Browse all your active case orders</p>
-        </a>
-
-        <a href="{% url 'lawyer_earnings' %}"
-            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-            <h3 class="font-bold mb-2">Earning Reports</h3>
-            <p class="text-gray-600 text-sm">View detailed earning analytics</p>
-        </a>
-
-        <a href="{% url 'lawyer_settings' %}"
-            class="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-black transition-colors text-center">
-            <h3 class="font-bold mb-2">Account Settings</h3>
-            <p class="text-gray-600 text-sm">Update your profile and preferences</p>
-        </a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

@@ -1,243 +1,132 @@
-{% extends 'base.html' %}
-
-{% block title %}My Profile - Admin{% endblock %}
+﻿{% extends 'base.html' %}
+{% block title %}Admin Profile - DivorceConnect India{% endblock %}
 
 {% block content %}
-
-<div class="min-h-screen bg-gray-100 py-10">
-
-```
-<div class="max-w-7xl mx-auto px-4">
-
-    <!-- Back Button -->
-    <div class="mb-6">
-        <a href="{% url 'admin_dashboard' %}"
-           class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
-            ← Back to Dashboard
-        </a>
-    </div>
-
-    <!-- Profile Header -->
-    <div class="bg-white rounded-3xl shadow-lg overflow-hidden mb-8">
-
-        <!-- Cover -->
-        <div class="h-48 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
-
-        <div class="px-8 pb-8">
-
-            <div class="flex flex-col md:flex-row items-center md:items-end -mt-16">
-
-                <!-- Profile Image -->
-                {% if profile.profile_picture %}
-                    <img src="{{ profile.profile_picture.url }}"
-                         alt="{{ profile.full_name }}"
-                         class="w-32 h-32 rounded-full border-4 border-white object-cover shadow-xl">
-                {% else %}
-                    <div class="w-32 h-32 rounded-full border-4 border-white bg-white shadow-xl flex items-center justify-center text-4xl font-bold text-blue-600">
-                        {{ profile.full_name|first|upper }}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="space-y-8">
+        <div class="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            <div class="h-52 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900"></div>
+            <div class="px-6 py-8 sm:px-10">
+                <div class="flex flex-col items-center gap-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="flex flex-col items-center gap-5 lg:items-start">
+                        <div class="-mt-16 rounded-full border-4 border-white bg-slate-800 p-1">
+                            {% if profile.profile_picture %}
+                                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.full_name }}" class="h-32 w-32 rounded-full object-cover shadow-xl" />
+                            {% else %}
+                                <div class="flex h-32 w-32 items-center justify-center rounded-full bg-slate-700 text-4xl font-semibold text-white shadow-xl">
+                                    {{ profile.full_name|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Admin Profile</p>
+                            <h1 class="mt-2 text-4xl font-bold text-slate-950">{{ profile.full_name }}</h1>
+                            <p class="mt-3 text-sm text-slate-500">{{ user.email }}</p>
+                        </div>
                     </div>
-                {% endif %}
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <span class="rounded-3xl bg-slate-100 px-4 py-2 text-center text-sm font-semibold text-slate-700">{% if profile.is_verified_by_superuser %}Verified{% else %}Verification Pending{% endif %}</span>
+                        <span class="rounded-3xl bg-slate-100 px-4 py-2 text-center text-sm font-semibold text-slate-700">{% if profile.is_profile_complete %}Profile Complete{% else %}Incomplete Profile{% endif %}</span>
+                        <span class="rounded-3xl bg-slate-100 px-4 py-2 text-center text-sm font-semibold text-slate-700">{% if user.is_staff %}Staff Access{% else %}Limited Access{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <!-- User Info -->
-                <div class="md:ml-6 mt-4 md:mt-0 text-center md:text-left">
-
-                    <h1 class="text-4xl font-bold text-gray-900">
-                        {{ profile.full_name }}
-                    </h1>
-
-                    <p class="text-gray-500 text-lg">
-                        {{ user.email }}
-                    </p>
-
-                    <div class="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
-
-                        {% if profile.is_verified_by_superuser %}
-                            <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-semibold">
-                                ✓ Verified Admin
-                            </span>
-                        {% else %}
-                            <span class="bg-yellow-100 text-yellow-700 px-4 py-1 rounded-full text-sm font-semibold">
-                                ⏳ Pending Verification
-                            </span>
-                        {% endif %}
-
-                        {% if user.is_staff %}
-                            <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
-                                Staff Member
-                            </span>
-                        {% endif %}
-
+        <div class="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
+            <div class="space-y-6">
+                <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Details</p>
+                            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Primary information</h2>
+                        </div>
+                        <div class="inline-flex rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Joined {{ profile.date_of_join|date:"d M Y" }}</div>
                     </div>
 
-                </div>
+                    <div class="mt-8 grid gap-6 md:grid-cols-2">
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Full Name</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{{ profile.full_name }}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Email Address</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{{ user.email }}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Gender</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{{ profile.get_gender_display }}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Date of Birth</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{% if profile.date_of_birth %}{{ profile.date_of_birth|date:"d M Y" }}{% else %}<span class="text-slate-400 italic">Not provided</span>{% endif %}</p>
+                        </div>
+                    </div>
+                </section>
 
+                <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Contact</p>
+                            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Contact information</h2>
+                        </div>
+                        <div class="inline-flex rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">Updated {{ profile.updated_at|timesince }} ago</div>
+                    </div>
+
+                    <div class="mt-8 grid gap-6 md:grid-cols-2">
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Primary Mobile</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{% if profile.mobile_number %}{{ profile.mobile_number }}{% else %}<span class="text-slate-400 italic">Not provided</span>{% endif %}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Alternate Mobile</p>
+                            <p class="mt-3 text-lg font-semibold text-slate-900">{% if profile.alternate_mobile_number %}{{ profile.alternate_mobile_number }}{% else %}<span class="text-slate-400 italic">Not provided</span>{% endif %}</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Status</p>
+                            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Profile state</h2>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 grid gap-4 md:grid-cols-3">
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Profile completion</p>
+                            <p class="mt-3 text-2xl font-semibold {% if profile.is_profile_complete %}text-emerald-600{% else %}text-rose-600{% endif %}">{% if profile.is_profile_complete %}Complete{% else %}Incomplete{% endif %}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Verification</p>
+                            <p class="mt-3 text-2xl font-semibold {% if profile.is_verified_by_superuser %}text-emerald-600{% else %}text-amber-600{% endif %}">{% if profile.is_verified_by_superuser %}Verified{% else %}Pending{% endif %}</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-6">
+                            <p class="text-sm text-slate-500">Admin access</p>
+                            <p class="mt-3 text-2xl font-semibold text-slate-900">{% if user.is_staff %}Staff{% else %}Limited{% endif %}</p>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-        </div>
+            <aside class="space-y-6">
+                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold text-slate-950">Quick actions</h3>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">Manage your admin account and verification workflow from these shortcuts.</p>
+                    <div class="mt-6 space-y-3">
+                        <a href="{% url 'admin_profile_edit' %}" class="block rounded-3xl bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800 transition">Edit profile</a>
+                        <a href="{% url 'admin_dashboard' %}" class="block rounded-3xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-100 transition">Go to dashboard</a>
+                        <a href="{% url 'admin_profile_delete' %}" class="block rounded-3xl bg-rose-50 px-5 py-3 text-center text-sm font-semibold text-rose-700 hover:bg-rose-100 transition">Delete profile</a>
+                    </div>
+                </div>
 
+                <div class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold text-slate-950">Support</h3>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">Need help completing verification or updating your profile? Reach out to the platform support team for assistance.</p>
+                </div>
+            </aside>
+        </div>
     </div>
-
-    <!-- Information Cards -->
-    <div class="grid lg:grid-cols-2 gap-8">
-
-        <!-- Personal Information -->
-        <div class="bg-white rounded-2xl shadow-lg p-8">
-
-            <h2 class="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
-                Personal Information
-            </h2>
-
-            <div class="space-y-5">
-
-                <div>
-                    <p class="text-gray-500 text-sm">Full Name</p>
-                    <p class="font-semibold text-lg">
-                        {{ profile.full_name }}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-gray-500 text-sm">Email Address</p>
-                    <p class="font-semibold text-lg">
-                        {{ user.email }}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-gray-500 text-sm">Gender</p>
-                    <p class="font-semibold text-lg">
-                        {{ profile.get_gender_display }}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-gray-500 text-sm">Date of Birth</p>
-                    <p class="font-semibold text-lg">
-                        {% if profile.date_of_birth %}
-                            {{ profile.date_of_birth|date:"d M Y" }}
-                        {% else %}
-                            Not Available
-                        {% endif %}
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Contact Information -->
-        <div class="bg-white rounded-2xl shadow-lg p-8">
-
-            <h2 class="text-2xl font-bold text-gray-800 border-b pb-4 mb-6">
-                Contact Information
-            </h2>
-
-            <div class="space-y-5">
-
-                <div>
-                    <p class="text-gray-500 text-sm">Primary Mobile</p>
-                    <p class="font-semibold text-lg">
-                        {{ profile.mobile_number|default:"Not Provided" }}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-gray-500 text-sm">Alternate Mobile</p>
-                    <p class="font-semibold text-lg">
-                        {{ profile.alternate_mobile_number|default:"Not Provided" }}
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Status Cards -->
-    <div class="grid md:grid-cols-3 gap-6 mt-8">
-
-        <!-- Profile Status -->
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-
-            <div class="text-gray-500 text-sm mb-2">
-                Profile Completion
-            </div>
-
-            {% if profile.is_profile_complete %}
-                <div class="text-2xl font-bold text-green-600">
-                    ✓ Complete
-                </div>
-            {% else %}
-                <div class="text-2xl font-bold text-red-600">
-                    ✗ Incomplete
-                </div>
-            {% endif %}
-
-        </div>
-
-        <!-- Verification -->
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-
-            <div class="text-gray-500 text-sm mb-2">
-                Verification Status
-            </div>
-
-            {% if profile.is_verified_by_superuser %}
-                <div class="text-2xl font-bold text-green-600">
-                    ✓ Verified
-                </div>
-            {% else %}
-                <div class="text-2xl font-bold text-yellow-600">
-                    Pending
-                </div>
-            {% endif %}
-
-        </div>
-
-        <!-- Staff Status -->
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-
-            <div class="text-gray-500 text-sm mb-2">
-                Staff Access
-            </div>
-
-            {% if user.is_staff %}
-                <div class="text-2xl font-bold text-green-600">
-                    ✓ Active
-                </div>
-            {% else %}
-                <div class="text-2xl font-bold text-red-600">
-                    ✗ Inactive
-                </div>
-            {% endif %}
-
-        </div>
-
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="text-center mt-10 space-y-4">
-
-        <a href="{% url 'admin_profile_edit' %}"
-           class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg transition duration-300">
-            ✏️ Edit Profile
-        </a>
-
-        <form method="post" action="{% url 'admin_profile_delete' %}" class="inline-block">
-            {% csrf_token %}
-            <button type="submit"
-                    onclick="return confirm('Are you sure you want to delete your admin profile? This is a soft delete and will suspend your access.')"
-                    class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-xl font-semibold shadow-lg transition duration-300">
-                🗑️ Delete Profile
-            </button>
-        </form>
-
-    </div>
-
 </div>
-```
-
-</div>
-
 {% endblock %}

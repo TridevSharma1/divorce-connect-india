@@ -16,12 +16,12 @@
                         Manage your revenue, escrow funds, and withdrawal history.
                     </p>
                 </div>
-                <button class="bg-black hover:bg-gray-900 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition-colors">
+                <a href="{% url 'lawyer_billing' %}" class="bg-black hover:bg-gray-900 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Withdraw Funds
-                </button>
+                </a>
             </div>
         </header>
 
@@ -32,16 +32,16 @@
                 <!-- Total Earnings Card -->
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                     <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Total Earnings (All Time)</p>
-                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹4,50,000</p>
+                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹{{ totals.total_earnings|floatformat:0 }}</p>
                     <p class="text-sm text-gray-600">
-                        <span class="text-black font-semibold">+12%</span> this month
+                        <span class="text-black font-semibold">{{ totals.monthly_generated|floatformat:0 }}</span> earned this month
                     </p>
                 </div>
 
                 <!-- Funds in Escrow Card -->
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                     <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Funds in Escrow</p>
-                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹15,000</p>
+                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹{{ totals.escrow_balance|floatformat:0 }}</p>
                     <p class="text-sm text-gray-600">
                         Clears upon consultation completion.
                     </p>
@@ -50,7 +50,7 @@
                 <!-- Available Balance Card -->
                 <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                     <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Available Balance</p>
-                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹45,000</p>
+                    <p class="heading-playfair text-3xl font-bold text-black mb-2">₹{{ totals.available_balance|floatformat:0 }}</p>
                     <p class="text-sm text-gray-600">
                         Ready to withdraw anytime
                     </p>
@@ -67,41 +67,12 @@
                 <div class="space-y-4">
                     <!-- Chart Container -->
                     <div class="flex items-end justify-between gap-3 h-64">
-                        <!-- May Bar -->
+                        {% for bar in chart_bars %}
                         <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-gray-200 rounded-t transition-all hover:bg-gray-300" style="height: 45%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">May</p>
+                            <div class="w-full rounded-t transition-all" style="height: {{ bar.height_pct }}%; background-color: {% if bar.is_current %}#000{% else %}#E5E7EB{% endif %};"></div>
+                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">{{ bar.label }}</p>
                         </div>
-
-                        <!-- Jun Bar -->
-                        <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-gray-200 rounded-t transition-all hover:bg-gray-300" style="height: 55%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">Jun</p>
-                        </div>
-
-                        <!-- Jul Bar -->
-                        <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-gray-200 rounded-t transition-all hover:bg-gray-300" style="height: 65%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">Jul</p>
-                        </div>
-
-                        <!-- Aug Bar (Current Month - Black) -->
-                        <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-black rounded-t transition-all hover:bg-gray-900" style="height: 85%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">Aug</p>
-                        </div>
-
-                        <!-- Sep Bar -->
-                        <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-gray-200 rounded-t transition-all hover:bg-gray-300" style="height: 72%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">Sep</p>
-                        </div>
-
-                        <!-- Oct Bar -->
-                        <div class="flex flex-col items-center flex-1">
-                            <div class="w-full bg-gray-200 rounded-t transition-all hover:bg-gray-300" style="height: 60%;"></div>
-                            <p class="text-xs uppercase tracking-wider text-gray-500 mt-3">Oct</p>
-                        </div>
+                        {% endfor %}
                     </div>
 
                     <!-- Chart Legend -->
@@ -168,89 +139,24 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <!-- Row 1 - Completed -->
+                            {% for transaction in transactions %}
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 22, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Priya Sharma</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">30-Min Video Call</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹2,500</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ transaction.date }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">{{ transaction.client_name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ transaction.consultation_type }}</td>
+                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹{{ transaction.amount|floatformat:0 }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-black rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Completed</span>
+                                        <span class="inline-block w-2 h-2 rounded-full {{ transaction.status_dot_class }}"></span>
+                                        <span class="text-xs uppercase tracking-wider text-gray-600">{{ transaction.status_label }}</span>
                                     </div>
                                 </td>
                             </tr>
-
-                            <!-- Row 2 - Completed -->
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 21, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Rajesh Patel</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">1-Hour Consultation</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹4,200</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-black rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Completed</span>
-                                    </div>
-                                </td>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-sm text-gray-600 text-center">No transactions found yet.</td>
                             </tr>
-
-                            <!-- Row 3 - Pending -->
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 20, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Meera Verma</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">45-Min Call</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹3,500</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Pending</span>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 4 - Completed -->
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 18, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Anita Singh</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">30-Min Video Call</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹2,500</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-black rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Completed</span>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 5 - Refunded -->
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 15, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Vikram Chandra</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">1-Hour Consultation</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹4,200</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-gray-300 rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Refunded</span>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 6 - Completed -->
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 text-sm text-gray-900">Oct 12, 2024</td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">Neha Gupta</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">45-Min Call</td>
-                                <td class="px-6 py-4 text-sm text-right font-semibold text-black">₹3,500</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="inline-block w-2 h-2 bg-black rounded-full"></span>
-                                        <span class="text-xs uppercase tracking-wider text-gray-600">Completed</span>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -258,7 +164,7 @@
                 <!-- Pagination Footer -->
                 <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                     <p class="text-sm text-gray-600">
-                        Showing 1-6 of 24 transactions
+                        Showing {{ transactions|length }} of {{ transactions_total }} recent transactions
                     </p>
                     <div class="flex gap-2">
                         <button class="px-3 py-1 border border-gray-200 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors">Previous</button>

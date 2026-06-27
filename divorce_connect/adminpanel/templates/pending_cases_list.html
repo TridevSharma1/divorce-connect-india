@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accepted Cases — DivorceConnect Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pc-page {
+        background: #f7f7f7;
+        min-height: 100vh;
+        padding: 3rem 1rem 5rem;
+    }
+    .pc-hero {
+        background: #0a0a0a;
+        border-radius: 1rem;
+        padding: 2.5rem 3rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+    .pc-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+    }
+    .pc-hero p {
+        color: #a1a1aa;
+        font-size: 1rem;
+        margin: 0.35rem 0 0;
+    }
+    .pc-search-bar {
+        max-width: 540px;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+    .pc-search-bar form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.75rem;
+    }
+    .pc-search-input {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border: 1px solid #d4d4d8;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: #0a0a0a;
+        background: #ffffff;
+    }
+    .pc-search-button {
+        border: none;
+        background: #0a0a0a;
+        color: #ffffff;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    .pc-search-button:hover {
+        background: #27272a;
+    }
+    .pc-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    }
+    .pc-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .pc-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .pc-card-meta {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.35rem;
+    }
+    .pc-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1f2937;
+        background: #e2e8f0;
+    }
+    .pc-pill.accepted {
+        background: #dcfce7;
+        color: #14532d;
+    }
+    .pc-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-top: 1.2rem;
+    }
+    .pc-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .pc-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+    }
+    .pc-value {
+        font-size: 0.95rem;
+        color: #111827;
+        line-height: 1.5;
+    }
+    .pc-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .pc-button {
+        text-decoration: none;
+        background: #0a0a0a;
+        color: #ffffff;
+        padding: 0.9rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .pc-button:hover {
+        transform: translateY(-1px);
+        background: #27272a;
+    }
+    .pc-empty {
+        background: #ffffff;
+        border: 1px dashed #d1d5db;
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+    .pc-empty h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+    }
+    .pc-empty p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pc-page">
+    <div class="max-w-6xl mx-auto">
+        <div class="pc-hero">
+            <div>
+                <h1>Pending Case Overview</h1>
+                <p>Review every lawyer-accepted case, with client and lawyer details in one place.</p>
+            </div>
+            <span class="pc-pill accepted">Accepted Cases</span>
+        </div>
+
+        <div class="pc-search-bar">
+            <form method="get" action="{% url 'admin_pending_cases' %}">
+                <input type="search" name="q" value="{{ query }}" placeholder="Search by client ID or case ID" class="pc-search-input" aria-label="Search cases">
+                <button type="submit" class="pc-search-button">Search</button>
+            </form>
+        </div>
+
+        {% if accepted_cases %}
+            <p class="text-sm text-gray-600 mb-4">Showing {{ count }} accepted case{{ count|pluralize }}{% if query %} matching “{{ query }}”{% endif %}.</p>
+            {% for case in accepted_cases %}
+                <div class="pc-card">
+                    <div class="pc-card-head">
+                        <div>
+                            <p class="pc-card-title">Case #{{ case.id }}</p>
+                            <p class="pc-card-meta">Accepted on {{ case.updated_at|date:'d M, Y · H:i' }} • Current status: {{ case.get_status_display }}</p>
+                        </div>
+                        <span class="pc-pill accepted">Accepted</span>
+                    </div>
+
+                    <div class="pc-row">
+                        <div class="pc-field">
+                            <span class="pc-label">Client</span>
+                            <span class="pc-value">{{ case.client.get_full_name }}</span>
+                        </div>
+                        <div class="pc-field">
+                            <span class="pc-label">Client ID</span>
+                            <span class="pc-value">{{ case.client.id }}</span>
+                        </div>
+                        <div class="pc-field">
+                            <span class="pc-label">Client Email</span>
+                            <span class="pc-value">{{ case.client.user.email }}</span>
+                        </div>
+                        <div class="pc-field">
+                            <span class="pc-label">Lawyer</span>
+                            <span class="pc-value">{{ case.lawyer.full_name }}</span>
+                        </div>
+                        <div class="pc-field">
+                            <span class="pc-label">Lawyer Email</span>
+                            <span class="pc-value">{{ case.lawyer.user.email }}</span>
+                        </div>
+                    </div>
+
+                    <div class="pc-actions">
+                        <a href="{% url 'case_details_for_admin' case.id %}" class="pc-button">View Case Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="pc-empty">
+                <h3>No accepted cases found</h3>
+                <p>{% if query %}Try another case ID or client ID.{% else %}There are currently no cases with status Accepted.{% endif %}</p>
+                <a href="{% url 'admin_dashboard' %}" class="pc-button">Back to Dashboard</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

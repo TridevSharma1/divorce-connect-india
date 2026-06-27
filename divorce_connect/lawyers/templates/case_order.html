@@ -4,86 +4,135 @@
 {% block title %}Incoming Requests - DivorceConnect India{% endblock %}
 
 {% block content %}
-    <div class="min-h-screen bg-white">
-        <!-- Header Section -->
-        <div class="py-8 px-6 lg:px-12 border-b border-gray-200">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex items-center gap-4 mb-3">
-                    <h1 class="text-4xl font-semibold text-black" style="font-family: 'Playfair Display', serif;">Incoming Requests</h1>
-                    {% if pending_requests.exists %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-black text-white">
-                        {{ pending_requests.count }} New
-                    </span>
-                    {% endif %}
+    <div class="min-h-screen bg-slate-50">
+        <div class="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+                <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.32em] text-slate-500 mb-2">Lawyer workspace</p>
+                        <h1 class="text-4xl font-semibold tracking-tight text-slate-950">Incoming client requests</h1>
+                        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Review new hire requests, send a fast response, and keep your client intake workflow moving.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="{% url 'lawyer_dashboard' %}" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Dashboard</a>
+                        <a href="{% url 'lawyer_earnings' %}" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Earnings</a>
+                    </div>
                 </div>
-                <p class="text-gray-500 text-base">Review and triage your pending consultation requests.</p>
             </div>
         </div>
 
-        <!-- Main Content Area -->
-        <div class="py-8 px-6 lg:px-12">
-            <div class="max-w-4xl mx-auto">
-                {% if pending_requests.exists %}
-                    <div class="flex flex-col gap-6">
-                        {% for request in pending_requests %}
-                            <div class="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-all hover:border-gray-300">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h2 class="text-lg font-semibold text-black">{{ request.client.get_full_name }}</h2>
-                                        <p class="text-sm text-gray-500">Requested {{ request.created_at|timesince }} ago</p>
-                                    </div>
-                                    <span class="inline-flex items-center rounded-full bg-yellow-100 text-yellow-800 px-3 py-1 text-sm font-semibold">
-                                        {{ request.get_status_display }}
-                                    </span>
-                                </div>
-
-                                <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                                    <p class="text-xs font-semibold text-black mb-2">Client's Note:</p>
-                                    <p class="text-sm text-gray-700 leading-relaxed">{{ request.message|default:'No message provided.' }}</p>
-                                </div>
-
-                                <form method="post" class="grid gap-4 md:grid-cols-[1fr_auto] items-end">
-                                    {% csrf_token %}
-                                    <div>
-                                        <label for="response_message_{{ request.id }}" class="block text-sm font-medium text-gray-700 mb-2">Response to client</label>
-                                        <textarea id="response_message_{{ request.id }}" name="response_message" rows="4" class="w-full rounded-xl border border-gray-300 p-4 text-gray-800 focus:border-blue-500 focus:ring-blue-200" placeholder="Write a note for the client..."></textarea>
-                                    </div>
-                                    <div class="flex flex-col gap-3">
-                                        <button formaction="{% url 'case_request_accept' request.id %}" formmethod="post" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
-                                            Accept
-                                        </button>
-                                        <button formaction="{% url 'case_request_reject' request.id %}" formmethod="post" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
-                                            Reject
-                                        </button>
-                                    </div>
-                                </form>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+            <div class="grid gap-8 lg:grid-cols-[1.6fr_0.9fr]">
+                <section class="space-y-8">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <h2 class="text-xl font-semibold text-slate-900">Order pipeline</h2>
+                                <p class="mt-2 text-sm text-slate-500">Pending requests are shown in order of receipt. Accept early to improve client confidence.</p>
                             </div>
-                        {% endfor %}
+                            <div class="flex flex-wrap gap-3">
+                                <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                                    {{ pending_requests.count }} pending request{% if pending_requests.count != 1 %}s{% endif %}
+                                </span>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                                    <span class="font-semibold text-slate-900">Fast response</span>
+                                    <span class="text-slate-500">keeps clients engaged</span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                {% else %}
-                    <div class="bg-white border border-gray-200 rounded-3xl p-12 text-center">
-                        <h2 class="text-2xl font-semibold text-black mb-3">No pending hire requests</h2>
-                        <p class="text-gray-600 mb-6">You currently have no open client requests. When a client requests to hire you, it will appear here.</p>
-                        <a href="{% url 'lawyer_dashboard' %}" class="inline-flex items-center justify-center rounded-full bg-black text-white px-8 py-3 font-semibold hover:bg-gray-900 transition-colors">Main Dashboard</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
 
-        <!-- Empty State (Hidden - Uncomment to show) -->
-        <!--
-        <div class="py-16 px-6 lg:px-12">
-            <div class="max-w-4xl mx-auto text-center">
-                <div class="border-2 border-dashed border-gray-300 rounded-xl py-16 px-8">
-                    <div class="flex justify-center mb-6">
-                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                    {% if pending_requests.exists %}
+                        <div class="space-y-6">
+                            {% for request in pending_requests %}
+                                <article class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                                    <div class="p-6 sm:p-8">
+                                        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                            <div class="space-y-2">
+                                                <p class="text-sm font-medium uppercase tracking-[0.24em] text-indigo-600">New client request</p>
+                                                <div class="flex flex-wrap items-center gap-3">
+                                                    <h3 class="text-2xl font-semibold text-slate-900">{{ request.client.get_full_name }}</h3>
+                                                    <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">{{ request.get_status_display }}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-500">Received {{ request.created_at|timesince }} ago</p>
+                                            </div>
+                                            <div class="flex gap-2 text-sm">
+                                                <span class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Request #{{ request.id }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-6 rounded-3xl bg-slate-50 p-5">
+                                            <div class="flex items-center justify-between gap-4">
+                                                <span class="text-xs uppercase tracking-[0.24em] text-slate-500">Client message</span>
+                                                <span class="text-xs text-slate-400">Information supplied by client</span>
+                                            </div>
+                                            <p class="mt-3 text-sm leading-7 text-slate-700">{{ request.message|default:'No message provided by the client.' }}</p>
+                                        </div>
+
+                                        <form method="post" class="mt-6 grid gap-4 xl:grid-cols-[1.3fr_auto]">
+                                            {% csrf_token %}
+                                            <div>
+                                                <label for="response_message_{{ request.id }}" class="block text-sm font-semibold text-slate-700">Response note</label>
+                                                <textarea id="response_message_{{ request.id }}" name="response_message" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" placeholder="Send a quick note to the client..."></textarea>
+                                            </div>
+                                            <div class="grid gap-3">
+                                                <button formaction="{% url 'case_request_accept' request.id %}" formmethod="post" class="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">Accept request</button>
+                                                <button formaction="{% url 'case_request_reject' request.id %}" formmethod="post" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">Reject request</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="rounded-[32px] border border-dashed border-slate-300 bg-white p-14 text-center shadow-sm">
+                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h2 class="mt-6 text-3xl font-semibold text-slate-900">No pending hire requests</h2>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">Your request queue is empty for now. New client requests will appear here for review.</p>
+                            <div class="mt-8 flex justify-center">
+                                <a href="{% url 'lawyer_dashboard' %}" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Back to dashboard</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <aside class="space-y-6">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                        <h2 class="text-lg font-semibold text-slate-900">Request overview</h2>
+                        <p class="mt-3 text-sm text-slate-500">Keep an eye on incoming requests and respond clearly to convert interest into active cases.</p>
+                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-3xl bg-slate-50 p-4">
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Pending</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900">{{ pending_requests.count }}</p>
+                            </div>
+                            <div class="rounded-3xl bg-slate-50 p-4">
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Status</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900">{{ pending_requests.count|yesno:"Active,No active" }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-semibold text-black mb-2" style="font-family: 'Playfair Display', serif;">You're all caught up.</h2>
-                    <p class="text-gray-500">You have no pending consultation requests at this time.</p>
-                </div>
+
+                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-base font-semibold text-slate-900">Pro tips</h3>
+                        <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Accept requests quickly to reduce drop-off.</li>
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-slate-400"></span>Use the response note to clarify next steps.</li>
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-slate-400"></span>Keep messages concise and professional.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-base font-semibold text-slate-900">Need support?</h3>
+                        <p class="mt-3 text-sm leading-6 text-slate-600">If you have questions about a request or need help with onboarding, our team is available to assist.</p>
+                        <a href="{% url 'lawyer_support' %}" class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition">Contact support</a>
+                    </div>
+                </aside>
             </div>
-        </div>
+        </main>
     </div>
 {% endblock %}

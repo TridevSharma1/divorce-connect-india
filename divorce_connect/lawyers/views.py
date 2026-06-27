@@ -1,3 +1,6 @@
+from decimal import Decimal
+import calendar
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -231,13 +234,18 @@ def lawyer_profile_edit_view(request):
                 messages.warning(request, "You already have a profile update pending approval.")
                 return redirect('/lawyers/profile/edit/')
 
+            consultation_fee_value = request.POST.get('consultation_fee')
+            if not consultation_fee_value:
+                messages.error(request, "Consultation fee is required.")
+                return redirect('/lawyers/profile/edit/')
+
             update_request = LawyerProfileUpdateRequest(
                 lawyer=profile,
                 full_name=request.POST.get('full_name'),
                 gender=request.POST.get('gender'),
                 years_of_experience=request.POST.get('years_of_experience') or profile.years_of_experience,
                 specialization=request.POST.get('specialization'),
-                consultation_fee=request.POST.get('consultation_fee') or profile.consultation_fee,
+                consultation_fee=consultation_fee_value,
                 office_city=request.POST.get('office_city'),
                 bio=request.POST.get('bio'),
                 mobile_number=request.POST.get('mobile_number'),
@@ -301,33 +309,54 @@ def lawyer_dashboard_view(request):
         return redirect('/api/auth/login/')
     profile = request.user.lawyer_profile
     has_pending_update = LawyerProfileUpdateRequest.objects.filter(lawyer=profile, status='PENDING').exists()
-    
-    # Fetch accepted cases for recent clients display
-    recent_clients = CaseRequest.objects.filter(
-        lawyer=profile,
-        status='ACCEPTED'
-    ).select_related('client', 'client__user').order_by('-updated_at')[:4]
 
-    # New incoming case requests (PENDING — shown as "New" in dashboard)
-    pending_requests = CaseRequest.objects.filter(
-        lawyer=profile,
+    base_queryset = CaseRequest.objects.filter(lawyer=profile)
+    pending_requests_qs = base_queryset.filter(status='PENDING')
+    ready_cases_qs = base_queryset.filter(status='DOCUMENTS_VERIFIED')
+    accepted_cases_qs = base_queryset.filter(status='ACCEPTED')
+
+    pending_requests = pending_requests_qs.select_related('client', 'client__user').order_by('-created_at')[:5]
+    ready_cases = ready_cases_qs.select_related('client', 'client__user').order_by('-updated_at')[:5]
+    recent_clients = accepted_cases_qs.select_related('client', 'client__user').order_by('-updated_at')[:4]
+
+    total_cases = base_queryset.count()
+    pending_count = pending_requests_qs.count()
+    active_cases_count = accepted_cases_qs.count()
+    completed_cases_count = base_queryset.filter(status='COMPLETED').count()
+    verified_documents = CaseDocumentVerification.objects.filter(
+        document__case_request__lawyer=profile,
+        status='VERIFIED'
+    ).count()
+    pending_document_reviews = CaseDocumentVerification.objects.filter(
+        document__case_request__lawyer=profile,
         status='PENDING'
-    ).select_related('client', 'client__user').order_by('-created_at')[:5]
+    ).count()
+    active_clients_count = accepted_cases_qs.values('client').distinct().count()
 
-    # Cases with all documents verified — ready for lawyer to accept
-    ready_cases = CaseRequest.objects.filter(
-        lawyer=profile,
-        status='DOCUMENTS_VERIFIED'
-    ).select_related('client', 'client__user').order_by('-updated_at')[:5]
+    now = timezone.now()
+    consultation_fee = profile.consultation_fee or 0
+    monthly_accepted_count = accepted_cases_qs.filter(updated_at__year=now.year, updated_at__month=now.month).count()
+    yearly_accepted_count = accepted_cases_qs.filter(updated_at__year=now.year).count()
 
     context = {
         'profile': profile,
         'is_verified': profile.verified,
         'is_complete': profile.is_profile_complete,
         'has_pending_update': has_pending_update,
-        'recent_clients': recent_clients,
         'pending_requests': pending_requests,
         'ready_cases': ready_cases,
+        'recent_clients': recent_clients,
+        'stats': {
+            'total_cases': total_cases,
+            'pending_requests': pending_count,
+            'active_cases': active_cases_count,
+            'completed_cases': completed_cases_count,
+            'verified_documents': verified_documents,
+            'pending_document_reviews': pending_document_reviews,
+            'active_clients': active_clients_count,
+            'monthly_revenue': consultation_fee * monthly_accepted_count,
+            'yearly_revenue': consultation_fee * yearly_accepted_count,
+        },
     }
     return render(request, 'lawyer_dashboard.html', context)
 
@@ -337,7 +366,93 @@ def earning_dashboard_view(request):
     """Secure financial dashboard for lawyers."""
     if not hasattr(request.user, 'lawyer_profile'):
         return redirect('/api/auth/login/')
-    return render(request, 'earning_dashboard.html')
+
+    profile = request.user.lawyer_profile
+    base_queryset = CaseRequest.objects.filter(lawyer=profile)
+    completed_qs = base_queryset.filter(status='COMPLETED')
+    accepted_qs = base_queryset.filter(status='ACCEPTED')
+    active_qs = base_queryset.filter(status__in=['ACCEPTED', 'COMPLETED'])
+    consultation_fee = profile.consultation_fee or Decimal('0.00')
+
+    total_generated_amount = consultation_fee * active_qs.count()
+    available_balance = consultation_fee * completed_qs.count()
+    escrow_balance = consultation_fee * accepted_qs.count()
+
+    now = timezone.now()
+    revenue_by_month = []
+    max_monthly_amount = Decimal('0.00')
+    for offset in range(5, -1, -1):
+        total_months = now.year * 12 + now.month - 1 - offset
+        year, month_index = divmod(total_months, 12)
+        month = month_index + 1
+        month_label = calendar.month_abbr[month]
+        month_cases = active_qs.filter(updated_at__year=year, updated_at__month=month).count()
+        month_amount = consultation_fee * month_cases
+        if month_amount > max_monthly_amount:
+            max_monthly_amount = month_amount
+        revenue_by_month.append({
+            'label': month_label,
+            'amount': month_amount,
+        })
+
+    chart_bars = []
+    for item in revenue_by_month:
+        if max_monthly_amount > 0:
+            height_pct = int((item['amount'] / max_monthly_amount) * 100)
+        else:
+            height_pct = 0
+        if item['amount'] > 0 and height_pct < 10:
+            height_pct = 10
+        chart_bars.append({
+            'label': item['label'],
+            'amount': item['amount'],
+            'height_pct': height_pct,
+            'is_current': item['label'] == calendar.month_abbr[now.month],
+        })
+
+    recent_transactions = base_queryset.filter(
+        status__in=['COMPLETED', 'ACCEPTED', 'PENDING', 'DOCUMENTS_VERIFIED']
+    ).select_related('client').order_by('-updated_at')[:10]
+
+    status_map = {
+        'COMPLETED': {'label': 'Completed', 'dot_class': 'bg-black'},
+        'ACCEPTED': {'label': 'Accepted', 'dot_class': 'bg-blue-500'},
+        'PENDING': {'label': 'Pending', 'dot_class': 'bg-gray-400'},
+        'DOCUMENTS_VERIFIED': {'label': 'Verified', 'dot_class': 'bg-green-500'},
+        'DOCUMENTS_PENDING': {'label': 'Documents Pending', 'dot_class': 'bg-yellow-400'},
+        'DOCUMENTS_SUBMITTED': {'label': 'Submitted', 'dot_class': 'bg-yellow-600'},
+        'REJECTED': {'label': 'Rejected', 'dot_class': 'bg-red-500'},
+    }
+
+    transactions = []
+    for case in recent_transactions:
+        status_info = status_map.get(case.status, {
+            'label': case.get_status_display(),
+            'dot_class': 'bg-gray-400'
+        })
+        transactions.append({
+            'date': case.updated_at.strftime('%b %d, %Y'),
+            'client_name': case.client.get_full_name(),
+            'consultation_type': 'Lawyer Consultation',
+            'amount': consultation_fee,
+            'status_label': status_info['label'],
+            'status_dot_class': status_info['dot_class'],
+        })
+
+    context = {
+        'profile': profile,
+        'totals': {
+            'total_earnings': total_generated_amount,
+            'escrow_balance': escrow_balance,
+            'available_balance': available_balance,
+            'monthly_generated': chart_bars[-1]['amount'] if chart_bars else Decimal('0.00'),
+        },
+        'chart_bars': chart_bars,
+        'transactions': transactions,
+        'transactions_total': base_queryset.count(),
+    }
+
+    return render(request, 'earning_dashboard.html', context)
 
 @login_required(login_url='/api/auth/login/')
 @require_verified_profile(profile_type='lawyer')
