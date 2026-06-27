@@ -1,509 +1,384 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Your Profile - Divorce Connect</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}Edit Profile - DivorceConnect India{% endblock %}
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+{% block extra_css %}
+<style>
+    .btn-minimal-primary {
+        background-color: #0a0a0a;
+        color: #ffffff;
+        border: 2px solid #0a0a0a;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-minimal-primary:hover {
+        background-color: transparent;
+        color: #0a0a0a;
+    }
+    .btn-minimal-danger-outline {
+        border: 1.5px solid #dc2626;
+        color: #dc2626;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-minimal-danger-outline:hover {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border-color: #b91c1c;
+    }
+    .profile-photo-container {
+        position: relative;
+        width: 140px;
+        height: 140px;
+    }
+    .profile-photo-preview {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #0a0a0a;
+        padding: 4px;
+        background-color: #ffffff;
+    }
+    .profile-photo-overlay {
+        position: absolute;
+        inset: 4px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .profile-photo-container:hover .profile-photo-overlay {
+        opacity: 1;
+    }
+    .form-input-premium {
+        width: 100%;
+        border: 1px solid #e4e4e7;
+        background-color: #ffffff;
+        color: #0a0a0a;
+        padding: 0.8rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease;
+    }
+    .form-input-premium:focus {
+        outline: none;
+        border-color: #0a0a0a;
+    }
+    .form-input-premium:disabled {
+        background-color: #f4f4f5;
+        color: #a1a1aa;
+        cursor: not-allowed;
+    }
+    /* Modal styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal-overlay.show {
+        display: flex;
+    }
+</style>
+{% endblock %}
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif;
-        }
-
-        .profile-image-wrapper {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-        }
-
-        .profile-image-placeholder {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 2px solid #e5e7eb;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .profile-image-placeholder:hover {
-            border-color: #000;
-            background: linear-gradient(135deg, #f0f0f0 0%, #d9d9d9 100%);
-        }
-
-        .profile-image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        #profile_picture {
-            display: none;
-        }
-
-        .form-input {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #000;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-input:disabled {
-            background-color: #f9fafb;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .form-select {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-            background-color: white;
-            cursor: pointer;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #000;
-            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-save {
-            background-color: #000;
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            font-size: 0.95rem;
-        }
-
-        .btn-save:hover {
-            background-color: #1a1a1a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-delete-outline {
-            background-color: transparent;
-            color: #dc2626;
-            border: 1.5px solid #dc2626;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .btn-delete-outline:hover {
-            background-color: #fef2f2;
-            border-color: #b91c1c;
-            color: #b91c1c;
-        }
-
-        .btn-delete-solid {
-            background-color: #dc2626;
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-        /* Modal Overlay styles */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-        }
-
-        .modal.show {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-            max-width: 400px;
-            width: 90%;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-    </style>
-</head>
-<body class="bg-white">
-    <!-- Premium Toast Notifications -->
-    {% if messages %}
-    <div id="toast-container" class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
-        {% for message in messages %}
-        <div class="toast-message pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-2xl border border-gray-100 bg-white transform transition-all duration-500 translate-x-[120%] opacity-0" role="alert">
-            <div class="flex-shrink-0 mt-0.5">
-                {% if message.tags == 'success' %}
-                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                {% elif message.tags == 'warning' %}
-                    <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                {% elif message.tags == 'error' %}
-                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                {% else %}
-                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                {% endif %}
-            </div>
-            <div class="flex-1">
-                <p class="text-[0.9rem] font-semibold text-gray-900 leading-snug">{{ message }}</p>
-            </div>
-            <button onclick="dismissToast(this.closest('.toast-message'))" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+{% block content %}
+<!-- Premium Toast Notifications -->
+{% if messages %}
+<div id="toast-container" class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+    {% for message in messages %}
+    <div class="toast-message pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-lg border border-zinc-100 bg-white transform transition-all duration-500 translate-x-[120%] opacity-0" role="alert">
+        <div class="flex-shrink-0 mt-0.5">
+            {% if message.tags == 'success' %}
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {% else %}
+                <svg class="w-5 h-5 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {% endif %}
         </div>
-        {% endfor %}
+        <div class="flex-1">
+            <p class="text-xs font-semibold text-zinc-900 leading-snug">{{ message }}</p>
+        </div>
+        <button onclick="dismissToast(this.closest('.toast-message'))" class="flex-shrink-0 text-zinc-400 hover:text-zinc-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
-    <script>
-        function dismissToast(toast) {
-            toast.classList.remove('translate-x-0', 'opacity-100');
-            toast.classList.add('translate-x-[120%]', 'opacity-0');
-            setTimeout(() => toast.remove(), 500);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const toasts = document.querySelectorAll('.toast-message');
-            toasts.forEach((toast, index) => {
-                // Slide in gracefully
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-[120%]', 'opacity-0');
-                    toast.classList.add('translate-x-0', 'opacity-100');
-                }, index * 150 + 100);
-                
-                // Auto dismiss after 6 seconds
-                setTimeout(() => {
-                    if (document.body.contains(toast)) {
-                        dismissToast(toast);
-                    }
-                }, 6000 + (index * 1000));
-            });
+    {% endfor %}
+</div>
+<script>
+    function dismissToast(toast) {
+        toast.classList.remove('translate-x-0', 'opacity-100');
+        toast.classList.add('translate-x-[120%]', 'opacity-0');
+        setTimeout(() => toast.remove(), 500);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const toasts = document.querySelectorAll('.toast-message');
+        toasts.forEach((toast, index) => {
+            setTimeout(() => {
+                toast.classList.remove('translate-x-[120%]', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, index * 150 + 100);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    dismissToast(toast);
+                }
+            }, 5000 + (index * 1000));
         });
-    </script>
-    {% endif %}
+    });
+</script>
+{% endif %}
 
-    <!-- Navigation (Placeholder) -->
-    <nav class="border-b border-gray-200 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 class="text-2xl font-bold text-gray-900"><a href="/" class="hover:opacity-80">Divorce Connect</a></h1>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-        <!-- Header Section -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Edit Your Profile</h1>
-            <p class="text-gray-500 text-base">Update your personal information.</p>
+<div class="min-h-screen bg-[#fafafa] py-16 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Breadcrumbs & Heading -->
+        <div class="mb-12">
+            <nav class="flex items-center gap-2 text-xs text-zinc-400 uppercase tracking-widest mb-3">
+                <a href="{% url 'client_dashboard' %}" class="hover:text-zinc-900 transition">Dashboard</a>
+                <span>/</span>
+                <span class="text-zinc-950 font-semibold">Edit Profile</span>
+            </nav>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-950">Profile Settings</h1>
+            <p class="text-sm text-zinc-500 mt-1">Manage and update your public and account credentials.</p>
         </div>
 
-        <!-- Main Form Card -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-8 mb-8">
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-
-                <!-- Profile Photo Section -->
-                <div class="mb-8 pb-8 border-b border-gray-200">
-                    <label class="block text-sm font-semibold text-gray-900 mb-4">Profile Photo</label>
-                    <div class="flex flex-col items-center">
-                        <div class="profile-image-wrapper mb-4" onclick="document.getElementById('profile_picture').click();">
-                            <div class="profile-image-placeholder">
-                                {% if profile.profile_picture %}
-                                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture">
-                                {% else %}
-                                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                    </svg>
-                                {% endif %}
+        <form method="POST" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Sidebar Panel (Avatar & Actions Summary) -->
+                <div class="lg:col-span-1 space-y-8">
+                    <!-- Avatar Card -->
+                    <div class="bg-white border border-zinc-200/80 rounded-3xl p-8 text-center shadow-sm flex flex-col items-center">
+                        <!-- File Input -->
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden">
+                        
+                        <div class="profile-photo-container cursor-pointer mb-6" onclick="document.getElementById('profile_picture').click();">
+                            {% if profile.profile_picture %}
+                                <img id="photo-preview" src="{{ profile.profile_picture.url }}" alt="Profile Photo" class="profile-photo-preview">
+                            {% else %}
+                                <div class="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center text-white text-3xl font-bold border-2 border-zinc-950 p-1">
+                                    {{ profile.first_name|first|upper }}
+                                </div>
+                            {% endif %}
+                            <div class="profile-photo-overlay">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
                             </div>
                         </div>
-                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-                        <p class="text-xs text-gray-500 mt-2">Click to upload a new photo</p>
+                        <h2 class="text-xl font-extrabold text-zinc-950">{{ profile.first_name }} {{ profile.last_name }}</h2>
+                        <span class="inline-block mt-2 px-3 py-1 bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase tracking-wider rounded-md">Client Account</span>
+                        <p class="text-xs text-zinc-400 mt-4 leading-relaxed">Click photo to upload a new profile picture. Recommended resolution is square.</p>
+                    </div>
+
+                    <!-- Account Actions Navigation Shortcuts -->
+                    <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 shadow-sm">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-4 px-2">Account Links</h3>
+                        <nav class="space-y-1">
+                            <a href="{% url 'client_dashboard' %}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition">
+                                <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                                Back to Dashboard
+                            </a>
+                            <a href="{% url 'client_cases' %}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-xl text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 transition">
+                                <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                My Cases List
+                            </a>
+                        </nav>
                     </div>
                 </div>
 
-                <!-- Personal Info Section -->
-                <div class="mb-8 pb-8 border-b border-gray-200">
-                    <label class="block text-sm font-semibold text-gray-900 mb-4">Personal Information</label>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                            <input
-                                type="text"
-                                id="first_name"
-                                name="first_name"
-                                class="form-input w-full"
-                                value="{{ profile.first_name }}"
-                                required
-                            >
+                <!-- Main Settings Form Panel -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-white border border-zinc-200/80 rounded-3xl p-8 sm:p-10 shadow-sm">
+                        <!-- Personal Credentials Section -->
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-zinc-950 border-b border-zinc-100 pb-3 mb-6">Personal Credentials</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="first_name" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">First Name *</label>
+                                    <input type="text" id="first_name" name="first_name" class="form-input-premium" value="{{ profile.first_name }}" required>
+                                </div>
+                                <div>
+                                    <label for="last_name" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Last Name *</label>
+                                    <input type="text" id="last_name" name="last_name" class="form-input-premium" value="{{ profile.last_name }}" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Registered Email Address</label>
+                                    <input type="email" id="email" class="form-input-premium" value="{{ profile.user.email }}" disabled>
+                                    <p class="text-[10px] text-zinc-400 mt-1">To change your email, contact DivorceConnect customer service.</p>
+                                </div>
+                                <div>
+                                    <label for="date_of_birth" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Date of Birth</label>
+                                    <input type="date" id="date_of_birth" name="date_of_birth" class="form-input-premium font-medium" value="{% if profile.date_of_birth %}{{ profile.date_of_birth|date:'Y-m-d' }}{% endif %}">
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                            <input
-                                type="text"
-                                id="last_name"
-                                name="last_name"
-                                class="form-input w-full"
-                                value="{{ profile.last_name }}"
-                                required
-                            >
+
+                        <!-- Demographics Section -->
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-zinc-950 border-b border-zinc-100 pb-3 mb-6">Demographics</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="gender" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Gender Category</label>
+                                    <select id="gender" name="gender" class="form-input-premium py-[0.85rem] cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2371717a%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                                        <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                                        <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="marital_status" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Current Marital Status</label>
+                                    <select id="marital_status" name="marital_status" class="form-input-premium py-[0.85rem] cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2371717a%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;">
+                                        <option value="">Select Status</option>
+                                        <option value="Single" {% if profile.marital_status == 'Single' %}selected{% endif %}>Single</option>
+                                        <option value="Married" {% if profile.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                                        <option value="Divorced" {% if profile.marital_status == 'Divorced' %}selected{% endif %}>Divorced</option>
+                                        <option value="Separated" {% if profile.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
+                                        <option value="Widowed" {% if profile.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                            <input
-                                type="email"
-                                id="email"
-                                class="form-input w-full"
-                                value="{{ profile.user.email }}"
-                                disabled
-                            >
-                            <p class="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+
+                        <!-- Contacts & Residential Address -->
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-zinc-950 border-b border-zinc-100 pb-3 mb-6">Contact & Verification Details</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="mobile_number" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Primary Phone Number</label>
+                                    <input type="tel" id="mobile_number" name="mobile_number" class="form-input-premium" value="{{ profile.mobile_number }}" placeholder="+91 98765 43210">
+                                </div>
+                                <div>
+                                    <label for="alternate_mobile_number" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Alternate Phone Number</label>
+                                    <input type="tel" id="alternate_mobile_number" name="alternate_mobile_number" class="form-input-premium" value="{{ profile.alternate_mobile_number|default:'' }}" placeholder="+91 98766 43210">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div class="sm:col-span-2">
+                                    <label for="address" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Residential Address *</label>
+                                    <input type="text" id="address" name="address" class="form-input-premium" value="{{ profile.address|default:'' }}" placeholder="Complete street name, unit number" required>
+                                </div>
+                                <div>
+                                    <label for="pincode" class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Postal Pincode *</label>
+                                    <input type="text" id="pincode" name="pincode" class="form-input-premium" value="{{ profile.pincode|default:'' }}" placeholder="6-digit PIN" maxlength="6" required>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-zinc-400 mt-2">A verified residential address is required before you can initiate case document submissions.</p>
                         </div>
-                        <div>
-                            <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                            <input
-                                type="date"
-                                id="date_of_birth"
-                                name="date_of_birth"
-                                class="form-input w-full"
-                                value="{% if profile.date_of_birth %}{{ profile.date_of_birth|date:'Y-m-d' }}{% endif %}"
-                            >
+
+                        <!-- Save changes action button -->
+                        <div class="flex justify-end pt-4 border-t border-zinc-100">
+                            <button type="submit" class="btn-minimal-primary px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm">
+                                Save Profile Changes
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </form>
 
-                <!-- Demographics Section -->
-                <div class="mb-8 pb-8 border-b border-gray-200">
-                    <label class="block text-sm font-semibold text-gray-900 mb-4">Demographics</label>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                            <select
-                                id="gender"
-                                name="gender"
-                                class="form-select w-full"
-                            >
-                                <option value="">Select Gender</option>
-                                <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
-                                <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
-                                <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="marital_status" class="block text-sm font-medium text-gray-700 mb-2">Marital Status</label>
-                            <select
-                                id="marital_status"
-                                name="marital_status"
-                                class="form-select w-full"
-                            >
-                                <option value="">Select Marital Status</option>
-                                <option value="Single" {% if profile.marital_status == 'Single' %}selected{% endif %}>Single</option>
-                                <option value="Married" {% if profile.marital_status == 'Married' %}selected{% endif %}>Married</option>
-                                <option value="Divorced" {% if profile.marital_status == 'Divorced' %}selected{% endif %}>Divorced</option>
-                                <option value="Separated" {% if profile.marital_status == 'Separated' %}selected{% endif %}>Separated</option>
-                                <option value="Widowed" {% if profile.marital_status == 'Widowed' %}selected{% endif %}>Widowed</option>
-                            </select>
-                        </div>
-                    </div>
+        <!-- Danger Zone Box -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div class="lg:col-start-2 lg:col-span-2">
+                <div class="bg-white border border-red-200 rounded-3xl p-8 sm:p-10 shadow-sm">
+                    <h2 class="text-lg font-bold text-red-600 mb-2">Danger Zone</h2>
+                    <p class="text-sm text-zinc-500 mb-6 leading-relaxed">
+                        Soft delete your profile. This will lock your login credentials and conceal your profile data from the verified listings. You can request account reactivation through administrator verification.
+                    </p>
+                    <button type="button" class="btn-minimal-danger-outline px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest" onclick="openDeleteModal()">
+                        Request Account Deletion
+                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Contact Info Section -->
-                <div class="mb-8 pb-8 border-b border-gray-200">
-                    <label class="block text-sm font-semibold text-gray-900 mb-4">Contact Information</label>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="mobile_number" class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
-                            <input
-                                type="tel"
-                                id="mobile_number"
-                                name="mobile_number"
-                                class="form-input w-full"
-                                value="{{ profile.mobile_number }}"
-                                placeholder="+91 98765 43210"
-                            >
-                        </div>
-                        <div>
-                            <label for="alternate_mobile_number" class="block text-sm font-medium text-gray-700 mb-2">Alternate Mobile Number</label>
-                            <input
-                                type="tel"
-                                id="alternate_mobile_number"
-                                name="alternate_mobile_number"
-                                class="form-input w-full"
-                                value="{{ profile.alternate_mobile_number|default:'' }}"
-                                placeholder="+91 98766 43210"
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Address Info Section -->
-                <div class="mb-8">
-                    <label class="block text-sm font-semibold text-gray-900 mb-4">Address Information</label>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Residential Address *</label>
-                            <input
-                                type="text"
-                                id="address"
-                                name="address"
-                                class="form-input w-full"
-                                value="{{ profile.address|default:'' }}"
-                                placeholder="Enter your residential address"
-                                required
-                            >
-                            <p class="text-xs text-gray-500 mt-1">This is required to hire a lawyer</p>
-                        </div>
-                        <div>
-                            <label for="pincode" class="block text-sm font-medium text-gray-700 mb-2">Postal Code (Pincode) *</label>
-                            <input
-                                type="text"
-                                id="pincode"
-                                name="pincode"
-                                class="form-input w-full"
-                                value="{{ profile.pincode|default:'' }}"
-                                placeholder="6-digit postal code"
-                                maxlength="6"
-                                required
-                            >
-                            <p class="text-xs text-gray-500 mt-1">Enter your 6-digit postal code</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="flex justify-end">
-                    <button type="submit" class="btn-save">Save Changes</button>
-                </div>
+<!-- Modal Dialog for Deletion Confirmation -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="bg-white rounded-3xl border border-zinc-200 p-8 max-w-md w-[90%] shadow-2xl transform transition-transform duration-300 scale-95 opacity-0" id="modal-container">
+        <h2 class="text-xl font-bold text-zinc-950 mb-3">Delete Profile Confirmation</h2>
+        <p class="text-sm text-zinc-500 mb-6 leading-relaxed">
+            Are you absolutely sure you want to deactivate and soft-delete your account? To confirm, please press confirm below to execute deletion link generation.
+        </p>
+        <div class="flex gap-3 justify-end">
+            <button type="button" class="px-5 py-2.5 border border-zinc-200 rounded-xl text-xs font-bold uppercase tracking-wider text-zinc-600 hover:bg-zinc-50 transition" onclick="closeDeleteModal()">
+                Cancel
+            </button>
+            <form method="POST" action="{% url 'client_delete_account' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition">
+                    Confirm Deactivate
+                </button>
             </form>
         </div>
-
-        <!-- Danger Zone Card -->
-        <div class="bg-white border-2 border-red-200 rounded-lg p-8">
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-1">Delete Account</h2>
-                <p class="text-gray-500 text-sm">Soft delete your account. This will suspend access but preserve your profile data for possible reactivation.</p>
-            </div>
-            <button
-                type="button"
-                class="btn-delete-outline"
-                onclick="openDeleteModal()"
-            >
-                Delete My Account
-            </button>
-        </div>
     </div>
+</div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-2">Delete Account</h2>
-                <p class="text-gray-600 text-sm mb-6">
-                    Are you sure you want to permanently delete your account? This action cannot be reversed. All your data will be deleted immediately.
-                </p>
-                <div class="flex gap-3 justify-end">
-                    <button
-                        type="button"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 transition"
-                        onclick="closeDeleteModal()"
-                    >
-                        Cancel
-                    </button>
-                    <form method="POST" action="{% url 'client_delete_account' %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button
-                            type="submit"
-                            class="btn-delete-solid"
-                        >
-                            Yes, Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Profile picture preview
-        document.getElementById('profile_picture').addEventListener('change', function(e) {
+<script>
+    // Handle Profile photo selection and instant client preview
+    const profilePicInput = document.getElementById('profile_picture');
+    if (profilePicInput) {
+        profilePicInput.addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const placeholder = document.querySelector('.profile-image-placeholder');
-                    placeholder.innerHTML = '<img src="' + event.target.result + '" alt="Profile Picture">';
+                    const preview = document.getElementById('photo-preview');
+                    if (preview) {
+                        preview.src = event.target.result;
+                    } else {
+                        // If no preview element exists (fallback), create one
+                        const container = document.querySelector('.profile-photo-container');
+                        if (container) {
+                            container.innerHTML = `<img id="photo-preview" src="${event.target.result}" alt="Profile Photo" class="profile-photo-preview">` + 
+                                                  `<div class="profile-photo-overlay">...</div>`;
+                        }
+                    }
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
         });
+    }
 
-        // Modal functions
-        function openDeleteModal() {
-            document.getElementById('deleteModal').classList.add('show');
-        }
+    // Modal overlay handlers
+    const modal = document.getElementById('deleteModal');
+    const container = document.getElementById('modal-container');
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('show');
-        }
+    function openDeleteModal() {
+        if (!modal || !container) return;
+        modal.classList.add('show');
+        setTimeout(() => {
+            container.classList.remove('scale-95', 'opacity-0');
+            container.classList.add('scale-100', 'opacity-100');
+        }, 50);
+    }
 
-        // Close modal when clicking outside
-        document.getElementById('deleteModal').addEventListener('click', function(e) {
+    function closeDeleteModal() {
+        if (!modal || !container) return;
+        container.classList.remove('scale-100', 'opacity-100');
+        container.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.remove('show');
+        }, 200);
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeDeleteModal();
             }
         });
-    </script>
-</body>
-</html>
+    }
+</script>
+{% endblock %}

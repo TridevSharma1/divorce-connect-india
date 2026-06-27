@@ -27,11 +27,13 @@
 
     <!--NEW Notification Bell -->
    <div class="relative">
-    <button id="notification-bell" class="relative p-2 text-black hover:bg-gray-50 rounded-lg transition-colors duration-150" aria-label="Notifications" aria-expanded="false">
+    <button id="notification-bell" class="relative p-2 text-black hover:bg-gray-50 rounded-lg transition-colors duration-150 animate-none" aria-label="Notifications" aria-expanded="false">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
-        <span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full pulse-dot"></span>
+        <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot {% if unread_notifications_count == 0 %}hidden{% endif %}">
+            {{ unread_notifications_count }}
+        </span>
     </button>
 
     <div id="notification-dropdown" class="notification-dropdown hidden absolute right-0 mt-2 w-96 bg-white rounded-xl border border-gray-100 shadow-xl z-50">
@@ -40,23 +42,25 @@
             <button id="mark-all-read" class="text-xs text-gray-500 hover:text-black font-medium transition-colors duration-150">Mark all as read</button>
         </div>
         <div class="notifications-list">
-            <div class="notification-item px-5 py-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100">
-                <div class="flex items-start gap-3">
-                    <div class="unread-indicator mt-1"></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-black leading-snug">Advocate Sharma accepted your consultation request.</p>
-                        <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+            {% if notifications %}
+                {% for notif in notifications %}
+                <div class="notification-item px-5 py-3 {% if not notif.is_read %}bg-gray-50{% else %}bg-white{% endif %} border-b border-gray-100 cursor-pointer hover:bg-gray-100" data-id="{{ notif.id }}">
+                    <div class="flex items-start gap-3">
+                        {% if not notif.is_read %}
+                        <div class="unread-indicator mt-1"></div>
+                        {% endif %}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-black leading-snug">{{ notif.message }}</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ notif.created_at|timesince }} ago</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="notification-item px-5 py-3 bg-white border-b border-gray-100 cursor-pointer">
-                <div class="flex items-start gap-3">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm text-gray-700 leading-snug">Your profile update was saved successfully.</p>
-                        <p class="text-xs text-gray-500 mt-1">Yesterday</p>
-                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="px-5 py-6 text-center text-sm text-gray-500">
+                    No notifications yet.
                 </div>
-            </div>
+            {% endif %}
         </div>
         <div class="px-5 py-3 border-t border-gray-100 sticky bottom-0 bg-white rounded-b-xl">
             <button class="w-full text-center text-sm font-medium text-black hover:text-gray-700 transition-colors duration-150 py-2">View all notifications</button>
@@ -93,6 +97,22 @@
         const dropdown = document.getElementById('notification-dropdown');
         const markAllReadBtn = document.getElementById('mark-all-read');
         const notificationItems = document.querySelectorAll('.notification-item');
+        const badge = document.getElementById('notification-badge');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
 
         bellButton.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -105,16 +125,69 @@
             }
         });
 
+        // Click individual notification to mark it as read
+        notificationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const notifId = this.getAttribute('data-id');
+                const isRead = !this.classList.contains('bg-gray-50');
+                if (isRead) return; // Already read
+
+                fetch(`/api/notifications/${notifId}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_read: true })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        this.classList.remove('bg-gray-50');
+                        this.classList.add('bg-white');
+                        const indicator = this.querySelector('.unread-indicator');
+                        if (indicator) indicator.remove();
+                        
+                        // Decrement badge count
+                        let currentCount = parseInt(badge.innerText.trim());
+                        if (!isNaN(currentCount) && currentCount > 0) {
+                            currentCount -= 1;
+                            if (currentCount > 0) {
+                                badge.innerText = currentCount;
+                            } else {
+                                badge.innerText = "";
+                                badge.classList.add('hidden');
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error("Error marking notification as read:", err));
+            });
+        });
+
+        // Mark all as read button
         markAllReadBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            notificationItems.forEach(item => {
-                item.classList.remove('bg-gray-50');
-                item.classList.add('bg-white');
-                const indicator = item.querySelector('.unread-indicator');
-                if (indicator) indicator.remove();
-            });
-            const redDot = bellButton.querySelector('.pulse-dot');
-            if (redDot) redDot.style.display = 'none';
+            
+            fetch('/api/notifications/mark-all-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    notificationItems.forEach(item => {
+                        item.classList.remove('bg-gray-50');
+                        item.classList.add('bg-white');
+                        const indicator = item.querySelector('.unread-indicator');
+                        if (indicator) indicator.remove();
+                    });
+                    badge.innerText = "";
+                    badge.classList.add('hidden');
+                }
+            })
+            .catch(err => console.error("Error marking all as read:", err));
         });
     })();
 </script>

@@ -7,11 +7,152 @@
     <a href="{% url 'support' %}" class="text-link">Support</a>
 
     <!-- Notification Bell -->
-    <button class="relative" onclick="alert('No new notifications')">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-        </svg>
-    </button>
+    <style>
+        .notification-dropdown { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .notification-dropdown.hidden { opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; }
+        .notification-dropdown:not(.hidden) { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+        .unread-indicator { width: 6px; height: 6px; background-color: #0a0a0a; border-radius: 50%; margin-right: 8px; }
+    </style>
+
+    <div class="relative">
+        <button id="admin-notification-bell" class="relative p-2 text-black hover:bg-gray-50 rounded-lg transition-colors duration-150" aria-label="Notifications" aria-expanded="false">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span id="admin-notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot {% if unread_notifications_count == 0 %}hidden{% endif %}">
+                {{ unread_notifications_count }}
+            </span>
+        </button>
+
+        <div id="admin-notification-dropdown" class="notification-dropdown hidden absolute right-0 mt-2 w-96 bg-white rounded-xl border border-gray-100 shadow-xl z-50">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <h3 class="text-sm font-bold text-black">Notifications</h3>
+                <button id="admin-mark-all-read" class="text-xs text-gray-500 hover:text-black font-medium transition-colors duration-150">Mark all as read</button>
+            </div>
+            <div class="notifications-list">
+                {% if notifications %}
+                    {% for notif in notifications %}
+                    <div class="admin-notification-item px-5 py-3 {% if not notif.is_read %}bg-gray-50{% else %}bg-white{% endif %} border-b border-gray-100 cursor-pointer hover:bg-gray-100" data-id="{{ notif.id }}">
+                        <div class="flex items-start gap-3">
+                            {% if not notif.is_read %}
+                            <div class="unread-indicator mt-1"></div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-black leading-snug">{{ notif.message }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ notif.created_at|timesince }} ago</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="px-5 py-6 text-center text-sm text-gray-500">
+                        No notifications yet.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="px-5 py-3 border-t border-gray-100 bg-white rounded-b-xl text-center">
+                <a href="{% url 'admin_dashboard' %}" class="text-sm font-medium text-black hover:text-gray-700 transition-colors duration-150 py-2">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const bellButton = document.getElementById('admin-notification-bell');
+            const dropdown = document.getElementById('admin-notification-dropdown');
+            const markAllReadBtn = document.getElementById('admin-mark-all-read');
+            const notificationItems = document.querySelectorAll('.admin-notification-item');
+            const badge = document.getElementById('admin-notification-badge');
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            bellButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && e.target !== bellButton && !bellButton.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            notificationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const notifId = this.getAttribute('data-id');
+                    const isRead = !this.classList.contains('bg-gray-50');
+                    if (isRead) return;
+
+                    fetch(`/api/notifications/${notifId}/`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ is_read: true })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            this.classList.remove('bg-gray-50');
+                            this.classList.add('bg-white');
+                            const indicator = this.querySelector('.unread-indicator');
+                            if (indicator) indicator.remove();
+                            
+                            let currentCount = parseInt(badge.innerText.trim());
+                            if (!isNaN(currentCount) && currentCount > 0) {
+                                currentCount -= 1;
+                                if (currentCount > 0) {
+                                    badge.innerText = currentCount;
+                                } else {
+                                    badge.innerText = "";
+                                    badge.classList.add('hidden');
+                                }
+                            }
+                        }
+                    })
+                    .catch(err => console.error(err));
+                });
+            });
+
+            markAllReadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                fetch('/api/notifications/mark-all-read/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        notificationItems.forEach(item => {
+                            item.classList.remove('bg-gray-50');
+                            item.classList.add('bg-white');
+                            const indicator = item.querySelector('.unread-indicator');
+                            if (indicator) indicator.remove();
+                        });
+                        badge.innerText = "";
+                        badge.classList.add('hidden');
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+        })();
+    </script>
 
     <!-- Profile Dropdown -->
     <div class="relative">

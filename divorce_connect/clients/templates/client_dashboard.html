@@ -1,88 +1,262 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Client Dashboard - DivorceConnect{% endblock %}
+{% block title %}Client Dashboard - DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, var(--deep-black) 0%, #27272a 100%);
+        color: var(--pure-white);
+        border-radius: 1.5rem;
+        padding: 3rem 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-hero::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    .stat-card {
+        background: var(--pure-white);
+        border: 1px solid var(--slate-gray);
+        border-radius: 1.25rem;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        border-color: var(--deep-black);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .icon-wrapper {
+        width: 3.5rem;
+        height: 3.5rem;
+        background-color: var(--subtle-gray);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover .icon-wrapper {
+        background-color: var(--deep-black);
+        color: var(--pure-white);
+    }
+
+    .card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--deep-black);
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.025em;
+    }
+
+    .card-text {
+        color: #52525b; /* zinc-600 */
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+        flex-grow: 1;
+    }
+
+    .card-link {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--deep-black);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-decoration: none;
+        transition: opacity 0.3s ease;
+        margin-top: auto;
+    }
+
+    .card-link svg {
+        margin-left: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover .card-link svg {
+        transform: translateX(4px);
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        height: 1px;
+        flex-grow: 1;
+        background-color: var(--slate-gray);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <!-- Welcome Section -->
-    <div class="mb-12">
-        <h1 class="text-5xl font-bold serif-heading mb-3">Welcome, {{ user.get_full_name|default:user.email }}</h1>
-        <p class="text-gray-600 text-lg">Manage your legal matters with confidence</p>
-    </div>
-
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Find Lawyers Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
-                </svg>
+<div class="bg-[#fafafa] min-h-screen py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Hero / Welcome Section -->
+        <div class="dashboard-hero mb-12 shadow-xl">
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-gray-300 font-medium mb-3 block">Client Portal</span>
+                    <h1 class="text-4xl md:text-5xl font-bold serif-heading mb-4">
+                        Welcome, {{ user.get_full_name|default:user.email }}
+                    </h1>
+                    <p class="text-gray-300 text-lg max-w-xl">
+                        Manage your legal matters efficiently with our premium platform resources.
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'client_profile' %}" class="inline-flex items-center justify-center bg-white text-[#0a0a0a] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors shadow-sm">
+                        Edit Profile Details
+                    </a>
+                </div>
             </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">Find a Lawyer</h3>
-            <p class="text-gray-600 mb-4">Browse verified legal professionals in your area</p>
-            <a href="{% url 'lawyers_section' %}" class="text-link font-semibold">Explore Now →</a>
         </div>
 
-        <!-- Counseling Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">Counseling Services</h3>
-            <p class="text-gray-600 mb-4">Get professional counseling support during this time</p>
-            <a href="{% url 'counseling' %}" class="text-link font-semibold">Learn More →</a>
+        <!-- Quick Access Section -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold serif-heading text-[#0a0a0a]">Essential Services</h2>
         </div>
 
-        <!-- My Case Status Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">My Cases</h3>
-            <p class="text-gray-600 mb-4">Track status and details of your active cases</p>
-            <a href="{% url 'client_cases' %}" class="text-link font-semibold">View Cases →</a>
+        <!-- Services Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            
+            <!-- Find a Lawyer -->
+            <a href="{% url 'lawyers_section' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M15 19H9a6 6 0 016-6v0"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Find a Lawyer</h3>
+                    <p class="card-text">Connect with verified matrimonial experts, explore profiles, and book consultations.</p>
+                </div>
+                <div class="card-link">
+                    Explore Directory
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- Counseling Services -->
+            <a href="{% url 'counseling' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Counseling Services</h3>
+                    <p class="card-text">Access professional mediators and family counselors to navigate dispute resolution gracefully.</p>
+                </div>
+                <div class="card-link">
+                    Request Session
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- My Cases -->
+            <a href="{% url 'client_cases' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">My Cases</h3>
+                    <p class="card-text">Track the progress of your active legal matters and view critical case updates in real-time.</p>
+                </div>
+                <div class="card-link">
+                    View Cases
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
         </div>
 
-        <!-- About Section Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">About DivorceConnect</h3>
-            <p class="text-gray-600 mb-4">Learn about our platform and mission</p>
-            <a href=\"{% url 'about' %}\" class=\"text-link font-semibold\">Read More →</a>
+        <!-- Platform & Support Section -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold serif-heading text-[#0a0a0a]">Platform Resources</h2>
         </div>
 
-        <!-- Support Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">Support & Help</h3>
-            <p class="text-gray-600 mb-4">Get help with any questions or concerns</p>
-            <a href="{% url 'support' %}" class="text-link font-semibold">Contact Support →</a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            <!-- About DivorceConnect -->
+            <a href="{% url 'about' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">About the Platform</h3>
+                    <p class="card-text">Learn about our mission, privacy standards, and the stringent lawyer verification process.</p>
+                </div>
+                <div class="card-link">
+                    Read More
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- Support & Help -->
+            <a href="{% url 'support' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Support Desk</h3>
+                    <p class="card-text">Access our knowledge base, frequently asked questions, or raise a priority support ticket.</p>
+                </div>
+                <div class="card-link">
+                    Get Help
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- Contact Us -->
+            <a href="{% url 'contact' %}" class="stat-card group cursor-pointer" style="text-decoration: none;">
+                <div>
+                    <div class="icon-wrapper text-[#0a0a0a]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Contact Admin</h3>
+                    <p class="card-text">Reach out to the DivorceConnect India administration team directly for billing or compliance.</p>
+                </div>
+                <div class="card-link">
+                    Get In Touch
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
         </div>
 
-        <!-- Contact Card -->
-        <div class="bg-white p-8 rounded-lg border-2 border-gray-200 hover:border-black transition-colors">
-            <div class="mb-4">
-                <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-            </div>
-            <h3 class="text-2xl font-bold serif-heading mb-2">Contact Us</h3>
-            <p class="text-gray-600 mb-4">Reach out with any questions or feedback</p>
-            <a href="{% url 'contact' %}" class="text-link font-semibold">Get in Touch →</a>
-        </div>
     </div>
 </div>
 {% endblock %}

@@ -6,6 +6,8 @@ from .models import (
     CaseDocument,
     CaseDocumentVerification,
     LawyerProfileUpdateRequest,
+    LawyerRating,
+    CaseMessage,
 )
 
 
@@ -267,3 +269,38 @@ class CaseDocumentVerificationAdmin(admin.ModelAdmin):
     list_filter = ('status', 'verified_at')
     search_fields = ('document__case_request__client__user__email', 'document__case_request__lawyer__user__email')
     ordering = ('-verified_at',)
+
+
+@admin.register(LawyerRating)
+class LawyerRatingAdmin(admin.ModelAdmin):
+    """Admin interface for lawyer ratings and reviews."""
+
+    list_display = (
+        'id',
+        'lawyer',
+        'client',
+        'score',
+        'created_at',
+    )
+    list_filter = ('score', 'created_at')
+    search_fields = ('lawyer__full_name', 'lawyer__user__email', 'client__user__email', 'review_text')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
+
+
+@admin.register(CaseMessage)
+class CaseMessageAdmin(admin.ModelAdmin):
+    """Admin interface for case chat messages."""
+
+    list_display = (
+        'id',
+        'case',
+        'sender_type',
+        'sender_user',
+        'is_read',
+        'created_at',
+    )
+    list_filter = ('sender_type', 'is_read', 'created_at')
+    search_fields = ('case__client__user__email', 'case__lawyer__user__email', 'sender_user__email', 'text')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)

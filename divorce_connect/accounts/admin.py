@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import BaseUser, Notification
+from .models import BaseUser, Notification, OTPCode, DeleteAccountToken
 from .forms import BaseUserCreationForm, BaseUserChangeForm
 
 
@@ -43,3 +43,35 @@ class NotificationAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'title', 'message')
     ordering = ('-created_at',)
     readonly_fields = ('created_at',)
+
+
+@admin.register(OTPCode)
+class OTPCodeAdmin(admin.ModelAdmin):
+    """Admin configuration for OTP codes."""
+
+    list_display = ('user', 'code', 'created_at', 'is_used', 'is_expired')
+    list_filter = ('is_used', 'created_at')
+    search_fields = ('user__email', 'code')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
+
+    def is_expired(self, obj):
+        return obj.is_expired()
+    is_expired.short_description = 'Expired'
+    is_expired.boolean = True
+
+
+@admin.register(DeleteAccountToken)
+class DeleteAccountTokenAdmin(admin.ModelAdmin):
+    """Admin configuration for account deletion tokens."""
+
+    list_display = ('user', 'token', 'created_at', 'is_used', 'is_expired')
+    list_filter = ('is_used', 'created_at')
+    search_fields = ('user__email', 'token')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'token')
+
+    def is_expired(self, obj):
+        return obj.is_expired()
+    is_expired.short_description = 'Expired'
+    is_expired.boolean = True

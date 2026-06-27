@@ -4,241 +4,1963 @@
 {% block title %}{{ lawyer.full_name }} - Lawyer Profile{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-3xl mx-auto">
-        <a href="/lawyers/" class="text-blue-600 hover:text-blue-800 mb-6 inline-block">&larr; Back to Lawyers</a>
 
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <!-- Header with Picture -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-8">
-                <div class="flex items-start gap-6">
+<div class="min-h-screen bg-[#090909] text-white">
+
+    <!-- Background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-60 -left-60 w-[700px] h-[700px] rounded-full bg-white/5 blur-[180px]"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gray-500/10 blur-[150px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 py-16">
+
+        <a href="/lawyers/" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition mb-10">
+
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+
+            Back to Lawyers
+        </a>
+
+        <div class="rounded-[35px] border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl">
+
+            <div class="grid lg:grid-cols-3">
+
+                <!-- LEFT SIDE -->
+
+                <div class="bg-gradient-to-br from-black via-[#111] to-[#202020] p-10 flex flex-col items-center">
+
                     {% if lawyer.profile_picture %}
-                        <img src="{{ lawyer.profile_picture.url }}" alt="{{ lawyer.full_name }}" class="w-24 h-24 rounded-full border-4 border-white object-cover">
+
+                    <img src="{{ lawyer.profile_picture.url }}" alt="{{ lawyer.full_name }}"
+                        class="w-52 h-52 rounded-full object-cover border-[6px] border-white shadow-2xl">
+
                     {% else %}
-                        <div class="w-24 h-24 rounded-full border-4 border-white bg-gray-300 flex items-center justify-center">
-                            <span class="text-gray-600 text-2xl">{{ lawyer.full_name|first }}</span>
-                        </div>
-                    {% endif %}
-                    <div class="text-white">
-                        <h1 class="text-3xl font-bold">{{ lawyer.full_name }}</h1>
-                        <p class="text-blue-100 mt-2">{{ lawyer.get_specialization_display }}</p>
-                        <div class="mt-6 grid gap-3 sm:grid-cols-2">
-                            <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20">
-                                <span class="text-yellow-300">★</span>
-                                <span>{{ lawyer.average_rating|default:lawyer.rating }}/5.0</span>
-                                <span class="text-white/80">({{ lawyer.rating_count }} reviews)</span>
-                            </div>
-                            <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20">
-                                <span class="text-sm">💰</span>
-                                <span>
-                                    {% if lawyer.consultation_fee %}
-                                        ₹{{ lawyer.consultation_fee|floatformat:"2" }} / hr
-                                    {% else %}
-                                        Fee not listed
-                                    {% endif %}
-                                </span>
-                            </div>
-                        </div>
+
+                    <div
+                        class="w-52 h-52 rounded-full border-[6px] border-white bg-gray-700 flex items-center justify-center text-7xl font-bold">
+
+                        {{ lawyer.full_name|first }}
+
                     </div>
+
+                    {% endif %}
+
+                    <div class="mt-8 text-center">
+
+                        <h1 class="text-4xl font-black tracking-wide">
+
+                            {{ lawyer.full_name }}
+
+                        </h1>
+
+                        <p class="mt-3 text-gray-400 text-lg">
+
+                            {{ lawyer.get_specialization_display }}
+
+                        </p>
+
+                        <div
+                            class="mt-8 inline-flex items-center px-5 py-2 rounded-full border border-yellow-500 text-yellow-400 text-sm">
+
+                            ★ Verified Lawyer
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                <!-- RIGHT SIDE -->
+
+                <div class="lg:col-span-2 p-12">
+
+                    <div class="flex flex-wrap items-center gap-4">
+
+                        <span class="bg-white text-black font-bold px-5 py-2 rounded-full">
+
+                            {{ lawyer.average_rating|default:lawyer.rating }}/5 Rating
+
+                        </span>
+
+                        <span class="bg-white/10 px-5 py-2 rounded-full">
+
+                            {{ lawyer.rating_count }} Reviews
+
+                        </span>
+
+                        <span class="bg-white/10 px-5 py-2 rounded-full">
+
+                            {{ lawyer.years_of_experience }} Years Experience
+
+                        </span>
+
+                    </div>
+
+                    <h2 class="mt-8 text-5xl font-black leading-tight">
+
+                        Professional Legal Representation
+                        For Your Family Matters
+
+                    </h2>
+
+                    <p class="mt-6 text-gray-400 text-lg leading-8 max-w-3xl">
+
+                        Experienced legal counsel specializing in family law,
+                        divorce proceedings, custody disputes, property settlements,
+                        and legal consultation with complete confidentiality and
+                        professionalism.
+
+                    </p>
+
+                    <!-- STATS -->
+
+                    <div class="grid md:grid-cols-4 gap-6 mt-12">
+
+                        <div
+                            class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition duration-300">
+
+                            <div class="text-gray-400 text-sm uppercase">
+
+                                Experience
+
+                            </div>
+
+                            <div class="mt-3 text-4xl font-black">
+
+                                {{ lawyer.years_of_experience }}
+
+                            </div>
+
+                            <div class="text-gray-500">
+
+                                Years
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+
+                            <div class="text-gray-400 text-sm uppercase">
+
+                                Rating
+
+                            </div>
+
+                            <div class="mt-3 text-4xl font-black">
+
+                                {{ lawyer.average_rating|default:lawyer.rating }}
+
+                            </div>
+
+                            <div class="text-yellow-400">
+
+                                ★★★★★
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+
+                            <div class="text-gray-400 text-sm uppercase">
+
+                                Fee
+
+                            </div>
+
+                            <div class="mt-3 text-3xl font-black">
+
+                                {% if lawyer.consultation_fee %}
+
+                                ₹{{ lawyer.consultation_fee|floatformat:"0" }}
+
+                                {% else %}
+
+                                Contact
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="text-gray-500">
+
+                                Per Consultation
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+
+                            <div class="text-gray-400 text-sm uppercase">
+
+                                City
+
+                            </div>
+
+                            <div class="mt-3 text-3xl font-black">
+
+                                {{ lawyer.office_city|default:"N/A" }}
+
+                            </div>
+
+                            <div class="text-gray-500">
+
+                                Office Location
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- BUTTONS -->
+
+                    <div class="flex flex-wrap gap-5 mt-12">
+
+                        <a href="#hire"
+                            class="px-10 py-4 rounded-full bg-white text-black font-bold hover:scale-105 transition">
+
+                            Hire Lawyer
+
+                        </a>
+
+                        <a href="#reviews"
+                            class="px-10 py-4 rounded-full border border-white hover:bg-white hover:text-black transition">
+
+                            Client Reviews
+
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- Content -->
-            <div class="p-8">
-                <!-- Professional Details -->
-                <div class="mb-8 pb-8 border-b">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Professional Details</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-sm text-gray-600">Experience</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.years_of_experience }} years</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Specialization</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.get_specialization_display }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Bar Registration</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.bar_registration_number }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Consultation Fee</p>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {% if lawyer.consultation_fee %}
-                                    ₹{{ lawyer.consultation_fee|floatformat:"2" }} / hr
-                                {% else %}
-                                    Contact for fee
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Bar Council</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.state_bar_council }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Office City</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.office_city|default:'Not specified' }}</p>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        <!-- ========================================================= -->
+        <!-- PROFESSIONAL DETAILS -->
+        <!-- ========================================================= -->
 
-                <!-- Personal Information -->
-                <div class="mb-8 pb-8 border-b">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">About</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-sm text-gray-600">Gender</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.get_gender_display }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Date of Birth</p>
-                            <p class="text-lg font-semibold text-gray-800">
-                                {% if lawyer.date_of_birth %}
-                                    {{ lawyer.date_of_birth|date:"M d, Y" }}
-                                {% else %}
-                                    Not provided
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <section class="mt-16">
 
-                <!-- Contact Information -->
-                <div class="mb-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="text-sm text-gray-600">Primary Mobile</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ lawyer.mobile_number }}</p>
-                        </div>
-                        {% if lawyer.alternate_mobile_number %}
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Professional Profile
+                </p>
+
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+
+                <!-- LEFT CARD -->
+
+                <div
+                    class="rounded-[30px] bg-[#121212] border border-white/10 p-10 hover:border-white/20 transition duration-300">
+
+                    <h2 class="text-3xl font-black mb-10">
+
+                        Professional Information
+
+                    </h2>
+
+                    <div class="space-y-8">
+
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+
                             <div>
-                                <p class="text-sm text-gray-600">Alternate Mobile</p>
-                                <p class="text-lg font-semibold text-gray-800">{{ lawyer.alternate_mobile_number }}</p>
+
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">
+
+                                    Experience
+
+                                </p>
+
+                                <h3 class="text-2xl font-bold mt-2">
+
+                                    {{ lawyer.years_of_experience }} Years
+
+                                </h3>
+
                             </div>
-                        {% endif %}
+
+                            <div class="text-5xl">
+
+                                ⚖️
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">
+
+                                    Specialization
+
+                                </p>
+
+                                <h3 class="text-xl font-semibold mt-2">
+
+                                    {{ lawyer.get_specialization_display }}
+
+                                </h3>
+
+                            </div>
+
+                            <div class="text-5xl">
+
+                                📚
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">
+
+                                    Registration Number
+
+                                </p>
+
+                                <h3 class="text-xl font-semibold mt-2 break-all">
+
+                                    {{ lawyer.bar_registration_number }}
+
+                                </h3>
+
+                            </div>
+
+                            <div class="text-5xl">
+
+                                🪪
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">
+
+                                    State Bar Council
+
+                                </p>
+
+                                <h3 class="text-xl font-semibold mt-2">
+
+                                    {{ lawyer.state_bar_council }}
+
+                                </h3>
+
+                            </div>
+
+                            <div class="text-5xl">
+
+                                🏛️
+
+                            </div>
+
+                        </div>
+
                     </div>
+
                 </div>
 
-                <!-- Client Rating -->
-                <div class="mb-8 rounded-3xl border border-gray-200 bg-gray-50 p-8">
-                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+                <!-- RIGHT CARD -->
+
+                <div
+                    class="rounded-[30px] bg-[#121212] border border-white/10 p-10 hover:border-white/20 transition duration-300">
+
+                    <h2 class="text-3xl font-black mb-10">
+
+                        Office Details
+
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-6">
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">
+
+                                Consultation Fee
+
+                            </p>
+
+                            <h3 class="text-3xl font-black mt-4">
+
+                                {% if lawyer.consultation_fee %}
+
+                                ₹{{ lawyer.consultation_fee|floatformat:"0" }}
+
+                                {% else %}
+
+                                Contact
+
+                                {% endif %}
+
+                            </h3>
+
+                            <p class="text-gray-500 mt-2">
+
+                                Per Hour
+
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">
+
+                                Office City
+
+                            </p>
+
+                            <h3 class="text-3xl font-black mt-4">
+
+                                {{ lawyer.office_city|default:"N/A" }}
+
+                            </h3>
+
+                            <p class="text-gray-500 mt-2">
+
+                                Location
+
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">
+
+                                Reviews
+
+                            </p>
+
+                            <h3 class="text-3xl font-black mt-4">
+
+                                {{ lawyer.rating_count }}
+
+                            </h3>
+
+                            <p class="text-gray-500 mt-2">
+
+                                Client Reviews
+
+                            </p>
+
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">
+
+                                Average Rating
+
+                            </p>
+
+                            <h3 class="text-3xl font-black mt-4">
+
+                                {{ lawyer.average_rating|default:lawyer.rating }}
+
+                            </h3>
+
+                            <p class="text-yellow-400 mt-2">
+
+                                ★★★★★
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- PREMIUM BADGES -->
+
+                    <div class="mt-10 flex flex-wrap gap-4">
+
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5">
+
+                            Verified Professional
+
+                        </span>
+
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5">
+
+                            Secure Consultation
+
+                        </span>
+
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5">
+
+                            Confidential Service
+
+                        </span>
+
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5">
+
+                            Online Available
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ========================================================= -->
+        <!-- ABOUT LAWYER -->
+        <!-- ========================================================= -->
+
+        <section class="mt-20">
+
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    About The Lawyer
+                </p>
+
+            </div>
+
+            <div class="rounded-[35px] bg-[#121212] border border-white/10 p-12">
+
+                <div class="grid lg:grid-cols-2 gap-14">
+
+                    <!-- LEFT -->
+
+                    <div>
+
+                        <h2 class="text-4xl font-black mb-8">
+
+                            Legal Professional
+
+                        </h2>
+
+                        <p class="text-gray-400 leading-9 text-lg">
+
+                            {{ lawyer.full_name }} is an experienced legal professional
+                            dedicated to protecting clients' rights through ethical,
+                            confidential and result-oriented legal representation.
+
+                            Specializing in
+                            <span class="text-white font-semibold">
+                                {{ lawyer.get_specialization_display }}
+                            </span>,
+                            every consultation is handled with professionalism,
+                            transparency and complete client confidentiality.
+
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-5 mt-10">
+
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+
+                                <div class="text-4xl mb-3">⚖️</div>
+
+                                <h3 class="font-bold text-xl">
+
+                                    Legal Advice
+
+                                </h3>
+
+                                <p class="text-gray-500 mt-2 text-sm">
+
+                                    Personalized consultation.
+
+                                </p>
+
+                            </div>
+
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+
+                                <div class="text-4xl mb-3">🏛️</div>
+
+                                <h3 class="font-bold text-xl">
+
+                                    Court Representation
+
+                                </h3>
+
+                                <p class="text-gray-500 mt-2 text-sm">
+
+                                    Representation in court proceedings.
+
+                                </p>
+
+                            </div>
+
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+
+                                <div class="text-4xl mb-3">📑</div>
+
+                                <h3 class="font-bold text-xl">
+
+                                    Documentation
+
+                                </h3>
+
+                                <p class="text-gray-500 mt-2 text-sm">
+
+                                    Drafting and reviewing legal documents.
+
+                                </p>
+
+                            </div>
+
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+
+                                <div class="text-4xl mb-3">🤝</div>
+
+                                <h3 class="font-bold text-xl">
+
+                                    Mediation
+
+                                </h3>
+
+                                <p class="text-gray-500 mt-2 text-sm">
+
+                                    Peaceful dispute resolution.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT -->
+
+                    <div>
+
+                        <div class="rounded-3xl bg-black border border-white/10 p-8">
+
+                            <h3 class="text-2xl font-bold mb-8">
+
+                                Personal Information
+
+                            </h3>
+
+                            <div class="space-y-8">
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-gray-500">
+                                        Full Name
+                                    </span>
+
+                                    <span class="font-semibold">
+
+                                        {{ lawyer.full_name }}
+
+                                    </span>
+
+                                </div>
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-gray-500">
+                                        Gender
+                                    </span>
+
+                                    <span class="font-semibold">
+
+                                        {{ lawyer.get_gender_display }}
+
+                                    </span>
+
+                                </div>
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-gray-500">
+                                        Date of Birth
+                                    </span>
+
+                                    <span class="font-semibold">
+
+                                        {% if lawyer.date_of_birth %}
+                                        {{ lawyer.date_of_birth|date:"d M Y" }}
+                                        {% else %}
+                                        Not Available
+                                        {% endif %}
+
+                                    </span>
+
+                                </div>
+
+                                <div class="flex justify-between">
+
+                                    <span class="text-gray-500">
+                                        Office City
+                                    </span>
+
+                                    <span class="font-semibold">
+
+                                        {{ lawyer.office_city|default:"N/A" }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- CONTACT INFORMATION -->
+        <!-- ========================================================= -->
+
+        <section class="mt-20">
+
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Contact Information
+                </p>
+
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition">
+
+                    <div class="text-5xl mb-6">
+
+                        📞
+
+                    </div>
+
+                    <h3 class="text-2xl font-bold">
+
+                        Primary Mobile
+
+                    </h3>
+
+                    <p class="mt-4 text-gray-400 text-lg">
+
+                        {{ lawyer.mobile_number }}
+
+                    </p>
+
+                </div>
+
+                {% if lawyer.alternate_mobile_number %}
+
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition">
+
+                    <div class="text-5xl mb-6">
+
+                        ☎️
+
+                    </div>
+
+                    <h3 class="text-2xl font-bold">
+
+                        Alternate Number
+
+                    </h3>
+
+                    <p class="mt-4 text-gray-400 text-lg">
+
+                        {{ lawyer.alternate_mobile_number }}
+
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition">
+
+                    <div class="text-5xl mb-6">
+
+                        📍
+
+                    </div>
+
+                    <h3 class="text-2xl font-bold">
+
+                        Office Location
+
+                    </h3>
+
+                    <p class="mt-4 text-gray-400 text-lg">
+
+                        {{ lawyer.office_city|default:"Not Specified" }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- PRACTICE AREAS -->
+        <!-- ========================================================= -->
+
+        <section class="mt-20 mb-10">
+
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Practice Areas
+                </p>
+
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div
+                    class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">⚖️</div>
+                    <h3 class="text-xl font-bold">Family Law</h3>
+                    <p class="mt-3 text-gray-500">
+                        Divorce, separation and legal family matters.
+                    </p>
+                </div>
+
+                <div
+                    class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">👨‍👩‍👧</div>
+                    <h3 class="text-xl font-bold">Child Custody</h3>
+                    <p class="mt-3 text-gray-500">
+                        Child custody and visitation rights.
+                    </p>
+                </div>
+
+                <div
+                    class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">📄</div>
+                    <h3 class="text-xl font-bold">Legal Documentation</h3>
+                    <p class="mt-3 text-gray-500">
+                        Agreements, notices and court paperwork.
+                    </p>
+                </div>
+
+                <div
+                    class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">🤝</div>
+                    <h3 class="text-xl font-bold">Legal Consultation</h3>
+                    <p class="mt-3 text-gray-500">
+                        Online and in-person professional consultation.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ========================================================= -->
+        <!-- CLIENT RATINGS -->
+        <!-- ========================================================= -->
+
+        <section id="reviews" class="mt-24">
+
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+
+                    Client Reviews
+
+                </p>
+
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+
+                <!-- LEFT SIDE -->
+
+                <div class="rounded-[35px] bg-[#121212] border border-white/10 p-10">
+
+                    <p class="text-gray-400 uppercase tracking-widest text-sm">
+
+                        Overall Rating
+
+                    </p>
+
+                    <h2 class="text-7xl font-black mt-6">
+
+                        {{ lawyer.average_rating|default:lawyer.rating }}
+
+                    </h2>
+
+                    <div class="flex text-yellow-400 text-3xl mt-4">
+
+                        ★★★★★
+
+                    </div>
+
+                    <p class="mt-5 text-gray-500">
+
+                        Based on
+
+                        <strong class="text-white">
+
+                            {{ lawyer.rating_count }}
+
+                        </strong>
+
+                        verified client reviews.
+
+                    </p>
+
+                    <!-- Rating Bars -->
+
+                    <div class="space-y-5 mt-12">
+
                         <div>
-                            <h2 class="text-xl font-bold text-gray-800">Rate this Lawyer</h2>
-                            <p class="text-sm text-gray-600">Choose a star rating and submit your feedback.</p>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span>5 Stars</span>
+
+                                <span>95%</span>
+
+                            </div>
+
+                            <div class="h-2 rounded-full bg-black">
+
+                                <div class="h-2 rounded-full bg-white w-[95%]"></div>
+
+                            </div>
+
                         </div>
-                        <div class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-gray-200">
-                            Current average: {{ lawyer.average_rating|default:lawyer.rating }}/5.0
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span>4 Stars</span>
+
+                                <span>4%</span>
+
+                            </div>
+
+                            <div class="h-2 rounded-full bg-black">
+
+                                <div class="h-2 rounded-full bg-white w-[60%]"></div>
+
+                            </div>
+
                         </div>
+
+                        <div>
+
+                            <div class="flex justify-between text-sm mb-2">
+
+                                <span>3 Stars</span>
+
+                                <span>1%</span>
+
+                            </div>
+
+                            <div class="h-2 rounded-full bg-black">
+
+                                <div class="h-2 rounded-full bg-white w-[20%]"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RIGHT SIDE -->
+
+                <div class="lg:col-span-2 rounded-[35px] bg-[#121212] border border-white/10 p-10">
+
+                    <div class="flex justify-between items-center mb-10">
+
+                        <div>
+
+                            <h2 class="text-3xl font-black">
+
+                                Rate This Lawyer
+
+                            </h2>
+
+                            <p class="text-gray-500 mt-2">
+
+                                Share your experience with other clients.
+
+                            </p>
+
+                        </div>
+
+                        <div class="hidden md:flex items-center gap-2 bg-black px-5 py-3 rounded-full">
+
+                            <span class="text-yellow-400 text-xl">
+
+                                ★
+
+                            </span>
+
+                            <span class="font-semibold">
+
+                                {{ lawyer.average_rating|default:lawyer.rating }}/5
+
+                            </span>
+
+                        </div>
+
                     </div>
 
                     {% if request.user.is_authenticated and request.user.client_profile %}
-                        {% if has_rated %}
-                            <div class="rounded-2xl bg-white p-6 text-gray-700">
-                                <p class="font-semibold text-gray-900">You have already rated this lawyer.</p>
-                                <p class="text-sm text-gray-600 mt-2">Thank you for your feedback. Additional ratings are not allowed.</p>
-                            </div>
-                        {% else %}
-                            <form method="post" class="space-y-4">
-                                {% csrf_token %}
-                                <input type="hidden" name="form_type" value="rating" />
-                                <input type="hidden" name="rating" id="rating-input" value="0" />
 
-                                <div class="flex items-center gap-2 text-3xl">
-                                    {% for star in "12345" %}
-                                        <span data-rating-star data-value="{{ star }}" class="cursor-pointer text-gray-300 transition hover:text-yellow-400">★</span>
-                                    {% endfor %}
+                    {% if has_rated %}
+
+                    <div class="rounded-3xl border border-green-500/30 bg-green-500/10 p-8">
+
+                        <h3 class="text-2xl font-bold">
+
+                            ✓ Review Submitted
+
+                        </h3>
+
+                        <p class="text-gray-400 mt-3">
+
+                            Thank you for rating this lawyer.
+
+                            Your feedback helps other clients.
+
+                        </p>
+
+                    </div>
+
+                    {% else %}
+
+                    <form method="post" class="space-y-8">
+
+                        {% csrf_token %}
+
+                        <input type="hidden" name="form_type" value="rating">
+
+                        <input type="hidden" name="rating" id="rating-input" value="0">
+
+                        <!-- Stars -->
+
+                        <div>
+
+                            <label class="block mb-4 text-gray-400 uppercase tracking-widest text-sm">
+
+                                Select Rating
+
+                            </label>
+
+                            <div class="flex gap-4 text-6xl">
+
+                                {% for star in "12345" %}
+
+                                <span data-rating-star data-value="{{ star }}"
+                                    class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">
+
+                                    ★
+
+                                </span>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Review -->
+
+                        <div>
+
+                            <label class="block mb-4 text-gray-400 uppercase tracking-widest text-sm">
+
+                                Write Review
+
+                            </label>
+
+                            <textarea id="review_text" name="review_text" rows="6"
+                                class="w-full rounded-3xl bg-black border border-white/10 p-6 text-white focus:outline-none focus:border-white"
+                                placeholder="Tell future clients about your experience..."></textarea>
+
+                        </div>
+
+                        <button
+                            class="bg-white text-black px-10 py-5 rounded-full font-bold hover:bg-gray-200 transition">
+
+                            Submit Review
+
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                    {% else %}
+
+                    <div class="rounded-3xl bg-black border border-white/10 p-12 text-center">
+
+                        <div class="text-6xl mb-6">
+
+                            🔒
+
+                        </div>
+
+                        <h2 class="text-3xl font-bold">
+
+                            Login Required
+
+                        </h2>
+
+                        <p class="text-gray-400 mt-5">
+
+                            Only verified clients can submit ratings and reviews.
+
+                        </p>
+
+                        <a href="/api/auth/login/"
+                            class="inline-block mt-8 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-200 transition">
+
+                            Login as Client
+
+                        </a>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ========================================================= -->
+        <!-- HIRE LAWYER -->
+        <!-- ========================================================= -->
+
+        <section id="hire" class="mt-24 mb-24">
+
+            <div class="flex items-center gap-4 mb-10">
+
+                <div class="w-14 h-[2px] bg-white"></div>
+
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Hire This Lawyer
+                </p>
+
+            </div>
+
+            {% if request.user.is_authenticated and request.user.client_profile %}
+
+            <div class="rounded-[40px] overflow-hidden border border-white/10 bg-[#121212]">
+
+                <div class="grid lg:grid-cols-3">
+
+                    <!-- LEFT -->
+
+                    <div
+                        class="bg-gradient-to-b from-[#0a0a0a] via-[#101010] to-[#181818] p-12 border-r border-white/10">
+
+                        <div
+                            class="w-24 h-24 rounded-full bg-white text-black flex items-center justify-center text-5xl">
+
+                            ⚖️
+
+                        </div>
+
+                        <h2 class="text-4xl font-black mt-10">
+
+                            Need Legal Help?
+
+                        </h2>
+
+                        <p class="text-gray-400 mt-6 leading-8">
+
+                            Hire an experienced lawyer for confidential legal
+                            consultation, court representation, documentation,
+                            family disputes and professional legal guidance.
+
+                        </p>
+
+                        <div class="mt-12 space-y-6">
+
+                            <div class="flex items-center gap-4">
+
+                                <div
+                                    class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center">
+
+                                    ✓
+
                                 </div>
 
                                 <div>
-                                    <label for="review_text" class="block text-sm font-medium text-gray-700">Review (optional)</label>
-                                    <textarea id="review_text" name="review_text" rows="4" class="mt-2 w-full rounded-2xl border border-gray-300 bg-white p-4 text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="Tell others what you liked about this lawyer..."></textarea>
+
+                                    <h4 class="font-semibold">
+
+                                        Verified Professional
+
+                                    </h4>
+
+                                    <p class="text-gray-500 text-sm">
+
+                                        Identity & Registration Verified
+
+                                    </p>
+
                                 </div>
 
-                                <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
-                                    Submit Rating
-                                </button>
-                            </form>
-                        {% endif %}
-                    {% else %}
-                        <div class="rounded-2xl bg-white p-6 text-center text-gray-700">
-                            <p class="font-semibold">Login as a client to rate this lawyer.</p>
-                            <a href="/api/auth/login/" class="mt-3 inline-flex rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700">Login to Rate</a>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+
+                                <div
+                                    class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center">
+
+                                    ⏰
+
+                                </div>
+
+                                <div>
+
+                                    <h4 class="font-semibold">
+
+                                        Fast Response
+
+                                    </h4>
+
+                                    <p class="text-gray-500 text-sm">
+
+                                        Usually replies within 24 hours
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex items-center gap-4">
+
+                                <div
+                                    class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center">
+
+                                    🔒
+
+                                </div>
+
+                                <div>
+
+                                    <h4 class="font-semibold">
+
+                                        Confidential
+
+                                    </h4>
+
+                                    <p class="text-gray-500 text-sm">
+
+                                        Your information stays secure
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    {% endif %}
+
+                    </div>
+
+                    <!-- RIGHT -->
+
+                    <div class="lg:col-span-2 p-12">
+
+                        {% if client_request %}
+
+                        <!-- Existing Request -->
+
+                        <div class="rounded-3xl border border-white/10 bg-black p-10">
+
+                            <div class="flex justify-between items-center mb-10">
+
+                                <div>
+
+                                    <h2 class="text-3xl font-black">
+
+                                        Request Status
+
+                                    </h2>
+
+                                    <p class="text-gray-500 mt-3">
+
+                                        Your request has been sent successfully.
+
+                                    </p>
+
+                                </div>
+
+                                <div class="px-6 py-3 rounded-full bg-white text-black font-bold">
+
+                                    {{ client_request.get_status_display }}
+
+                                </div>
+
+                            </div>
+
+                            <div class="space-y-8">
+
+                                <div class="flex gap-5">
+
+                                    <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+
+                                        ✓
+
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="font-semibold">
+
+                                            Request Submitted
+
+                                        </h3>
+
+                                        <p class="text-gray-500">
+
+                                            Your legal request has been received.
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="flex gap-5">
+
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center">
+
+                                        2
+
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="font-semibold">
+
+                                            Lawyer Review
+
+                                        </h3>
+
+                                        <p class="text-gray-500">
+
+                                            Waiting for lawyer response.
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="flex gap-5">
+
+                                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+
+                                        3
+
+                                    </div>
+
+                                    <div>
+
+                                        <h3 class="font-semibold">
+
+                                            Consultation
+
+                                        </h3>
+
+                                        <p class="text-gray-500">
+
+                                            Schedule your meeting after approval.
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {% if client_request.response_message %}
+
+                            <div class="mt-12 rounded-2xl bg-[#181818] p-8">
+
+                                <h4 class="font-bold mb-4">
+
+                                    Lawyer's Message
+
+                                </h4>
+
+                                <p class="text-gray-400">
+
+                                    {{ client_request.response_message }}
+
+                                </p>
+
+                            </div>
+
+                            {% endif %}
+
+                            <a href="{% url 'client_cases' %}"
+                                class="inline-flex mt-10 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-300 transition">
+
+                                View My Cases
+
+                            </a>
+
+                        </div>
+
+                        {% else %}
+
+                        <!-- Hire Form -->
+
+                        <form method="post" class="space-y-8">
+
+                            {% csrf_token %}
+
+                            <div>
+
+                                <label class="block mb-4 uppercase tracking-widest text-sm text-gray-500">
+
+                                    Describe Your Legal Issue
+
+                                </label>
+
+                                <textarea name="message" rows="8"
+                                    class="w-full rounded-3xl bg-black border border-white/10 p-8 text-white focus:border-white focus:outline-none"
+                                    placeholder="Briefly explain your legal matter, timeline, expectations, and any important information...">{{ request.POST.message }}</textarea>
+
+                            </div>
+
+                            <div class="grid md:grid-cols-3 gap-6">
+
+                                <div class="rounded-3xl bg-black border border-white/10 p-6">
+
+                                    <div class="text-4xl mb-4">
+
+                                        📞
+
+                                    </div>
+
+                                    <h3 class="font-bold">
+
+                                        Consultation
+
+                                    </h3>
+
+                                    <p class="text-gray-500 mt-2">
+
+                                        Online & Offline
+
+                                    </p>
+
+                                </div>
+
+                                <div class="rounded-3xl bg-black border border-white/10 p-6">
+
+                                    <div class="text-4xl mb-4">
+
+                                        ⚖️
+
+                                    </div>
+
+                                    <h3 class="font-bold">
+
+                                        Representation
+
+                                    </h3>
+
+                                    <p class="text-gray-500 mt-2">
+
+                                        Court Assistance
+
+                                    </p>
+
+                                </div>
+
+                                <div class="rounded-3xl bg-black border border-white/10 p-6">
+
+                                    <div class="text-4xl mb-4">
+
+                                        🔐
+
+                                    </div>
+
+                                    <h3 class="font-bold">
+
+                                        Confidential
+
+                                    </h3>
+
+                                    <p class="text-gray-500 mt-2">
+
+                                        100% Secure
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <button type="submit"
+                                class="w-full py-5 rounded-full bg-white text-black text-lg font-bold hover:bg-gray-200 transition duration-300">
+
+                                Hire This Lawyer
+
+                            </button>
+
+                        </form>
+
+                        {% endif %}
+
+                    </div>
+
                 </div>
 
-                <!-- Action Button -->
-                {% if request.user.is_authenticated and request.user.client_profile %}
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                        {% if client_request %}
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="text-sm font-semibold text-gray-700">Your request is currently <span class="text-blue-700">{{ client_request.get_status_display }}</span>.</span>
-                                    <a href="{% url 'client_cases' %}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View My Cases</a>
-                                </div>
-                                {% if client_request.response_message %}
-                                    <p class="text-sm text-gray-600">Lawyer note: {{ client_request.response_message }}</p>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <form method="post">
-                                {% csrf_token %}
-                                <label for="message" class="block text-sm font-medium text-gray-700 mb-3">Briefly explain your request</label>
-                                <textarea id="message" name="message" rows="4" class="w-full rounded-xl border border-gray-300 p-4 text-gray-800 focus:border-blue-500 focus:ring-blue-200" placeholder="Describe your legal need, timeline, or any special concerns...">{{ request.POST.message }}</textarea>
-                                <button type="submit" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
-                                    Send Hire Request
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                {% elif not request.user.is_authenticated %}
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                        <p class="text-gray-700 mb-4">
-                            <strong>Want to get legal help from this lawyer?</strong>
-                        </p>
-                        <a href="/api/auth/login/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
-                            Login as Client
-                        </a>
-                    </div>
-                {% endif %}
             </div>
-        </div>
+
+            {% elif not request.user.is_authenticated %}
+
+            <!-- LOGIN CARD -->
+
+            <div class="rounded-[40px] border border-white/10 bg-[#121212] p-16 text-center">
+
+                <div class="text-8xl mb-8">
+
+                    🔒
+
+                </div>
+
+                <h2 class="text-5xl font-black">
+
+                    Login Required
+
+                </h2>
+
+                <p class="text-gray-400 mt-6 max-w-2xl mx-auto text-lg">
+
+                    Sign in as a client to hire this lawyer, send consultation
+                    requests, manage your legal cases and communicate securely.
+
+                </p>
+
+                <a href="/api/auth/login/"
+                    class="inline-flex mt-12 px-12 py-5 rounded-full bg-white text-black font-bold text-lg hover:bg-gray-200 transition">
+
+                    Login as Client
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+        {% block extra_js %}
+
+        <script>
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                /*======================================================
+                    STAR RATING
+                ======================================================*/
+
+                const stars = document.querySelectorAll("[data-rating-star]");
+                const ratingInput = document.getElementById("rating-input");
+
+                if (stars.length && ratingInput) {
+
+                    function updateStars(value) {
+
+                        stars.forEach((star) => {
+
+                            const v = Number(star.dataset.value);
+
+                            if (v <= value) {
+
+                                star.classList.remove("text-gray-700");
+
+                                star.classList.add(
+                                    "text-yellow-400",
+                                    "scale-125"
+                                );
+
+                            } else {
+
+                                star.classList.remove(
+                                    "text-yellow-400",
+                                    "scale-125"
+                                );
+
+                                star.classList.add("text-gray-700");
+
+                            }
+
+                        });
+
+                        ratingInput.value = value;
+
+                    }
+
+                    stars.forEach((star) => {
+
+                        star.addEventListener("mouseenter", () => {
+
+                            updateStars(Number(star.dataset.value));
+
+                        });
+
+                        star.addEventListener("click", () => {
+
+                            updateStars(Number(star.dataset.value));
+
+                        });
+
+                    });
+
+                    stars[0].parentElement.addEventListener("mouseleave", () => {
+
+                        updateStars(Number(ratingInput.value) || 0);
+
+                    });
+
+                }
+
+                /*======================================================
+                    CARD HOVER
+                ======================================================*/
+
+                document.querySelectorAll(".hover-card").forEach((card) => {
+
+                    card.addEventListener("mouseenter", () => {
+
+                        card.style.transform = "translateY(-10px)";
+                        card.style.transition = ".35s";
+                        card.style.boxShadow = "0 25px 60px rgba(255,255,255,.08)";
+
+                    });
+
+                    card.addEventListener("mouseleave", () => {
+
+                        card.style.transform = "translateY(0)";
+                        card.style.boxShadow = "";
+
+                    });
+
+                });
+
+                /*======================================================
+                    FADE UP
+                ======================================================*/
+
+                const observer = new IntersectionObserver((entries) => {
+
+                    entries.forEach((entry) => {
+
+                        if (entry.isIntersecting) {
+
+                            entry.target.classList.add("opacity-100");
+                            entry.target.classList.add("translate-y-0");
+
+                        }
+
+                    });
+
+                }, {
+
+                    threshold: .1
+
+                });
+
+                document.querySelectorAll(".animate-section").forEach((el) => {
+
+                    observer.observe(el);
+
+                });
+
+                /*======================================================
+                    BUTTON RIPPLE
+                ======================================================*/
+
+                document.querySelectorAll("button,.ripple").forEach((btn) => {
+
+                    btn.addEventListener("click", function (e) {
+
+                        const circle = document.createElement("span");
+
+                        const diameter = Math.max(
+                            this.clientWidth,
+                            this.clientHeight
+                        );
+
+                        circle.style.width = diameter + "px";
+                        circle.style.height = diameter + "px";
+
+                        circle.style.left =
+                            e.clientX -
+                            this.getBoundingClientRect().left -
+                            diameter / 2 + "px";
+
+                        circle.style.top =
+                            e.clientY -
+                            this.getBoundingClientRect().top -
+                            diameter / 2 + "px";
+
+                        circle.className = "ripple-effect";
+
+                        this.appendChild(circle);
+
+                        setTimeout(() => {
+
+                            circle.remove();
+
+                        }, 700);
+
+                    });
+
+                });
+
+            });
+
+        </script>
+
+        <style>
+            html {
+
+                scroll-behavior: smooth;
+
+            }
+
+            body {
+
+                background: #090909;
+
+            }
+
+            /* Scrollbar */
+
+            ::-webkit-scrollbar {
+
+                width: 10px;
+
+            }
+
+            ::-webkit-scrollbar-thumb {
+
+                background: #555;
+
+                border-radius: 20px;
+
+            }
+
+            ::-webkit-scrollbar-track {
+
+                background: #111;
+
+            }
+
+            /* Glass */
+
+            .glass {
+
+                backdrop-filter: blur(18px);
+
+            }
+
+            /* Hover */
+
+            .hover-card {
+
+                transition: .35s;
+
+            }
+
+            /* Sections */
+
+            .animate-section {
+
+                opacity: 0;
+
+                transform: translateY(40px);
+
+                transition: all .8s ease;
+
+            }
+
+            /* Ripple */
+
+            button {
+
+                overflow: hidden;
+
+                position: relative;
+
+            }
+
+            .ripple-effect {
+
+                position: absolute;
+
+                border-radius: 50%;
+
+                transform: scale(0);
+
+                animation: ripple .7s linear;
+
+                background: rgba(255, 255, 255, .35);
+
+            }
+
+            @keyframes ripple {
+
+                to {
+
+                    transform: scale(4);
+
+                    opacity: 0;
+
+                }
+
+            }
+
+            /* Floating */
+
+            .floating {
+
+                animation: floating 5s ease-in-out infinite;
+
+            }
+
+            @keyframes floating {
+
+                0% {
+
+                    transform: translateY(0px);
+
+                }
+
+                50% {
+
+                    transform: translateY(-12px);
+
+                }
+
+                100% {
+
+                    transform: translateY(0px);
+
+                }
+
+            }
+
+            /* Shine */
+
+            .shine {
+
+                position: relative;
+
+                overflow: hidden;
+
+            }
+
+            .shine:before {
+
+                content: "";
+
+                position: absolute;
+
+                top: 0;
+
+                left: -100%;
+
+                width: 100%;
+
+                height: 100%;
+
+                background: linear-gradient(120deg,
+                        transparent,
+                        rgba(255, 255, 255, .15),
+                        transparent);
+
+                transition: 1s;
+
+            }
+
+            .shine:hover:before {
+
+                left: 100%;
+
+            }
+
+            /* Glow */
+
+            .glow:hover {
+
+                box-shadow:
+
+                    0 0 25px rgba(255, 255, 255, .18);
+
+            }
+
+            /* Selection */
+
+            ::selection {
+
+                background: white;
+
+                color: black;
+
+            }
+        </style>
+
+        {% endblock %}
+
     </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const stars = document.querySelectorAll('[data-rating-star]');
-        const ratingInput = document.getElementById('rating-input');
-
-        if (!stars.length || !ratingInput) {
-            return;
-        }
-
-        const updateStars = function(value) {
-            stars.forEach(function(star) {
-                const starValue = Number(star.dataset.value);
-                star.classList.toggle('text-yellow-400', starValue <= value);
-                star.classList.toggle('text-gray-300', starValue > value);
-            });
-            ratingInput.value = value;
-        };
-
-        stars.forEach(function(star) {
-            star.addEventListener('click', function() {
-                updateStars(Number(star.dataset.value));
-            });
-            star.addEventListener('mouseover', function() {
-                updateStars(Number(star.dataset.value));
-            });
-        });
-
-        document.querySelector('[data-rating-star]').parentElement.addEventListener('mouseleave', function() {
-            updateStars(Number(ratingInput.value) || 0);
-        });
-    });
-</script>
 {% endblock %}

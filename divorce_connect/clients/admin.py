@@ -15,10 +15,13 @@ class ClientProfileAdmin(admin.ModelAdmin):
 			'description': 'The BaseUser account associated with this client profile.'
 		}),
 		('Personal Information', {
-			'fields': ('first_name', 'last_name', 'gender', 'date_of_birth', 'marital_status'),
+			'fields': ('first_name', 'last_name', 'gender', 'date_of_birth', 'marital_status', 'profile_picture'),
 		}),
 		('Contact Information', {
 			'fields': ('mobile_number', 'alternate_mobile_number'),
+		}),
+		('Address Information', {
+			'fields': ('address', 'pincode'),
 		}),
 		('Metadata', {
 			'fields': ('date_of_join', 'updated_at', 'deleted_at'),

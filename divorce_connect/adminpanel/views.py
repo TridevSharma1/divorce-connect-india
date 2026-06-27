@@ -50,6 +50,15 @@ def admin_profile_edit_view(request):
 
                 profile.is_verified_by_superuser = False
                 profile.save()
+                
+                # Auto-send notification for update request
+                Notification.objects.create(
+                    user=request.user,
+                    title="Profile Update Submitted",
+                    message="Your admin profile update request was submitted successfully.",
+                    url="/adminpanel/profile/"
+                )
+                
                 messages.success(request, 'Profile submitted successfully! Admin will review your request soon.')
                 messages.warning(request, 'Your profile is pending verification by admin. You will have full access once verified.')
                 return redirect('admin_profile_edit')
@@ -58,6 +67,15 @@ def admin_profile_edit_view(request):
             updated_profile.is_profile_complete = True
             updated_profile.is_verified_by_superuser = False
             updated_profile.save()
+            
+            # Auto-send notification for direct save
+            Notification.objects.create(
+                user=request.user,
+                title="Profile Saved",
+                message="Your admin profile has been completed and saved successfully.",
+                url="/adminpanel/profile/"
+            )
+            
             messages.success(request, 'Profile submitted successfully! Admin will review your request soon.')
             messages.warning(request, 'Your profile is pending verification by admin. You will have full access once verified.')
             return redirect('admin_profile_edit')
@@ -280,6 +298,14 @@ def lawyer_verification_detail_view(request, lawyer_id):
 
             verification_request.save()
             lawyer.save()
+            
+            # Send notification to the lawyer
+            Notification.objects.create(
+                user=lawyer.user,
+                title="Profile Verified",
+                message="Congratulations! Your lawyer profile has been verified successfully by admin.",
+                url="/lawyers/profile/"
+            )
 
             messages.success(request, f'✓ {lawyer.full_name} has been verified successfully!')
             return redirect('admin_dashboard')
@@ -293,6 +319,14 @@ def lawyer_verification_detail_view(request, lawyer_id):
             verification_request.reviewed_at = timezone.now()
 
             verification_request.save()
+            
+            # Send notification to the lawyer
+            Notification.objects.create(
+                user=lawyer.user,
+                title="Verification Rejected",
+                message=f"Your lawyer verification request was rejected. Reason: {rejection_reason}",
+                url="/lawyers/profile/edit/"
+            )
 
             messages.warning(request, f'✗ {lawyer.full_name} verification has been rejected.')
             return redirect('admin_dashboard')
@@ -337,6 +371,14 @@ def lawyer_update_request_detail_view(request, request_id):
             update_request.reviewed_at = timezone.now()
             update_request.admin_notes = notes
             update_request.save()
+            
+            # Send notification to the lawyer
+            Notification.objects.create(
+                user=lawyer.user,
+                title="Profile Update Approved",
+                message="Your lawyer profile update request has been approved and applied.",
+                url="/lawyers/profile/"
+            )
 
             messages.success(request, f'✓ {lawyer.full_name} profile update approved and applied.')
             return redirect('admin_dashboard')
@@ -347,6 +389,14 @@ def lawyer_update_request_detail_view(request, request_id):
             update_request.reviewed_at = timezone.now()
             update_request.admin_notes = notes or rejection_reason
             update_request.save()
+            
+            # Send notification to the lawyer
+            Notification.objects.create(
+                user=lawyer.user,
+                title="Profile Update Rejected",
+                message=f"Your profile update request was rejected. Reason: {notes or rejection_reason}",
+                url="/lawyers/profile/edit/"
+            )
 
             messages.warning(request, f'✗ {lawyer.full_name} profile update rejected.')
             return redirect('admin_dashboard')
@@ -421,6 +471,22 @@ def case_document_verify_view(request, document_id):
                     return render(request, 'case_document_verify.html', context)
             
             verification.save()
+
+            # Auto-send notification to the client regarding individual document status
+            if verification.status == 'VERIFIED':
+                Notification.objects.create(
+                    user=case_request.client.user,
+                    title="Document Approved",
+                    message=f"Your document '{document.document_type}' has been verified and approved by admin.",
+                    url="/cases/"
+                )
+            elif verification.status == 'REJECTED':
+                Notification.objects.create(
+                    user=case_request.client.user,
+                    title="Document Rejected",
+                    message=f"Your document '{document.document_type}' was rejected. Reason: {verification.rejection_reason}",
+                    url="/cases/"
+                )
 
             # Check if all documents for this case are verified
             all_verified = CaseDocumentVerification.objects.filter(

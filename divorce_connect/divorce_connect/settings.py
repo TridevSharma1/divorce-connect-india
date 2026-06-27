@@ -18,7 +18,7 @@ SMTP_AUTH = {
     "HOST": "smtp.gmail.com",
     "PORT": 587,
     "USER": "sharikahmed731@gmail.com",
-    "PASSWORD": os.getenv("SMTP_AUTH_PASSWORD", "tqyo drfl lkax wmbk"),
+    "PASSWORD": os.getenv("SMTP_AUTH_PASSWORD", "qijn piou dnrg tovn"),
     "USE_TLS": True,
 }
 
@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
     'accounts.apps.AccountsConfig',
     'clients.apps.ClientsConfig',
     'adminpanel.apps.AdminpanelConfig',
@@ -151,5 +153,29 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] ##Fourth Changes
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Django REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# Simple JWT Configuration for local development
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 
 

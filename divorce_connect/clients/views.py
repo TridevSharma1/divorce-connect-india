@@ -110,6 +110,16 @@ def edit_profile_client_view(request):
             profile.profile_picture = request.FILES['profile_picture']
             
         profile.save()
+        
+        # Auto-send notification on successful profile update
+        from accounts.models import Notification
+        Notification.objects.create(
+            user=user,
+            title="Profile Updated",
+            message="Your profile has been updated successfully.",
+            url="/profile/"
+        )
+        
         messages.success(request, "Your profile has been updated successfully.")
         return redirect('client_profile')
 
@@ -176,7 +186,7 @@ def report_lawyer_view(request):
             })
 
         reported_lawyer = get_object_or_404(LawyerProfile, id=lawyer_id)
-        TrustReport.objects.create(
+        report = TrustReport.objects.create(
             reporter=request.user,
             reported_lawyer=reported_lawyer,
             reason=reason,
@@ -196,6 +206,16 @@ def report_lawyer_view(request):
             message=f'{current_client.get_full_name()} has submitted a report. Admin will review and take action.',
             url='/lawyers/dashboard/'
         )
+
+        # Notify all admin users
+        from accounts.models import BaseUser
+        for admin in BaseUser.objects.filter(is_staff=True, is_active=True):
+            Notification.objects.create(
+                user=admin,
+                title="New Trust Report Filed",
+                message=f"Client {current_client.get_full_name()} reported Lawyer {reported_lawyer.full_name}.",
+                url=f"/adminpanel/reports/{report.id}/"
+            )
 
         # Send confirmation email to the reporting client
         try:

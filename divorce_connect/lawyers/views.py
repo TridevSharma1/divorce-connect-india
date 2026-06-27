@@ -188,6 +188,26 @@ def lawyer_profile_edit_view(request):
                 verification_request, created = LawyerVerificationRequest.objects.get_or_create(
                     lawyer=profile
                 )
+                
+                # Auto-send notification on profile update
+                from accounts.models import Notification
+                Notification.objects.create(
+                    user=request.user,
+                    title="Profile Saved",
+                    message="Your profile has been saved successfully and is pending admin verification.",
+                    url="/lawyers/profile/"
+                )
+
+                # Notify all admin users
+                from accounts.models import BaseUser
+                for admin in BaseUser.objects.filter(is_staff=True, is_active=True):
+                    Notification.objects.create(
+                        user=admin,
+                        title="New Lawyer Verification Request",
+                        message=f"Lawyer {profile.full_name} has submitted a verification request.",
+                        url=f"/adminpanel/lawyer/{profile.id}/verify/"
+                    )
+
                 if created:
                     messages.success(request, 'Profile submitted successfully! Admin will review your request soon.')
                 else:
@@ -232,6 +252,26 @@ def lawyer_profile_edit_view(request):
                 update_request.profile_picture = request.FILES['profile_picture']
                 
             update_request.save()
+            
+            # Auto-send notification on profile update request submission
+            from accounts.models import Notification
+            Notification.objects.create(
+                user=request.user,
+                title="Profile Update Submitted",
+                message="Your profile updates have been submitted and are pending admin approval.",
+                url="/lawyers/profile/"
+            )
+
+            # Notify all admin users
+            from accounts.models import BaseUser
+            for admin in BaseUser.objects.filter(is_staff=True, is_active=True):
+                Notification.objects.create(
+                    user=admin,
+                    title="Lawyer Profile Update Request",
+                    message=f"Lawyer {profile.full_name} has requested a profile update.",
+                    url=f"/adminpanel/lawyer/update-request/{update_request.id}/"
+                )
+            
             messages.success(request, "Your profile updates have been submitted and are pending admin approval.")
             return redirect('/lawyers/profile/edit/')
 
@@ -406,7 +446,7 @@ def report_client_view(request):
             ClientProfile,
             id=client_id
         )
-        TrustReport.objects.create(
+        report = TrustReport.objects.create(
             reporter=request.user,
             reported_client=reported_client,
             reason=reason,
@@ -426,6 +466,16 @@ def report_client_view(request):
             message=f'{current_lawyer.full_name} has submitted a report. Admin will review and take action.',
             url='/dashboard/'
         )
+
+        # Notify all admin users
+        from accounts.models import BaseUser
+        for admin in BaseUser.objects.filter(is_staff=True, is_active=True):
+            Notification.objects.create(
+                user=admin,
+                title="New Trust Report Filed",
+                message=f"Lawyer {current_lawyer.full_name} reported Client {reported_client.get_full_name()}.",
+                url=f"/adminpanel/reports/{report.id}/"
+            )
 
         # Send confirmation email to the reporting lawyer
         try:
@@ -513,6 +563,16 @@ def case_document_upload_view(request, case_request_id):
                     message=f'{request.user.client_profile.get_full_name()} has submitted documents for the case.',
                     url=f'/lawyers/case/{case_request.id}/view-documents/'
                 )
+
+                # Notify all admin users
+                from accounts.models import BaseUser
+                for admin in BaseUser.objects.filter(is_staff=True, is_active=True):
+                    Notification.objects.create(
+                        user=admin,
+                        title='New Case Documents Submitted',
+                        message=f'Client {request.user.client_profile.get_full_name()} submitted documents for case #{case_request.id}.',
+                        url='/adminpanel/documents/verify/'
+                    )
 
                 messages.success(request, f"Successfully uploaded {documents_created} document(s). Waiting for admin verification.")
                 return redirect('client_cases')
