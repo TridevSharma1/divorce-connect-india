@@ -7,222 +7,122 @@
     <title>Register - DivorceConnect India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary-black: #1a1a1a;
-            --accent-blue: #0066cc;
-            --focus-blue: #0052a3;
-            --border-gray: #e0e0e0;
-            --bg-light: #f8f9fa;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        input:focus,
-        select:focus {
-            outline: 2px solid var(--accent-blue);
-            outline-offset: 2px;
-        }
-
-        input:focus,
-        select:focus {
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-black);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--focus-blue);
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.25);
-        }
-
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px 0;
-        }
-
-        .radio-group input[type="radio"] {
-            cursor: pointer;
-            accent-color: var(--accent-blue);
-            width: 18px;
-            height: 18px;
-        }
-
-        .form-input {
-            border: 1px solid var(--border-gray);
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:hover {
-            border-color: #bbb;
-        }
-
-        .error-message {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .error-input {
-            border-color: #dc2626 !important;
-        }
+        body { font-family: Inter, 'Segoe UI', sans-serif; }
+        .input-focus:focus { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); border-color: #2563eb; }
+        .radio-card input:checked + span { border-color: #2563eb; background-color: #eff6ff; color: #1d4ed8; }
+        .error-input { border-color: #dc2626 !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center py-8 px-4">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <!-- Logo Section -->
-        <div class="text-center mb-8">
-            <div class="mb-4">
-                <a href="/" class="flex justify-center">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-16 w-auto">
-                </a>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-900">DivorceConnect India</h1>
-            <p class="text-sm text-gray-600 mt-1">Online Divorce & Lawyer Marketplace</p>
-        </div>
-
-        <!-- Error Messages -->
-        {% if form.non_field_errors %}
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                {% for error in form.non_field_errors %}
-                    <p class="text-red-600 text-sm">{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <!-- Registration Form -->
-        <form method="post" class="space-y-5">
-            {% csrf_token %}
-
-            <!-- Role Selection -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-900 mb-3">Select Your Role *</label>
-                <div class="radio-group space-y-2 p-3 bg-gray-50 rounded-lg border {% if form.role.errors %}border-red-600{% else %}border-gray-200{% endif %}">
-                    <label>
-                        <input type="radio" name="role" value="client" {% if form.data.role == 'client' %}checked{% endif %} required>
-                        <span class="ml-3 text-gray-700 font-medium">Client</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="role" value="lawyer" {% if form.data.role == 'lawyer' %}checked{% endif %} required>
-                        <span class="ml-3 text-gray-700 font-medium">Lawyer</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="role" value="admin" {% if form.data.role == 'admin' %}checked{% endif %} required>
-                        <span class="ml-3 text-gray-700 font-medium">Admin Panel</span>
-                    </label>
+<body class="min-h-screen bg-slate-950 text-slate-900">
+    <div class="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top_right,_rgba(124,58,237,0.2),_transparent_30%),linear-gradient(135deg,_#f8fafc_0%,_#eff6ff_100%)] px-4 py-8">
+        <div class="w-full max-w-6xl overflow-hidden rounded-[32px] shadow-2xl bg-white lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+            <div class="hidden lg:flex flex-col justify-between bg-slate-950 px-10 py-10 text-white">
+                <div>
+                    <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
+                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-10 w-auto">
+                        <span class="text-sm font-semibold tracking-[0.2em] uppercase">DivorceConnect</span>
+                    </a>
+                    <h1 class="mt-8 text-4xl font-semibold leading-tight">Create your account and start your journey.</h1>
+                    <p class="mt-4 max-w-lg text-sm text-slate-300">Join a trusted platform designed for clients, lawyers, and administrators looking for a secure and seamless experience.</p>
                 </div>
-                {% if form.role.errors %}
-                    <div class="error-message">{{ form.role.errors.0 }}</div>
-                {% endif %}
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                    <div class="mb-2 font-semibold text-white">Why join?</div>
+                    <ul class="space-y-2">
+                        <li>• Build a secure professional profile</li>
+                        <li>• Connect faster with verified users</li>
+                        <li>• Manage documents and updates in one place</li>
+                    </ul>
+                </div>
             </div>
 
-            <!-- First Name -->
-            <div>
-                <label for="first_name" class="block text-sm font-semibold text-gray-900 mb-1">First Name *</label>
-                <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    required
-                    placeholder="John"
-                    value="{{ form.first_name.value|default_if_none:'' }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.first_name.errors %}error-input{% endif %}"
-                >
-                {% if form.first_name.errors %}
-                    <div class="error-message">{{ form.first_name.errors.0 }}</div>
+            <div class="px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+                <div class="mb-8 text-center lg:text-left">
+                    <div class="mb-4 flex justify-center lg:justify-start">
+                        <a href="/" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
+                            <span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+                            New account
+                        </a>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-slate-900">Create your DivorceConnect account</h2>
+                    <p class="mt-2 text-sm text-slate-600">Choose your role and set up your profile in a few steps.</p>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-3">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-sm text-red-700">{{ error }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
+
+                <form method="post" class="space-y-5">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="mb-3 block text-sm font-semibold text-slate-800">Select Your Role *</label>
+                        <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 {% if form.role.errors %}border-red-300{% endif %}">
+                            <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
+                                <input type="radio" name="role" value="client" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'client' or form.role.value == 'client' %}checked{% endif %} required>
+                                <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Client</span>
+                            </label>
+                            <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
+                                <input type="radio" name="role" value="lawyer" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'lawyer' or form.role.value == 'lawyer' %}checked{% endif %} required>
+                                <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Lawyer</span>
+                            </label>
+                            <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
+                                <input type="radio" name="role" value="admin" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'admin' or form.role.value == 'admin' %}checked{% endif %} required>
+                                <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Admin Panel</span>
+                            </label>
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="mt-1 text-sm text-red-600">{{ form.role.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="first_name" class="mb-1 block text-sm font-semibold text-slate-800">First Name *</label>
+                            <input type="text" id="first_name" name="first_name" required placeholder="John" value="{{ form.first_name.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.first_name.errors %}error-input{% endif %}">
+                            {% if form.first_name.errors %}<div class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div>
+                            <label for="last_name" class="mb-1 block text-sm font-semibold text-slate-800">Last Name *</label>
+                            <input type="text" id="last_name" name="last_name" required placeholder="Doe" value="{{ form.last_name.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.last_name.errors %}error-input{% endif %}">
+                            {% if form.last_name.errors %}<div class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="mb-1 block text-sm font-semibold text-slate-800">Email Address *</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com" value="{{ form.email.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.email.errors %}error-input{% endif %}">
+                        {% if form.email.errors %}<div class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="password1" class="mb-1 block text-sm font-semibold text-slate-800">Password *</label>
+                            <input type="password" id="password1" name="password1" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password1.errors %}error-input{% endif %}">
+                            <p class="mt-1 text-xs text-slate-500">At least 8 characters</p>
+                            {% if form.password1.errors %}<div class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div>
+                            <label for="password2" class="mb-1 block text-sm font-semibold text-slate-800">Confirm Password *</label>
+                            <input type="password" id="password2" name="password2" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password2.errors %}error-input{% endif %}">
+                            {% if form.password2.errors %}<div class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                        Create Account
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-slate-600">
+                    Already have an account?
+                    <a href="{% url 'login' %}" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Sign In</a>
+                </p>
             </div>
-
-            <!-- Last Name -->
-            <div>
-                <label for="last_name" class="block text-sm font-semibold text-gray-900 mb-1">Last Name *</label>
-                <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    required
-                    placeholder="Doe"
-                    value="{{ form.last_name.value|default_if_none:'' }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.last_name.errors %}error-input{% endif %}"
-                >
-                {% if form.last_name.errors %}
-                    <div class="error-message">{{ form.last_name.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Email -->
-            <div>
-                <label for="email" class="block text-sm font-semibold text-gray-900 mb-1">Email Address *</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    placeholder="you@example.com"
-                    value="{{ form.email.value|default_if_none:'' }}"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.email.errors %}error-input{% endif %}"
-                >
-                {% if form.email.errors %}
-                    <div class="error-message">{{ form.email.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Password -->
-            <div>
-                <label for="password1" class="block text-sm font-semibold text-gray-900 mb-1">Password *</label>
-                <input
-                    type="password"
-                    id="password1"
-                    name="password1"
-                    required
-                    placeholder="••••••••"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.password1.errors %}error-input{% endif %}"
-                >
-                <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-                {% if form.password1.errors %}
-                    <div class="error-message">{{ form.password1.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Confirm Password -->
-            <div>
-                <label for="password2" class="block text-sm font-semibold text-gray-900 mb-1">Confirm Password *</label>
-                <input
-                    type="password"
-                    id="password2"
-                    name="password2"
-                    required
-                    placeholder="••••••••"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.password2.errors %}error-input{% endif %}"
-                >
-                {% if form.password2.errors %}
-                    <div class="error-message">{{ form.password2.errors.0 }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Submit Button -->
-            <button
-                type="submit"
-                class="w-full btn-primary py-2 rounded-lg font-semibold text-base mt-6"
-            >
-                Create Account
-            </button>
-        </form>
-
-        <!-- Login Link -->
-        <p class="text-center text-sm text-gray-600 mt-6">
-            Already have an account?
-            <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-800 font-semibold transition">
-                Sign In
-            </a>
-        </p>
+        </div>
     </div>
 </body>
 </html>

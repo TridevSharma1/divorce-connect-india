@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from .forms import BaseUserAuthenticationForm, BaseUserRegistrationForm
 from .models import BaseUser, OTPCode, DeleteAccountToken
 from clients.models import ClientProfile
@@ -9,12 +11,86 @@ from lawyers.models import LawyerProfile
 from adminpanel.models import AdminPanelProfile
 from utils.email_utils import (
     send_otp_email,
+    send_password_reset_otp_email,
     send_register_otp_email,
     send_registration_email,
     send_welcome_back_email,
     send_logout_email,
     send_delete_account_email,
 )
+
+
+# ──────────────────────────────────────────────
+#  FORGOT PASSWORD  →  OTP  →  NEW PASSWORD
+# ──────────────────────────────────────────────
+
+def forgot_password_view(request):
+    """Collect the user's email and send a reset verification code."""
+    if request.user.is_authenticated:
+        return redirect_to_dashboard(request.user)
+
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        if not email:
+            messages.error(request, 'Please enter your email address.')
+            return render(request, 'forgot_password.html')
+
+        try:
+            user = BaseUser.objects.get(email__iexact=email)
+        except BaseUser.DoesNotExist:
+            messages.error(request, 'No account was found with that email address.')
+            return render(request, 'forgot_password.html')
+
+        request.session['otp_user_id'] = user.pk
+        request.session['otp_user_email'] = user.email
+        request.session['otp_purpose'] = 'password_reset'
+
+        otp = OTPCode.generate_for_user(user)
+        try:
+            send_password_reset_otp_email(user, otp.code)
+        except Exception:
+            pass
+
+        messages.success(request, 'A verification code has been sent to your email.')
+        return redirect('verify_otp')
+
+    return render(request, 'forgot_password.html')
+
+
+def reset_password_view(request):
+    """Allow the user to choose a new password after OTP verification."""
+    user_id = request.session.get('password_reset_user_id')
+    if not user_id:
+        return redirect('forgot_password')
+
+    try:
+        user = BaseUser.objects.get(pk=user_id)
+    except BaseUser.DoesNotExist:
+        request.session.pop('password_reset_user_id', None)
+        return redirect('forgot_password')
+
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        if not new_password or not confirm_password:
+            messages.error(request, 'Please enter and confirm your new password.')
+        elif new_password != confirm_password:
+            messages.error(request, 'The two password fields did not match.')
+        else:
+            try:
+                validate_password(new_password, user=user)
+            except ValidationError as exc:
+                messages.error(request, '; '.join(exc.messages))
+                return render(request, 'reset_password.html')
+
+            user.set_password(new_password)
+            user.save()
+            request.session.pop('password_reset_user_id', None)
+            messages.success(request, 'Your password has been changed successfully. Please sign in with your new password.')
+            return redirect('login')
+
+    return render(request, 'reset_password.html')
 
 
 # ──────────────────────────────────────────────
@@ -54,7 +130,7 @@ def verify_otp_view(request):
     user_email = request.session.get('otp_user_email', '')
     purpose = request.session.get('otp_purpose', 'login')
 
-    if not user_id or purpose != 'login':
+    if not user_id or purpose not in ['login', 'password_reset']:
         return redirect('login')
 
     try:
@@ -76,6 +152,11 @@ def verify_otp_view(request):
             # Clear OTP session keys
             for key in ['otp_user_id', 'otp_user_email', 'otp_purpose']:
                 request.session.pop(key, None)
+
+            if purpose == 'password_reset':
+                request.session['password_reset_user_id'] = user.pk
+                messages.success(request, 'Verification successful. Please create a new password.')
+                return redirect('reset_password')
 
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 

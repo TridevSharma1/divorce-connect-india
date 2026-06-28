@@ -7,154 +7,112 @@
     <title>Login - DivorceConnect India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary-black: #1a1a1a;
-            --accent-blue: #0066cc;
-            --focus-blue: #0052a3;
-            --border-gray: #e0e0e0;
-            --bg-light: #f8f9fa;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        input:focus {
-            outline: 2px solid var(--accent-blue);
-            outline-offset: 2px;
-        }
-
-        input:focus {
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-black);
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--focus-blue);
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.25);
-        }
-
-        .form-input {
-            border: 1px solid var(--border-gray);
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:hover {
-            border-color: #bbb;
-        }
-
-        .error-message {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .error-input {
-            border-color: #dc2626 !important;
-        }
+        body { font-family: Inter, 'Segoe UI', sans-serif; }
+        .input-focus:focus { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); border-color: #2563eb; }
+        .error-input { border-color: #dc2626 !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center py-8 px-4">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <!-- Logo Section -->
-        <div class="text-center mb-8">
-            <div class="mb-4">
-                <a href="/" class="flex justify-center">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-16 w-auto">
-                </a>
+<body class="min-h-screen bg-slate-950 text-slate-900">
+    <div class="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.25),_transparent_32%),linear-gradient(135deg,_#f8fafc_0%,_#eef2ff_100%)] px-4 py-8">
+        <div class="w-full max-w-6xl overflow-hidden rounded-[32px] shadow-2xl bg-white lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+            <div class="hidden lg:flex flex-col justify-between bg-slate-950 px-10 py-10 text-white">
+                <div>
+                    <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
+                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-10 w-auto">
+                        <span class="text-sm font-semibold tracking-[0.2em] uppercase">DivorceConnect</span>
+                    </a>
+                    <h1 class="mt-8 text-4xl font-semibold leading-tight">Find trusted legal support with confidence.</h1>
+                    <p class="mt-4 max-w-lg text-sm text-slate-300">Securely connect with verified lawyers, manage your divorce journey, and access trusted guidance in one place.</p>
+                </div>
+                <div class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                    <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Verified lawyer network</div>
+                    <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-400"></span> Secure document sharing</div>
+                    <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Fast support and updates</div>
+                </div>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">DivorceConnect India</h1>
-            <p class="text-sm text-gray-600 mt-1">Online Divorce & Lawyer Marketplace</p>
-        </div>
 
-        <!-- Error Messages -->
-        {% if form.non_field_errors %}
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                {% for error in form.non_field_errors %}
-                    <p class="text-red-600 text-sm">{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+            <div class="px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+                <div class="mb-8 text-center lg:text-left">
+                    <div class="mb-4 flex justify-center lg:justify-start">
+                        <a href="/" class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
+                            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                            Welcome back
+                        </a>
+                    </div>
+                    <h2 class="text-3xl font-semibold text-slate-900">Sign in to your account</h2>
+                    <p class="mt-2 text-sm text-slate-600">Access your dashboard and continue your legal journey.</p>
+                </div>
 
-        <!-- Login Form -->
-        <form method="post" class="space-y-5">
-            {% csrf_token %}
-
-            <!-- Email -->
-            <div>
-                <label for="{{ form.email.id_for_label }}" class="block text-sm font-semibold text-gray-900 mb-1">
-                    {{ form.email.label }}
-                </label>
-                <input
-                    type="email"
-                    id="{{ form.email.id_for_label }}"
-                    name="email"
-                    value="{{ form.email.value|default_if_none:'' }}"
-                    required
-                    placeholder="you@example.com"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.email.errors %}error-input{% endif %}"
-                >
-                {% if form.email.errors %}
-                    <div class="error-message">
-                        {% for error in form.email.errors %}{{ error }}{% endfor %}
+                {% if messages %}
+                    <div class="mb-5 space-y-2">
+                        {% for message in messages %}
+                            <div class="rounded-xl border px-3 py-2 text-sm {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
-            </div>
 
-            <!-- Password -->
-            <div>
-                <label for="{{ form.password.id_for_label }}" class="block text-sm font-semibold text-gray-900 mb-1">
-                    {{ form.password.label }}
-                </label>
-                <input
-                    type="password"
-                    id="{{ form.password.id_for_label }}"
-                    name="password"
-                    required
-                    placeholder="••••••••"
-                    class="w-full px-4 py-2 form-input rounded-lg text-gray-900 placeholder-gray-400 text-sm {% if form.password.errors %}error-input{% endif %}"
-                >
-                {% if form.password.errors %}
-                    <div class="error-message">
-                        {% for error in form.password.errors %}{{ error }}{% endfor %}
+                {% if form.non_field_errors %}
+                    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-3">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-sm text-red-700">{{ error }}</p>
+                        {% endfor %}
                     </div>
                 {% endif %}
+
+                <form method="post" class="space-y-5">
+                    {% csrf_token %}
+
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="mb-1 block text-sm font-semibold text-slate-800">{{ form.email.label }}</label>
+                        <input
+                            type="email"
+                            id="{{ form.email.id_for_label }}"
+                            name="email"
+                            value="{{ form.email.value|default_if_none:'' }}"
+                            required
+                            placeholder="you@example.com"
+                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.email.errors %}error-input{% endif %}"
+                        >
+                        {% if form.email.errors %}
+                            <div class="mt-1 text-sm text-red-600">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.password.id_for_label }}" class="mb-1 block text-sm font-semibold text-slate-800">{{ form.password.label }}</label>
+                        <input
+                            type="password"
+                            id="{{ form.password.id_for_label }}"
+                            name="password"
+                            required
+                            placeholder="••••••••"
+                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password.errors %}error-input{% endif %}"
+                        >
+                        {% if form.password.errors %}
+                            <div class="mt-1 text-sm text-red-600">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm">
+                        <a href="{% url 'forgot_password' %}" class="font-medium text-blue-600 transition hover:text-blue-700">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                        Sign In
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-sm text-slate-600">
+                    Don’t have an account?
+                    <a href="{% url 'register' %}" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Create one now</a>
+                </p>
+
+                <div class="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-center text-xs text-blue-800">
+                    🔒 Your data is encrypted and secure. We never share your information.
+                </div>
             </div>
-
-            <!-- Forgot Password Link -->
-            <div class="text-right">
-                <a href="{% url 'support' %}" class="text-blue-600 hover:text-blue-800 font-medium transition text-sm">
-                    Forgot password?
-                </a>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-                type="submit"
-                class="w-full btn-primary py-2 rounded-lg font-semibold text-base mt-6"
-            >
-                Sign In
-            </button>
-        </form>
-
-        <!-- Registration Link -->
-        <p class="text-center text-sm text-gray-600 mt-6">
-            Don't have an account?
-            <a href="{% url 'register' %}" class="text-blue-600 hover:text-blue-800 font-semibold transition">
-                Create one now
-            </a>
-        </p>
-
-        <!-- Security Note -->
-        <div class="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-100">
-            <p class="text-xs text-blue-800 text-center">
-                🔒 Your data is encrypted and secure. We never share your information.
-            </p>
         </div>
     </div>
 </body>

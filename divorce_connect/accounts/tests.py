@@ -1,10 +1,48 @@
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
-from accounts.models import Notification
+from accounts.models import Notification, OTPCode
 
 User = get_user_model()
+
+class PasswordResetFlowTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="reset.user@example.com",
+            password="oldpassword123",
+            username="resetuser"
+        )
+
+    def test_password_reset_flow_allows_new_password(self):
+        response = self.client.post(reverse('forgot_password'), {
+            'email': self.user.email,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('verify_otp'))
+        self.assertEqual(self.client.session['otp_purpose'], 'password_reset')
+        self.assertEqual(self.client.session['otp_user_id'], self.user.pk)
+
+        otp_code = OTPCode.objects.filter(user=self.user).latest('created_at')
+        response = self.client.post(reverse('verify_otp'), {
+            'otp': otp_code.code,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('reset_password'))
+
+        response = self.client.post(reverse('reset_password'), {
+            'new_password': 'NewPassword123!',
+            'confirm_password': 'NewPassword123!',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('login'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('NewPassword123!'))
+
 
 class NotificationAPITests(APITestCase):
     def setUp(self):

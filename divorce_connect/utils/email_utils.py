@@ -81,6 +81,20 @@ def send_register_otp_email(user, otp_code):
     )
 
 
+def send_password_reset_otp_email(user, otp_code):
+    """Send a password reset verification code via auth SMTP."""
+    _send_html_email(
+        subject="🔐 Password Reset Verification Code — DivorceConnect India",
+        template_name="emails/otp_email.html",
+        context={
+            "user_name": user.get_full_name() or user.email,
+            "otp_code": otp_code,
+        },
+        recipient_email=user.email,
+        purpose=PURPOSE_AUTH,
+    )
+
+
 def send_welcome_back_email(user):
     """Send a Welcome Back email after successful OTP-verified login."""
     now = timezone.localtime(timezone.now())
