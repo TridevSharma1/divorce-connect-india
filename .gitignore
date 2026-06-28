@@ -1,0 +1,37 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Django / local environment
+*.sqlite3
+*.log
+*.env
+.env
+.db.sqlite3
+
+# Media and uploads (if local only)
+media/
+migrations/
+node/
+node_modules/
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Django sensitive/local files
+settings.py
+settings_local.py
+local_settings.py
+
+
+
