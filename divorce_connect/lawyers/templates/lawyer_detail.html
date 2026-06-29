@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}{{ lawyer.full_name }} - Lawyer Profile{% endblock %}
 
@@ -1074,7 +1074,7 @@
 
                     <form method="post" class="space-y-8">
 
-                        {% csrf_token %}
+                        <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                         <input type="hidden" name="form_type" value="rating">
 
@@ -1446,7 +1446,7 @@
 
                             {% endif %}
 
-                            <a href="{% url 'client_cases' %}"
+                            <a href="/client_cases/"
                                 class="inline-flex mt-10 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-300 transition">
 
                                 View My Cases
@@ -1461,7 +1461,7 @@
 
                         <form method="post" class="space-y-8">
 
-                            {% csrf_token %}
+                            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                             <div>
 

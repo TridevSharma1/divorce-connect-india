@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Case Documents - Divorce Connect{% endblock %}
 
@@ -154,14 +154,14 @@
         <!-- Action Buttons -->
         <div class="mt-8 flex flex-col gap-4 md:flex-row">
             {% if case_request.status == 'DOCUMENTS_VERIFIED' and case_request.status != 'ACCEPTED' %}
-            <a href="{% url 'lawyer_accept_case' case_request.id %}" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+            <a href="/lawyer_accept_case/" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
                 Accept Case
             </a>
             {% endif %}
 
             {% if case_request.status == 'ACCEPTED' and case_request.workflow_stage != 'COMPLETED' %}
-            <form action="{% url 'lawyer_advance_case_stage' case_request.id %}" method="post" class="flex-1">
-                {% csrf_token %}
+            <form action="/lawyer_advance_case_stage/" method="post" class="flex-1">
+                <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
                     {% if case_request.workflow_stage == 'DECREE_ISSUED' %}
                         Mark Case as Completed
@@ -172,7 +172,7 @@
             </form>
             {% endif %}
 
-            <a href="{% url 'lawyer_case_orders' %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+            <a href="/lawyer_case_orders/" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
                 Back to Orders
             </a>
         </div>

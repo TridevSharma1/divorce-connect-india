@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,7 +59,7 @@
                 {% endif %}
 
                 <form method="POST" id="otp-form">
-                    {% csrf_token %}
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                     <!-- OTP Boxes -->
                     <div class="flex justify-center gap-3 mb-8" id="otp-boxes">
                         {% for i in "123456" %}
@@ -89,7 +89,7 @@
 
                 <div class="mt-6 text-center">
                     <p class="text-sm text-gray-500">Didn't receive the code?
-                        <a href="{% url 'login' %}" class="font-semibold text-gray-900 hover:underline">Go back</a>
+                        <a href="/login/" class="font-semibold text-gray-900 hover:underline">Go back</a>
                     </p>
                 </div>
             </div>

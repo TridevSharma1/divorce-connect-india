@@ -6,7 +6,7 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <!-- Header -->
     <div class="mb-12">
-        <a href="{% url 'lawyer_dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Dashboard</a>
+        <a href="/lawyer_dashboard/" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Dashboard</a>
         <h1 class="text-5xl font-bold serif-heading mb-3">Complete Your Profile</h1>
         <p class="text-gray-600 text-lg">Fill in all details to complete your professional profile. Admin will verify your credentials.</p>
     </div>
@@ -23,7 +23,7 @@
     <!-- Profile Form -->
     <div class="bg-white rounded-lg border-2 border-gray-200 p-8">
         <form method="post" enctype="multipart/form-data" class="space-y-8">
-            {% csrf_token %}
+            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
             <!-- Personal Information Section -->
             <div class="border-b pb-6">
@@ -208,7 +208,7 @@
                 >
                     Submit Profile for Verification
                 </button>
-                <a href="{% url 'lawyer_dashboard' %}" class="text-gray-700 font-semibold px-8 py-3 rounded-lg border-2 border-gray-300 hover:bg-gray-50 transition">
+                <a href="/lawyer_dashboard/" class="text-gray-700 font-semibold px-8 py-3 rounded-lg border-2 border-gray-300 hover:bg-gray-50 transition">
                     Cancel
                 </a>
             </div>

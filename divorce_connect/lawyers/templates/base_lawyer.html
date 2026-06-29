@@ -1,4 +1,4 @@
-{% load static %}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
 
                 <!-- Left: Logo -->
                 <div class="flex-shrink-0">
-                    <a href="{% url 'lawyer_dashboard' %}" class="flex items-center space-x-2">
+                    <a href="/lawyer_dashboard/" class="flex items-center space-x-2">
                         <div class="w-10 h-10 bg-black rounded flex items-center justify-center">
                             <span class="text-white font-bold text-sm" style="font-family: 'Playfair Display', serif;">DC</span>
                         </div>
@@ -56,12 +56,12 @@
 
                 <!-- Center: Navigation Links (Hidden on mobile, visible on md+) -->
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="{% url 'lawyer_dashboard' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Dashboard</a>
-                    <a href="{% url 'lawyer_case_orders' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Case Orders</a>
-                    <a href="{% url 'lawyer_case_status' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Case Status</a>
-                    <a href="{% url 'lawyer_earnings' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Earnings</a>
-                    <a href="{% url 'lawyer_billing' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Billing</a>
-                    <a href="{% url 'lawyer_settings' %}" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Settings</a>
+                    <a href="/lawyer_dashboard/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Dashboard</a>
+                    <a href="/lawyer_case_orders/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Case Orders</a>
+                    <a href="/lawyer_case_status/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Case Status</a>
+                    <a href="/lawyer_earnings/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Earnings</a>
+                    <a href="/lawyer_billing/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Billing</a>
+                    <a href="/lawyer_settings/" class="navbar-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-black">Settings</a>
                 </div>
 
                 <!-- Right: Notifications & Profile -->
@@ -82,20 +82,20 @@
 
                         <!-- Dropdown Menu -->
                         <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 hidden group-hover:block hover:block">
-                            <a href="{% url 'lawyer_dashboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
+                            <a href="/lawyer_dashboard/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
                                 Dashboard
                             </a>
-                            <a href="{% url 'lawyer_profile_edit' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
+                            <a href="/lawyer_profile_edit/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
                                 My Profile
                             </a>
-                            <a href="{% url 'lawyer_support' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
+                            <a href="/lawyer_support/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
                                 Support
                             </a>
-                            <a href="{% url 'lawyer_report_client' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
+                            <a href="/lawyer_report_client/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors">
                                 Report Client
                             </a>
                             <hr class="my-2 border-gray-200">
-                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors font-medium">
+                            <a href="/logout/" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors font-medium">
                                 Logout
                             </a>
                         </div>
@@ -107,12 +107,12 @@
         <!-- Mobile Menu (for smaller screens) -->
         <div class="md:hidden border-t border-gray-200 px-4 py-2 bg-white">
             <div class="flex flex-col space-y-2">
-                <a href="{% url 'lawyer_dashboard' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Dashboard</a>
-                <a href="{% url 'lawyer_case_orders' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Case Orders</a>
-                <a href="{% url 'lawyer_case_status' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Case Status</a>
-                <a href="{% url 'lawyer_earnings' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Earnings</a>
-                <a href="{% url 'lawyer_billing' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Billing</a>
-                <a href="{% url 'lawyer_settings' %}" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Settings</a>
+                <a href="/lawyer_dashboard/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Dashboard</a>
+                <a href="/lawyer_case_orders/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Case Orders</a>
+                <a href="/lawyer_case_status/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Case Status</a>
+                <a href="/lawyer_earnings/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Earnings</a>
+                <a href="/lawyer_billing/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Billing</a>
+                <a href="/lawyer_settings/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Settings</a>
             </div>
         </div>
     </nav>
@@ -135,13 +135,13 @@
 
                 <!-- Right: Footer Links -->
                 <div class="flex space-x-8">
-                    <a href="{% url 'support' %}" class="text-sm text-gray-600 hover:text-black transition-colors">
+                    <a href="/support/" class="text-sm text-gray-600 hover:text-black transition-colors">
                         Terms of Service
                     </a>
-                    <a href="{% url 'support' %}" class="text-sm text-gray-600 hover:text-black transition-colors">
+                    <a href="/support/" class="text-sm text-gray-600 hover:text-black transition-colors">
                         Privacy Policy
                     </a>
-                    <a href="{% url 'lawyer_support' %}" class="text-sm text-gray-600 hover:text-black transition-colors">
+                    <a href="/lawyer_support/" class="text-sm text-gray-600 hover:text-black transition-colors">
                         Partner Support
                     </a>
                 </div>

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Accepted Cases — DivorceConnect Admin{% endblock %}
 
@@ -182,7 +182,7 @@
         </div>
 
         <div class="pc-search-bar">
-            <form method="get" action="{% url 'admin_pending_cases' %}">
+            <form method="get" action="/admin_pending_cases/">
                 <input type="search" name="q" value="{{ query }}" placeholder="Search by client ID or case ID" class="pc-search-input" aria-label="Search cases">
                 <button type="submit" class="pc-search-button">Search</button>
             </form>
@@ -224,7 +224,7 @@
                     </div>
 
                     <div class="pc-actions">
-                        <a href="{% url 'case_details_for_admin' case.id %}" class="pc-button">View Case Details</a>
+                        <a href="/case_details_for_admin/" class="pc-button">View Case Details</a>
                     </div>
                 </div>
             {% endfor %}
@@ -232,7 +232,7 @@
             <div class="pc-empty">
                 <h3>No accepted cases found</h3>
                 <p>{% if query %}Try another case ID or client ID.{% else %}There are currently no cases with status Accepted.{% endif %}</p>
-                <a href="{% url 'admin_dashboard' %}" class="pc-button">Back to Dashboard</a>
+                <a href="/admin_dashboard/" class="pc-button">Back to Dashboard</a>
             </div>
         {% endif %}
     </div>

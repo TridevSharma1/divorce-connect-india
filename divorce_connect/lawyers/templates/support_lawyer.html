@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -211,7 +211,7 @@
                     <p class="text-gray-500 text-sm mb-6">Our partner support team typically responds within 2 hours.</p>
 
                     <form method="POST" action="" enctype="multipart/form-data" class="space-y-5">
-                        {% csrf_token %}
+                        <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                         <!-- Category Dropdown -->
                         <div>

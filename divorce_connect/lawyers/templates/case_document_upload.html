@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Upload Case Documents - Divorce Connect{% endblock %}
 
@@ -48,7 +48,7 @@
 
         <!-- Document Upload Form -->
         <form method="post" enctype="multipart/form-data" class="space-y-8">
-            {% csrf_token %}
+            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Required Documents</h2>
@@ -154,7 +154,7 @@
                 <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
                     Upload Documents
                 </button>
-                <a href="{% url 'client_cases' %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+                <a href="/client_cases/" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
                     Back to Cases
                 </a>
             </div>

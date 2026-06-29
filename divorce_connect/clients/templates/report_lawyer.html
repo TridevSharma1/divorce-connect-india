@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,7 +47,7 @@
     <div class="mx-auto max-w-3xl mb-16">
         <div class="bg-white border border-e2e8f0 rounded-lg shadow-sm p-8">
                 <form id="reportForm" method="post" enctype="multipart/form-data" class="space-y-6">
-                    {% csrf_token %}
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                     <!-- Select Professional -->
                     <div>

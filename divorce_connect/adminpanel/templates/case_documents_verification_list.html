@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Document Verification — DivorceConnect Admin{% endblock %}
 
@@ -393,7 +393,7 @@
                             Submitted {{ case_data.case_request.documents_submitted_at|date:"M d, Y · H:i" }}
                         </p>
                     </div>
-                    <a href="{% url 'case_details_for_admin' case_data.case_request.id %}" class="dv-view-all-btn">
+                    <a href="/case_details_for_admin/" class="dv-view-all-btn">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -440,7 +440,7 @@
                             Download
                         </a>
                         {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
-                        <a href="{% url 'case_document_verify' document.id %}" class="dv-btn dv-btn-review">
+                        <a href="/case_document_verify/" class="dv-btn dv-btn-review">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
@@ -472,7 +472,7 @@
             </div>
             <h3>All Documents Verified</h3>
             <p>There are no pending documents to review at the moment. Great work!</p>
-            <a href="{% url 'admin_dashboard' %}" class="dv-empty-btn">
+            <a href="/admin_dashboard/" class="dv-empty-btn">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>

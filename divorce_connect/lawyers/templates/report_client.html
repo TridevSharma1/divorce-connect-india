@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,7 +45,7 @@
             <!-- Report Form Card -->
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
                 <form id="reportForm" method="post" enctype="multipart/form-data" class="space-y-6">
-                    {% csrf_token %}
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                     <!-- Field 1: Select Client -->
                     <div>

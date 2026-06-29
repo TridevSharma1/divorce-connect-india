@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -141,14 +141,14 @@
             <!-- Logo -->
             <div class="flex items-center gap-2">
                 <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-20 w-auto">
+                    <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect India" class="h-20 w-auto">
                 </a>
             </div>
 
             <!-- Navigation -->
             <div class="flex items-center gap-6">
-                <a href="{% url 'login' %}" class="text-link">Login</a>
-                <a href="{% url 'register' %}" class="btn-primary">Get Started</a>
+                <a href="/login/" class="text-link">Login</a>
+                <a href="/register/" class="btn-primary">Get Started</a>
             </div>
         </div>
     </header>
@@ -159,7 +159,7 @@
             <div class="flex flex-col items-center justify-center">
                 <!-- Logo Showcase -->
                 <div class="mb-8 transform hover:scale-105 transition-transform duration-300">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-56 w-auto drop-shadow-lg">
+                    <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect India" class="h-56 w-auto drop-shadow-lg">
                 </div>
                 <p class="text-center text-gray-600 text-lg font-medium tracking-wide">
                     India's Premier Legal Professionals Marketplace
@@ -181,10 +181,10 @@
 
                 <!-- Hero CTAs -->
                 <div class="flex flex-col sm:flex-row gap-8 justify-center items-center">
-                    <a href="{% url 'register' %}" class="btn-primary text-lg px-10 py-4 font-semibold">
+                    <a href="/register/" class="btn-primary text-lg px-10 py-4 font-semibold">
                         Find a Lawyer
                     </a>
-                    <a href="{% url 'register' %}" class="btn-secondary text-lg px-10 py-4 font-semibold">
+                    <a href="/register/" class="btn-secondary text-lg px-10 py-4 font-semibold">
                         Join as a Legal Expert
                     </a>
                 </div>
@@ -350,7 +350,7 @@
 
             <!-- CTA -->
             <div class="text-center mt-16">
-                <a href="{% url 'register' %}" class="btn-primary text-lg px-10 py-4 font-semibold">
+                <a href="/register/" class="btn-primary text-lg px-10 py-4 font-semibold">
                     Get Started Today
                 </a>
             </div>
@@ -374,9 +374,9 @@
                 <div>
                     <h5 class="font-semibold mb-4">Quick Links</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'lawyers_section' %}" class="text-gray-400 hover:text-white transition-colors">Find a Lawyer</a></li>
-                        <li><a href="{% url 'register' %}" class="text-gray-400 hover:text-white transition-colors">Become an Expert</a></li>
-                        <li><a href="{% url 'about' %}" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="/lawyers_section/" class="text-gray-400 hover:text-white transition-colors">Find a Lawyer</a></li>
+                        <li><a href="/register/" class="text-gray-400 hover:text-white transition-colors">Become an Expert</a></li>
+                        <li><a href="/about/" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
                     </ul>
                 </div>
 
@@ -384,18 +384,18 @@
                 <div>
                     <h5 class="font-semibold mb-4">Support</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="{% url 'support' %}" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-                        <li><a href="{% url 'support' %}" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="/support/" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="/support/" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
                     </ul>
 
                 <!-- Legal -->
                 <div>
                     <h5 class="font-semibold mb-4">Legal</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
                     </ul>
                 </div>
             </div>

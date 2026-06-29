@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +19,7 @@
             <div class="hidden lg:flex flex-col justify-between bg-slate-950 px-10 py-10 text-white">
                 <div>
                     <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-10 w-auto">
+                        <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect" class="h-10 w-auto">
                         <span class="text-sm font-semibold tracking-[0.2em] uppercase">DivorceConnect</span>
                     </a>
                     <h1 class="mt-8 text-4xl font-semibold leading-tight">Create your account and start your journey.</h1>
@@ -47,82 +47,125 @@
                     <p class="mt-2 text-sm text-slate-600">Choose your role and set up your profile in a few steps.</p>
                 </div>
 
-                {% if form.non_field_errors %}
-                    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-3">
-                        {% for error in form.non_field_errors %}
-                            <p class="text-sm text-red-700">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <form method="post" class="space-y-5">
-                    {% csrf_token %}
+                <form id="registerForm" class="space-y-5">
+                    <div id="error-message" class="hidden mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
 
                     <div>
                         <label class="mb-3 block text-sm font-semibold text-slate-800">Select Your Role *</label>
-                        <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 {% if form.role.errors %}border-red-300{% endif %}">
+                        <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
                             <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
-                                <input type="radio" name="role" value="client" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'client' or form.role.value == 'client' %}checked{% endif %} required>
+                                <input type="radio" name="role" value="client" class="h-4 w-4 accent-blue-600" required>
                                 <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Client</span>
                             </label>
                             <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
-                                <input type="radio" name="role" value="lawyer" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'lawyer' or form.role.value == 'lawyer' %}checked{% endif %} required>
+                                <input type="radio" name="role" value="lawyer" class="h-4 w-4 accent-blue-600" required>
                                 <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Lawyer</span>
                             </label>
                             <label class="radio-card flex cursor-pointer items-center rounded-xl border border-slate-200 bg-white px-3 py-3 transition">
-                                <input type="radio" name="role" value="admin" class="h-4 w-4 accent-blue-600" {% if form.data.role == 'admin' or form.role.value == 'admin' %}checked{% endif %} required>
+                                <input type="radio" name="role" value="admin" class="h-4 w-4 accent-blue-600" required>
                                 <span class="ml-3 block w-full rounded-lg border border-transparent px-2 py-1 text-sm font-medium text-slate-700">Admin Panel</span>
                             </label>
                         </div>
-                        {% if form.role.errors %}
-                            <div class="mt-1 text-sm text-red-600">{{ form.role.errors.0 }}</div>
-                        {% endif %}
                     </div>
 
                     <div class="grid gap-5 sm:grid-cols-2">
                         <div>
                             <label for="first_name" class="mb-1 block text-sm font-semibold text-slate-800">First Name *</label>
-                            <input type="text" id="first_name" name="first_name" required placeholder="John" value="{{ form.first_name.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.first_name.errors %}error-input{% endif %}">
-                            {% if form.first_name.errors %}<div class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</div>{% endif %}
+                            <input type="text" id="first_name" name="first_name" required placeholder="John" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400">
                         </div>
                         <div>
                             <label for="last_name" class="mb-1 block text-sm font-semibold text-slate-800">Last Name *</label>
-                            <input type="text" id="last_name" name="last_name" required placeholder="Doe" value="{{ form.last_name.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.last_name.errors %}error-input{% endif %}">
-                            {% if form.last_name.errors %}<div class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</div>{% endif %}
+                            <input type="text" id="last_name" name="last_name" required placeholder="Doe" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400">
                         </div>
                     </div>
 
                     <div>
                         <label for="email" class="mb-1 block text-sm font-semibold text-slate-800">Email Address *</label>
-                        <input type="email" id="email" name="email" required placeholder="you@example.com" value="{{ form.email.value|default_if_none:'' }}" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.email.errors %}error-input{% endif %}">
-                        {% if form.email.errors %}<div class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</div>{% endif %}
+                        <input type="email" id="email" name="email" required placeholder="you@example.com" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400">
                     </div>
 
                     <div class="grid gap-5 sm:grid-cols-2">
                         <div>
-                            <label for="password1" class="mb-1 block text-sm font-semibold text-slate-800">Password *</label>
-                            <input type="password" id="password1" name="password1" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password1.errors %}error-input{% endif %}">
+                            <label for="password" class="mb-1 block text-sm font-semibold text-slate-800">Password *</label>
+                            <input type="password" id="password" name="password" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400">
                             <p class="mt-1 text-xs text-slate-500">At least 8 characters</p>
-                            {% if form.password1.errors %}<div class="mt-1 text-sm text-red-600">{{ form.password1.errors.0 }}</div>{% endif %}
                         </div>
                         <div>
-                            <label for="password2" class="mb-1 block text-sm font-semibold text-slate-800">Confirm Password *</label>
-                            <input type="password" id="password2" name="password2" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password2.errors %}error-input{% endif %}">
-                            {% if form.password2.errors %}<div class="mt-1 text-sm text-red-600">{{ form.password2.errors.0 }}</div>{% endif %}
+                            <label for="confirm_password" class="mb-1 block text-sm font-semibold text-slate-800">Confirm Password *</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••" class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400">
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                    <button type="submit" id="registerBtn" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
                         Create Account
                     </button>
                 </form>
 
                 <p class="mt-6 text-center text-sm text-slate-600">
                     Already have an account?
-                    <a href="{% url 'login' %}" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Sign In</a>
+                    <a href="/login/" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Sign In</a>
                 </p>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const firstName = document.getElementById('first_name').value;
+            const lastName = document.getElementById('last_name').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            
+            const errorDiv = document.getElementById('error-message');
+            const registerBtn = document.getElementById('registerBtn');
+            
+            errorDiv.classList.add('hidden');
+
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            registerBtn.textContent = 'Creating account...';
+            registerBtn.disabled = true;
+
+            const payload = {
+                email: email,
+                password: password,
+                first_name: firstName,
+                last_name: lastName,
+                role: role
+            };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Account created successfully! Please sign in.');
+                    window.location.href = "/login/"; 
+                } else {
+                    const errorData = await response.json();
+                    errorDiv.textContent = errorData.detail || 'Registration failed. Please try again.';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error occurred. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                registerBtn.textContent = 'Create Account';
+                registerBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

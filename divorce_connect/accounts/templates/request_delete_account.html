@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,7 +61,7 @@
                 {% endif %}
 
                 <form method="POST" id="delete-form">
-                    {% csrf_token %}
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Confirm your registered email address
                     </label>

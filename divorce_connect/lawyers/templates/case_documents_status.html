@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Document Status - Divorce Connect{% endblock %}
 
@@ -122,7 +122,7 @@
                 <p class="mt-1 text-sm text-gray-500">
                     Please upload required documents to proceed with your case
                 </p>
-                <a href="{% url 'case_document_upload' case_request.id %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+                <a href="/case_document_upload/" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
                     Upload Documents
                 </a>
             </div>
@@ -132,11 +132,11 @@
         <!-- Action Buttons -->
         <div class="mt-8 flex gap-4">
             {% if case_request.status == 'DOCUMENTS_PENDING' or case_request.status == 'DOCUMENTS_SUBMITTED' %}
-            <a href="{% url 'case_document_upload' case_request.id %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+            <a href="/case_document_upload/" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
                 Upload/Update Documents
             </a>
             {% endif %}
-            <a href="{% url 'client_cases' %}" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
+            <a href="/client_cases/" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-6 rounded-lg transition duration-200 text-center">
                 Back to Cases
             </a>
         </div>

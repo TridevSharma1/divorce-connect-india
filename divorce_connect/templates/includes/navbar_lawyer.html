@@ -1,11 +1,11 @@
 <!-- Lawyer Navbar - Desktop -->
 <nav class="flex items-center gap-6">
-    <a href="{% url 'lawyer_dashboard' %}" class="text-link">Home</a>
-    <a href="{% url 'lawyer_earnings' %}" class="text-link">Earning Dashboard</a>
-    <a href="{% url 'lawyer_case_orders' %}" class="text-link">Case Order</a>
-    <a href="{% url 'lawyer_case_status' %}" class="text-link">Case Status</a>
-    <a href="{% url 'lawyer_settings' %}" class="text-link">Account Settings</a>
-    <a href="{% url 'lawyer_billing' %}" class="text-link">Billing & Payment</a>
+    <a href="/lawyer_dashboard/" class="text-link">Home</a>
+    <a href="/lawyer_earnings/" class="text-link">Earning Dashboard</a>
+    <a href="/lawyer_case_orders/" class="text-link">Case Order</a>
+    <a href="/lawyer_case_status/" class="text-link">Case Status</a>
+    <a href="/lawyer_settings/" class="text-link">Account Settings</a>
+    <a href="/lawyer_billing/" class="text-link">Billing & Payment</a>
 
     <!-- Notification Bell -->
 
@@ -26,9 +26,9 @@
     <!-- Pulsing Red Unread Indicator Dot with Number -->
     <span
       id="notificationDot"
-      class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot shadow-lg {% if unread_notifications_count == 0 %}hidden{% endif %}"
+      class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot shadow-lg hidden"
     >
-      {{ unread_notifications_count }}
+      0
     </span>
   </button>
 
@@ -52,37 +52,13 @@
 
     <!-- Notifications List -->
     <div class="max-h-96 overflow-y-auto" id="notificationsList">
-      {% if notifications %}
-        {% for notif in notifications %}
-        <div
-          class="notification-item px-4 py-3 {% if not notif.is_read %}bg-gray-50{% else %}bg-white{% endif %} border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors duration-150"
-          data-id="{{ notif.id }}"
-          data-read="{% if notif.is_read %}true{% else %}false{% endif %}"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <div class="flex items-center gap-2">
-                {% if not notif.is_read %}
-                <span class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 unread-indicator"></span>
-                {% endif %}
-                <p class="text-sm font-medium text-gray-900">{{ notif.message }}</p>
-              </div>
-              <p class="text-xs text-gray-500 mt-1.5">{{ notif.created_at|timesince }} ago</p>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="px-4 py-6 text-center text-sm text-gray-500">
-          No notifications yet.
-        </div>
-      {% endif %}
+      <!-- Notifications will load here via JS -->
     </div>
 
     <!-- Footer -->
     <div class="px-4 py-3 bg-white border-t border-gray-100 text-center">
       <a
-        href="{% url 'lawyer_dashboard' %}"
+        href="/lawyer_dashboard/"
         class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors duration-150"
         aria-label="View all notifications"
       >
@@ -100,15 +76,15 @@
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
                 </svg>
             </div>
-            <span class="hidden md:inline text-sm font-medium">{{ user.first_name }}</span>
+            <span class="hidden md:inline text-sm font-medium"><span class="auth-user-name">Profile</span></span>
         </button>
 
         <div id="lawyerDropdown" class="dropdown-menu">
-            <a href="{% url 'lawyer_dashboard' %}" class="dropdown-item">Dashboard</a>
-            <a href="{% url 'lawyer_profile_edit' %}" class="dropdown-item">My Profile</a>
-            <a href="{% url 'lawyer_support' %}" class="dropdown-item">Support</a>
-            <a href="{% url 'lawyer_report_client' %}" class="dropdown-item">Report Client</a>
-            <a href="{% url 'logout' %}" class="dropdown-item logout-item">Logout</a>
+            <a href="/lawyer_dashboard/" class="dropdown-item">Dashboard</a>
+            <a href="/lawyer_profile_edit/" class="dropdown-item">My Profile</a>
+            <a href="/lawyer_support/" class="dropdown-item">Support</a>
+            <a href="/lawyer_report_client/" class="dropdown-item">Report Client</a>
+            <a href="/logout/" class="dropdown-item logout-item">Logout</a>
         </div>
     </div>
 </nav>

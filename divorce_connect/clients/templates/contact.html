@@ -115,7 +115,7 @@
                 <div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
                         <form method="POST" action="" class="space-y-6">
-                            {% csrf_token %}
+                            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                             <!-- Full Name -->
                             <div>

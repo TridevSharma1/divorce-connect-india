@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +18,7 @@
             <div class="hidden lg:flex flex-col justify-between bg-slate-950 px-10 py-10 text-white">
                 <div>
                     <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-10 w-auto">
+                        <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect" class="h-10 w-auto">
                         <span class="text-sm font-semibold tracking-[0.2em] uppercase">DivorceConnect</span>
                     </a>
                     <h1 class="mt-8 text-4xl font-semibold leading-tight">Find trusted legal support with confidence.</h1>
@@ -43,70 +43,45 @@
                     <p class="mt-2 text-sm text-slate-600">Access your dashboard and continue your legal journey.</p>
                 </div>
 
-                {% if messages %}
-                    <div class="mb-5 space-y-2">
-                        {% for message in messages %}
-                            <div class="rounded-xl border px-3 py-2 text-sm {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                {% if form.non_field_errors %}
-                    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-3">
-                        {% for error in form.non_field_errors %}
-                            <p class="text-sm text-red-700">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <form method="post" class="space-y-5">
-                    {% csrf_token %}
+                <form id="loginForm" class="space-y-5">
+                    <div id="error-message" class="hidden mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"></div>
 
                     <div>
-                        <label for="{{ form.email.id_for_label }}" class="mb-1 block text-sm font-semibold text-slate-800">{{ form.email.label }}</label>
+                        <label for="email" class="mb-1 block text-sm font-semibold text-slate-800">Email Address</label>
                         <input
                             type="email"
-                            id="{{ form.email.id_for_label }}"
-                            name="email"
-                            value="{{ form.email.value|default_if_none:'' }}"
+                            id="email"
+                            name="username"
                             required
                             placeholder="you@example.com"
-                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.email.errors %}error-input{% endif %}"
+                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400"
                         >
-                        {% if form.email.errors %}
-                            <div class="mt-1 text-sm text-red-600">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
                     </div>
 
                     <div>
-                        <label for="{{ form.password.id_for_label }}" class="mb-1 block text-sm font-semibold text-slate-800">{{ form.password.label }}</label>
+                        <label for="password" class="mb-1 block text-sm font-semibold text-slate-800">Password</label>
                         <input
                             type="password"
-                            id="{{ form.password.id_for_label }}"
+                            id="password"
                             name="password"
                             required
                             placeholder="••••••••"
-                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 {% if form.password.errors %}error-input{% endif %}"
+                            class="input-focus w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400"
                         >
-                        {% if form.password.errors %}
-                            <div class="mt-1 text-sm text-red-600">{% for error in form.password.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
                     </div>
 
                     <div class="flex items-center justify-between text-sm">
-                        <a href="{% url 'forgot_password' %}" class="font-medium text-blue-600 transition hover:text-blue-700">Forgot password?</a>
+                        <a href="/forgot_password/" class="font-medium text-blue-600 transition hover:text-blue-700">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                    <button type="submit" id="loginBtn" class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
                         Sign In
                     </button>
                 </form>
 
                 <p class="mt-6 text-center text-sm text-slate-600">
                     Don’t have an account?
-                    <a href="{% url 'register' %}" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Create one now</a>
+                    <a href="/register/" class="ml-1 font-semibold text-blue-600 transition hover:text-blue-700">Create one now</a>
                 </p>
 
                 <div class="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-center text-xs text-blue-800">
@@ -115,5 +90,52 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error-message');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            errorDiv.classList.add('hidden');
+            loginBtn.textContent = 'Signing in...';
+            loginBtn.disabled = true;
+
+            // FastAPI OAuth2PasswordBearer expects form data, not JSON
+            const formData = new URLSearchParams();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            try {
+                const response = await fetch('/api/auth/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Save JWT token
+                    localStorage.setItem('access_token', data.access_token);
+                    // Redirect to dashboard (hardcoded for now, can be dynamic based on role)
+                    window.location.href = "/client_dashboard/"; 
+                } else {
+                    const errorData = await response.json();
+                    errorDiv.textContent = errorData.detail || 'Login failed. Please check your credentials.';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error occurred. Please try again.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                loginBtn.textContent = 'Sign In';
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

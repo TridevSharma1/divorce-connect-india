@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
-                        <a href="{% url 'client_case_detail' request.id %}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition w-full text-center">
+                        <a href="/client_case_detail/" class="inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition w-full text-center">
                             Open Chat & Details
                         </a>
                     </div>
@@ -43,7 +43,7 @@
         <div class="bg-white shadow-sm rounded-3xl border border-gray-200 p-12 text-center">
             <h2 class="text-2xl font-semibold text-gray-900 mb-3">No case requests yet</h2>
             <p class="text-gray-600 mb-6">You haven't requested to hire a lawyer yet. Find a lawyer and submit a hire request from their profile page.</p>
-            <a href="{% url 'lawyers_section' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
+            <a href="/lawyers_section/" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
                 Browse Lawyers
             </a>
         </div>

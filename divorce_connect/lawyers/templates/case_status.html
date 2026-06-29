@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Client Roster & Case Status - DivorceConnect India{% endblock %}
 
@@ -72,7 +72,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{% url 'lawyer_accept_case' case.id %}" class="text-green-600 hover:text-green-800 font-semibold">Accept Case</a>
+                            <a href="/lawyer_accept_case/" class="text-green-600 hover:text-green-800 font-semibold">Accept Case</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -98,7 +98,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{% url 'lawyer_case_detail' case.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                            <a href="/lawyer_case_detail/" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -133,7 +133,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ case.created_at|date:'M d, Y' }}</td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{% url 'lawyer_view_case_documents' case.id %}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                            <a href="/lawyer_view_case_documents/" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                         </td>
                     </tr>
                     {% empty %}

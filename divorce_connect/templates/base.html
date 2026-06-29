@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,25 +196,29 @@
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-12 w-auto">
+                        <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect India" class="h-12 w-auto">
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8">
-                    {% if user.is_authenticated %}
-                        {% if user_role == 'client' %}
-                            {% include 'includes/navbar_client.html' %}
-                        {% elif user_role == 'lawyer' %}
-                            {% include 'includes/navbar_lawyer.html' %}
-                        {% elif user_role == 'admin' %}
-                            {% include 'includes/navbar_admin.html' %}
-                        {% endif %}
-                    {% else %}
-                        <a href="{% url 'landing_page' %}" class="text-link">Home</a>
-                        <a href="{% url 'login' %}" class="text-link">Login</a>
-                        <a href="{% url 'register' %}" class="btn-primary">Get Started</a>
-                    {% endif %}
+                    <div id="nav-client" style="display: none;" class="flex items-center gap-8">
+                        {% include 'includes/navbar_client.html' %}
+                    </div>
+                    
+                    <div id="nav-lawyer" style="display: none;" class="flex items-center gap-8">
+                        {% include 'includes/navbar_lawyer.html' %}
+                    </div>
+                    
+                    <div id="nav-admin" style="display: none;" class="flex items-center gap-8">
+                        {% include 'includes/navbar_admin.html' %}
+                    </div>
+                    
+                    <div id="nav-guest" style="display: none;" class="flex items-center gap-8">
+                        <a href="/" class="text-link">Home</a>
+                        <a href="/login/" class="text-link">Login</a>
+                        <a href="/register/" class="btn-primary">Get Started</a>
+                    </div>
                 </div>
 
                 <!-- Mobile Toggle -->
@@ -227,19 +231,10 @@
 
             <!-- Mobile Navigation -->
             <div class="mobile-menu md:hidden" id="mobileMenu">
-                {% if user.is_authenticated %}
-                    {% if user_role == 'client' %}
-                        {% include 'includes/navbar_client_mobile.html' %}
-                    {% elif user_role == 'lawyer' %}
-                        {% include 'includes/navbar_lawyer_mobile.html' %}
-                    {% elif user_role == 'admin' %}
-                        {% include 'includes/navbar_admin_mobile.html' %}
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'landing_page' %}" class="nav-link">Home</a>
-                    <a href="{% url 'login' %}" class="nav-link">Login</a>
-                    <a href="{% url 'register' %}" class="nav-link btn-primary mt-2">Get Started</a>
-                {% endif %}
+                <!-- We can extend auth.js to handle mobile navs as well if needed, but for now we'll just include standard links for guest fallback. Real implementation would toggle mobile views exactly like desktop views. -->
+                <a href="/" class="nav-link">Home</a>
+                <a href="/login/" class="nav-link">Login</a>
+                <a href="/register/" class="nav-link btn-primary mt-2">Get Started</a>
             </div>
         </div>
     </header>
@@ -263,27 +258,27 @@
                 <div>
                     <h5 class="font-semibold mb-4">Quick Links</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'lawyers_section' %}" class="text-gray-400 hover:text-white transition-colors">Find a Lawyer</a></li>
-                        <li><a href="{% url 'register' %}" class="text-gray-400 hover:text-white transition-colors">Become an Expert</a></li>
-                        <li><a href="{% url 'about' %}" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="/lawyers_section/" class="text-gray-400 hover:text-white transition-colors">Find a Lawyer</a></li>
+                        <li><a href="/register/" class="text-gray-400 hover:text-white transition-colors">Become an Expert</a></li>
+                        <li><a href="/about/" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h5 class="font-semibold mb-4">Support</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="{% url 'support' %}" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-                        <li><a href="{% url 'support' %}" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="/support/" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="/support/" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <h5 class="font-semibold mb-4">Legal</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
-                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors">Disclaimer</a></li>
                     </ul>
                 </div>
             </div>
@@ -367,7 +362,8 @@
     </script>
     {% endif %}
 
-    <script src="{% static 'notifications_api.js' %}"></script>
+    <script src="/static/js/auth.js"></script>
+    <script src="{{ url_for('static', path='notifications_api.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

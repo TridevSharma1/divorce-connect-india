@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Client Dashboard - DivorceConnect India{% endblock %}
 
@@ -403,8 +403,8 @@
                         Client Portal
                     </div>
 
-                    <h1 class="dashboard-title">
-                        Welcome, {{ user.get_full_name|default:user.email }}
+                    <h1 class="dashboard-title" id="welcome-text">
+                        Welcome, ...
                     </h1>
 
                     <p class="dashboard-subtitle">
@@ -414,14 +414,14 @@
                 </div>
 
                 <div class="hero-actions">
-                    <a href="{% url 'client_profile' %}" class="hero-btn hero-btn-primary">
+                    <a href="/client_profile/" class="hero-btn hero-btn-primary">
                         Edit Profile
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
                         </svg>
                     </a>
 
-                    <a href="{% url 'client_cases' %}" class="hero-btn hero-btn-secondary">
+                    <a href="/client_cases/" class="hero-btn hero-btn-secondary">
                         View My Cases
                     </a>
                 </div>
@@ -462,7 +462,7 @@
 
             <div class="service-grid">
 
-                <a href="{% url 'lawyers_section' %}" class="service-card">
+                <a href="/lawyers_section/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -485,7 +485,7 @@
                     </div>
                 </a>
 
-                <a href="{% url 'counseling' %}" class="service-card">
+                <a href="/counseling/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -508,7 +508,7 @@
                     </div>
                 </a>
 
-                <a href="{% url 'client_cases' %}" class="service-card">
+                <a href="/client_cases/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -550,7 +550,7 @@
 
             <div class="service-grid">
 
-                <a href="{% url 'about' %}" class="service-card">
+                <a href="/about/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -573,7 +573,7 @@
                     </div>
                 </a>
 
-                <a href="{% url 'support' %}" class="service-card">
+                <a href="/support/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -596,7 +596,7 @@
                     </div>
                 </a>
 
-                <a href="{% url 'contact' %}" class="service-card">
+                <a href="/contact/" class="service-card">
                     <div class="service-card-content">
                         <div class="service-icon">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,4 +624,19 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const user = await Auth.getCurrentUser();
+    const welcomeText = document.getElementById("welcome-text");
+    if (user) {
+        welcomeText.textContent = `Welcome, ${user.first_name || user.email}`;
+    } else {
+        // Redirect to login if not authenticated
+        window.location.href = "/login/";
+    }
+});
+</script>
 {% endblock %}

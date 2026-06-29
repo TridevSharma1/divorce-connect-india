@@ -1,4 +1,4 @@
-{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,7 +55,7 @@
         <div class="text-center mb-8">
             <div class="mb-4">
                 <a href="/" class="flex justify-center">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-16 w-auto">
+                    <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect" class="h-16 w-auto">
                 </a>
             </div>
             <h1 class="text-2xl font-bold text-gray-900">DivorceConnect India</h1>
@@ -115,7 +115,7 @@
 
         <!-- Action Buttons -->
         <div class="space-y-3">
-            <a href="{% url 'login' %}" class="block w-full text-center btn-primary py-2 rounded-lg font-semibold text-base transition">
+            <a href="/login/" class="block w-full text-center btn-primary py-2 rounded-lg font-semibold text-base transition">
                 Go to Login
             </a>
             <a href="/" class="block w-full text-center py-2 rounded-lg font-semibold text-base text-gray-700 bg-gray-100 hover:bg-gray-200 transition">

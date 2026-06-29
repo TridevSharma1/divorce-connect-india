@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+
 
 {% block title %}Case Details - DivorceConnect{% endblock %}
 
@@ -413,7 +413,7 @@
                         </div>
                         <div class="chat-input">
                             <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
+                                <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                                 <div class="flex gap-3 items-end">
                                     <label for="chatAttachment" class="upload-button" title="Attach file">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a4.15 4.15 0 01-5.87 0 4.14 4.14 0 010-5.86l9.2-9.19a2.76 2.76 0 013.9 0 2.76 2.76 0 010 3.9l-6.59 6.59a1.38 1.38 0 11-1.95-1.95l6.59-6.59"/></svg>
@@ -443,14 +443,14 @@
 
                         {% if request.user.is_authenticated and request.user.lawyer_profile and request.user.lawyer_profile == case_request.lawyer %}
                             {% if case_request.status == 'DOCUMENTS_VERIFIED' %}
-                                <form method="post" action="{% url 'lawyer_accept_case' case_request.id %}" class="space-y-4">
-                                    {% csrf_token %}
+                                <form method="post" action="/lawyer_accept_case/" class="space-y-4">
+                                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                                     <textarea name="response_message" rows="3" class="w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700" placeholder="Optional message to client"></textarea>
                                     <button type="submit" class="action-button bg-emerald-600 text-white">Accept case</button>
                                 </form>
                             {% elif case_request.status == 'ACCEPTED' or case_request.status == 'COMPLETED' %}
-                                <form method="post" action="{% url 'lawyer_advance_case_stage' case_request.id %}" class="space-y-4">
-                                    {% csrf_token %}
+                                <form method="post" action="/lawyer_advance_case_stage/" class="space-y-4">
+                                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                                     <button type="submit" class="action-button bg-blue-600 text-white">Advance case stage</button>
                                 </form>
                             {% else %}
@@ -461,7 +461,7 @@
                         {% endif %}
 
                         <div class="pt-4 border-t border-slate-200">
-                            <a href="{% url 'lawyer_view_case_documents' case_request.id %}" class="inline-flex w-full justify-center rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">View all documents</a>
+                            <a href="/lawyer_view_case_documents/" class="inline-flex w-full justify-center rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">View all documents</a>
                         </div>
                     </div>
                 </section>
@@ -481,7 +481,7 @@
                                 <div class="rounded-[1.375rem] border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500">No messages yet.</div>
                             {% endfor %}
                         </div>
-                        <a href="{% url 'lawyer_case_detail' case_request.id %}" class="inline-flex w-full justify-center rounded-3xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Open full chat</a>
+                        <a href="/lawyer_case_detail/" class="inline-flex w-full justify-center rounded-3xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Open full chat</a>
                     </div>
                 </section>
             </aside>

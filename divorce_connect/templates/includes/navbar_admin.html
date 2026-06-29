@@ -1,10 +1,10 @@
 <!-- Admin Navbar - Desktop -->
 <nav class="flex items-center gap-6">
-    <a href="{% url 'admin_dashboard' %}" class="text-link">Home</a>
-    <a href="{% url 'case_documents_verification_list' %}" class="text-link">Verify Documents</a>
-    <a href="{% url 'lawyer_verification_list' %}" class="text-link">Verify Lawyer</a>
-    <a href="{% url 'admin_pending_cases' %}" class="text-link">Pending Cases</a>
-    <a href="{% url 'support' %}" class="text-link">Support</a>
+    <a href="/admin_dashboard/" class="text-link">Home</a>
+    <a href="/case_documents_verification_list/" class="text-link">Verify Documents</a>
+    <a href="/lawyer_verification_list/" class="text-link">Verify Lawyer</a>
+    <a href="/admin_pending_cases/" class="text-link">Pending Cases</a>
+    <a href="/support/" class="text-link">Support</a>
 
     <!-- Notification Bell -->
     <style>
@@ -19,8 +19,8 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span id="admin-notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot {% if unread_notifications_count == 0 %}hidden{% endif %}">
-                {{ unread_notifications_count }}
+            <span id="admin-notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center pulse-dot hidden">
+                0
             </span>
         </button>
 
@@ -30,28 +30,10 @@
                 <button id="admin-mark-all-read" class="text-xs text-gray-500 hover:text-black font-medium transition-colors duration-150">Mark all as read</button>
             </div>
             <div class="notifications-list">
-                {% if notifications %}
-                    {% for notif in notifications %}
-                    <div class="admin-notification-item px-5 py-3 {% if not notif.is_read %}bg-gray-50{% else %}bg-white{% endif %} border-b border-gray-100 cursor-pointer hover:bg-gray-100" data-id="{{ notif.id }}">
-                        <div class="flex items-start gap-3">
-                            {% if not notif.is_read %}
-                            <div class="unread-indicator mt-1"></div>
-                            {% endif %}
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-black leading-snug">{{ notif.message }}</p>
-                                <p class="text-xs text-gray-500 mt-1">{{ notif.created_at|timesince }} ago</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="px-5 py-6 text-center text-sm text-gray-500">
-                        No notifications yet.
-                    </div>
-                {% endif %}
+                <!-- Notifications will load here via JS -->
             </div>
             <div class="px-5 py-3 border-t border-gray-100 bg-white rounded-b-xl text-center">
-                <a href="{% url 'admin_dashboard' %}" class="text-sm font-medium text-black hover:text-gray-700 transition-colors duration-150 py-2">Go to Dashboard</a>
+                <a href="/admin_dashboard/" class="text-sm font-medium text-black hover:text-gray-700 transition-colors duration-150 py-2">Go to Dashboard</a>
             </div>
         </div>
     </div>
@@ -162,15 +144,15 @@
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
                 </svg>
             </div>
-            <span class="hidden md:inline text-sm font-medium">{{ user.first_name }}</span>
+            <span class="hidden md:inline text-sm font-medium"><span class="auth-user-name">Profile</span></span>
         </button>
 
         <div id="adminDropdown" class="dropdown-menu">
-            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Dashboard</a>
-            <a href="{% url 'admin_profile' %}" class="dropdown-item">My Profile</a>
-            <a href="{% url 'support' %}" class="dropdown-item">Support</a>
-            <a href="{% url 'contact' %}" class="dropdown-item">Report Issue</a>
-            <a href="{% url 'logout' %}" class="dropdown-item logout-item">Logout</a>
+            <a href="/admin_dashboard/" class="dropdown-item">Dashboard</a>
+            <a href="/admin_profile/" class="dropdown-item">My Profile</a>
+            <a href="/support/" class="dropdown-item">Support</a>
+            <a href="/contact/" class="dropdown-item">Report Issue</a>
+            <a href="/logout/" class="dropdown-item logout-item">Logout</a>
         </div>
     </div>
 </nav>
