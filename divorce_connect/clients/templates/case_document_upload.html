@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Submit Case Documents - DivorceConnect{% endblock %}
 
@@ -104,6 +104,7 @@
         <div class="space-y-6">
             <form method="POST" enctype="multipart/form-data" id="documentForm" class="rounded-3xl border border-slate-200 bg-white p-8 shadow-lg">
                 <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+<input type="hidden" id="document_type" name="document_type" value="client_document">
                 <div class="mb-7">
                     <h2 class="text-2xl font-semibold text-slate-900">Upload required documents</h2>
                     <p class="mt-2 text-sm text-slate-500">Every document below is required. Please attach files for each item.</p>
@@ -311,10 +312,12 @@ function updateFileDisplay(input) {
 
 const form = document.getElementById('documentForm');
 if (form) {
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault(); // handle via fetch
         const requiredInputs = Array.from(form.querySelectorAll('input[type="file"]'));
         const missing = requiredInputs.filter(input => !input.files.length);
-
+        const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+        let sizeError = false;
         requiredInputs.forEach(input => {
             const display = document.getElementById(`${input.id}-display`);
             if (!input.files.length) {
@@ -324,13 +327,41 @@ if (form) {
                     display.classList.add('text-red-600');
                 }
             } else {
-                input.closest('div').classList.remove('border-red-400');
+                // size validation
+                const file = input.files[0];
+                if (file.size > MAX_SIZE) {
+                    sizeError = true;
+                    input.closest('div').classList.add('border-red-400');
+                    if (display) {
+                        display.textContent = `File exceeds 5 MB limit (${(file.size/1024/1024).toFixed(2)} MB)`;
+                        display.classList.add('text-red-600');
+                    }
+                } else {
+                    input.closest('div').classList.remove('border-red-400');
+                }
             }
         });
-
-        if (missing.length) {
-            event.preventDefault();
-            alert('All documents are mandatory. Please upload every required file before submitting.');
+        if (missing.length || sizeError) {
+            alert('Please ensure all required files are selected and each is under 5 MB.');
+            return;
+        }
+        // Build FormData
+        const formData = new FormData();
+        requiredInputs.forEach(input => {
+            formData.append(input.name, input.files[0]);
+        });
+        const docType = document.getElementById('document_type').value;
+        const caseId = new URLSearchParams(window.location.search).get('id');
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}/documents?document_type=${encodeURIComponent(docType)}`, {
+                method: 'POST',
+                body: formData
+            });
+            if (!res.ok) throw new Error('Upload failed');
+            showToast('Documents uploaded successfully', 'success');
+            // Optionally redirect or refresh
+        } catch (err) {
+            showToast(err.message, 'danger');
         }
     });
 }

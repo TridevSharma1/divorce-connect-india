@@ -202,6 +202,7 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8">
+                    {% block navbar %}
                     <div id="nav-client" style="display: none;" class="flex items-center gap-8">
                         {% include 'includes/navbar_client.html' %}
                     </div>
@@ -219,6 +220,7 @@
                         <a href="/login/" class="text-link">Login</a>
                         <a href="/register/" class="btn-primary">Get Started</a>
                     </div>
+                    {% endblock %}
                 </div>
 
                 <!-- Mobile Toggle -->

@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Incoming Requests - DivorceConnect India{% endblock %}
 
+{% block navbar %}
+<div id="nav-lawyer-static" class="flex items-center gap-8">
+    {% include 'includes/navbar_lawyer.html' %}
+</div>
+{% endblock %}
+
 {% block content %}
-    <div class="min-h-screen bg-slate-50">
+    <div class="min-h-screen bg-slate-50" id="requests-container" style="display: none;">
         <div class="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
             <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                 <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
@@ -33,7 +38,7 @@
                             <div class="flex flex-wrap gap-3">
                                 <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
                                     <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                                    {{ pending_requests.count }} pending request{% if pending_requests.count != 1 %}s{% endif %}
+                                    <span id="stat-pending-count">0</span> pending request(s)
                                 </span>
                                 <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
                                     <span class="font-semibold text-slate-900">Fast response</span>
@@ -43,62 +48,22 @@
                         </div>
                     </div>
 
-                    {% if pending_requests.exists %}
-                        <div class="space-y-6">
-                            {% for request in pending_requests %}
-                                <article class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                                    <div class="p-6 sm:p-8">
-                                        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                            <div class="space-y-2">
-                                                <p class="text-sm font-medium uppercase tracking-[0.24em] text-indigo-600">New client request</p>
-                                                <div class="flex flex-wrap items-center gap-3">
-                                                    <h3 class="text-2xl font-semibold text-slate-900">{{ request.client.get_full_name }}</h3>
-                                                    <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">{{ request.get_status_display }}</span>
-                                                </div>
-                                                <p class="text-sm text-slate-500">Received {{ request.created_at|timesince }} ago</p>
-                                            </div>
-                                            <div class="flex gap-2 text-sm">
-                                                <span class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Request #{{ request.id }}</span>
-                                            </div>
-                                        </div>
+                    <div id="requests-list" class="space-y-6">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
 
-                                        <div class="mt-6 rounded-3xl bg-slate-50 p-5">
-                                            <div class="flex items-center justify-between gap-4">
-                                                <span class="text-xs uppercase tracking-[0.24em] text-slate-500">Client message</span>
-                                                <span class="text-xs text-slate-400">Information supplied by client</span>
-                                            </div>
-                                            <p class="mt-3 text-sm leading-7 text-slate-700">{{ request.message|default:'No message provided by the client.' }}</p>
-                                        </div>
-
-                                        <form method="post" class="mt-6 grid gap-4 xl:grid-cols-[1.3fr_auto]">
-                                            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
-                                            <div>
-                                                <label for="response_message_{{ request.id }}" class="block text-sm font-semibold text-slate-700">Response note</label>
-                                                <textarea id="response_message_{{ request.id }}" name="response_message" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" placeholder="Send a quick note to the client..."></textarea>
-                                            </div>
-                                            <div class="grid gap-3">
-                                                <button formaction="/case_request_accept/" formmethod="post" class="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">Accept request</button>
-                                                <button formaction="/case_request_reject/" formmethod="post" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">Reject request</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </article>
-                            {% endfor %}
+                    <div id="empty-state" class="rounded-[32px] border border-dashed border-slate-300 bg-white p-14 text-center shadow-sm hidden">
+                        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                         </div>
-                    {% else %}
-                        <div class="rounded-[32px] border border-dashed border-slate-300 bg-white p-14 text-center shadow-sm">
-                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h2 class="mt-6 text-3xl font-semibold text-slate-900">No pending hire requests</h2>
-                            <p class="mt-3 text-sm leading-6 text-slate-600">Your request queue is empty for now. New client requests will appear here for review.</p>
-                            <div class="mt-8 flex justify-center">
-                                <a href="/lawyer_dashboard/" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Back to dashboard</a>
-                            </div>
+                        <h2 class="mt-6 text-3xl font-semibold text-slate-900">No pending hire requests</h2>
+                        <p class="mt-3 text-sm leading-6 text-slate-600">Your request queue is empty for now. New client requests will appear here for review.</p>
+                        <div class="mt-8 flex justify-center">
+                            <a href="/lawyer_dashboard/" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Back to dashboard</a>
                         </div>
-                    {% endif %}
+                    </div>
                 </section>
 
                 <aside class="space-y-6">
@@ -108,11 +73,11 @@
                         <div class="mt-6 grid gap-4 sm:grid-cols-2">
                             <div class="rounded-3xl bg-slate-50 p-4">
                                 <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Pending</p>
-                                <p class="mt-3 text-3xl font-semibold text-slate-900">{{ pending_requests.count }}</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900" id="stat-pending-count-aside">0</p>
                             </div>
                             <div class="rounded-3xl bg-slate-50 p-4">
                                 <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Status</p>
-                                <p class="mt-3 text-3xl font-semibold text-slate-900">{{ pending_requests.count|yesno:"Active,No active" }}</p>
+                                <p class="mt-3 text-lg font-semibold text-slate-900" id="stat-status-text">No active</p>
                             </div>
                         </div>
                     </div>
@@ -135,4 +100,104 @@
             </div>
         </main>
     </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/lawyer/case-requests", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+        if (!res.ok) {
+            console.error("Failed to load case requests", res.status);
+            return;
+        }
+
+        const requests = await res.json();
+        document.getElementById("requests-container").style.display = "block";
+
+        const pendingRequests = requests.filter(r => r.status === 'PENDING');
+        document.getElementById("stat-pending-count").innerText = pendingRequests.length;
+        document.getElementById("stat-pending-count-aside").innerText = pendingRequests.length;
+        document.getElementById("stat-status-text").innerText = pendingRequests.length > 0 ? "Active" : "No active";
+
+        if (pendingRequests.length > 0) {
+            const requestsList = document.getElementById("requests-list");
+            requestsList.innerHTML = pendingRequests.map(req => `
+                <article class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    <div class="p-6 sm:p-8">
+                        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            <div class="space-y-2">
+                                <p class="text-sm font-medium uppercase tracking-[0.24em] text-indigo-600">New client request</p>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <h3 class="text-2xl font-semibold text-slate-900">\${req.client_name}</h3>
+                                    <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">\${req.status}</span>
+                                </div>
+                                <p class="text-sm text-slate-500">Received \${req.created_at}</p>
+                            </div>
+                            <div class="flex gap-2 text-sm">
+                                <span class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Request #\${req.id}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 rounded-3xl bg-slate-50 p-5">
+                            <div class="flex items-center justify-between gap-4">
+                                <span class="text-xs uppercase tracking-[0.24em] text-slate-500">Client message</span>
+                                <span class="text-xs text-slate-400">Information supplied by client</span>
+                            </div>
+                            <p class="mt-3 text-sm leading-7 text-slate-700">\${req.message || 'No message provided by the client.'}</p>
+                        </div>
+
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <label for="response_message_\${req.id}" class="block text-sm font-semibold text-slate-700">Response note</label>
+                                <textarea id="response_message_\${req.id}" name="response_message" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" placeholder="Send a quick note to the client..."></textarea>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="respondRequest(\${req.id}, 'accept')" class="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">Accept request</button>
+                                <button onclick="respondRequest(\${req.id}, 'reject')" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">Reject request</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        } else {
+            document.getElementById("requests-list").classList.add("hidden");
+            document.getElementById("empty-state").classList.remove("hidden");
+        }
+
+    } catch (err) {
+        console.error("Error loading case requests page", err);
+    }
+});
+
+async function respondRequest(reqId, action) {
+    const token = localStorage.getItem("access_token");
+    const note = document.getElementById(`response_message_${reqId}`).value;
+    try {
+        const res = await fetch(`/api/lawyer/case-requests/${reqId}/respond?action=${action}&response_message=${encodeURIComponent(note)}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        if (res.ok) {
+            alert(`Request ${action}ed successfully!`);
+            window.location.reload();
+        } else {
+            const err = await res.json();
+            alert(err.detail || "Action failed");
+        }
+    } catch (e) {
+        alert("Network error");
+    }
+}
+</script>
 {% endblock %}

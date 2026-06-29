@@ -56,7 +56,7 @@
                             <option value="">— Select a client —</option>
                             {% for client in clients %}
                                 <option value="{{ client.id }}">{{ client.get_full_name }}</option>
-                            {% empty %}
+                            {% else %}
                                 <option value="" disabled>No clients available</option>
                             {% endfor %}
                         </select>

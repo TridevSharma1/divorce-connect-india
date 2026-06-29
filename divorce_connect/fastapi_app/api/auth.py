@@ -1,12 +1,16 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from jose import JWTError, jwt
+from pydantic import BaseModel, EmailStr
+import uuid
+import datetime
 
 from ..database import get_db
-from ..models import User
+from ..models import User, ClientProfile, LawyerProfile, AdminPanelProfile
 from ..schemas import Token, UserCreate, UserResponse
 from ..security import (
     verify_password, create_access_token, create_refresh_token,
@@ -17,11 +21,36 @@ from ..security import (
 router = APIRouter()
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_details(current_user: User = Depends(get_current_user)):
+async def get_current_user_details(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """
     Get the currently logged in user based on the JWT token.
     """
-    return current_user
+    role = "client"
+    lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    if lawyer_res.scalar_one_or_none():
+        role = "lawyer"
+    else:
+        admin_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
+        if admin_res.scalar_one_or_none():
+            role = "admin"
+        else:
+            client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
+            if client_res.scalar_one_or_none():
+                role = "client"
+
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "username": current_user.username,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+        "role": role
+    }
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
@@ -50,6 +79,41 @@ async def register_user(
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    
+    if user_in.role == 'client':
+        profile = ClientProfile(
+            user_id=new_user.id,
+            first_name=user_in.first_name,
+            last_name=user_in.last_name,
+            gender='other',
+            marital_status='single',
+            mobile_number=''
+        )
+        db.add(profile)
+    elif user_in.role == 'lawyer':
+        profile = LawyerProfile(
+            user_id=new_user.id,
+            full_name=f"{user_in.first_name} {user_in.last_name}",
+            gender='other',
+            bar_registration_number=f"PENDING-{new_user.id}",
+            state_bar_council='',
+            years_of_experience=0,
+            specialization='other',
+            mobile_number='',
+            bio='',
+            office_city=''
+        )
+        db.add(profile)
+    elif user_in.role == 'admin':
+        profile = AdminPanelProfile(
+            user_id=new_user.id,
+            full_name=f"{user_in.first_name} {user_in.last_name}",
+            gender='other',
+            mobile_number=''
+        )
+        db.add(profile)
+
+    await db.commit()
     return {"message": "User created successfully"}
 
 @router.post("/token", response_model=Token)
@@ -107,3 +171,156 @@ async def refresh_access_token(refresh_token: str):
     )
     # Return the same refresh token or generate a new one
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
+class DeleteAccountRequest(BaseModel):
+    email: EmailStr
+
+
+@router.post("/delete-account")
+async def delete_account_request(
+    payload: DeleteAccountRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if payload.email.lower() != current_user.email.lower():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The email address you entered does not match your registered account email."
+        )
+        
+    token_str = str(uuid.uuid4())
+    
+    # Save token in database
+    from ..models import DeleteAccountToken
+    new_token = DeleteAccountToken(
+        token=token_str,
+        user_id=current_user.id,
+        is_used=False,
+        created_at=datetime.datetime.utcnow()
+    )
+    db.add(new_token)
+    await db.commit()
+    
+    # Send email
+    from ..notifications import send_email
+    confirm_url = f"http://{request.url.netloc}/api/auth/confirm-delete/{token_str}"
+    
+    html_body = f"""
+    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #dc2626; text-align: center;">DivorceConnect India</h2>
+        <p>Hello {current_user.first_name},</p>
+        <p>We received a request to permanently deactivate and delete your account.</p>
+        <p>To confirm this deactivation and delete your account data, click the button below within 30 minutes:</p>
+        <p style="text-align: center;">
+            <a href="{confirm_url}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Confirm Deactivation & Deletion</a>
+        </p>
+        <p style="color: #666; font-size: 0.9em; margin-top: 20px;">If you did not request this, please ignore this email or contact support.</p>
+    </div>
+    """
+    
+    try:
+        send_email(
+            current_user.email,
+            "⚠️ Confirm Account Deactivation",
+            html_body
+        )
+    except Exception as e:
+        pass
+        
+    return {"message": "A deletion confirmation link has been sent to your email. Please check your inbox and click the link within 30 minutes."}
+
+
+@router.get("/confirm-delete/{token}", response_class=HTMLResponse)
+async def confirm_delete_account(
+    token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    from ..models import DeleteAccountToken, ClientProfile, LawyerProfile, User
+    
+    # Query token
+    res = await db.execute(select(DeleteAccountToken).where(DeleteAccountToken.token == token, DeleteAccountToken.is_used == False))
+    token_obj = res.scalar_one_or_none()
+    
+    if not token_obj:
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Invalid Deactivation Link</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-red-600">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h1>
+                <p class="text-sm text-gray-600 mb-6">This deletion link is invalid, has expired, or has already been used.</p>
+                <a href="/" class="inline-block bg-gray-900 text-white font-semibold px-6 py-3 rounded-xl hover:bg-gray-800 transition">Go to Homepage</a>
+            </div>
+        </body>
+        </html>
+        """
+        
+    # Check if expired (30 minutes)
+    now = datetime.datetime.utcnow()
+    if (now - token_obj.created_at).total_seconds() > 1800:
+        token_obj.is_used = True
+        await db.commit()
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Deactivation Link Expired</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-red-600">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Deactivation Link Expired</h1>
+                <p class="text-sm text-gray-600 mb-6">This deletion link has expired. Please request account deactivation again.</p>
+                <a href="/" class="inline-block bg-gray-900 text-white font-semibold px-6 py-3 rounded-xl hover:bg-gray-800 transition">Go to Homepage</a>
+            </div>
+        </body>
+        </html>
+        """
+        
+    # Mark token as used
+    token_obj.is_used = True
+    
+    # Soft delete profiles
+    # ClientProfile
+    client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == token_obj.user_id))
+    client_prof = client_res.scalar_one_or_none()
+    if client_prof:
+        client_prof.is_deleted = True
+        
+    # LawyerProfile
+    lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == token_obj.user_id))
+    lawyer_prof = lawyer_res.scalar_one_or_none()
+    if lawyer_prof:
+        lawyer_prof.is_deleted = True
+        
+    # Deactivate User
+    user_res = await db.execute(select(User).where(User.id == token_obj.user_id))
+    user_obj = user_res.scalar_one_or_none()
+    if user_obj:
+        user_obj.is_active = False
+        
+    await db.commit()
+    
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Account Deactivated</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-emerald-600">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Account Successfully Deactivated</h1>
+            <p class="text-sm text-gray-600 mb-6">Your profile and account listings have been soft-deleted. We're sorry to see you go.</p>
+            <a href="/" class="inline-block bg-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-emerald-700 transition">Go to Homepage</a>
+        </div>
+    </body>
+    </html>
+    """
+

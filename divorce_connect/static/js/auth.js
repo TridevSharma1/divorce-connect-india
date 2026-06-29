@@ -50,8 +50,10 @@ const Auth = {
         if(adminNav) adminNav.style.display = "none";
 
         if (user) {
-            if (user.is_staff) {
+            if (user.role === "admin" || user.is_staff) {
                 if(adminNav) adminNav.style.display = "flex";
+            } else if (user.role === "lawyer") {
+                if(lawyerNav) lawyerNav.style.display = "flex";
             } else {
                 if(clientNav) clientNav.style.display = "flex";
             }
@@ -70,4 +72,12 @@ const Auth = {
 
 document.addEventListener("DOMContentLoaded", () => {
     Auth.applyNavbarState();
+
+    document.addEventListener("click", (e) => {
+        const logoutLink = e.target.closest(".logout-item");
+        if (logoutLink) {
+            e.preventDefault();
+            Auth.logout();
+        }
+    });
 });

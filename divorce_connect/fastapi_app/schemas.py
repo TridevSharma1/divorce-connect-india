@@ -26,6 +26,7 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     created_at: datetime.datetime
+    role: str
 
     class Config:
         from_attributes = True

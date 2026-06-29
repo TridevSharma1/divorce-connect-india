@@ -1,135 +1,119 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner Support Center - DivorceConnect India</title>
+{% block title %}Partner Support Center - DivorceConnect India{% endblock %}
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% block extra_css %}
+<style>
+    /* Native HTML5 Accordion Styling */
+    details {
+        border-bottom: 1px solid #e2e8f0;
+    }
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    details:last-child {
+        border-bottom: none;
+    }
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
+    summary {
+        cursor: pointer;
+        font-weight: 500;
+        color: #0a0a0a;
+        user-select: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        transition: color 0.2s ease;
+    }
+
+    summary:hover {
+        color: #4b5563;
+    }
+
+    summary::marker {
+        content: '';
+    }
+
+    summary::after {
+        content: '+';
+        font-size: 1.5rem;
+        font-weight: 300;
+        line-height: 1;
+        transition: transform 0.3s ease;
+        color: #0a0a0a;
+    }
+
+    details[open] summary::after {
+        content: '−';
+        transform: rotate(0deg);
+    }
+
+    details > div {
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
         }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
 
-        /* Native HTML5 Accordion Styling */
-        details {
-            border-bottom: 1px solid #e2e8f0;
-        }
+    /* Form Input Styling */
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+        font-family: 'Inter', sans-serif;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
 
-        details:last-child {
-            border-bottom: none;
-        }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #0a0a0a;
+        box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
+    }
 
-        summary {
-            cursor: pointer;
-            font-weight: 500;
-            color: #0a0a0a;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            transition: color 0.2s ease;
-        }
+    /* File Upload Drop Zone */
+    .drop-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #f8fafc;
+    }
 
-        summary:hover {
-            color: #4b5563;
-        }
+    .drop-zone:hover {
+        border-color: #0a0a0a;
+        background-color: #f1f5f9;
+    }
 
-        summary::marker {
-            content: '';
-        }
+    .drop-zone.dragover {
+        border-color: #0a0a0a;
+        background-color: #f1f5f9;
+    }
 
-        summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            font-weight: 300;
-            line-height: 1;
-            transition: transform 0.3s ease;
-            color: #0a0a0a;
-        }
+    .drop-zone input[type="file"] {
+        display: none;
+    }
+</style>
+{% endblock %}
 
-        details[open] summary::after {
-            content: '−';
-            transform: rotate(0deg);
-        }
-
-        details > div {
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Form Input Styling */
-        input[type="text"],
-        input[type="email"],
-        select,
-        textarea {
-            font-family: 'Inter', sans-serif;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #0a0a0a;
-            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.05);
-        }
-
-        /* File Upload Drop Zone */
-        .drop-zone {
-            border: 2px dashed #cbd5e1;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background-color: #f8fafc;
-        }
-
-        .drop-zone:hover {
-            border-color: #0a0a0a;
-            background-color: #f1f5f9;
-        }
-
-        .drop-zone.dragover {
-            border-color: #0a0a0a;
-            background-color: #f1f5f9;
-        }
-
-        .drop-zone input[type="file"] {
-            display: none;
-        }
-    </style>
-</head>
-<body class="bg-white text-[#0a0a0a]">
-
+{% block content %}
+<div class="bg-white text-[#0a0a0a] min-h-screen">
     <!-- Header Section -->
     <header class="bg-white border-b border-[#e2e8f0] py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-4xl font-bold text-[#0a0a0a] mb-2">Partner Support Center</h1>
+            <h1 class="text-4xl font-bold text-[#0a0a0a] mb-2 font-serif">Partner Support Center</h1>
             <p class="text-gray-500 text-lg font-light">Find answers to common operational questions or submit a priority ticket to the admin team.</p>
         </div>
     </header>
@@ -140,7 +124,7 @@
 
             <!-- Column 1: FAQ Section -->
             <section class="faq-section">
-                <h2 class="text-xl font-bold text-[#0a0a0a] mb-8">Frequently Asked Questions</h2>
+                <h2 class="text-xl font-bold text-[#0a0a0a] mb-8 font-serif">Frequently Asked Questions</h2>
 
                 <!-- FAQ 1 -->
                 <details class="mb-2">
@@ -207,10 +191,10 @@
             <!-- Column 2: Ticketing Form -->
             <section class="ticketing-section">
                 <div class="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-8">
-                    <h2 class="text-xl font-bold text-[#0a0a0a] mb-2">Submit a Priority Ticket</h2>
+                    <h2 class="text-xl font-bold text-[#0a0a0a] mb-2 font-serif">Submit a Priority Ticket</h2>
                     <p class="text-gray-500 text-sm mb-6">Our partner support team typically responds within 2 hours.</p>
 
-                    <form method="POST" action="" enctype="multipart/form-data" class="space-y-5">
+                    <form method="POST" action="" enctype="multipart/form-data" class="space-y-5" id="ticketForm">
                         <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                         <!-- Category Dropdown -->
@@ -266,7 +250,7 @@
                         <!-- File Upload -->
                         <div>
                             <label class="block text-sm font-medium text-[#0a0a0a] mb-2">Attachment (Optional)</label>
-                            <div class="drop-zone" onclick="document.getElementById('fileInput').click();">
+                            <div class="drop-zone" id="dropZone">
                                 <input
                                     type="file"
                                     id="fileInput"
@@ -301,46 +285,46 @@
             <p>For urgent issues, contact <a href="mailto:support@divorceconnect.in" class="text-[#0a0a0a] hover:underline">support@divorceconnect.in</a></p>
         </div>
     </footer>
+</div>
+{% endblock %}
 
-    <!-- Minimal Vanilla JS for File Upload -->
-    <script>
-        const dropZone = document.querySelector('.drop-zone');
-        const fileInput = document.getElementById('fileInput');
-        const fileName = document.getElementById('fileName');
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
 
-        // Click to upload
-        dropZone.addEventListener('click', () => fileInput.click());
+    // Click to upload
+    dropZone.addEventListener('click', () => fileInput.click());
 
-        // Drag and drop events
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
+    // Drag and drop events
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                updateFileName();
-            }
-        });
-
-        // File selection
-        fileInput.addEventListener('change', updateFileName);
-
-        function updateFileName() {
-            if (fileInput.files.length) {
-                fileName.textContent = `Selected: ${fileInput.files[0].name}`;
-            } else {
-                fileName.textContent = '';
-            }
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileName();
         }
-    </script>
+    });
 
-</body>
-</html>
+    // File selection
+    fileInput.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+        if (fileInput.files.length) {
+            fileName.textContent = `Selected: ${fileInput.files[0].name}`;
+        } else {
+            fileName.textContent = '';
+        }
+    }
+</script>
+{% endblock %}

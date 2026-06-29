@@ -108,6 +108,62 @@
             btn.style.opacity = check.checked ? '1' : '0.5';
             btn.style.cursor = check.checked ? 'pointer' : 'not-allowed';
         });
+
+        // Intercept form submission
+        const form = document.getElementById('delete-form');
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = form.querySelector('input[type="email"]').value;
+            btn.disabled = true;
+            btn.innerText = "Sending Link...";
+
+            // Clear previous alerts
+            const existingAlerts = form.querySelectorAll('.alert-box');
+            existingAlerts.forEach(a => a.remove());
+
+            try {
+                const res = await fetch('/api/auth/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await res.json();
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert-box mb-6 px-4 py-3 rounded-lg text-sm font-medium border';
+
+                if (res.ok) {
+                    alertDiv.className += ' bg-green-50 border-green-200 text-green-700';
+                    alertDiv.innerText = data.message || "Confirmation link sent successfully.";
+                    form.insertBefore(alertDiv, form.firstChild);
+                    
+                    // Hide inputs
+                    form.querySelector('input[type="email"]').style.display = 'none';
+                    form.querySelector('label').style.display = 'none';
+                    form.querySelector('.group').style.display = 'none';
+                    btn.style.display = 'none';
+                } else {
+                    alertDiv.className += ' bg-red-50 border-red-200 text-red-700';
+                    alertDiv.innerText = data.detail || "Verification failed.";
+                    form.insertBefore(alertDiv, form.firstChild);
+                    btn.disabled = false;
+                    btn.innerText = "Send Deletion Confirmation Email →";
+                }
+            } catch (err) {
+                console.error("Error submitting deactivation request:", err);
+                btn.disabled = false;
+                btn.innerText = "Send Deletion Confirmation Email →";
+            }
+        });
     </script>
 </body>
 </html>

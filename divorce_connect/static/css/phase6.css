@@ -1,0 +1,91 @@
+/* Phase 6 UI Styles – premium, glassmorphism, vibrant accents */
+:root {
+    --bg-card: rgba(255,255,255,0.85);
+    --bg-card-dark: rgba(0,0,0,0.65);
+    --success: #16a34a;
+    --danger: #dc2626;
+    --primary: #0a0a0a;
+    --accent: #3b82f6;
+    --border: rgba(0,0,0,0.12);
+    --shadow: rgba(0,0,0,0.1);
+}
+
+/* Card container */
+.phase6-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px var(--shadow);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 900px;
+    border: 1px solid var(--border);
+}
+
+/* Table for verification list */
+.phase6-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+.phase6-table th,
+.phase6-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+.phase6-table th {
+    background: var(--bg-card-dark);
+    color: #fff;
+    font-weight: 600;
+}
+.phase6-table tr:hover {
+    background: rgba(0,0,0,0.03);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+.btn-primary:hover {
+    box-shadow: 0 4px 12px var(--shadow);
+    transform: translateY(-2px);
+}
+.btn-success {
+    background: var(--success);
+    color: #fff;
+}
+.btn-success:hover { background: #15803d; }
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+}
+.btn-danger:hover { background: #b91c1c; }
+
+/* Toast notifications */
+#toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--bg-card-dark);
+    color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px var(--shadow);
+    opacity: 0.95;
+    z-index: 1000;
+    display: none;
+    font-size: 0.9rem;
+}

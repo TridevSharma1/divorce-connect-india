@@ -119,10 +119,29 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    // Save JWT token
                     localStorage.setItem('access_token', data.access_token);
-                    // Redirect to dashboard (hardcoded for now, can be dynamic based on role)
-                    window.location.href = "/client_dashboard/"; 
+                    
+                    try {
+                        const meRes = await fetch('/api/auth/me', {
+                            headers: {
+                                'Authorization': 'Bearer ' + data.access_token
+                            }
+                        });
+                        if (meRes.ok) {
+                            const user = await meRes.json();
+                            if (user.role === 'lawyer') {
+                                window.location.href = "/lawyer_dashboard/";
+                            } else if (user.role === 'admin') {
+                                window.location.href = "/admin_dashboard/";
+                            } else {
+                                window.location.href = "/client_dashboard/";
+                            }
+                        } else {
+                            window.location.href = "/client_dashboard/";
+                        }
+                    } catch (err) {
+                        window.location.href = "/client_dashboard/";
+                    } 
                 } else {
                     const errorData = await response.json();
                     errorDiv.textContent = errorData.detail || 'Login failed. Please check your credentials.';

@@ -77,196 +77,203 @@
                         style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2371717a%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;"
                     >
                         <option value="">All Categories</option>
+                        <option value="criminal">Criminal Law</option>
                         <option value="family">Family Law</option>
-                        <option value="divorce">Divorce Law</option>
-                        <option value="child_custody">Child Custody</option>
-                        <option value="alimony">Alimony & Maintenance</option>
-                        <option value="mediation">Mediation</option>
+                        <option value="corporate">Corporate Law</option>
+                        <option value="ip">Intellectual Property</option>
+                        <option value="labor">Labor Law</option>
+                        <option value="tax">Tax Law</option>
+                        <option value="real_estate">Real Estate</option>
+                        <option value="bankruptcy">Bankruptcy Law</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
             </div>
             
             <p class="text-zinc-400 text-xs mt-4" id="results-count">
-                Showing {{ verified_lawyers|length }} verified professional(s)
+                Loading verified professionals...
             </p>
         </div>
 
-        {% if verified_lawyers %}
-            <!-- Listings Grid (Perfect Medium-size Cards: 1 column on mobile, 2 columns on tablet/desktop) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto" id="lawyers-grid">
-                {% for lawyer in verified_lawyers %}
-                    <div 
-                        class="lawyer-card rounded-2xl overflow-hidden flex flex-col h-full"
-                        data-name="{{ lawyer.full_name|lower }}"
-                        data-specialization="{{ lawyer.get_specialization_display|lower }}"
-                        data-location="{{ lawyer.state_bar_council|lower }}"
-                    >
-                        <!-- Main Card Info Body -->
-                        <div class="p-7 flex-1 flex flex-col">
-                            
-                            <div class="flex items-start gap-5 mb-5">
-                                <!-- Avatar Frame -->
-                                {% if lawyer.profile_picture %}
-                                    <img src="{{ lawyer.profile_picture.url }}" alt="{{ lawyer.full_name }}" class="w-[72px] h-[72px] rounded-full object-cover border border-[#0a0a0a] p-0.5 flex-shrink-0">
-                                {% else %}
-                                    <div class="w-[72px] h-[72px] rounded-full bg-[#0a0a0a] flex items-center justify-center text-white text-xl font-bold flex-shrink-0 border border-zinc-200">
-                                        {{ lawyer.full_name|first }}
-                                    </div>
-                                {% endif %}
+        <!-- Listings Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto" id="lawyers-grid">
+            <!-- Loaded dynamically via JS -->
+        </div>
 
-                                <!-- Name & Specialization -->
-                                <div class="min-w-0">
-                                    <h3 class="text-lg font-extrabold text-[#0a0a0a] mb-1.5 leading-snug truncate">{{ lawyer.full_name }}</h3>
-                                    <span class="inline-block px-3 py-1 bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase tracking-wider rounded">
-                                        {{ lawyer.get_specialization_display }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Rating Section -->
-                            <div class="flex items-center gap-1.5 mb-5">
-                                <div class="flex text-zinc-900 text-sm">
-                                    {% for i in "12345" %}
-                                        {% if lawyer.rating >= i %}★{% elif lawyer.rating > i|add:"-1" %}⭐{% else %}☆{% endif %}
-                                    {% endfor %}
-                                </div>
-                                <span class="text-xs font-bold text-zinc-900">{{ lawyer.rating|default:"0.0" }}/5.0</span>
-                            </div>
-
-                            <!-- Key Metrics Section -->
-                            <div class="grid grid-cols-2 gap-3 border-t border-b border-zinc-100 py-4 mb-5 text-sm">
-                                <div>
-                                    <span class="text-zinc-400 text-xs block mb-0.5 font-semibold uppercase tracking-wider">Experience</span>
-                                    <span class="text-base font-extrabold text-[#0a0a0a]">{{ lawyer.years_of_experience }} Years</span>
-                                </div>
-                                <div>
-                                    <span class="text-zinc-400 text-xs block mb-0.5 font-semibold uppercase tracking-wider">Consultation Fee</span>
-                                    <span class="text-base font-extrabold text-[#0a0a0a]">
-                                        {% if lawyer.consultation_fee %}
-                                            ₹{{ lawyer.consultation_fee|floatformat:"2" }} / hr
-                                        {% else %}
-                                            Contact For Fee
-                                        {% endif %}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Location Box -->
-                            <div class="mt-auto bg-zinc-50 border border-zinc-100 rounded-xl p-4 flex items-start gap-2.5">
-                                <svg class="w-4 h-4 text-zinc-800 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <div class="min-w-0">
-                                    <span class="text-zinc-400 text-[9px] block font-semibold uppercase tracking-wider mb-0.5">Location</span>
-                                    <p class="text-xs text-zinc-800 font-bold truncate">{{ lawyer.state_bar_council|default:"Location info pending" }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card Footer Action Panel -->
-                        <div class="bg-zinc-50 border-t border-zinc-150 px-7 py-4 flex items-center justify-between">
-                            <span class="inline-flex items-center rounded-full bg-zinc-200 text-zinc-800 px-3 py-1 text-[9px] font-bold uppercase tracking-wider">
-                                {% if lawyer.rating >= 4.5 %}Top Rated{% elif lawyer.rating >= 3.0 %}Premier{% else %}New Listing{% endif %}
-                            </span>
-                            
-                            <a 
-                                href="/lawyer_detail/"
-                                class="btn-minimal-primary px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider"
-                            >
-                                View Profile
-                            </a>
-                        </div>
-                    </div>
-                {% endfor %}
+        <!-- Client-side No Results State (Initially hidden) -->
+        <div id="no-search-results" class="hidden bg-white rounded-3xl border border-zinc-200 p-16 text-center max-w-2xl mx-auto shadow-sm">
+            <div class="inline-block mb-4 p-4 bg-zinc-50 rounded-full border border-zinc-100">
+                <svg class="w-10 h-10 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
+            <h3 class="text-xl font-extrabold text-[#0a0a0a] mb-2">No Matching Legal Professionals</h3>
+            <p class="text-zinc-500 mb-6 max-w-md mx-auto text-sm">We couldn't find any verified lawyers matching your filters. Try adjusting your search query or choosing another category.</p>
+            <button onclick="resetFilters()" class="btn-minimal-secondary font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider">
+                Reset Search Filters
+            </button>
+        </div>
 
-            <!-- Client-side No Results State (Initially hidden) -->
-            <div id="no-search-results" class="hidden bg-white rounded-3xl border border-zinc-200 p-16 text-center max-w-2xl mx-auto shadow-sm">
-                <div class="inline-block mb-4 p-4 bg-zinc-50 rounded-full border border-zinc-100">
-                    <svg class="w-10 h-10 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-extrabold text-[#0a0a0a] mb-2">No Matching Legal Professionals</h3>
-                <p class="text-zinc-500 mb-6 max-w-md mx-auto text-sm">We couldn't find any verified lawyers matching your filters. Try adjusting your search query or choosing another category.</p>
-                <button onclick="resetFilters()" class="btn-minimal-secondary font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider">
-                    Reset Search Filters
-                </button>
+        <!-- System Empty State (Initially hidden) -->
+        <div id="system-empty-state" class="hidden bg-white rounded-3xl border border-zinc-250 p-16 text-center max-w-2xl mx-auto shadow-sm">
+            <div class="inline-block mb-4 p-4 bg-zinc-50 rounded-full border border-zinc-100">
+                <svg class="w-10 h-10 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
             </div>
-
-        {% else %}
-            <!-- System Empty State -->
-            <div class="bg-white rounded-3xl border border-zinc-250 p-16 text-center max-w-2xl mx-auto shadow-sm">
-                <div class="inline-block mb-4 p-4 bg-zinc-50 rounded-full border border-zinc-100">
-                    <svg class="w-10 h-10 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-extrabold text-[#0a0a0a] mb-2">No Lawyers Currently Listed</h3>
-                <p class="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Matrimonial legal professionals are undergoing verification. Please check back shortly.</p>
-                <a href="/" class="btn-minimal-secondary font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider inline-block">
-                    Return to Homepage
-                </a>
-            </div>
-        {% endif %}
+            <h3 class="text-xl font-extrabold text-[#0a0a0a] mb-2">No Lawyers Currently Listed</h3>
+            <p class="text-zinc-500 mb-6 max-w-md mx-auto text-sm">Matrimonial legal professionals are undergoing verification. Please check back shortly.</p>
+            <a href="/" class="btn-minimal-secondary font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider inline-block">
+                Return to Homepage
+            </a>
+        </div>
     </div>
 </div>
 
 <!-- Real-time filtering script -->
 <script>
-    (function() {
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
         const searchInput = document.getElementById('search-input');
         const specFilter = document.getElementById('specialization-filter');
         const resultsCountEl = document.getElementById('results-count');
         const noResultsEl = document.getElementById('no-search-results');
+        const systemEmptyEl = document.getElementById('system-empty-state');
         const grid = document.getElementById('lawyers-grid');
-        
-        if (!searchInput || !specFilter) return;
 
-        function filterLawyers() {
-            const query = searchInput.value.toLowerCase().trim();
-            const selectedSpec = specFilter.value.toLowerCase();
-            const cards = document.querySelectorAll('.lawyer-card');
-            let visibleCount = 0;
+        let allLawyers = [];
 
-            cards.forEach(card => {
-                const name = card.getAttribute('data-name');
-                const spec = card.getAttribute('data-specialization');
-                const location = card.getAttribute('data-location');
-
-                const matchesSearch = !query || name.includes(query) || spec.includes(query) || location.includes(query);
-                const matchesSpec = !selectedSpec || spec.includes(selectedSpec);
-
-                if (matchesSearch && matchesSpec) {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
+        try {
+            const res = await fetch("/api/client/lawyers", {
+                headers: {
+                    "Authorization": "Bearer " + token
                 }
             });
-
-            // Update count
-            resultsCountEl.innerText = `Showing ${visibleCount} verified professional(s)`;
-
-            // Handle empty search results state
-            if (visibleCount === 0) {
-                noResultsEl.classList.remove('hidden');
-                if (grid) grid.classList.add('hidden');
-            } else {
-                noResultsEl.classList.add('hidden');
-                if (grid) grid.classList.remove('hidden');
+            if (!res.ok) {
+                console.error("Failed to fetch lawyers list");
+                resultsCountEl.innerText = "Error loading lawyers directory.";
+                return;
             }
+
+            allLawyers = await res.json();
+            
+            if (allLawyers.length === 0) {
+                systemEmptyEl.classList.remove('hidden');
+                resultsCountEl.innerText = "Showing 0 verified professional(s)";
+                return;
+            }
+
+            function renderLawyers(filtered) {
+                if (filtered.length === 0) {
+                    noResultsEl.classList.remove('hidden');
+                    grid.classList.add('hidden');
+                } else {
+                    noResultsEl.classList.add('hidden');
+                    grid.classList.remove('hidden');
+                    grid.innerHTML = filtered.map(lawyer => {
+                        const stars = "★".repeat(Math.round(lawyer.rating)) + "☆".repeat(5 - Math.round(lawyer.rating));
+                        const ratingText = `${lawyer.rating.toFixed(1)}/5.0`;
+                        const feeText = lawyer.consultation_fee > 0 ? `₹${lawyer.consultation_fee.toFixed(2)} / hr` : "Contact For Fee";
+                        const locationText = lawyer.office_city || "Location info pending";
+                        const tierLabel = lawyer.rating >= 4.5 ? "Top Rated" : (lawyer.rating >= 3.0 ? "Premier" : "New Listing");
+                        
+                        const avatarHTML = lawyer.profile_picture 
+                            ? `<img src="${lawyer.profile_picture}" alt="${lawyer.full_name}" class="w-[72px] h-[72px] rounded-full object-cover border border-[#0a0a0a] p-0.5 flex-shrink-0">`
+                            : `<div class="w-[72px] h-[72px] rounded-full bg-[#0a0a0a] flex items-center justify-center text-white text-xl font-bold flex-shrink-0 border border-zinc-200">${lawyer.full_name.charAt(0)}</div>`;
+
+                        return `
+                            <div class="lawyer-card rounded-2xl overflow-hidden flex flex-col h-full">
+                                <div class="p-7 flex-1 flex flex-col">
+                                    <div class="flex items-start gap-5 mb-5">
+                                        ${avatarHTML}
+                                        <div class="min-w-0">
+                                            <h3 class="text-lg font-extrabold text-[#0a0a0a] mb-1.5 leading-snug truncate">${lawyer.full_name}</h3>
+                                            <span class="inline-block px-3 py-1 bg-zinc-100 text-zinc-800 text-[10px] font-bold uppercase tracking-wider rounded">
+                                                ${lawyer.specialization.toUpperCase()}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-1.5 mb-5">
+                                        <div class="flex text-zinc-900 text-sm">${stars}</div>
+                                        <span class="text-xs font-bold text-zinc-900">${ratingText}</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-3 border-t border-b border-zinc-100 py-4 mb-5 text-sm">
+                                        <div>
+                                            <span class="text-zinc-400 text-xs block mb-0.5 font-semibold uppercase tracking-wider">Experience</span>
+                                            <span class="text-base font-extrabold text-[#0a0a0a]">${lawyer.years_of_experience} Years</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-zinc-400 text-xs block mb-0.5 font-semibold uppercase tracking-wider">Consultation Fee</span>
+                                            <span class="text-base font-extrabold text-[#0a0a0a]">${feeText}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto bg-zinc-50 border border-zinc-100 rounded-xl p-4 flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-zinc-800 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <div class="min-w-0">
+                                            <span class="text-zinc-400 text-[9px] block font-semibold uppercase tracking-wider mb-0.5">Location</span>
+                                            <p class="text-xs text-zinc-800 font-bold truncate">${locationText}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-50 border-t border-zinc-150 px-7 py-4 flex items-center justify-between">
+                                    <span class="inline-flex items-center rounded-full bg-zinc-200 text-zinc-800 px-3 py-1 text-[9px] font-bold uppercase tracking-wider">
+                                        ${tierLabel}
+                                    </span>
+                                    <a href="/lawyer_detail/?id=${lawyer.id}" class="btn-minimal-primary px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                resultsCountEl.innerText = `Showing ${filtered.length} verified professional(s)`;
+            }
+
+            function filterLawyers() {
+                const query = searchInput.value.toLowerCase().trim();
+                const selectedSpec = specFilter.value.toLowerCase();
+
+                const filtered = allLawyers.filter(lawyer => {
+                    const matchesSearch = !query || 
+                        lawyer.full_name.toLowerCase().includes(query) || 
+                        lawyer.specialization.toLowerCase().includes(query) || 
+                        lawyer.office_city.toLowerCase().includes(query);
+                    const matchesSpec = !selectedSpec || lawyer.specialization.toLowerCase() === selectedSpec;
+                    return matchesSearch && matchesSpec;
+                });
+
+                renderLawyers(filtered);
+            }
+
+            searchInput.addEventListener('input', filterLawyers);
+            specFilter.addEventListener('change', filterLawyers);
+
+            window.resetFilters = function() {
+                searchInput.value = '';
+                specFilter.value = '';
+                filterLawyers();
+            };
+
+            // Initial render
+            renderLawyers(allLawyers);
+
+        } catch (err) {
+            console.error("Error loading verified lawyers list", err);
+            resultsCountEl.innerText = "Error loading lawyers directory.";
         }
-
-        searchInput.addEventListener('input', filterLawyers);
-        specFilter.addEventListener('change', filterLawyers);
-
-        window.resetFilters = function() {
-            searchInput.value = '';
-            specFilter.value = '';
-            filterLawyers();
-        };
-    })();
+    });
 </script>
 {% endblock %}

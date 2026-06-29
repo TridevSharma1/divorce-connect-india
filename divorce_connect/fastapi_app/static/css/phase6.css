@@ -1,0 +1,50 @@
+/* Phase 6 CSS – premium dark‑mode UI */
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #111827;
+    --text-primary: #f8fafc;
+    --text-muted: #9ca3af;
+    --accent: #3b82f6;
+    --card-bg: #1f2937;
+    --card-border: #374151;
+    --shadow: rgba(0,0,0,0.4);
+    --transition: 0.2s ease;
+}
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+a { color: var(--accent); text-decoration: none; }
+button {
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    transition: var(--transition);
+}
+button:hover { opacity: 0.9; }
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px var(--shadow);
+    margin-bottom: 1.5rem;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+.table th, .table td {
+    padding: 0.75rem;
+    border: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-primary);
+}
+.table th { background: var(--bg-secondary); }
+.alert-success { background: #ecfdf5; color: #166534; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem; }
+.alert-error { background: #fee2e2; color: #b91c1c; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem; }

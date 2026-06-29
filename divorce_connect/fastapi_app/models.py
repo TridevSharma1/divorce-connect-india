@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import List, Optional
 from sqlalchemy import String, Boolean, DateTime, ForeignKey, Text, Integer, Float, DECIMAL, Date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -10,6 +10,10 @@ class User(Base):
     __tablename__ = "accounts_baseuser"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    # Role-based access: superadmin, staff, client, lawyer
+    role: Mapped[str] = mapped_column(String(20), nullable=False, default="client")
+    # Optional field for Razorpay customer id
+    razorpay_customer_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     email: Mapped[str] = mapped_column(String(254), unique=True, index=True)
     username: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     first_name: Mapped[str] = mapped_column(String(150), default="")
@@ -42,6 +46,7 @@ class Notification(Base):
 
     user = relationship("User", back_populates="notifications")
 
+
 class ClientProfile(Base):
     __tablename__ = "clients_clientprofile"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -61,6 +66,7 @@ class ClientProfile(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     
     user = relationship("User", backref="client_profile")
+
 
 class LawyerProfile(Base):
     __tablename__ = "lawyers_lawyerprofile"
@@ -90,6 +96,7 @@ class LawyerProfile(Base):
     
     user = relationship("User", backref="lawyer_profile")
 
+
 class AdminPanelProfile(Base):
     __tablename__ = "adminpanel_adminpanelprofile"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,6 +115,7 @@ class AdminPanelProfile(Base):
     
     user = relationship("User", backref="admin_profile")
 
+
 class CaseRequest(Base):
     __tablename__ = "lawyers_caserequest"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -123,6 +131,7 @@ class CaseRequest(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
 
+
 class CaseDocument(Base):
     __tablename__ = "lawyers_casedocument"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -130,3 +139,70 @@ class CaseDocument(Base):
     document_type: Mapped[str] = mapped_column(String(20))
     document_file: Mapped[str] = mapped_column(String(100))
     uploaded_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+
+class CaseDocumentVerification(Base):
+    __tablename__ = "lawyers_casedocumentverification"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("lawyers_casedocument.id", ondelete="CASCADE"), unique=True)
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    verified_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
+    verified_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("accounts_baseuser.id"), nullable=True)
+
+    document = relationship("CaseDocument", backref="verification")
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    case_request_id: Mapped[int] = mapped_column(ForeignKey("lawyers_caserequest.id"))
+    amount: Mapped[float] = mapped_column(DECIMAL(precision=10, scale=2))
+    currency: Mapped[str] = mapped_column(String(3), default="INR")
+    razorpay_payment_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    case_request: Mapped["CaseRequest"] = relationship("CaseRequest", backref="payments")
+
+
+class Reminder(Base):
+    __tablename__ = "reminders"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("accounts_baseuser.id"))
+    case_request_id: Mapped[Optional[int]] = mapped_column(ForeignKey("lawyers_caserequest.id"), nullable=True)
+    title: Mapped[str] = mapped_column(String(150))
+    message: Mapped[str] = mapped_column(Text)
+    remind_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False)
+    sent: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", backref="reminders")
+    case_request: Mapped[Optional["CaseRequest"]] = relationship("CaseRequest", backref="reminders")
+
+
+class DeleteAccountToken(Base):
+    __tablename__ = "accounts_deleteaccounttoken"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    token: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    is_used: Mapped[bool] = mapped_column(Boolean, default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("accounts_baseuser.id"))
+
+    user: Mapped["User"] = relationship("User")
+
+
+class LawyerRating(Base):
+    __tablename__ = "lawyers_lawyerrating"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    score: Mapped[int] = mapped_column(Integer)
+    review_text: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    client_id: Mapped[int] = mapped_column(ForeignKey("clients_clientprofile.id"))
+    lawyer_id: Mapped[int] = mapped_column(ForeignKey("lawyers_lawyerprofile.id"))
+
+

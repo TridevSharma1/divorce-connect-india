@@ -1,622 +1,132 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
-
-{% block title %}Case Detail & Chat - DivorceConnect{% endblock %}
+{% block title %}Case Details – DivorceConnect{% endblock %}
 
 {% block extra_css %}
-<style>
-    body { background-color: #f3f4f6; }
-
-    .lc-page {
-        padding: 2.5rem 1rem 3rem;
-    }
-
-    .lc-hero {
-        background: linear-gradient(135deg, #111827, #0f172a);
-        border-radius: 1.5rem;
-        padding: 2rem 2.25rem;
-        margin-bottom: 1.75rem;
-        color: #ffffff;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 1.5rem;
-        align-items: center;
-        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
-    }
-
-    .lc-hero h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 2.4rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.02em;
-    }
-
-    .lc-hero p {
-        margin: 0.75rem 0 0;
-        color: rgba(255, 255, 255, 0.75);
-        line-height: 1.7;
-    }
-
-    .lc-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.75rem 1.15rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
-        color: #f8fafc;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        border: 1px solid rgba(255, 255, 255, 0.16);
-    }
-
-    .stat-grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        margin-bottom: 1.5rem;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 1rem;
-        padding: 1.25rem;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-    }
-
-    .stat-card span {
-        display: block;
-        font-size: 0.75rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #6b7280;
-    }
-
-    .stat-card strong {
-        display: block;
-        margin-top: 0.85rem;
-        font-size: 1.15rem;
-        color: #111827;
-    }
-
-    .lc-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 430px;
-        gap: 1.5rem;
-    }
-
-    @media (max-width: 1100px) {
-        .lc-grid {
-            grid-template-columns: 1fr;
-        }
-        .lc-hero {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .lc-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 1.25rem;
-        overflow: hidden;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
-    }
-
-    .lc-card-header {
-        padding: 1.5rem 1.75rem;
-        border-bottom: 1px solid #e5e7eb;
-        background: #f9fafb;
-    }
-
-    .lc-card-header h2 {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.3rem;
-        margin: 0;
-        color: #111827;
-    }
-
-    .lc-card-body {
-        padding: 1.5rem 1.75rem 1.75rem;
-    }
-
-    .detail-block {
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        border-radius: 1rem;
-        padding: 1.25rem;
-    }
-
-    .detail-block h3 {
-        margin: 0 0 0.75rem;
-        font-size: 0.95rem;
-        color: #374151;
-    }
-
-    .detail-block p {
-        margin: 0;
-        color: #4b5563;
-        line-height: 1.8;
-    }
-
-    .info-grid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        margin-top: 1.5rem;
-    }
-
-    .info-item {
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        border-radius: 1rem;
-        padding: 1rem 1.15rem;
-    }
-
-    .info-item .info-label {
-        margin-bottom: 0.45rem;
-        color: #6b7280;
-        font-size: 0.72rem;
-        letter-spacing: 0.12em;
-    }
-
-    .info-item .info-value {
-        font-weight: 700;
-        color: #111827;
-        display: block;
-    }
-
-    .workflow-step {
-        padding: 0.9rem 1rem;
-        border-radius: 1rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .wf-completed {
-        background: #ecfdf5;
-        color: #166534;
-    }
-
-    .wf-active {
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-    }
-
-    .wf-pending {
-        color: #6b7280;
-        background: #f8fafc;
-    }
-
-    .lc-chat-container {
-        display: flex;
-        flex-direction: column;
-        min-height: 660px;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 1.25rem;
-        overflow: hidden;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-        position: sticky;
-        top: 1.5rem;
-    }
-
-    .lc-chat-header {
-        padding: 1.5rem 1.75rem;
-        background: #111827;
-        color: #f8fafc;
-    }
-
-    .lc-chat-header h3 {
-        margin: 0 0 0.45rem;
-        font-size: 1.2rem;
-    }
-
-    .lc-chat-header p {
-        margin: 0;
-        color: #cbd5e1;
-        font-size: 0.92rem;
-    }
-
-    .lc-chat-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        background: #f8fafc;
-    }
-
-    .msg-wrap {
-        display: flex;
-        flex-direction: column;
-        max-width: 82%;
-    }
-
-    .msg-wrap.client {
-        align-self: flex-end;
-        align-items: flex-end;
-    }
-
-    .msg-wrap.lawyer {
-        align-self: flex-start;
-        align-items: flex-start;
-    }
-
-    .msg-bubble {
-        padding: 0.95rem 1.1rem;
-        border-radius: 1.25rem;
-        font-size: 0.9rem;
-        line-height: 1.75;
-        word-break: break-word;
-    }
-
-    .msg-wrap.client .msg-bubble {
-        background: #111827;
-        color: #ffffff;
-        border-bottom-right-radius: 0.5rem;
-    }
-
-    .msg-wrap.lawyer .msg-bubble {
-        background: #ffffff;
-        color: #111827;
-        border: 1px solid #e5e7eb;
-        border-bottom-left-radius: 0.5rem;
-    }
-
-    .msg-meta {
-        margin-top: 0.35rem;
-        font-size: 0.72rem;
-        color: #6b7280;
-        font-weight: 600;
-    }
-
-    .msg-attachment {
-        margin-top: 0.75rem;
-        border-radius: 1rem;
-        overflow: hidden;
-        border: 1px solid rgba(15, 23, 42, 0.08);
-    }
-
-    .msg-attachment img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .msg-attachment-file {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        padding: 0.85rem 1rem;
-        background: #f8fafc;
-        color: #111827;
-        text-decoration: none;
-        border-radius: 0.95rem;
-        font-size: 0.88rem;
-        font-weight: 600;
-    }
-
-    .lc-chat-input {
-        padding: 1.25rem 1.5rem;
-        background: #ffffff;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .chat-form {
-        display: flex;
-        gap: 0.75rem;
-        align-items: flex-end;
-    }
-
-    .file-upload-wrapper {
-        position: relative;
-    }
-
-    .file-upload-wrapper input[type="file"] {
-        display: none;
-    }
-
-    .file-upload-btn {
-        width: 3.2rem;
-        height: 3.2rem;
-        border-radius: 50%;
-        border: 1px solid #e5e7eb;
-        background: #f8fafc;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .file-upload-btn:hover {
-        background: #e2e8f0;
-        transform: translateY(-1px);
-    }
-
-    .file-name-preview {
-        position: absolute;
-        bottom: 110%;
-        left: 0;
-        background: #111827;
-        color: #f8fafc;
-        padding: 0.35rem 0.55rem;
-        border-radius: 0.35rem;
-        font-size: 0.72rem;
-        white-space: nowrap;
-        display: none;
-    }
-
-    .chat-textarea {
-        flex: 1;
-        min-height: 3.5rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 1.5rem;
-        padding: 1rem 1.1rem;
-        background: #f8fafc;
-        font-size: 0.95rem;
-        outline: none;
-        resize: none;
-        transition: border-color 0.2s ease, background 0.2s ease;
-    }
-
-    .chat-textarea:focus {
-        border-color: #111827;
-        background: #ffffff;
-    }
-
-    .chat-btn {
-        width: 3.4rem;
-        height: 3.4rem;
-        border-radius: 50%;
-        border: none;
-        background: #111827;
-        color: #ffffff;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .chat-btn:hover {
-        transform: translateY(-1px);
-        background: #27272a;
-    }
-
-    .chat-disabled {
-        padding: 1.75rem;
-        text-align: center;
-        background: #f8fafc;
-        border-top: 1px solid #e5e7eb;
-        color: #6b7280;
-        font-size: 0.95rem;
-    }
-</style>
+<link rel="stylesheet" href="/static/css/phase6.css">
 {% endblock %}
 
 {% block content %}
-<div class="lc-page max-w-7xl mx-auto">
-    <div class="mb-4">
-        <a href="/client_cases/" class="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-gray-900">
-            ← Back to My Cases
-        </a>
+<div class="phase6-card" id="case-container" style="display:none;">
+    <h2 class="case-title">Case #<span id="case-id"></span></h2>
+    <div class="case-info">
+        <p><strong>Lawyer:</strong> <span id="lawyer-name"></span></p>
+        <p><strong>Status:</strong> <span id="case-status"></span></p>
+        <p><strong>Created:</strong> <span id="case-created"></span></p>
+        <p><strong>Workflow Stage:</strong> <span id="case-stage"></span></p>
     </div>
-
-    <div class="lc-hero">
-        <div>
-            <p class="text-sm uppercase tracking-[0.24em] text-slate-300 mb-3">Your lawyer engagement</p>
-            <h1>Case with {{ active_case.lawyer.full_name }}</h1>
-            <p>Manage your case updates, documents, and communication in one place.</p>
-        </div>
-        <div class="text-right">
-            <span class="lc-badge">{{ active_case.get_status_display }}</span>
-            <p class="text-sm text-slate-300 mt-4">Requested on</p>
-            <p class="mt-1 text-lg font-semibold">{{ active_case.created_at|date:'M d, Y' }}</p>
-        </div>
+    <!-- Workflow progress bar -->
+    <div class="workflow-bar" style="display:flex;gap:4px;margin-top:1rem;align-items:center">
+        <div id="stage-pending" class="stage active" style="flex:1;padding:0.5rem;background:#e0e0e0;text-align:center;border-radius:4px">Pending</div>
+        <div id="stage-docs" class="stage" style="flex:1;padding:0.5rem;background:#c0c0c0;text-align:center;border-radius:4px">Documents Uploaded</div>
+        <div id="stage-verified" class="stage" style="flex:1;padding:0.5rem;background:#a0a0a0;text-align:center;border-radius:4px">Verified</div>
     </div>
-
-    <div class="stat-grid">
-        <div class="stat-card">
-            <span>Case status</span>
-            <strong>{{ active_case.get_status_display }}</strong>
-        </div>
-        <div class="stat-card">
-            <span>Assigned lawyer</span>
-            <strong>{{ active_case.lawyer.full_name }}</strong>
-        </div>
-        <div class="stat-card">
-            <span>Requested</span>
-            <strong>{{ active_case.created_at|date:'M d, Y' }}</strong>
-        </div>
-        <div class="stat-card">
-            <span>Case ID</span>
-            <strong>#{{ active_case.id }}</strong>
-        </div>
-    </div>
-
-    <div class="lc-grid">
-        <div class="space-y-5">
-            <div class="lc-card">
-                <div class="lc-card-header">
-                    <h2>Case summary</h2>
-                </div>
-                <div class="lc-card-body">
-                    <div class="detail-block">
-                        <h3>Request details</h3>
-                        <p>{{ active_case.message|default:'No message provided for this request.' }}</p>
-                    </div>
-
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Lawyer</span>
-                            <span class="info-value">{{ active_case.lawyer.full_name }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Status</span>
-                            <span class="info-value">{{ active_case.get_status_display }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Requested on</span>
-                            <span class="info-value">{{ active_case.created_at|date:'M d, Y' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Case ID</span>
-                            <span class="info-value">#{{ active_case.id }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lc-card">
-                <div class="lc-card-header">
-                    <h2>Progress tracker</h2>
-                </div>
-                <div class="lc-card-body space-y-3">
-                    {% for step in active_case.workflow_progress %}
-                        <div class="workflow-step {% if step.completed and not step.active %}wf-completed{% elif step.active %}wf-active{% else %}wf-pending{% endif %}">
-                            {% if step.completed %}✓{% else %}○{% endif %}
-                            {{ step.label }}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {% if active_case.status == 'DOCUMENTS_PENDING' %}
-                <div class="lc-card border-blue-200 bg-blue-50">
-                    <div class="lc-card-header">
-                        <h2>Documents required</h2>
-                    </div>
-                    <div class="lc-card-body">
-                        <p class="text-sm text-blue-700 mb-4">Your lawyer needs supporting documents to progress this matter.</p>
-                        <a href="/case_document_upload/" class="btn-primary w-full inline-flex justify-center">Upload documents</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-
-        <div>
-            <div class="lc-chat-container">
-                <div class="lc-chat-header">
-                    <h3>Chat with {{ active_case.lawyer.full_name }}</h3>
-                    <p>Secure conversation for this case</p>
-                </div>
-
-                {% if active_case.status == 'ACCEPTED' or active_case.status == 'COMPLETED' %}
-                    <div class="lc-chat-messages" id="chatMessages">
-                        {% for msg in messages %}
-                            <div class="msg-wrap {% if msg.sender_type == 'CLIENT' %}client{% else %}lawyer{% endif %}">
-                                <div class="msg-bubble">
-                                    {% if msg.text %}
-                                        {{ msg.text|linebreaksbr|urlize }}
-                                    {% endif %}
-                                    {% if msg.attachment %}
-                                        <div class="msg-attachment">
-                                            {% if msg.is_image %}
-                                                <a href="{{ msg.attachment.url }}" target="_blank">
-                                                    <img src="{{ msg.attachment.url }}" alt="Attached Image">
-                                                </a>
-                                            {% else %}
-                                                <a href="{{ msg.attachment.url }}" target="_blank" class="msg-attachment-file">
-                                                    📄 {{ msg.file_extension|upper }} Document
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <span class="msg-meta">{{ msg.created_at|date:'M d, h:i A' }}</span>
-                            </div>
-                        {% empty %}
-                            <div class="text-center text-gray-400 my-auto">
-                                <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                </svg>
-                                <p class="text-sm">No messages yet.<br>Start the conversation to keep your lawyer updated.</p>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    {% if active_case.status == 'ACCEPTED' %}
-                        <div class="lc-chat-input">
-                            <form method="POST" enctype="multipart/form-data" class="chat-form">
-                                <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
-                                <div class="file-upload-wrapper">
-                                    <div class="file-name-preview" id="fileNamePreview"></div>
-                                    <label for="chatAttachment" class="file-upload-btn" title="Attach file">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                        </svg>
-                                    </label>
-                                    <input type="file" id="chatAttachment" name="attachment" onchange="updateFileName(this)">
-                                </div>
-
-                                <textarea
-                                    name="message"
-                                    rows="1"
-                                    class="chat-textarea"
-                                    placeholder="Type a message or share a file..."
-                                    oninput="this.style.height = '';this.style.height = Math.min(this.scrollHeight, 120) + 'px'"
-                                ></textarea>
-                                <button type="submit" class="chat-btn" aria-label="Send message">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    {% else %}
-                        <div class="chat-disabled">
-                            This case has been completed. Chat is closed.
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="flex-1 flex flex-col items-center justify-center p-8 text-center text-gray-500 bg-gray-50">
-                        <svg class="w-16 h-16 mb-4 opacity-30" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z" />
-                        </svg>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Chat Unavailable</h3>
-                        <p>The chat feature will be unlocked once the lawyer accepts your case request.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+    <hr>
+    <h3>Documents</h3>
+    <ul id="document-list"></ul>
+    <button class="btn btn-primary" id="upload-btn">Upload Document</button>
+    <input type="file" id="file-input" style="display:none;" />
 </div>
+<div id="toast"></div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const chatBox = document.getElementById('chatMessages');
-        if (chatBox) {
-            chatBox.scrollTop = chatBox.scrollHeight;
+    const toast = document.getElementById('toast');
+    function showToast(message, type='info') {
+        toast.textContent = message;
+        toast.style.display = 'block';
+        toast.style.background = type==='success' ? 'var(--success)' : (type==='danger' ? 'var(--danger)' : 'var(--bg-card)');
+        setTimeout(()=>{ toast.style.display='none'; }, 3000);
+    }
+    function getCaseId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
+    async function loadCase() {
+        const caseId = getCaseId();
+        if (!caseId) { showToast('Case ID missing', 'danger'); return; }
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}`);
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            document.getElementById('case-id').textContent = data.id;
+            document.getElementById('lawyer-name').textContent = data.lawyer_id; // replace with more friendly name in real app
+            document.getElementById('case-status').textContent = data.status;
+            document.getElementById('case-created').textContent = new Date(data.created_at).toLocaleString();
+            document.getElementById('case-stage').textContent = data.workflow_stage;
+            const list = document.getElementById('document-list');
+            list.innerHTML = '';
+            data.documents.forEach(doc => {
+                const li = document.createElement('li');
+                // Inline preview for images, PDFs, and office docs
+                const ext = doc.document_file.split('.').pop().toLowerCase();
+                if (['png','jpg','jpeg','gif'].includes(ext)) {
+                    const img = document.createElement('img');
+                    img.src = `/static/uploads/${doc.document_file}`;
+                    img.alt = doc.document_type;
+                    img.style.maxWidth = '200px';
+                    img.style.display = 'block';
+                    li.appendChild(img);
+                } else if (ext === 'pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `/static/uploads/${doc.document_file}`;
+                    iframe.width = '200';
+                    iframe.height = '250';
+                    iframe.style.border = 'none';
+                    li.appendChild(iframe);
+                } else if (['doc','docx','ppt','pptx','xls','xlsx','txt'].includes(ext)) {
+                    const iframe = document.createElement('iframe');
+                    const fileUrl = encodeURIComponent(`${window.location.origin}/static/uploads/${doc.document_file}`);
+                    iframe.src = `https://docs.google.com/gview?url=${fileUrl}&embedded=true`;
+                    iframe.width = '200';
+                    iframe.height = '250';
+                    iframe.style.border = 'none';
+                    li.appendChild(iframe);
+                }
+                const a = document.createElement('a');
+                a.href = `/static/uploads/${doc.document_file}`;
+                a.textContent = `${doc.document_type} (${doc.uploaded_at})`;
+                a.target = '_blank';
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+            document.getElementById('case-container').style.display = 'block';
+                // Update workflow bar visual based on stage
+                const stage = data.workflow_stage.toLowerCase();
+                document.getElementById('stage-pending').classList.remove('active');
+                document.getElementById('stage-docs').classList.remove('active');
+                document.getElementById('stage-verified').classList.remove('active');
+                if (stage === 'pending') {
+                    document.getElementById('stage-pending').classList.add('active');
+                } else if (stage === 'documents_uploaded') {
+                    document.getElementById('stage-docs').classList.add('active');
+                } else if (stage === 'verified') {
+                    document.getElementById('stage-verified').classList.add('active');
+                }
+        } catch (e) {
+            showToast(e.message, 'danger');
+        }
+    }
+    document.getElementById('upload-btn').addEventListener('click',()=>{
+        document.getElementById('file-input').click();
+    });
+    document.getElementById('file-input').addEventListener('change', async (e)=>{
+        const file = e.target.files[0];
+        if (!file) return;
+        const caseId = getCaseId();
+        const form = new FormData();
+        form.append('file', file);
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}/documents`, {
+                method: 'POST',
+                body: form
+            });
+            if (!res.ok) throw new Error('Upload failed');
+            showToast('Document uploaded', 'success');
+            loadCase(); // refresh list
+        } catch (err) {
+            showToast(err.message, 'danger');
         }
     });
-
-    function updateFileName(input) {
-        const preview = document.getElementById('fileNamePreview');
-        if (input.files && input.files.length > 0) {
-            preview.textContent = input.files[0].name;
-            preview.style.display = 'block';
-        } else {
-            preview.style.display = 'none';
-        }
-    }
-
-    const textarea = document.querySelector('.chat-textarea');
-    if (textarea) {
-        textarea.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                const fileInput = document.getElementById('chatAttachment');
-                if (this.value.trim() !== '' || (fileInput && fileInput.files.length > 0)) {
-                    this.closest('form').submit();
-                }
-            }
-        });
-    }
+    loadCase();
 </script>
 {% endblock %}

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Document Verification — DivorceConnect Admin{% endblock %}
 
 {% block extra_css %}
@@ -231,6 +230,7 @@
         text-decoration: none;
         transition: all 0.2s ease;
         white-space: nowrap;
+        cursor: pointer;
     }
     .dv-btn-download {
         background: #f4f4f5;
@@ -250,6 +250,22 @@
         background: #1a1a1a;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         transform: translateY(-1px);
+    }
+    .dv-btn-approve {
+        background: #10b981;
+        color: #ffffff;
+        border: 1px solid #10b981;
+    }
+    .dv-btn-approve:hover {
+        background: #059669;
+    }
+    .dv-btn-reject {
+        background: #ef4444;
+        color: #ffffff;
+        border: 1px solid #ef4444;
+    }
+    .dv-btn-reject:hover {
+        background: #dc2626;
     }
 
     /* Rejection reason strip */
@@ -311,14 +327,11 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
-
-    /* Arrow icon for view all */
-    .arrow-icon { font-style: normal; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dv-page">
+<div class="dv-page" id="dashboard-container" style="display: none;">
     <div class="max-w-6xl mx-auto">
 
         <!-- ── Hero Header ── -->
@@ -341,7 +354,7 @@
                 </div>
                 <div>
                     <div class="dv-stat-label">Pending Documents</div>
-                    <div class="dv-stat-value">{{ total_pending }}</div>
+                    <div class="dv-stat-value" id="stat-pending-docs">0</div>
                 </div>
             </div>
 
@@ -354,7 +367,7 @@
                 </div>
                 <div>
                     <div class="dv-stat-label">Cases to Review</div>
-                    <div class="dv-stat-value">{{ cases_with_pending_docs|length }}</div>
+                    <div class="dv-stat-value" id="stat-cases-review">0</div>
                 </div>
             </div>
 
@@ -367,104 +380,21 @@
                 </div>
                 <div>
                     <div class="dv-stat-label">Total Cases</div>
-                    <div class="dv-stat-value">{{ cases_with_pending_docs|length }}</div>
+                    <div class="dv-stat-value" id="stat-total-cases">0</div>
                 </div>
             </div>
         </div>
 
         <!-- ── Cases List ── -->
-        {% if cases_with_pending_docs %}
-        <p class="dv-section-label">Pending Case Documents</p>
-        <div>
-            {% for case_data in cases_with_pending_docs %}
-            <div class="dv-case-card">
-
-                <!-- Case Header -->
-                <div class="dv-case-header">
-                    <div>
-                        <p class="dv-case-title">
-                            {{ case_data.case_request.client.get_full_name }}
-                            <span style="opacity:0.55; font-size:0.85em; margin:0 0.3rem;">→</span>
-                            {{ case_data.case_request.lawyer.full_name }}
-                        </p>
-                        <p class="dv-case-meta">
-                            Case ID <span>#{{ case_data.case_request.id }}</span>
-                            &nbsp;·&nbsp;
-                            Submitted {{ case_data.case_request.documents_submitted_at|date:"M d, Y · H:i" }}
-                        </p>
-                    </div>
-                    <a href="/case_details_for_admin/" class="dv-view-all-btn">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        View All
-                    </a>
-                </div>
-
-                <!-- Documents -->
-                {% for document in case_data.documents %}
-                <div class="dv-doc-row">
-                    <!-- Document Info -->
-                    <div style="flex:1; min-width:150px;">
-                        <p class="dv-doc-name">
-                            <svg class="w-4 h-4" style="display:inline;vertical-align:-3px;margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                            </svg>
-                            {{ document.get_document_type_display }}
-                        </p>
-                        <p class="dv-doc-date">Uploaded: {{ document.uploaded_at|date:"M d, Y · H:i" }}</p>
-                    </div>
-
-                    <!-- Status Badge -->
-                    <div style="flex-shrink:0;">
-                        {% if document.casedocumentverification %}
-                            {% if document.casedocumentverification.status == 'PENDING' %}
-                            <span class="dv-badge pending">⏳ Pending</span>
-                            {% elif document.casedocumentverification.status == 'VERIFIED' %}
-                            <span class="dv-badge verified">✓ Verified</span>
-                            {% elif document.casedocumentverification.status == 'REJECTED' %}
-                            <span class="dv-badge rejected">✗ Rejected</span>
-                            {% endif %}
-                        {% else %}
-                        <span class="dv-badge not-started">⏳ Not Started</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="dv-actions">
-                        <a href="{{ document.document_file.url }}" class="dv-btn dv-btn-download" download>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            Download
-                        </a>
-                        {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
-                        <a href="/case_document_verify/" class="dv-btn dv-btn-review">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            Review
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Rejection Reason (if any) -->
-                {% if document.casedocumentverification and document.casedocumentverification.rejection_reason %}
-                <div class="dv-rejection">
-                    <strong>Rejection Reason:</strong> {{ document.casedocumentverification.rejection_reason }}
-                </div>
-                {% endif %}
-
-                {% endfor %}
+        <div id="cases-section-wrapper" class="hidden">
+            <p class="dv-section-label">Pending Case Documents</p>
+            <div id="cases-container">
+                <!-- Populated via JS -->
             </div>
-            {% endfor %}
         </div>
 
-        {% else %}
         <!-- ── Empty State ── -->
-        <div class="dv-empty">
+        <div class="dv-empty hidden" id="empty-state">
             <div class="dv-empty-icon">
                 <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -479,8 +409,186 @@
                 Back to Dashboard
             </a>
         </div>
-        {% endif %}
 
     </div>
 </div>
+
+<script>
+    async function loadVerificationList() {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/admin/documents/verification-list', {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            if (!resp.ok) {
+                console.error("Failed to load verification list dashboard");
+                return;
+            }
+
+            const data = await resp.json();
+
+            // Populate Stats
+            document.getElementById("stat-pending-docs").innerText = data.total_pending;
+            document.getElementById("stat-cases-review").innerText = data.cases_with_pending_docs.length;
+            document.getElementById("stat-total-cases").innerText = data.cases_with_pending_docs.length;
+
+            const casesWrapper = document.getElementById("cases-section-wrapper");
+            const casesContainer = document.getElementById("cases-container");
+            const emptyState = document.getElementById("empty-state");
+
+            casesContainer.innerHTML = "";
+
+            if (data.cases_with_pending_docs.length === 0) {
+                casesWrapper.classList.add("hidden");
+                emptyState.classList.remove("hidden");
+            } else {
+                emptyState.classList.add("hidden");
+                casesWrapper.classList.remove("hidden");
+
+                data.cases_with_pending_docs.forEach(caseData => {
+                    const card = document.createElement("div");
+                    card.className = "dv-case-card";
+
+                    // Build documents list
+                    let docsHtml = "";
+                    caseData.documents.forEach(doc => {
+                        // Badge HTML
+                        let badgeHtml = '<span class="dv-badge not-started">⏳ Not Started</span>';
+                        if (doc.verification) {
+                            if (doc.verification.status === 'PENDING') {
+                                badgeHtml = '<span class="dv-badge pending">⏳ Pending</span>';
+                            } else if (doc.verification.status === 'VERIFIED') {
+                                badgeHtml = '<span class="dv-badge verified">✓ Verified</span>';
+                            } else if (doc.verification.status === 'REJECTED') {
+                                badgeHtml = '<span class="dv-badge rejected">✗ Rejected</span>';
+                            }
+                        }
+
+                        // Rejection Reason
+                        let rejectionHtml = "";
+                        if (doc.verification && doc.verification.status === 'REJECTED' && doc.verification.rejection_reason) {
+                            rejectionHtml = `
+                                <div class="dv-rejection">
+                                    <strong>Rejection Reason:</strong> ${doc.verification.rejection_reason}
+                                </div>
+                            `;
+                        }
+
+                        // Action Buttons
+                        let actionsHtml = `
+                            <a href="${doc.document_file_url}" class="dv-btn dv-btn-download" download>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Download
+                            </a>
+                        `;
+
+                        if (doc.verification && doc.verification.status === 'PENDING') {
+                            actionsHtml += `
+                                <button class="dv-btn dv-btn-approve" onclick="verifyDocument(${doc.id}, 'approve')">
+                                    Approve
+                                </button>
+                                <button class="dv-btn dv-btn-reject" onclick="verifyDocument(${doc.id}, 'reject')">
+                                    Reject
+                                </button>
+                            `;
+                        }
+
+                        docsHtml += `
+                            <div class="dv-doc-row">
+                                <div style="flex:1; min-width:150px;">
+                                    <p class="dv-doc-name">
+                                        <svg class="w-4 h-4" style="display:inline;vertical-align:-3px;margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                        </svg>
+                                        ${doc.document_type_display}
+                                    </p>
+                                    <p class="dv-doc-date">Uploaded: ${doc.uploaded_at}</p>
+                                </div>
+                                <div style="flex-shrink:0;">
+                                    ${badgeHtml}
+                                </div>
+                                <div class="dv-actions">
+                                    ${actionsHtml}
+                                </div>
+                            </div>
+                            ${rejectionHtml}
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <!-- Case Header -->
+                        <div class="dv-case-header">
+                            <div>
+                                <p class="dv-case-title">
+                                    ${caseData.case_request.client.get_full_name}
+                                    <span style="opacity:0.55; font-size:0.85em; margin:0 0.3rem;">→</span>
+                                    ${caseData.case_request.lawyer.full_name}
+                                </p>
+                                <p class="dv-case-meta">
+                                    Case ID <span>#${caseData.case_request.id}</span>
+                                    &nbsp;·&nbsp;
+                                    Submitted ${caseData.case_request.documents_submitted_at}
+                                </p>
+                            </div>
+                            <a href="/case_details_for_admin/" class="dv-view-all-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View All
+                            </a>
+                        </div>
+                        ${docsHtml}
+                    `;
+                    casesContainer.appendChild(card);
+                });
+            }
+
+            document.getElementById("dashboard-container").style.display = "block";
+
+        } catch (err) {
+            console.error("Error loading verification list:", err);
+        }
+    }
+
+    async function verifyDocument(docId, action) {
+        const token = localStorage.getItem("access_token");
+        let rejection_reason = "";
+        
+        if (action === 'reject') {
+            rejection_reason = prompt("Please enter the reason for rejection:");
+            if (rejection_reason === null) return; // cancel click
+        }
+
+        try {
+            const resp = await fetch(`/api/client/admin/documents/${docId}/verify`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ 
+                    action,
+                    rejection_reason
+                })
+            });
+
+            if (!resp.ok) throw new Error('Verification failed');
+            loadVerificationList(); // refresh dashboard
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    // Initial load
+    document.addEventListener("DOMContentLoaded", loadVerificationList);
+</script>
 {% endblock %}
