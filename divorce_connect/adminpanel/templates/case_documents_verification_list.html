@@ -427,6 +427,10 @@
             });
 
             if (!resp.ok) {
+                if (resp.status === 403) {
+                    window.location.href = "/admin_dashboard/";
+                    return;
+                }
                 console.error("Failed to load verification list dashboard");
                 return;
             }
@@ -582,9 +586,16 @@
             });
 
             if (!resp.ok) throw new Error('Verification failed');
+            if (typeof showToastNotification !== 'undefined') {
+                showToastNotification("Success", "Document verification completed successfully!");
+            }
             loadVerificationList(); // refresh dashboard
         } catch (e) {
-            alert(e.message);
+            if (typeof showToastNotification !== 'undefined') {
+                showToastNotification("Error", e.message);
+            } else {
+                alert(e.message);
+            }
         }
     }
 

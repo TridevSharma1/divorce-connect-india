@@ -55,12 +55,18 @@ def send_email(to_address: str, subject: str, html_body: str, purpose: str = "op
     from .tasks import send_email_task
     import asyncio
     
+    async def safe_kiq():
+        try:
+            await send_email_task.kiq(to_address, subject, html_body, purpose)
+        except Exception as e:
+            logger.error(f"Taskiq SendTaskError in background email task: {e}")
+            
     logger.info(f"Scheduling background task to send {purpose} email to {to_address}")
     try:
         loop = asyncio.get_running_loop()
-        loop.create_task(send_email_task.kiq(to_address, subject, html_body, purpose))
+        loop.create_task(safe_kiq())
     except RuntimeError:
-        asyncio.run(send_email_task.kiq(to_address, subject, html_body, purpose))
+        asyncio.run(safe_kiq())
 
 async def create_and_broadcast_notification(
     db,

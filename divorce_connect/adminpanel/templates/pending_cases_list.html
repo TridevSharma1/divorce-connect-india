@@ -194,6 +194,10 @@
             });
 
             if (!res.ok) {
+                if (res.status === 403) {
+                    window.location.href = "/admin_dashboard/";
+                    return;
+                }
                 console.error("Failed to load admin pending cases");
                 return;
             }

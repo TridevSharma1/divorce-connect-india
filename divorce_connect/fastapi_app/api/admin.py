@@ -32,7 +32,7 @@ async def get_admin_dashboard(
     profile_picture = getattr(admin_profile, 'profile_picture', None) if admin_profile else None
     
     # Global stats
-    pending_lawyers_count_res = await db.execute(select(func.count()).select_from(LawyerProfile).where(LawyerProfile.verified == False))
+    pending_lawyers_count_res = await db.execute(select(func.count()).select_from(LawyerProfile).where(LawyerProfile.verified == False, LawyerProfile.is_profile_complete == True))
     pending_lawyers_count = pending_lawyers_count_res.scalar() or 0
     active_cases_count_res = await db.execute(select(func.count()).select_from(CaseRequest).where(CaseRequest.status == 'ACTIVE'))
     active_cases_count = active_cases_count_res.scalar() or 0
@@ -130,7 +130,7 @@ async def get_admin_dashboard(
     # Fetch real pending lawyer requests
     pending_lawyers_res = await db.execute(
         select(LawyerProfile)
-        .where(LawyerProfile.verified == False)
+        .where(LawyerProfile.verified == False, LawyerProfile.is_profile_complete == True)
         .order_by(LawyerProfile.id.desc())
     )
     pending_lawyers = pending_lawyers_res.scalars().all()
@@ -291,6 +291,19 @@ async def update_admin_profile(
     admin_profile.updated_at = datetime.datetime.utcnow()
     
     await db.commit()
+
+    try:
+        from ..notifications import create_and_broadcast_notification
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Profile Verification Pending",
+            message="Your admin profile has been submitted and is pending verification by a superuser.",
+            url="/admin_dashboard/"
+        )
+    except Exception:
+        pass
+
     return {"message": "Admin profile updated successfully", "is_complete": True}
 
 

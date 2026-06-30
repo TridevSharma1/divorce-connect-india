@@ -36,7 +36,9 @@ async def override_get_current_user():
     return active_user
 
 # Setup App Dependency Overrides
-app.dependency_overrides[get_current_user] = override_get_current_user
+@pytest.fixture(autouse=True)
+def setup_overrides():
+    app.dependency_overrides[get_current_user] = override_get_current_user
 
 client = TestClient(app)
 

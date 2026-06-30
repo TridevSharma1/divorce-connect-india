@@ -171,6 +171,42 @@
                 });
             }
         });
+
+        // Global Lawyer Verification Guard
+        document.addEventListener('DOMContentLoaded', async function() {
+            const path = window.location.pathname;
+            const restrictedPaths = [
+                '/lawyer_earnings/', '/lawyer_earnings',
+                '/lawyer_case_orders/', '/lawyer_case_orders',
+                '/lawyer_case_status/', '/lawyer_case_status',
+                '/lawyer_settings/', '/lawyer_settings',
+                '/lawyer_billing/', '/lawyer_billing'
+            ];
+
+            if (restrictedPaths.some(p => path === p || path.startsWith(p))) {
+                const token = localStorage.getItem("access_token");
+                if (!token) {
+                    window.location.href = "/login/";
+                    return;
+                }
+                try {
+                    const res = await fetch("/api/lawyer/dashboard", {
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.is_verified) {
+                            console.warn("Unverified lawyer. Redirecting to lawyer dashboard...");
+                            window.location.href = "/lawyer_dashboard/";
+                        }
+                    } else if (res.status === 401 || res.status === 403) {
+                        window.location.href = "/login/";
+                    }
+                } catch (e) {
+                    console.error("Verification guard check failed:", e);
+                }
+            }
+        });
     </script>
 
 </body>

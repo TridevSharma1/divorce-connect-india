@@ -253,14 +253,25 @@
                 });
 
                 if (res.ok) {
-                    alert("Profile submitted successfully! Admin will verify your account shortly.");
+                    sessionStorage.setItem("queued_toast", JSON.stringify({
+                        title: "Profile Submitted",
+                        message: "Profile submitted successfully! Admin will verify your account shortly."
+                    }));
                     window.location.href = "/lawyer_dashboard/";
                 } else {
                     const err = await res.json();
-                    alert(err.detail || "Failed to update profile.");
+                    if (typeof showToastNotification !== 'undefined') {
+                        showToastNotification("Error", err.detail || "Failed to update profile.");
+                    } else {
+                        alert(err.detail || "Failed to update profile.");
+                    }
                 }
             } catch (err) {
-                alert("Network error. Please try again.");
+                if (typeof showToastNotification !== 'undefined') {
+                    showToastNotification("Error", "Network error. Please try again.");
+                } else {
+                    alert("Network error. Please try again.");
+                }
             }
         });
     });

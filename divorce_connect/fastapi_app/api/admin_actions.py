@@ -4,20 +4,38 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Dict, Any
 
 from ..database import get_db
-from ..models import User, LawyerProfile
+from ..models import User, LawyerProfile, AdminPanelProfile
 from ..security import get_current_user
 
 router = APIRouter()
 
-@router.get("/lawyers/pending")
-async def list_pending_lawyers(
+async def check_verified_admin(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    if not current_user.is_staff:
+    if not (current_user.is_staff or current_user.role == "admin"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         
-    res = await db.execute(select(LawyerProfile).where(LawyerProfile.verified == False))
+    admin_profile_res = await db.execute(
+        select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id)
+    )
+    admin_profile = admin_profile_res.scalar_one_or_none()
+    if not admin_profile or not admin_profile.is_verified_by_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin account not verified by superuser"
+        )
+    return current_user
+
+@router.get("/lawyers/pending")
+async def list_pending_lawyers(
+    current_user: User = Depends(check_verified_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    res = await db.execute(
+        select(LawyerProfile)
+        .where(LawyerProfile.verified == False, LawyerProfile.is_profile_complete == True)
+    )
     lawyers = res.scalars().all()
     
     return [
@@ -36,12 +54,9 @@ async def list_pending_lawyers(
 async def verify_lawyer(
     lawyer_id: int,
     action: str, # "approve" or "reject"
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    if not current_user.is_staff:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-        
     res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == lawyer_id))
     lawyer = res.scalar_one_or_none()
     if not lawyer:
@@ -49,8 +64,30 @@ async def verify_lawyer(
         
     if action == "approve":
         lawyer.verified = True
+        try:
+            from ..notifications import create_and_broadcast_notification
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=lawyer.user_id,
+                title="Account Approved",
+                message="Congratulations! Your lawyer profile has been verified and approved by admin.",
+                url="/lawyer_dashboard/"
+            )
+        except Exception:
+            pass
     elif action == "reject":
         lawyer.verified = False
+        try:
+            from ..notifications import create_and_broadcast_notification
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=lawyer.user_id,
+                title="Account Rejected",
+                message="Your profile verification was rejected. Please edit your details and re-submit.",
+                url="/lawyer_profile_edit/"
+            )
+        except Exception:
+            pass
         
     await db.commit()
     return {"message": f"Lawyer status updated to {action}"}
@@ -59,12 +96,9 @@ from ..models import CaseRequest, ClientProfile, LawyerProfile, User
 from sqlalchemy.orm import aliased
 @router.get("/cases")
 async def list_cases_for_admin(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    if not current_user.is_staff:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-        
     ClientUser = aliased(User)
     LawyerUser = aliased(User)
     
@@ -96,12 +130,9 @@ from ..models import CaseDocumentVerification, CaseDocument
 from sqlalchemy import func
 @router.get("/documents/verification-list")
 async def get_document_verification_list(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    if not (current_user.is_staff or current_user.role == "admin"):
-        raise HTTPException(status_code=403, detail="Access denied")
-
     # 1. Calculate total pending documents
     pending_count_res = await db.execute(
         select(func.count(CaseDocumentVerification.id))

@@ -115,6 +115,7 @@ async def register_user(
         password=hashed_password,
         first_name=user_in.first_name,
         last_name=user_in.last_name,
+        role=user_in.role,
         is_active=False,  # Inactive until OTP verified
         is_staff=(user_in.role == 'admin')
     )
@@ -236,15 +237,19 @@ async def login_for_access_token(
     }
 
 
+class TokenRefreshRequest(BaseModel):
+    refresh: str
+
 @router.post("/token/refresh", response_model=Token)
 async def refresh_access_token(
-    refresh_token: str,
+    payload: TokenRefreshRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """
     Take a refresh token and return a new access token.
     Replaces DRF's TokenRefreshView.
     """
+    refresh_token = payload.refresh
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

@@ -9,6 +9,24 @@ from ..security import get_current_user
 
 router = APIRouter()
 
+async def check_verified_lawyer(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if current_user.role != "lawyer":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        
+    lawyer_profile_res = await db.execute(
+        select(LawyerProfile).where(LawyerProfile.user_id == current_user.id)
+    )
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile or not lawyer_profile.verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Lawyer account not verified by admin or superuser"
+        )
+    return current_user
+
 @router.get("/dashboard")
 async def get_lawyer_dashboard(
     current_user: User = Depends(get_current_user),
@@ -98,7 +116,7 @@ async def get_lawyer_dashboard(
 
 @router.get("/case-requests")
 async def list_case_requests(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_admin if False else check_verified_lawyer),
     db: Session = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
@@ -131,7 +149,7 @@ async def respond_case_request(
     request_id: int,
     action: str, # "accept" or "reject"
     response_message: str = "",
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_lawyer),
     db: Session = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
@@ -158,7 +176,7 @@ async def respond_case_request(
 
 @router.get("/earnings")
 async def get_lawyer_earnings(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_lawyer),
     db: Session = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
@@ -254,7 +272,7 @@ async def get_lawyer_earnings(
 
 @router.get("/cases")
 async def get_lawyer_cases(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(check_verified_lawyer),
     db: Session = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
@@ -401,13 +419,27 @@ async def update_lawyer_profile_endpoint(
 
     try:
         from ..notifications import create_and_broadcast_notification
+        # 1. Notify the lawyer
         await create_and_broadcast_notification(
             db=db,
             user_id=current_user.id,
-            title="Profile Updated",
-            message="Your lawyer profile has been successfully updated.",
-            url="/lawyer_profile_edit/"
+            title="Profile Submitted",
+            message="Your profile has been submitted and is pending verification.",
+            url="/lawyer_dashboard/"
         )
+        # 2. Notify all admins
+        admins_res = await db.execute(
+            select(User).where((User.role == "admin") | (User.is_staff == True))
+        )
+        admins = admins_res.scalars().all()
+        for admin in admins:
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=admin.id,
+                title="Lawyer Verification Pending",
+                message=f"Lawyer {profile.full_name} has submitted their profile and is pending verification.",
+                url="/admin_dashboard/"
+            )
     except Exception:
         pass
         

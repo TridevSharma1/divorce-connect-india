@@ -116,6 +116,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
         if (!res.ok) {
+            if (res.status === 403) {
+                window.location.href = "/lawyer_dashboard/";
+                return;
+            }
             console.error("Failed to load case requests", res.status);
             return;
         }
@@ -189,14 +193,25 @@ async function respondRequest(reqId, action) {
             }
         });
         if (res.ok) {
-            alert(`Request ${action}ed successfully!`);
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: action === 'accept' ? 'Request Accepted' : 'Request Rejected',
+                message: `Request has been ${action}ed successfully!`
+            }));
             window.location.reload();
         } else {
             const err = await res.json();
-            alert(err.detail || "Action failed");
+            if (typeof showToastNotification !== 'undefined') {
+                showToastNotification("Error", err.detail || "Action failed");
+            } else {
+                alert(err.detail || "Action failed");
+            }
         }
     } catch (e) {
-        alert("Network error");
+        if (typeof showToastNotification !== 'undefined') {
+            showToastNotification("Error", "Network error. Please try again.");
+        } else {
+            alert("Network error");
+        }
     }
 }
 </script>

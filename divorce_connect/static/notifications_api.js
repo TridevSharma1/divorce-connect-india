@@ -12,20 +12,26 @@ async function updateNavbarNotifications() {
     return;
   }
 
-  // Find DOM elements dynamically across client, lawyer, and admin navbars
-  const badge = document.getElementById('notification-badge') || 
-                document.getElementById('admin-notification-badge') || 
-                document.getElementById('notificationDot');
+  // Find all DOM elements across client, lawyer, and admin navbars
+  const badges = [
+    document.getElementById('notification-badge'),
+    document.getElementById('admin-notification-badge'),
+    document.getElementById('notificationDot')
+  ].filter(Boolean);
                 
-  const listContainer = document.querySelector('.notifications-list') || 
-                        document.querySelector('.admin-notifications-list') || 
-                        document.getElementById('notificationsList');
+  const listContainers = [
+    document.querySelector('#nav-client .notifications-list'),
+    document.querySelector('#nav-admin .notifications-list'),
+    document.getElementById('notificationsList')
+  ].filter(Boolean);
                         
-  const markAllReadBtn = document.getElementById('mark-all-read') || 
-                        document.getElementById('admin-mark-all-read') || 
-                        document.getElementById('markAllRead');
+  const markAllReadBtns = [
+    document.getElementById('mark-all-read'),
+    document.getElementById('admin-mark-all-read'),
+    document.getElementById('markAllRead')
+  ].filter(Boolean);
 
-  if (!listContainer) return; // No notifications layout on this page
+  if (listContainers.length === 0) return; // No notifications layout on this page
 
   try {
     let response = await fetch('/api/notifications/', {
@@ -51,40 +57,42 @@ async function updateNavbarNotifications() {
 
     const notifications = await response.json();
     
-    // Render list
-    listContainer.innerHTML = '';
-    
-    if (notifications.length === 0) {
-      listContainer.innerHTML = '<div class="p-4 text-center text-xs text-gray-400">No notifications yet.</div>';
-    } else {
-      notifications.forEach(n => {
-        const itemHTML = createNotificationItemHTML(n);
-        listContainer.insertAdjacentHTML('beforeend', itemHTML);
-      });
-    }
+    // Render list in all containers
+    listContainers.forEach(listContainer => {
+      listContainer.innerHTML = '';
+      
+      if (notifications.length === 0) {
+        listContainer.innerHTML = '<div class="p-4 text-center text-xs text-gray-400">No notifications yet.</div>';
+      } else {
+        notifications.forEach(n => {
+          const itemHTML = createNotificationItemHTML(n);
+          listContainer.insertAdjacentHTML('beforeend', itemHTML);
+        });
+      }
 
-    // Attach click handlers to dynamic items
-    listContainer.querySelectorAll('.notification-item').forEach(item => {
-      item.addEventListener('click', async function(e) {
-        const id = this.getAttribute('data-id');
-        const isRead = !this.classList.contains('bg-gray-50');
-        if (!isRead) {
-          e.preventDefault();
-          const targetUrl = this.getAttribute('href');
-          await markAsRead(id, this);
-          if (targetUrl && targetUrl !== '#') {
-            window.location.href = targetUrl;
+      // Attach click handlers to dynamic items
+      listContainer.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', async function(e) {
+          const id = this.getAttribute('data-id');
+          const isRead = !this.classList.contains('bg-gray-50');
+          if (!isRead) {
+            e.preventDefault();
+            const targetUrl = this.getAttribute('href');
+            await markAsRead(id, this);
+            if (targetUrl && targetUrl !== '#') {
+              window.location.href = targetUrl;
+            }
           }
-        }
+        });
       });
     });
 
-    // Update UI badge
+    // Update all UI badges
     const unreadCount = notifications.filter(n => !n.is_read).length;
-    updateBadgeUI(unreadCount, badge);
+    badges.forEach(badge => updateBadgeUI(unreadCount, badge));
 
-    // Hook mark all read button
-    if (markAllReadBtn) {
+    // Hook all mark all read buttons
+    markAllReadBtns.forEach(markAllReadBtn => {
       markAllReadBtn.onclick = async function(e) {
         e.preventDefault();
         try {
@@ -96,19 +104,21 @@ async function updateNavbarNotifications() {
             }
           });
           if (res.ok) {
-            listContainer.querySelectorAll('.notification-item').forEach(item => {
-              item.classList.remove('bg-gray-50');
-              item.classList.add('bg-white');
-              const indicator = item.querySelector('.unread-indicator');
-              if (indicator) indicator.remove();
+            listContainers.forEach(listContainer => {
+              listContainer.querySelectorAll('.notification-item').forEach(item => {
+                item.classList.remove('bg-gray-50');
+                item.classList.add('bg-white');
+                const indicator = item.querySelector('.unread-indicator');
+                if (indicator) indicator.remove();
+              });
             });
-            updateBadgeUI(0, badge);
+            badges.forEach(badge => updateBadgeUI(0, badge));
           }
         } catch (err) {
           console.error("Error marking all read:", err);
         }
       };
-    }
+    });
 
   } catch (error) {
     console.error("Error updating notifications list:", error);
@@ -146,16 +156,21 @@ async function markAsRead(id, element) {
       const indicator = element.querySelector('.unread-indicator');
       if (indicator) indicator.remove();
       
-      // Decrement badge count
-      const badge = document.getElementById('notification-badge') || 
-                    document.getElementById('admin-notification-badge') || 
-                    document.getElementById('notificationDot');
-      if (badge && badge.innerText.trim()) {
-        let currentCount = parseInt(badge.innerText.trim());
-        if (!isNaN(currentCount) && currentCount > 0) {
-          updateBadgeUI(currentCount - 1, badge);
+      // Decrement badge count across all active badges
+      const badges = [
+        document.getElementById('notification-badge'),
+        document.getElementById('admin-notification-badge'),
+        document.getElementById('notificationDot')
+      ].filter(Boolean);
+      
+      badges.forEach(badge => {
+        if (badge && badge.innerText.trim()) {
+          let currentCount = parseInt(badge.innerText.trim());
+          if (!isNaN(currentCount) && currentCount > 0) {
+            updateBadgeUI(currentCount - 1, badge);
+          }
         }
-      }
+      });
     }
   } catch (err) {
     console.error("Failed to mark notification as read:", err);
@@ -188,6 +203,21 @@ function createNotificationItemHTML(notification) {
   `;
 }
 
+function decodeJWT(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+    const jsonPayload = decodeURIComponent(atob(base64 + padding).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("JWT decoding failed:", e);
+    return null;
+  }
+}
+
 // WebSocket setup for real-time notifications
 let notificationWS = null;
 function connectNotificationWS() {
@@ -200,7 +230,8 @@ function connectNotificationWS() {
 
   let wsUrl;
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = decodeJWT(token);
+    if (!payload) throw new Error("Decoded token payload is null");
     const userId = payload.user_id || payload.sub;
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     wsUrl = `${protocol}${window.location.host}/ws/notifications/${userId}?token=${encodeURIComponent(token)}`;
@@ -225,11 +256,11 @@ function connectNotificationWS() {
       message = data.substring(colonIndex + 1).trim();
     }
 
-    // Refresh navbar to render the new notification from DB
-    updateNavbarNotifications();
-
     // Show premium Toast alert
     showToastNotification(title, message);
+
+    // Refresh navbar to render the new notification from DB
+    updateNavbarNotifications();
   };
 
   notificationWS.onclose = function(e) {
@@ -297,7 +328,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch('/api/token/refresh/', {
+    const response = await fetch('/api/auth/token/refresh', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -307,9 +338,9 @@ async function refreshAccessToken() {
 
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem('access_token', data.access);
-      if (data.refresh) {
-        localStorage.setItem('refresh_token', data.refresh);
+      localStorage.setItem('access_token', data.access_token || data.access);
+      if (data.refresh_token || data.refresh) {
+        localStorage.setItem('refresh_token', data.refresh_token || data.refresh);
       }
       return true;
     }
@@ -323,4 +354,16 @@ async function refreshAccessToken() {
 document.addEventListener('DOMContentLoaded', () => {
   updateNavbarNotifications();
   connectNotificationWS();
+  
+  // Check for queued toast notifications in sessionStorage
+  const queuedToast = sessionStorage.getItem("queued_toast");
+  if (queuedToast) {
+    try {
+      const parsed = JSON.parse(queuedToast);
+      showToastNotification(parsed.title || "Notification", parsed.message || "");
+    } catch (e) {
+      showToastNotification("Notification", queuedToast);
+    }
+    sessionStorage.removeItem("queued_toast");
+  }
 });

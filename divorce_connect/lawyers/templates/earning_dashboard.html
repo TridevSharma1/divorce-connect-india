@@ -176,6 +176,10 @@
                 });
 
                 if (!res.ok) {
+                    if (res.status === 403) {
+                        window.location.href = "/lawyer_dashboard/";
+                        return;
+                    }
                     console.error("Failed to load earnings dashboard data");
                     return;
                 }
