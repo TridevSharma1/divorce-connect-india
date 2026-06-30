@@ -29,9 +29,9 @@ node_modules/
 Thumbs.db
 
 # Django sensitive/local files
-settings.py
-settings_local.py
-local_settings.py
+# settings.py
+# settings_local.py
+# local_settings.py
 
 
 
