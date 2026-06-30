@@ -50,6 +50,7 @@ async def create_notification(
 
 
 @router.post("/mark-all-read", status_code=status.HTTP_200_OK)
+@router.post("/mark-all-read/", status_code=status.HTTP_200_OK)
 async def mark_all_as_read(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
