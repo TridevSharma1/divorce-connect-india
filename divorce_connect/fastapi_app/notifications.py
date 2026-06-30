@@ -52,44 +52,14 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 def send_email(to_address: str, subject: str, html_body: str, purpose: str = "operations"):
-    if purpose == "auth":
-        smtp_host = os.getenv("SMTP_AUTH_HOST", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_AUTH_PORT", "587"))
-        smtp_user = os.getenv("SMTP_AUTH_USER", "")
-        smtp_password = os.getenv("SMTP_AUTH_PASSWORD", "")
-        smtp_use_tls = os.getenv("SMTP_AUTH_USE_TLS", "True").lower() in ("true", "1")
-    else:
-        smtp_host = os.getenv("SMTP_OPERATIONS_HOST", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_OPERATIONS_PORT", "587"))
-        smtp_user = os.getenv("SMTP_OPERATIONS_USER", "")
-        smtp_password = os.getenv("SMTP_OPERATIONS_PASSWORD", "")
-        smtp_use_tls = os.getenv("SMTP_OPERATIONS_USE_TLS", "True").lower() in ("true", "1")
-
-    # Fallback to general SMTP settings if specific settings are empty
-    if not smtp_user or not smtp_password:
-        smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_PORT", "587"))
-        smtp_user = os.getenv("SMTP_USER", "")
-        smtp_password = os.getenv("SMTP_PASSWORD", "")
-        smtp_use_tls = os.getenv("SMTP_USE_TLS", "True").lower() in ("true", "1")
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = f"DivorceConnect India <{smtp_user or 'noreply@divorceconnect.in'}>"
-    msg["To"] = to_address
-    msg.attach(MIMEText(html_body, "html"))
-
+    from .tasks import send_email_task
+    import asyncio
+    
+    logger.info(f"Scheduling background task to send {purpose} email to {to_address}")
     try:
-        logger.info(f"Sending email via {purpose} SMTP to {to_address} (Host: {smtp_host}, User: {smtp_user})")
-        server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-        if smtp_use_tls:
-            server.starttls()
-        if smtp_user and smtp_password:
-            server.login(smtp_user, smtp_password)
-        server.sendmail(msg["From"], [to_address], msg.as_string())
-        server.quit()
-        logger.info("Email sent successfully.")
-    except Exception as e:
-        logger.warning(f"SMTP sending failed ({e}). Logging email to console instead.")
-        logger.info(f"\n--- [DEV EMAIL LOG] ---\nTo: {to_address}\nSubject: {subject}\nBody:\n{html_body}\n-----------------------\n")
+        loop = asyncio.get_running_loop()
+        loop.create_task(send_email_task.kiq(to_address, subject, html_body, purpose))
+    except RuntimeError:
+        asyncio.run(send_email_task.kiq(to_address, subject, html_body, purpose))
+
 

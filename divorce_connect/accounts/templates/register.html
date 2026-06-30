@@ -151,8 +151,14 @@
                 });
 
                 if (response.ok) {
-                    alert('Account created successfully! Please sign in.');
-                    window.location.href = "/login/"; 
+                    const data = await response.json();
+                    if (data.redirect) {
+                        sessionStorage.setItem("pending_otp_email", data.email);
+                        window.location.href = data.redirect;
+                    } else {
+                        alert('Account created successfully! Please sign in.');
+                        window.location.href = "/login/"; 
+                    }
                 } else {
                     const errorData = await response.json();
                     errorDiv.textContent = errorData.detail || 'Registration failed. Please try again.';

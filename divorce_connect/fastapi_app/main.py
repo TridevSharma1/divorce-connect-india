@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+from jose import JWTError, jwt
+from .security import SECRET_KEY, ALGORITHM
 
 from .database import engine
 from .models import Base
@@ -48,6 +50,11 @@ class DjangoToJinjaFileSystemLoader(jinja2.FileSystemLoader):
             r'{{ ((\1 | float / \2 | float) * \3) | int }}',
             contents
         )
+        # Django forloop variables to Jinja2 loop variables translation
+        contents = re.sub(r'forloop\.counter0', r'loop.index0', contents)
+        contents = re.sub(r'forloop\.counter', r'loop.index', contents)
+        contents = re.sub(r'forloop\.first', r'loop.first', contents)
+        contents = re.sub(r'forloop\.last', r'loop.last', contents)
         return contents, filename, uptodate
 
 templates.env.loader = DjangoToJinjaFileSystemLoader([str(d) for d in TEMPLATES_DIRS if d.exists()])
@@ -145,7 +152,30 @@ app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 app.include_router(reminders.router, prefix="/api/reminders", tags=["Reminders"])
 
 @app.websocket("/ws/notifications/{user_id}")
-async def websocket_notifications(websocket: WebSocket, user_id: int):
+async def websocket_notifications(
+    websocket: WebSocket, 
+    user_id: int, 
+    token: str | None = Query(None)
+):
+    if not token:
+        await websocket.accept()
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+        
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        token_type = payload.get("type")
+        
+        if not email or token_type != "access":
+            await websocket.accept()
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+    except JWTError:
+        await websocket.accept()
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
     await manager.connect(websocket, user_id)
     try:
         while True:
@@ -199,7 +229,11 @@ async def dynamic_page(request: Request, page_path: str):
         page_path = page_path[:-1]
         
     # Map the client profile paths to the actual template file name
-    if page_path in ["client_profile", "profile/edit"]:
+    if page_path in ["verify-otp", "verify_otp"]:
+        template_name = "verify_otp.html"
+    elif page_path in ["verify-register-otp", "verify_register_otp"]:
+        template_name = "verify_register_otp.html"
+    elif page_path in ["client_profile", "profile/edit"]:
         template_name = "edit_profile_client.html"
     elif page_path in ["delete-account", "api/auth/delete-account"]:
         template_name = "request_delete_account.html"

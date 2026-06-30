@@ -30,6 +30,9 @@ class User(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
+    def get_full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip() or self.email
+
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
 
@@ -45,6 +48,18 @@ class Notification(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="notifications")
+
+
+class OTPCode(Base):
+    __tablename__ = "accounts_otpcode"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("accounts_baseuser.id", ondelete="CASCADE"))
+    code: Mapped[str] = mapped_column(String(6))
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    is_used: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    user = relationship("User", backref="otp_codes")
 
 
 class ClientProfile(Base):

@@ -87,7 +87,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" id="verify-btn"
                         class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm tracking-wide">
                         Verify &amp; Create Account →
                     </button>
@@ -135,6 +135,13 @@
         function updateHidden() { hidden.value = [...boxes].map(b => b.value).join(''); }
         boxes[0].focus();
 
+        // Populate email from sessionStorage
+        const emailDisplay = document.querySelector('strong.text-gray-900');
+        const pendingEmail = sessionStorage.getItem("pending_otp_email");
+        if (pendingEmail && emailDisplay) {
+            emailDisplay.textContent = pendingEmail;
+        }
+
         // countdown
         let totalSeconds = 600;
         const circle = document.getElementById('timer-circle');
@@ -144,14 +151,76 @@
             const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
             const s = (totalSeconds % 60).toString().padStart(2, '0');
             display.textContent = `${m}:${s}`;
-            circle.style.strokeDashoffset = 188 - (totalSeconds / 600) * 188;
+            if (circle) circle.style.strokeDashoffset = 188 - (totalSeconds / 600) * 188;
             if (totalSeconds <= 0) { clearInterval(interval); display.textContent = '00:00'; display.style.color = '#dc2626'; }
         }, 1000);
 
+        // Submit via AJAX/fetch
+        document.getElementById('reg-otp-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            updateHidden();
+            const otp = hidden.value;
+            const email = sessionStorage.getItem("pending_otp_email");
+            const verifyBtn = document.getElementById('verify-btn');
+            
+            if (!email) {
+                alert("Session expired. Please start the registration process again.");
+                window.location.href = "/register/";
+                return;
+            }
+            if (otp.length < 6) {
+                alert("Please enter the full 6-digit code.");
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = "Verifying...";
+            
+            try {
+                const response = await fetch('/api/auth/verify-register-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, otp: otp })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    sessionStorage.removeItem("pending_otp_email");
+                    
+                    if (data.role === 'lawyer') {
+                        window.location.href = "/lawyer_dashboard/";
+                    } else if (data.role === 'admin') {
+                        window.location.href = "/admin_dashboard/";
+                    } else {
+                        window.location.href = "/client_dashboard/";
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || "Invalid OTP code.");
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = "Verify & Continue →";
+                }
+            } catch (err) {
+                alert("Network error occurred.");
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = "Verify & Continue →";
+            }
+        });
+
         // auto-submit
-        boxes.forEach(b => b.addEventListener('input', () => {
-            if ([...boxes].every(b => b.value)) { updateHidden(); setTimeout(() => document.getElementById('reg-otp-form').submit(), 300); }
-        }));
+        function checkAutoSubmit() {
+            if ([...boxes].every(b => b.value)) {
+                updateHidden();
+                setTimeout(() => {
+                    const form = document.getElementById('reg-otp-form');
+                    form.dispatchEvent(new Event('submit'));
+                }, 300);
+            }
+        }
+        boxes.forEach(b => b.addEventListener('input', checkAutoSubmit));
     </script>
 </body>
 </html>

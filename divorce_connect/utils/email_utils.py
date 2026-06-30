@@ -13,40 +13,19 @@ PURPOSE_AUTH = "auth"
 PURPOSE_OPERATIONS = "operations"
 
 
-def get_email_connection(purpose: str):
-    """Return a live SMTP connection based on the purpose."""
-    config = settings.SMTP_AUTH if purpose == PURPOSE_AUTH else settings.SMTP_OPERATIONS
-    return get_connection(
-        backend=settings.EMAIL_BACKEND,
-        host=config["HOST"],
-        port=config["PORT"],
-        username=config["USER"],
-        password=config["PASSWORD"],
-        use_tls=config.get("USE_TLS", True),
-        fail_silently=False,
-    )
-
-
 def _send_html_email(subject, template_name, context, recipient_email, purpose):
-    """Internal helper: render an HTML template and send it."""
-    config = settings.SMTP_AUTH if purpose == PURPOSE_AUTH else settings.SMTP_OPERATIONS
-    from_email = f"DivorceConnect India <{config['USER']}>"
-
+    """Internal helper: render an HTML template and send it asynchronously via Taskiq."""
     html_body = render_to_string(template_name, context)
-    # Plain text fallback (strip tags crudely)
-    import re
-    plain_body = re.sub(r'<[^>]+>', ' ', html_body)
-    plain_body = re.sub(r'\s+', ' ', plain_body).strip()
 
-    msg = EmailMultiAlternatives(
-        subject=subject,
-        body=plain_body,
-        from_email=from_email,
-        to=[recipient_email],
-        connection=get_email_connection(purpose),
-    )
-    msg.attach_alternative(html_body, "text/html")
-    msg.send(fail_silently=False)
+    from fastapi_app.tasks import send_email_task
+    import asyncio
+
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(send_email_task.kiq(recipient_email, subject, html_body, purpose))
+    except RuntimeError:
+        asyncio.run(send_email_task.kiq(recipient_email, subject, html_body, purpose))
+
 
 
 # ── Auth emails ───────────────────────────────────────────────────────────────

@@ -149,6 +149,13 @@
 
         boxes[0].focus();
 
+        // Populate email from sessionStorage
+        const emailDisplay = document.querySelector('strong.text-gray-900');
+        const pendingEmail = sessionStorage.getItem("pending_otp_email");
+        if (pendingEmail && emailDisplay) {
+            emailDisplay.textContent = pendingEmail;
+        }
+
         // 10-minute countdown
         let totalSeconds = 600;
         const circle = document.getElementById('timer-circle');
@@ -161,7 +168,7 @@
             const s = (totalSeconds % 60).toString().padStart(2, '0');
             display.textContent = `${m}:${s}`;
             const offset = circumference - (totalSeconds / 600) * circumference;
-            circle.style.strokeDashoffset = offset;
+            if (circle) circle.style.strokeDashoffset = offset;
             if (totalSeconds <= 0) {
                 clearInterval(interval);
                 display.textContent = '00:00';
@@ -169,11 +176,69 @@
             }
         }, 1000);
 
+        // Submit via AJAX/fetch
+        document.getElementById('otp-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            updateHidden();
+            const otp = hidden.value;
+            const email = sessionStorage.getItem("pending_otp_email");
+            const verifyBtn = document.getElementById('verify-btn');
+            
+            if (!email) {
+                alert("Session expired. Please start the login process again.");
+                window.location.href = "/login/";
+                return;
+            }
+            if (otp.length < 6) {
+                alert("Please enter the full 6-digit code.");
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = "Verifying...";
+            
+            try {
+                const response = await fetch('/api/auth/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, otp: otp })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    sessionStorage.removeItem("pending_otp_email");
+                    
+                    if (data.role === 'lawyer') {
+                        window.location.href = "/lawyer_dashboard/";
+                    } else if (data.role === 'admin') {
+                        window.location.href = "/admin_dashboard/";
+                    } else {
+                        window.location.href = "/client_dashboard/";
+                    }
+                } else {
+                    const err = await response.json();
+                    alert(err.detail || "Invalid OTP code.");
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = "Verify & Continue →";
+                }
+            } catch (err) {
+                alert("Network error occurred.");
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = "Verify & Continue →";
+            }
+        });
+
         // Auto-submit when all 6 filled
         function checkAutoSubmit() {
             if ([...boxes].every(b => b.value)) {
                 updateHidden();
-                setTimeout(() => document.getElementById('otp-form').submit(), 300);
+                setTimeout(() => {
+                    const form = document.getElementById('otp-form');
+                    form.dispatchEvent(new Event('submit'));
+                }, 300);
             }
         }
         boxes.forEach(b => b.addEventListener('input', checkAutoSubmit));

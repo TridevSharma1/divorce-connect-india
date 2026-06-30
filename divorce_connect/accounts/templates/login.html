@@ -119,6 +119,11 @@
 
                 if (response.ok) {
                     const data = await response.json();
+                    if (data.redirect) {
+                        sessionStorage.setItem("pending_otp_email", data.email);
+                        window.location.href = data.redirect;
+                        return;
+                    }
                     localStorage.setItem('access_token', data.access_token);
                     
                     try {

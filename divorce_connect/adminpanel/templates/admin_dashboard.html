@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const userId = payload.user_id || payload.sub;
         if (userId) {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}/ws/notifications/${userId}`;
+            const wsUrl = `${protocol}//${window.location.host}/ws/notifications/${userId}?token=${encodeURIComponent(token)}`;
             const ws = new WebSocket(wsUrl);
 
             ws.onmessage = function(event) {
