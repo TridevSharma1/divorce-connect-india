@@ -519,6 +519,18 @@ async def verify_register_otp(
     otp_obj.is_used = True
     user.is_active = True
     await db.commit()
+
+    try:
+        from ..notifications import create_and_broadcast_notification
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=user.id,
+            title="Registration Successful",
+            message="Welcome to DivorceConnect India! Your account is active and verified.",
+            url="/"
+        )
+    except Exception:
+        pass
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

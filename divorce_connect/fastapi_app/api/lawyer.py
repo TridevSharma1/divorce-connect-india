@@ -398,6 +398,19 @@ async def update_lawyer_profile_endpoint(
         profile.profile_picture = f"/media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
         
     await db.commit()
+
+    try:
+        from ..notifications import create_and_broadcast_notification
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Profile Updated",
+            message="Your lawyer profile has been successfully updated.",
+            url="/lawyer_profile_edit/"
+        )
+    except Exception:
+        pass
+        
     return {"message": "Profile updated successfully"}
 
 

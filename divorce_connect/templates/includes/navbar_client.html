@@ -77,99 +77,16 @@
     (function() {
         const bellButton = document.getElementById('notification-bell');
         const dropdown = document.getElementById('notification-dropdown');
-        const markAllReadBtn = document.getElementById('mark-all-read');
-        const notificationItems = document.querySelectorAll('.notification-item');
-        const badge = document.getElementById('notification-badge');
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        bellButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            dropdown.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!dropdown.contains(e.target) && e.target !== bellButton && !bellButton.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
-        // Click individual notification to mark it as read
-        notificationItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const notifId = this.getAttribute('data-id');
-                const isRead = !this.classList.contains('bg-gray-50');
-                if (isRead) return; // Already read
-
-                fetch(`/api/notifications/${notifId}/`, {
-                    method: 'PATCH',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ is_read: true })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        this.classList.remove('bg-gray-50');
-                        this.classList.add('bg-white');
-                        const indicator = this.querySelector('.unread-indicator');
-                        if (indicator) indicator.remove();
-                        
-                        // Decrement badge count
-                        let currentCount = parseInt(badge.innerText.trim());
-                        if (!isNaN(currentCount) && currentCount > 0) {
-                            currentCount -= 1;
-                            if (currentCount > 0) {
-                                badge.innerText = currentCount;
-                            } else {
-                                badge.innerText = "";
-                                badge.classList.add('hidden');
-                            }
-                        }
-                    }
-                })
-                .catch(err => console.error("Error marking notification as read:", err));
+        if (bellButton && dropdown) {
+            bellButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
             });
-        });
-
-        // Mark all as read button
-        markAllReadBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            fetch('/api/notifications/mark-all-read/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json'
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && e.target !== bellButton && !bellButton.contains(e.target)) {
+                    dropdown.classList.add('hidden');
                 }
-            })
-            .then(response => {
-                if (response.ok) {
-                    notificationItems.forEach(item => {
-                        item.classList.remove('bg-gray-50');
-                        item.classList.add('bg-white');
-                        const indicator = item.querySelector('.unread-indicator');
-                        if (indicator) indicator.remove();
-                    });
-                    badge.innerText = "";
-                    badge.classList.add('hidden');
-                }
-            })
-            .catch(err => console.error("Error marking all as read:", err));
-        });
+            });
+        }
     })();
 </script>

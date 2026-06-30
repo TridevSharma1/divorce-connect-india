@@ -149,6 +149,27 @@ async def hire_lawyer(
     db.add(new_request)
     await db.commit()
     await db.refresh(new_request)
+
+    try:
+        from ..notifications import create_and_broadcast_notification
+        # Notify client
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Hire Request Sent",
+            message=f"Your hire request has been sent to {lawyer.full_name}.",
+            url="/client_dashboard/"
+        )
+        # Notify lawyer
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=lawyer.user_id,
+            title="New Hire Request",
+            message=f"You have received a new case request from {client.first_name} {client.last_name}.",
+            url="/lawyer_dashboard/"
+        )
+    except Exception:
+        pass
     
     return {"message": "Hire request sent successfully", "request_id": new_request.id}
 
@@ -234,6 +255,19 @@ async def update_client_profile(
     current_user.last_name = last_name
     
     await db.commit()
+
+    try:
+        from ..notifications import create_and_broadcast_notification
+        await create_and_broadcast_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Profile Updated",
+            message="Your profile has been successfully updated.",
+            url="/client_profile/"
+        )
+    except Exception:
+        pass
+    
     return {"message": "Profile updated successfully"}
 
 @router.post("/deactivate")

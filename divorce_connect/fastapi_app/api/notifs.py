@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update
@@ -17,9 +17,13 @@ async def get_notifications(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get all notifications for the authenticated user.
+    Get all unread notifications for the authenticated user.
     """
-    result = await db.execute(select(Notification).where(Notification.user_id == current_user.id).order_by(Notification.created_at.desc()))
+    result = await db.execute(
+        select(Notification)
+        .where(Notification.user_id == current_user.id, Notification.is_read == False)
+        .order_by(Notification.created_at.desc())
+    )
     return result.scalars().all()
 
 
@@ -65,3 +69,23 @@ async def mark_all_as_read(
     
     # SQLAlchemy's result.rowcount gives the number of rows updated
     return {"message": f"Successfully marked {result.rowcount} notification(s) as read."}
+
+@router.patch("/{notification_id}", response_model=NotificationResponse)
+@router.patch("/{notification_id}/", response_model=NotificationResponse)
+async def mark_notification_read(
+    notification_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.execute(
+        select(Notification)
+        .where(Notification.id == notification_id, Notification.user_id == current_user.id)
+    )
+    notification = result.scalar_one_or_none()
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification not found")
+        
+    notification.is_read = True
+    await db.commit()
+    await db.refresh(notification)
+    return notification

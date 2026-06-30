@@ -62,4 +62,28 @@ def send_email(to_address: str, subject: str, html_body: str, purpose: str = "op
     except RuntimeError:
         asyncio.run(send_email_task.kiq(to_address, subject, html_body, purpose))
 
+async def create_and_broadcast_notification(
+    db,
+    user_id: int,
+    title: str,
+    message: str,
+    url: str = None
+):
+    from .models import Notification
+    notification = Notification(
+        user_id=user_id,
+        title=title,
+        message=message,
+        url=url,
+        is_read=False
+    )
+    db.add(notification)
+    await db.commit()
+    await db.refresh(notification)
+    
+    # Broadcast in real-time via WebSocket
+    ws_msg = f"{title}: {message}"
+    await manager.send_personal_message(ws_msg, user_id=user_id)
+    return notification
+
 

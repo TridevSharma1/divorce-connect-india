@@ -95,116 +95,30 @@
     const notificationContainer = document.getElementById('notificationContainer');
     const notificationBell = document.getElementById('notificationBell');
     const notificationPanel = document.getElementById('notificationPanel');
-    const notificationDot = document.getElementById('notificationDot');
-    const markAllReadBtn = document.getElementById('markAllRead');
-    const notificationItems = document.querySelectorAll('.notification-item');
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Toggle dropdown on bell click
-    notificationBell.addEventListener('click', function(event) {
-      event.stopPropagation();
-      notificationPanel.classList.toggle('hidden');
-      notificationBell.setAttribute('aria-expanded', !notificationPanel.classList.contains('hidden'));
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-      if (!notificationContainer.contains(event.target)) {
-        notificationPanel.classList.add('hidden');
-        notificationBell.setAttribute('aria-expanded', 'false');
-      }
-    });
-
-    // Mark individual notification as read
-    notificationItems.forEach(function(item) {
-      item.addEventListener('click', function(event) {
-        if (event.target === markAllReadBtn) return;
-        
-        const notifId = this.getAttribute('data-id');
-        const isRead = this.getAttribute('data-read') === 'true';
-        if (isRead) return;
-
-        fetch(`/api/notifications/${notifId}/`, {
-            method: 'PATCH',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ is_read: true })
-        })
-        .then(response => {
-            if (response.ok) {
-                this.setAttribute('data-read', 'true');
-                this.classList.remove('bg-gray-50');
-                this.classList.add('bg-white');
-                const unreadDot = this.querySelector('.unread-indicator');
-                if (unreadDot) unreadDot.remove();
-                
-                // Decrement badge count
-                let currentCount = parseInt(notificationDot.innerText.trim());
-                if (!isNaN(currentCount) && currentCount > 0) {
-                    currentCount -= 1;
-                    if (currentCount > 0) {
-                        notificationDot.innerText = currentCount;
-                    } else {
-                        notificationDot.innerText = "";
-                        notificationDot.classList.add('hidden');
-                    }
-                }
-            }
-        })
-        .catch(err => console.error("Error marking notification as read:", err));
+    if (notificationBell && notificationPanel) {
+      // Toggle dropdown on bell click
+      notificationBell.addEventListener('click', function(event) {
+        event.stopPropagation();
+        notificationPanel.classList.toggle('hidden');
+        notificationBell.setAttribute('aria-expanded', !notificationPanel.classList.contains('hidden'));
       });
-    });
 
-    // Mark all as read
-    markAllReadBtn.addEventListener('click', function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      
-      fetch('/api/notifications/mark-all-read/', {
-          method: 'POST',
-          headers: {
-              'X-CSRFToken': getCookie('csrftoken'),
-              'Content-Type': 'application/json'
-          }
-      })
-      .then(response => {
-          if (response.ok) {
-              notificationItems.forEach(function(item) {
-                  item.setAttribute('data-read', 'true');
-                  item.classList.remove('bg-gray-50');
-                  item.classList.add('bg-white');
-                  const unreadDot = item.querySelector('.unread-indicator');
-                  if (unreadDot) unreadDot.remove();
-              });
-              notificationDot.innerText = "";
-              notificationDot.classList.add('hidden');
-          }
-      })
-      .catch(err => console.error("Error marking all as read:", err));
-    });
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (notificationContainer && !notificationContainer.contains(event.target)) {
+          notificationPanel.classList.add('hidden');
+          notificationBell.setAttribute('aria-expanded', 'false');
+        }
+      });
 
-    // Close on Escape key
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape' && !notificationPanel.classList.contains('hidden')) {
-        notificationPanel.classList.add('hidden');
-        notificationBell.setAttribute('aria-expanded', 'false');
-      }
-    });
+      // Close on Escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !notificationPanel.classList.contains('hidden')) {
+          notificationPanel.classList.add('hidden');
+          notificationBell.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
   })();
 </script>
