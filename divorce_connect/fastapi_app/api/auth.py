@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
+from urllib.parse import quote
 import uuid
 import datetime
 import logging
@@ -430,6 +431,7 @@ async def confirm_delete_account(
 class VerifyOTPRequest(BaseModel):
     email: EmailStr
     otp: str
+    purpose: str | None = None
 
 @router.post("/verify-otp")
 async def verify_otp(
@@ -462,6 +464,11 @@ async def verify_otp(
     otp_obj.is_used = True
     user.is_active = True
     await db.commit()
+
+    if payload.purpose == "password_reset":
+        return {
+            "redirect": f"/reset-password/?email={quote(user.email)}"
+        }
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

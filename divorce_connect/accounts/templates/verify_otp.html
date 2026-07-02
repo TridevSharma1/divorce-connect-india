@@ -181,7 +181,8 @@
             e.preventDefault();
             updateHidden();
             const otp = hidden.value;
-            const email = sessionStorage.getItem("pending_otp_email");
+            const email = sessionStorage.getItem("pending_otp_email") || new URLSearchParams(window.location.search).get('email') || '';
+            const purpose = new URLSearchParams(window.location.search).get('purpose') || 'login';
             const verifyBtn = document.getElementById('verify-btn');
             
             if (!email) {
@@ -203,13 +204,19 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email: email, otp: otp })
+                    body: JSON.stringify({ email: email, otp: otp, purpose: purpose })
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    localStorage.setItem('access_token', data.access_token);
                     sessionStorage.removeItem("pending_otp_email");
+
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                        return;
+                    }
+
+                    localStorage.setItem('access_token', data.access_token);
                     
                     if (data.role === 'lawyer') {
                         window.location.href = "/lawyer_dashboard/";

@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 import datetime
 from fastapi.testclient import TestClient
@@ -5,9 +6,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi_app.main import app
-from fastapi_app.security import get_current_user
-from fastapi_app.database import get_db
-from fastapi_app.models import User, CaseRequest, Payment, Reminder, ClientProfile, Base, DeleteAccountToken
+from fastapi_app.security import get_current_user, create_access_token
+from fastapi_app.database import get_db, AsyncSessionLocal
+from fastapi_app.models import User, CaseRequest, Payment, Reminder, ClientProfile, Base, DeleteAccountToken, LawyerProfile
 
 # --- Test Data Setup ---
 # We will create mock users and inject them
@@ -55,6 +56,123 @@ def test_health_check():
         # Fallback dynamic route verification
         response = client.get("/")
         assert response.status_code == 200
+
+
+def test_lawyer_case_order_page_renders():
+    response = client.get("/lawyer_case_orders")
+    assert response.status_code == 200
+    assert "Incoming client requests" in response.text
+
+
+def test_lawyer_case_order_page_shows_pending_case_for_authenticated_lawyer():
+    async def seed_lawyer_case():
+        async with AsyncSessionLocal() as db:
+            existing_user = await db.execute(select(User).where(User.email == "lawyer.case@example.com"))
+            user = existing_user.scalar_one_or_none()
+            if user is None:
+                user = User(
+                    email="lawyer.case@example.com",
+                    role="lawyer",
+                    first_name="Lawyer",
+                    last_name="Case",
+                    is_active=True,
+                    password="hashed",
+                )
+                db.add(user)
+                await db.flush()
+
+            existing_lawyer = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == user.id))
+            lawyer_profile = existing_lawyer.scalar_one_or_none()
+            if lawyer_profile is None:
+                lawyer_profile = LawyerProfile(
+                    user_id=user.id,
+                    full_name="Lawyer Case",
+                    gender="other",
+                    bar_registration_number="BAR7777",
+                    state_bar_council="Test Council",
+                    years_of_experience=5,
+                    specialization="family",
+                    bio="",
+                    consultation_fee=1000.0,
+                    office_city="Delhi",
+                    verified=True,
+                    is_profile_complete=True,
+                    mobile_number="9876543210",
+                )
+                db.add(lawyer_profile)
+                await db.flush()
+
+            existing_client = await db.execute(select(ClientProfile).where(ClientProfile.user_id == 9998))
+            client_profile = existing_client.scalar_one_or_none()
+            if client_profile is None:
+                client_profile = ClientProfile(
+                    user_id=9998,
+                    first_name="Client",
+                    last_name="Name",
+                    gender="other",
+                    marital_status="single",
+                    mobile_number="9876543211",
+                    address="123 Test Street",
+                    pincode="110001",
+                )
+                db.add(client_profile)
+                await db.flush()
+
+            existing_request = await db.execute(
+                select(CaseRequest).where(
+                    CaseRequest.lawyer_id == lawyer_profile.id,
+                    CaseRequest.client_id == client_profile.id,
+                )
+            )
+            case_request = existing_request.scalar_one_or_none()
+            if case_request is None:
+                case_request = CaseRequest(
+                    client_id=client_profile.id,
+                    lawyer_id=lawyer_profile.id,
+                    message="Need help with a divorce filing.",
+                    status="PENDING",
+                    workflow_stage="CASE_CREATED",
+                )
+                db.add(case_request)
+                await db.commit()
+
+            return user, case_request
+
+    user, _ = asyncio.run(seed_lawyer_case())
+    token = create_access_token(data={"sub": user.email, "user_id": user.id})
+    response = client.get(
+        "/lawyer_case_orders",
+        headers={"Authorization": f"Bearer {token}"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 200
+    assert "Need help with a divorce filing." in response.text
+
+
+def test_forgot_password_page_renders():
+    response = client.get("/forgot-password/")
+    assert response.status_code == 200
+    assert "Forgot your password?" in response.text
+
+
+def test_forgot_password_submission_redirects_to_otp_flow():
+    async def create_user():
+        async with AsyncSessionLocal() as db:
+            existing = await db.execute(select(User).where(User.email == "forgot.user@example.com"))
+            user = existing.scalar_one_or_none()
+            if user is None:
+                user = User(email="forgot.user@example.com", password="hashed", role="client", is_active=True)
+                db.add(user)
+                await db.commit()
+                await db.refresh(user)
+            return user.email
+
+    email = asyncio.run(create_user())
+    response = client.post("/forgot-password/", data={"email": email}, follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"].startswith("/verify-otp/")
+
 
 def test_payments_api():
     global active_user

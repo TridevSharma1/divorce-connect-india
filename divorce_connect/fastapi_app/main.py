@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from types import SimpleNamespace
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -33,6 +34,8 @@ templates = Jinja2Templates(directory=[str(d) for d in TEMPLATES_DIRS if d.exist
 
 import re
 import jinja2
+from urllib.parse import quote
+
 class DjangoToJinjaFileSystemLoader(jinja2.FileSystemLoader):
     def get_source(self, environment, template):
         contents, filename, uptodate = super().get_source(environment, template)
@@ -55,6 +58,10 @@ class DjangoToJinjaFileSystemLoader(jinja2.FileSystemLoader):
         contents = re.sub(r'forloop\.counter', r'loop.index', contents)
         contents = re.sub(r'forloop\.first', r'loop.first', contents)
         contents = re.sub(r'forloop\.last', r'loop.last', contents)
+        # Django-only tags that FastAPI/Jinja needs to understand
+        contents = re.sub(r'\{\%\s*load\s+static\s*\%\}', '', contents)
+        contents = re.sub(r'\{\%\s*static\s+(["\'])(.*?)\1\s*\%\}', r"{{ url_for('static', path='\2') }}", contents)
+        contents = re.sub(r'\{\%\s*csrf_token\s*\%\}', r'{{ csrf_token }}', contents)
         return contents, filename, uptodate
 
 templates.env.loader = DjangoToJinjaFileSystemLoader([str(d) for d in TEMPLATES_DIRS if d.exists()])
@@ -185,7 +192,7 @@ async def websocket_notifications(
         manager.disconnect(websocket, user_id)
 
 # --- Fallback Server-side Logout ---
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 @app.get("/logout")
 @app.get("/logout/")
 async def logout_page(request: Request):
@@ -217,7 +224,7 @@ async def landing_page(request: Request):
     """
     return templates.TemplateResponse(request, "index.html")
 
-@app.get("/{page_path:path}", tags=["Frontend"])
+@app.api_route("/{page_path:path}", methods=["GET", "POST"], tags=["Frontend"])
 async def dynamic_page(request: Request, page_path: str):
     """
     Catch-all router to automatically render any HTML template by its URL path.
@@ -227,9 +234,59 @@ async def dynamic_page(request: Request, page_path: str):
     # Remove trailing slash if present for easier handling
     if page_path.endswith("/"):
         page_path = page_path[:-1]
-        
+
+    if page_path in ["forgot-password", "forgot_password"]:
+        if request.method == "POST":
+            form = await request.form()
+            email = (form.get("email") or "").strip().lower()
+            if not email:
+                return RedirectResponse(url="/forgot-password/?error=missing-email", status_code=303)
+
+            from sqlalchemy import select
+            from .database import AsyncSessionLocal
+            from .models import User
+            from .api.auth import generate_otp_for_user
+
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(select(User).where(User.email == email))
+                user = result.scalar_one_or_none()
+                if not user:
+                    return RedirectResponse(url="/forgot-password/?error=not-found", status_code=303)
+
+                await generate_otp_for_user(user.id, db)
+
+            return RedirectResponse(url=f"/verify-otp/?email={quote(email)}&purpose=password_reset", status_code=303)
+
+        template_name = "forgot_password.html"
+    elif page_path in ["reset-password", "reset_password"]:
+        if request.method == "POST":
+            form = await request.form()
+            email = (form.get("email") or request.query_params.get("email", "") or "").strip().lower()
+            new_password = (form.get("new_password") or "").strip()
+            confirm_password = (form.get("confirm_password") or "").strip()
+            if not email or not new_password or not confirm_password:
+                return RedirectResponse(url=f"/reset-password/?email={quote(email)}&error=missing-fields", status_code=303)
+            if new_password != confirm_password:
+                return RedirectResponse(url=f"/reset-password/?email={quote(email)}&error=match", status_code=303)
+
+            from sqlalchemy import select
+            from .database import AsyncSessionLocal
+            from .models import User
+            from .security import pwd_context
+
+            async with AsyncSessionLocal() as db:
+                result = await db.execute(select(User).where(User.email == email))
+                user = result.scalar_one_or_none()
+                if user:
+                    user.password = pwd_context.hash(new_password)
+                    db.add(user)
+                    await db.commit()
+
+            return RedirectResponse(url="/login/?reset=success", status_code=303)
+        template_name = "reset_password.html"
+    
     # Map the client profile paths to the actual template file name
-    if page_path in ["verify-otp", "verify_otp"]:
+    elif page_path in ["verify-otp", "verify_otp"]:
         template_name = "verify_otp.html"
     elif page_path in ["verify-register-otp", "verify_register_otp"]:
         template_name = "verify_register_otp.html"
@@ -267,7 +324,63 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = page_path
         
     try:
-        context = {"request": request}
+        context = {"request": request, "email": request.query_params.get("email", "")}
+        if template_name == "case_order.html":
+            from .database import AsyncSessionLocal
+            from sqlalchemy import select
+            from .models import User, LawyerProfile, CaseRequest, ClientProfile
+            from .security import get_current_user
+            from fastapi import Depends
+
+            token = request.headers.get("authorization", "")
+            if token.startswith("Bearer "):
+                token_value = token.split(" ", 1)[1]
+                from jose import jwt
+                try:
+                    payload = jwt.decode(token_value, SECRET_KEY, algorithms=[ALGORITHM])
+                    email = payload.get("sub")
+                    if email:
+                        async with AsyncSessionLocal() as db:
+                            user_result = await db.execute(select(User).where(User.email == email))
+                            user = user_result.scalar_one_or_none()
+                            if user:
+                                lawyer_result = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == user.id))
+                                lawyer_profile = lawyer_result.scalar_one_or_none()
+                                if lawyer_profile and lawyer_profile.verified and lawyer_profile.is_profile_complete:
+                                    requests_result = await db.execute(
+                                        select(CaseRequest)
+                                        .where(CaseRequest.lawyer_id == lawyer_profile.id, CaseRequest.status == 'PENDING')
+                                        .order_by(CaseRequest.created_at.desc())
+                                    )
+                                    pending_requests = []
+                                    for case_request in requests_result.scalars().all():
+                                        client_result = await db.execute(select(ClientProfile).where(ClientProfile.id == case_request.client_id))
+                                        client_profile = client_result.scalar_one_or_none()
+                                        client_name = f"{client_profile.first_name} {client_profile.last_name}".strip() if client_profile else f"Client #{case_request.client_id}"
+                                        display_name = SimpleNamespace(get_full_name=lambda name=client_name: name)
+                                        status_label = {
+                                            'PENDING': 'Pending',
+                                            'DOCUMENTS_PENDING': 'Waiting for Documents',
+                                            'DOCUMENTS_SUBMITTED': 'Documents Submitted',
+                                            'DOCUMENTS_VERIFIED': 'Documents Verified',
+                                            'ACCEPTED': 'Accepted',
+                                            'COMPLETED': 'Completed',
+                                            'REJECTED': 'Rejected',
+                                        }.get(case_request.status, case_request.status)
+
+                                        request_view = SimpleNamespace(
+                                            id=case_request.id,
+                                            message=case_request.message,
+                                            created_at=case_request.created_at,
+                                            status=case_request.status,
+                                            client=display_name,
+                                            get_status_display=lambda status_label=status_label: status_label,
+                                        )
+                                        pending_requests.append(request_view)
+                                    context["pending_requests"] = pending_requests
+                except Exception:
+                    pass
+
         if template_name == "edit_profile_client.html":
             class DummyUser:
                 email = ""

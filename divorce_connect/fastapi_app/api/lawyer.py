@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
 from typing import Dict, Any
 
@@ -11,15 +11,20 @@ router = APIRouter()
 
 async def check_verified_lawyer(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
-    if current_user.role != "lawyer":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-        
     lawyer_profile_res = await db.execute(
         select(LawyerProfile).where(LawyerProfile.user_id == current_user.id)
     )
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+
+    if lawyer_profile:
+        if current_user.role != "lawyer":
+            current_user.role = "lawyer"
+            await db.commit()
+    elif current_user.role == "lawyer":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     if not lawyer_profile or not lawyer_profile.verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -30,7 +35,7 @@ async def check_verified_lawyer(
 @router.get("/dashboard")
 async def get_lawyer_dashboard(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
     
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
@@ -117,7 +122,7 @@ async def get_lawyer_dashboard(
 @router.get("/case-requests")
 async def list_case_requests(
     current_user: User = Depends(check_verified_admin if False else check_verified_lawyer),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -125,7 +130,9 @@ async def list_case_requests(
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
         
     requests_res = await db.execute(
-        select(CaseRequest).where(CaseRequest.lawyer_id == lawyer_profile.id)
+        select(CaseRequest)
+        .where(CaseRequest.lawyer_id == lawyer_profile.id)
+        .order_by(CaseRequest.created_at.desc())
     )
     requests = requests_res.scalars().all()
     
@@ -150,7 +157,7 @@ async def respond_case_request(
     action: str, # "accept" or "reject"
     response_message: str = "",
     current_user: User = Depends(check_verified_lawyer),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -177,7 +184,7 @@ async def respond_case_request(
 @router.get("/earnings")
 async def get_lawyer_earnings(
     current_user: User = Depends(check_verified_lawyer),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -273,7 +280,7 @@ async def get_lawyer_earnings(
 @router.get("/cases")
 async def get_lawyer_cases(
     current_user: User = Depends(check_verified_lawyer),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -323,7 +330,7 @@ async def get_lawyer_cases(
 @router.get("/profile")
 async def get_lawyer_profile_endpoint(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -379,7 +386,7 @@ async def update_lawyer_profile_endpoint(
     mobile_number: str = Form(...),
     alternate_mobile_number: str | None = Form(None),
     profile_picture: UploadFile | None = File(None),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     import datetime
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
