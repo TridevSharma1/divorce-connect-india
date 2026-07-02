@@ -17,4 +17,7 @@ broker = NatsBroker(
 # You can add middlewares here (e.g., for logging, retry logic, or result backends)
 
 # THIS LINE IS MANDATORY: It forces the broker to discover and register your tasks!
-import divorce_connect.fastapi_app.tasks
+try:
+    import divorce_connect.fastapi_app.tasks
+except ModuleNotFoundError:
+    import fastapi_app.tasks
