@@ -11,7 +11,7 @@ from .security import SECRET_KEY, ALGORITHM
 from .database import engine
 from .models import Base
 from .broker import broker
-from .api import auth, notifs, lawyer, admin, admin_actions, client_actions, client_case_actions, payments, reminders
+from .api import auth, notifs, lawyer, admin, admin_actions, client_actions, client_case_actions, payments, reminders, auth_flows, profiles, support, cases, chat
 from .notifications import manager
 import logging
 
@@ -149,12 +149,17 @@ if MEDIA_DIR.exists():
 
 # Include API Routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(auth_flows.router, prefix="/api/auth", tags=["Authentication Flows"])
+app.include_router(profiles.router, prefix="/api/profiles", tags=["Profiles"])
 app.include_router(notifs.router, prefix="/api/notifications", tags=["Notifications"])
 app.include_router(lawyer.router, prefix="/api/lawyer", tags=["Lawyer"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(admin_actions.router, prefix="/api/admin", tags=["Admin Actions"])
 app.include_router(client_actions.router, prefix="/api/client", tags=["Client Actions"])
 app.include_router(client_case_actions.router, prefix="/api/client", tags=["Client Case Actions"])
+app.include_router(cases.router, prefix="/api/cases", tags=["Cases Workflows"])
+app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
+app.include_router(support.router, prefix="/api/support", tags=["Support & Contact"])
 app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 app.include_router(reminders.router, prefix="/api/reminders", tags=["Reminders"])
 

@@ -74,3 +74,53 @@ async def send_email_task(to_address: str, subject: str, html_body: str, purpose
         logger.error(f"Taskiq: SMTP sending failed to {to_address} ({e})")
         return False
 
+@broker.task
+async def task_purge_deleted_accounts():
+    """
+    Background task to purge accounts that have been deactivated for 14+ days.
+    """
+    logger.info("Starting purge of deleted accounts...")
+    from .database import AsyncSessionLocal
+    from .models import User, DeleteAccountToken
+    from sqlalchemy import select
+    import datetime
+    
+    cutoff = datetime.datetime.utcnow() - datetime.timedelta(days=14)
+    async with AsyncSessionLocal() as db:
+        res = await db.execute(
+            select(DeleteAccountToken).where(
+                DeleteAccountToken.is_used == True,
+                DeleteAccountToken.created_at <= cutoff
+            )
+        )
+        tokens = res.scalars().all()
+        count = 0
+        for token in tokens:
+            user_res = await db.execute(select(User).where(User.id == token.user_id))
+            user = user_res.scalars().first()
+            if user and not user.is_active:
+                await db.delete(user) # Cascade deletes other models ideally
+                count += 1
+        await db.commit()
+    logger.info(f"Purged {count} accounts.")
+    return count
+
+@broker.task
+async def task_send_bug_report_email(issue_text: str, reporter_email: str):
+    """
+    Email superusers about a new bug report.
+    """
+    subject = f"New Bug Report from {reporter_email}"
+    html_body = f"<p>A new bug report was submitted:</p><p>{issue_text}</p>"
+    
+    # Ideally fetch all superusers, but hardcoding for example or fetching from env
+    import os
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@divorceconnect.in")
+    
+    await send_email_task.kiq(
+        to_address=admin_email,
+        subject=subject,
+        html_body=html_body,
+        purpose="operations"
+    )
+    return True

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Contact Us - DivorceConnect India{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Background styling -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 z-0"></div>
+    <div class="absolute top-20 -left-10 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
+    <div class="absolute top-40 right-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+
+    <div class="max-w-4xl mx-auto relative z-10 bg-white/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/60 p-10 sm:p-16 transition-all duration-300 hover:shadow-2xl">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold text-gray-900 serif-heading tracking-tight sm:text-5xl">
+                Get in Touch
+            </h2>
+            <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                Have a question or need assistance? Fill out the form below and our support team will get back to you shortly.
+            </p>
+        </div>
+
+        <form id="contactForm" class="space-y-8 max-w-2xl mx-auto">
+            <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
+                <div class="sm:col-span-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <div class="mt-1">
+                        <input type="text" name="name" id="name" required class="py-3 px-4 block w-full shadow-sm focus:ring-black focus:border-black border-gray-300 rounded-xl bg-white/50 backdrop-blur-sm transition-all focus:bg-white">
+                    </div>
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <div class="mt-1">
+                        <input id="email" name="email" type="email" autocomplete="email" required class="py-3 px-4 block w-full shadow-sm focus:ring-black focus:border-black border-gray-300 rounded-xl bg-white/50 backdrop-blur-sm transition-all focus:bg-white">
+                    </div>
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                    <div class="mt-1">
+                        <textarea id="message" name="message" rows="4" required class="py-3 px-4 block w-full shadow-sm focus:ring-black focus:border-black border border-gray-300 rounded-xl bg-white/50 backdrop-blur-sm transition-all focus:bg-white resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="sm:col-span-2">
+                <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-4 border border-transparent rounded-xl shadow-lg text-base font-medium text-white bg-black hover:bg-gray-800 hover:shadow-xl hover:-translate-y-1 transform transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-blob { animation: blob 10s infinite; }
+    .animation-delay-2000 { animation-delay: 2s; }
+</style>
+
+<script src="/static/js/support.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const message = document.getElementById('message').value;
+    
+    await submitContactForm(name, email, message);
+    e.target.reset(); // clear form
+});
+</script>
+{% endblock %}

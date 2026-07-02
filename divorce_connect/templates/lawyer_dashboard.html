@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Lawyer Dashboard - DivorceConnect India{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col md:flex-row relative overflow-hidden">
+    {% include 'includes/navbar_lawyer.html' %}
+
+    <!-- Background styling -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 z-0 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-30"></div>
+    
+    <main class="flex-1 p-6 lg:p-12 relative z-10 overflow-y-auto">
+        <div class="max-w-7xl mx-auto space-y-8">
+            
+            <header class="mb-8">
+                <h1 class="text-4xl font-extrabold text-gray-900 serif-heading tracking-tight">Your Cases</h1>
+                <p class="mt-2 text-gray-600">Manage case requests and track your active clients.</p>
+            </header>
+
+            <div class="bg-white/60 backdrop-blur-xl rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/70">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 serif-heading">Pending Requests</h2>
+                    <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="pending-count">0</span>
+                </div>
+                
+                <div id="pending-cases-container" class="space-y-4">
+                    <p class="text-gray-500">Loading pending requests...</p>
+                </div>
+            </div>
+
+            <div class="bg-white/60 backdrop-blur-xl rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/70 mt-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 serif-heading">Active Cases</h2>
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full" id="active-count">0</span>
+                </div>
+                
+                <div id="active-cases-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <p class="text-gray-500">Loading active cases...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Stage Update Modal -->
+<div id="stageModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="this.parentElement.parentElement.classList.add('hidden')"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white/80 backdrop-blur-xl rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-white/50">
+            <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-2xl leading-6 font-bold text-gray-900 serif-heading mb-4">Update Stage</h3>
+                <form id="stageForm" class="space-y-4">
+                    <input type="hidden" id="stage-case-id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Workflow Stage</label>
+                        <select id="stage-select" required class="mt-1 p-3 w-full border border-gray-300 rounded-xl focus:ring-black focus:border-black bg-white/50">
+                            <option value="Lawyer Assigned">Lawyer Assigned</option>
+                            <option value="Petition Drafted">Petition Drafted</option>
+                            <option value="Petition Filed">Petition Filed</option>
+                            <option value="First Motion">First Motion</option>
+                            <option value="Second Motion">Second Motion</option>
+                            <option value="Decree Issued">Decree Issued</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="pt-4 flex justify-end space-x-3">
+                        <button type="button" onclick="document.getElementById('stageModal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button type="submit" class="px-6 py-2 bg-black text-white rounded-xl shadow-lg hover:bg-gray-800 transition-colors">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/cases.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("jwt_token");
+    if(!token) window.location.href = "/login";
+
+    // Re-using the same endpoints or a new specific lawyer cases endpoint.
+    // If not existing, assume /api/lawyer/cases exists from old structure.
+    try {
+        const res = await fetch("/api/lawyer/cases", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if(res.ok) {
+            const cases = await res.json();
+            renderLawyerCases(cases);
+        } else {
+            console.error("Failed to fetch cases");
+        }
+    } catch(e) {
+        console.error(e);
+    }
+});
+
+function renderLawyerCases(cases) {
+    const pendingContainer = document.getElementById("pending-cases-container");
+    const activeContainer = document.getElementById("active-cases-container");
+    
+    pendingContainer.innerHTML = "";
+    activeContainer.innerHTML = "";
+
+    const pending = cases.filter(c => c.status === "PENDING");
+    const active = cases.filter(c => c.status !== "PENDING" && c.status !== "REJECTED");
+    
+    document.getElementById("pending-count").innerText = pending.length;
+    document.getElementById("active-count").innerText = active.length;
+
+    if(pending.length === 0) {
+        pendingContainer.innerHTML = `<p class="text-gray-500">No pending case requests.</p>`;
+    } else {
+        pending.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "flex justify-between items-center p-4 bg-white/50 rounded-2xl border border-gray-200";
+            div.innerHTML = `
+                <div>
+                    <h4 class="font-bold text-gray-900">Client ID: ${c.client_id}</h4>
+                    <p class="text-sm text-gray-600">${c.message}</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="respondToCase(${c.id}, 'ACCEPT')" class="px-4 py-2 bg-black text-white text-sm font-medium rounded-xl hover:bg-gray-800">Accept</button>
+                    <button onclick="respondToCase(${c.id}, 'REJECT')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50">Reject</button>
+                </div>
+            `;
+            pendingContainer.appendChild(div);
+        });
+    }
+
+    if(active.length === 0) {
+        activeContainer.innerHTML = `<p class="text-gray-500 col-span-2">No active cases.</p>`;
+    } else {
+        active.forEach(c => {
+            const card = document.createElement("div");
+            card.className = "bg-white/50 rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-shadow";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="font-bold text-gray-900">Case #${c.id}</h4>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">${c.status}</span>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Client ID: ${c.client_id}</p>
+                <div class="mb-6">
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stage</p>
+                    <p class="text-base font-semibold text-indigo-600">${c.workflow_stage}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="window.location.href='/lawyer_chat?case_id=${c.id}'" class="flex-1 bg-black text-white px-3 py-2 text-sm rounded-xl font-medium hover:bg-gray-800 transition-colors text-center">Chat</button>
+                    <button onclick="openStageModal(${c.id}, '${c.workflow_stage}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-2 text-sm rounded-xl font-medium hover:bg-gray-50 transition-colors text-center">Update Stage</button>
+                </div>
+            `;
+            activeContainer.appendChild(card);
+        });
+    }
+}
+
+function openStageModal(caseId, currentStage) {
+    document.getElementById('stage-case-id').value = caseId;
+    document.getElementById('stage-select').value = currentStage;
+    document.getElementById('stageModal').classList.remove('hidden');
+}
+
+document.getElementById("stageForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const caseId = document.getElementById('stage-case-id').value;
+    const stage = document.getElementById('stage-select').value;
+    await updateWorkflowStage(caseId, stage);
+});
+</script>
+{% endblock %}
