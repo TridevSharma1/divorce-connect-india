@@ -75,6 +75,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'rest_framework',
     'rest_framework_simplejwt',
     'accounts.apps.AccountsConfig',
@@ -119,17 +121,17 @@ WSGI_APPLICATION = 'divorce_connect.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # if ENVIRONMENT == "development":
-DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-# else:
-#    import dj_database_url
-#    DATABASES = {
-#         'default': dj_database_url.parse(env("DATABASE_URL"))
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
 #     }
+# else:
+import dj_database_url
+DATABASES = {
+        'default': dj_database_url.parse(env("DATABASE_URL"))
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -177,6 +179,11 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] ##Fourth Changes
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary storage
+# Uses CLOUDINARY_URL from the .env file (e.g. cloudinary://key:secret@cloud_name)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
