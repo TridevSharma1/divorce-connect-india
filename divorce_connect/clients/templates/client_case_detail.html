@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             isLawyer = data.is_lawyer;
 
             // Render Header info
-            document.getElementById("header-case-id").innerText = data.id;
+            document.getElementById("header-case-id").innerText = data.custom_id || data.id;
             document.getElementById("header-case-created").innerText = new Date(data.created_at).toLocaleDateString(undefined, {
                 year: 'numeric', month: 'long', day: 'numeric'
             });

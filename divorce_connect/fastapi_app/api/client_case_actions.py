@@ -34,6 +34,7 @@ async def list_client_cases(
     return [
         {
             "id": c.id,
+            "custom_id": c.custom_id,
             "lawyer_id": c.lawyer_id,
             "lawyer_name": l.full_name,
             "message": c.message,
@@ -75,6 +76,17 @@ async def get_case_detail(
     if not case:
         raise HTTPException(status_code=404, detail="Case request not found")
         
+    if not case.custom_id:
+        import random
+        while True:
+            candidate = f"ci:{random.randint(10000, 99999)}"
+            check = await db.execute(select(CaseRequest).where(CaseRequest.custom_id == candidate))
+            if not check.scalar_one_or_none():
+                case.custom_id = candidate
+                break
+        await db.commit()
+        await db.refresh(case)
+
     # Fetch lawyer details
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == case.lawyer_id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
@@ -102,6 +114,7 @@ async def get_case_detail(
     docs = docs_res.scalars().all()
     return {
         "id": case.id,
+        "custom_id": case.custom_id,
         "lawyer_id": case.lawyer_id,
         "message": case.message,
         "status": case.status,

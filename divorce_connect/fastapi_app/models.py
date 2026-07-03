@@ -236,3 +236,24 @@ class LawyerRating(Base):
     lawyer_id: Mapped[int] = mapped_column(ForeignKey("lawyers_lawyerprofile.id"))
 
 
+class LawyerProfileUpdateRequest(Base):
+    __tablename__ = "lawyers_lawyerprofileupdaterequest"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    lawyer_id: Mapped[int] = mapped_column(ForeignKey("lawyers_lawyerprofile.id", ondelete="CASCADE"))
+    full_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    gender: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    date_of_birth: Mapped[Optional[datetime.date]] = mapped_column(Date, nullable=True)
+    years_of_experience: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    specialization: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    consultation_fee: Mapped[Optional[float]] = mapped_column(DECIMAL, nullable=True)
+    office_city: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
+    alternate_mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
+    profile_picture: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    submitted_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
