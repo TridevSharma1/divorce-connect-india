@@ -93,6 +93,28 @@ async def get_lawyer_dashboard(
             "message": req.message
         })
 
+    # Fetch real ready cases (verified documents awaiting lawyer acceptance)
+    ready_cases_res = await db.execute(
+        select(CaseRequest, ClientProfile, User)
+        .join(ClientProfile, CaseRequest.client_id == ClientProfile.id)
+        .join(User, ClientProfile.user_id == User.id)
+        .where(CaseRequest.lawyer_id == lawyer_profile.id, CaseRequest.status == 'DOCUMENTS_VERIFIED')
+        .order_by(CaseRequest.updated_at.desc())
+    )
+    ready_rows = ready_cases_res.all()
+    ready_data = []
+    for req, client_p, client_user in ready_rows:
+        ready_data.append({
+            "id": req.id,
+            "client_name": f"{client_p.first_name} {client_p.last_name}",
+            "client_email": client_user.email,
+            "created_at": req.created_at.strftime("%b %d, %Y") if req.created_at else "",
+            "updated_at": req.updated_at.strftime("%b %d, %Y") if req.updated_at else "",
+            "status": req.status,
+            "workflow_stage": req.workflow_stage or "pending_review",
+            "message": req.message
+        })
+
     return {
         "is_complete": lawyer_profile.is_profile_complete,
         "is_verified": lawyer_profile.verified,
@@ -109,14 +131,14 @@ async def get_lawyer_dashboard(
             "total_cases": total_cases,
             "active_cases": active_cases,
             "pending_requests": len(pending_requests),
-            "verified_documents": 0,
+            "verified_documents": len(ready_data),
             "monthly_revenue": monthly_revenue,
             "yearly_revenue": yearly_revenue,
             "active_clients": active_cases,
             "completed_cases": completed_cases
         },
         "pending_requests": pending_data,
-        "ready_cases": []
+        "ready_cases": ready_data
     }
 
 @router.get("/case-requests")
