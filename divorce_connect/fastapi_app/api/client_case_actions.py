@@ -215,6 +215,7 @@ async def upload_case_document(
     # If case was rejected previously, reset to PENDING / DOCUMENTS_SUBMITTED so admin reviews it again
     if case.status in ["REJECTED", "DOCUMENTS_PENDING"]:
         case.status = "DOCUMENTS_SUBMITTED"
+    case.workflow_stage = "DOCUMENT_VERIFICATION"
         
     await db.commit()
     return {"message": "Document uploaded", "document_id": ret_doc.id}
@@ -301,7 +302,8 @@ async def verify_document(
                 
         if all_approved:
             case.documents_verified_at = datetime.datetime.utcnow()
-            case.workflow_stage = "documents_verified"
+            case.status = "DOCUMENTS_VERIFIED"
+            case.workflow_stage = "LAWYER_ASSIGNED"
     else:
         ver.status = "REJECTED"
         ver.rejection_reason = req_body.rejection_reason

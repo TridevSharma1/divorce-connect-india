@@ -153,6 +153,7 @@ async def get_admin_dashboard(
         .join(ClientProfile, CaseRequest.client_id == ClientProfile.id)
         .outerjoin(CaseDocumentVerification, CaseDocument.id == CaseDocumentVerification.document_id)
         .where(
+            CaseRequest.status != 'PENDING',
             (CaseDocumentVerification.id == None) | (CaseDocumentVerification.status == 'PENDING')
         )
         .order_by(CaseDocument.uploaded_at.desc())

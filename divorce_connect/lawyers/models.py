@@ -44,6 +44,14 @@ class LawyerProfile(models.Model):
         help_text="Associated BaseUser account"
     )
 
+    custom_id = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Unique lawyer ID (ld:XXXXX)"
+    )
+
     # Personal Information
     full_name = models.CharField(
         max_length=100,
@@ -217,6 +225,16 @@ class LawyerProfile(models.Model):
     def __str__(self):
         return f"{self.full_name} ({self.user.email})"
 
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            import random
+            while True:
+                candidate = f"ld:{random.randint(10000, 99999)}"
+                if not LawyerProfile.objects.filter(custom_id=candidate).exists():
+                    self.custom_id = candidate
+                    break
+        super().save(*args, **kwargs)
+
     @property
     def report_count(self):
         """Return the number of reports filed against this lawyer."""
@@ -294,6 +312,14 @@ class CaseRequest(models.Model):
         ('REJECTED', 'Rejected'),
     ]
 
+    custom_id = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Unique case ID (ci:XXXXX)"
+    )
+
     client = models.ForeignKey(
         'clients.ClientProfile',
         on_delete=models.CASCADE,
@@ -316,6 +342,16 @@ class CaseRequest(models.Model):
 
     def __str__(self):
         return f"Case Request #{self.id}: {self.client} to {self.lawyer}"
+
+    def save(self, *args, **kwargs):
+        if not self.custom_id:
+            import random
+            while True:
+                candidate = f"ci:{random.randint(10000, 99999)}"
+                if not CaseRequest.objects.filter(custom_id=candidate).exists():
+                    self.custom_id = candidate
+                    break
+        super().save(*args, **kwargs)
 
     WORKFLOW_STAGES = [
         ('CASE_CREATED', 'Case Created'),
@@ -487,7 +523,6 @@ class CaseDocument(models.Model):
         ('income_proof', 'Income Proof'),
         ('passport', 'Passport'),
         ('affidavit', 'Affidavits'),
-        ('court_notice', 'Court Notices'),
     ]
 
     case_request = models.ForeignKey(

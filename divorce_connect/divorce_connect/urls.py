@@ -43,6 +43,12 @@ urlpatterns = [
     path('', include('clients.urls')),
     path('adminpanel/', include('adminpanel.urls')),
     path('lawyers/', include('lawyers.urls')),
+    
+    # Direct Lawyer Profile Aliases
+    path('lawyer_profile/', include([
+        path('', lambda r: __import__('django.shortcuts').shortcuts.redirect('/lawyers/profile/')),
+    ])),
+    path('lawyer_profile_edit/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/lawyers/profile/edit/')),
 ]
 
 urlpatterns += static( settings.MEDIA_URL ,document_root = settings.MEDIA_ROOT)

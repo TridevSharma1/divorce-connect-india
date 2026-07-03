@@ -173,6 +173,14 @@ def lawyer_profile_edit_view(request):
         return redirect('/api/auth/login/')
 
     profile = request.user.lawyer_profile
+    if not profile.custom_id:
+        import random
+        while True:
+            candidate = f"ld:{random.randint(10000, 99999)}"
+            if not LawyerProfile.objects.filter(custom_id=candidate).exists():
+                profile.custom_id = candidate
+                profile.save(update_fields=['custom_id'])
+                break
 
     # ==========================================
     # PATH A: INITIAL SETUP (Not Verified Yet)

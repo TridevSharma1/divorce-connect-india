@@ -335,8 +335,15 @@ async def get_lawyer_profile_endpoint(
 ):
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    import random
     if not lawyer_profile:
         # Create an empty profile row to avoid breaking on onboarding
+        while True:
+            candidate = f"ld:{random.randint(10000, 99999)}"
+            check = await db.execute(select(LawyerProfile).where(LawyerProfile.custom_id == candidate))
+            if not check.scalar_one_or_none():
+                custom_id = candidate
+                break
         lawyer_profile = LawyerProfile(
             user_id=current_user.id,
             full_name=current_user.first_name + " " + current_user.last_name,
@@ -347,9 +354,19 @@ async def get_lawyer_profile_endpoint(
             specialization="",
             mobile_number="",
             bio="",
-            office_city=""
+            office_city="",
+            custom_id=custom_id
         )
         db.add(lawyer_profile)
+        await db.commit()
+        await db.refresh(lawyer_profile)
+    elif not lawyer_profile.custom_id:
+        while True:
+            candidate = f"ld:{random.randint(10000, 99999)}"
+            check = await db.execute(select(LawyerProfile).where(LawyerProfile.custom_id == candidate))
+            if not check.scalar_one_or_none():
+                lawyer_profile.custom_id = candidate
+                break
         await db.commit()
         await db.refresh(lawyer_profile)
         
@@ -366,7 +383,10 @@ async def get_lawyer_profile_endpoint(
         "bio": lawyer_profile.bio,
         "mobile_number": lawyer_profile.mobile_number,
         "alternate_mobile_number": lawyer_profile.alternate_mobile_number or "",
-        "profile_picture": lawyer_profile.profile_picture or ""
+        "profile_picture": lawyer_profile.profile_picture or "",
+        "custom_id": lawyer_profile.custom_id,
+        "rating": lawyer_profile.rating,
+        "verified": lawyer_profile.verified
     }
 
 from fastapi import UploadFile, File, Form

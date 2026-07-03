@@ -88,6 +88,14 @@ def edit_profile_client_view(request):
     
     # Get or create the profile for this user
     profile, created = ClientProfile.objects.get_or_create(user=user)
+    if not profile.custom_id:
+        import random
+        while True:
+            candidate = f"cl:{random.randint(10000, 99999)}"
+            if not ClientProfile.objects.filter(custom_id=candidate).exists():
+                profile.custom_id = candidate
+                profile.save(update_fields=['custom_id'])
+                break
 
     if request.method == 'POST':
         # UPDATE operation - Mapping exactly to your custom model

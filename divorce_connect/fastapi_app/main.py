@@ -292,6 +292,8 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "verify_register_otp.html"
     elif page_path in ["client_profile", "profile/edit"]:
         template_name = "edit_profile_client.html"
+    elif page_path in ["lawyer_profile", "lawyers/profile"]:
+        template_name = "profile_lawyer.html"
     elif page_path in ["delete-account", "api/auth/delete-account"]:
         template_name = "request_delete_account.html"
     elif page_path in ["lawyer_earnings", "earnings"]:
@@ -400,7 +402,34 @@ async def dynamic_page(request: Request, page_path: str):
                 date_of_birth = None
                 profile_picture = None
                 user = DummyUser()
+        if "profile" not in context:
+            class DummyUser:
+                email = ""
+            class DummyProfile:
+                full_name = ""
+                gender = ""
+                date_of_birth = None
+                bar_registration_number = ""
+                state_bar_council = ""
+                years_of_experience = 0
+                specialization = ""
+                rating = 0.0
+                rating_count = 0
+                rating_total = 0
+                verified = False
+                is_profile_complete = False
+                mobile_number = ""
+                alternate_mobile_number = ""
+                profile_picture = None
+                bio = ""
+                consultation_fee = 0.0
+                office_city = ""
+                custom_id = ""
+                get_specialization_display = lambda self=None: ""
+                get_gender_display = lambda self=None: ""
+                user = DummyUser()
             context["profile"] = DummyProfile()
+            context["user"] = DummyUser()
             
         return templates.TemplateResponse(request, template_name, context)
     except jinja2.exceptions.TemplateNotFound:

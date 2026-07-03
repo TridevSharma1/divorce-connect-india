@@ -302,6 +302,7 @@
 
                             <h2 id="display_full_name" class="text-xl font-semibold text-zinc-950">Loading...</h2>
                             <p id="display_email" class="text-sm text-zinc-500 mt-1">Loading...</p>
+                            <p id="display_client_id" class="text-xs font-bold text-zinc-700 bg-zinc-100 border border-zinc-200/50 rounded-lg px-2.5 py-1 inline-block mt-2">Client ID: Loading...</p>
 
                             <div class="mt-4">
                                 <span class="status-badge">
@@ -523,6 +524,7 @@
             // Update displays
             document.getElementById('display_full_name').innerText = `${data.first_name || ''} ${data.last_name || ''}`;
             document.getElementById('display_email').innerText = data.email || '';
+            document.getElementById('display_client_id').innerText = `Client ID: ${data.custom_id || 'N/A'}`;
 
             // Handle preview and placeholder
             const preview = document.getElementById('photo-preview');

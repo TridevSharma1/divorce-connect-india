@@ -79,6 +79,7 @@ class ClientProfile(Base):
     date_of_join: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     
     user = relationship("User", backref="client_profile")
 
@@ -108,6 +109,7 @@ class LawyerProfile(Base):
     date_joined: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     
     user = relationship("User", backref="lawyer_profile")
 
@@ -145,6 +147,7 @@ class CaseRequest(Base):
     workflow_stage_updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
 
 
 class CaseMessage(Base):

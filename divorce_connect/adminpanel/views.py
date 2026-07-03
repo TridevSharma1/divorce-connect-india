@@ -125,7 +125,7 @@ def admin_dashboard_view(request):
     # Get pending document verifications
     pending_documents = CaseDocumentVerification.objects.filter(
         status='PENDING'
-    ).select_related('document', 'document__case_request', 'document__case_request__client').order_by('-document__uploaded_at')
+    ).exclude(document__case_request__status='PENDING').select_related('document', 'document__case_request', 'document__case_request__client').order_by('-document__uploaded_at')
 
     pending_reports = TrustReport.objects.filter(
         status='PENDING'
@@ -417,7 +417,7 @@ def case_documents_verification_list_view(request):
     # Get all pending documents
     pending_verifications = CaseDocumentVerification.objects.filter(
         status='PENDING'
-    ).select_related('document', 'document__case_request', 'document__case_request__client', 'document__case_request__lawyer').order_by('-document__uploaded_at')
+    ).exclude(document__case_request__status='PENDING').select_related('document', 'document__case_request', 'document__case_request__client', 'document__case_request__lawyer').order_by('-document__uploaded_at')
 
     # Group by case request
     cases_with_pending_docs = {}
@@ -537,7 +537,7 @@ def case_document_verify_view(request, document_id):
             elif all_verified:
                 # Only update to DOCUMENTS_VERIFIED if ALL are verified
                 case_request.status = 'DOCUMENTS_VERIFIED'
-                case_request.workflow_stage = 'DOCUMENT_VERIFICATION'
+                case_request.workflow_stage = 'LAWYER_ASSIGNED'
                 case_request.workflow_stage_updated_at = timezone.now()
                 case_request.documents_verified_at = timezone.now()
                 case_request.save()

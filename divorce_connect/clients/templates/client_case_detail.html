@@ -241,8 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         { key: "address_proof", label: "Address Proof" },
         { key: "income_proof", label: "Income Proof" },
         { key: "passport", label: "Passport" },
-        { key: "affidavit", label: "Affidavits" },
-        { key: "court_notice", label: "Court Notices" }
+        { key: "affidavit", label: "Affidavits" }
     ];
 
     let activeDocUploadType = null;
@@ -337,6 +336,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 statusClass = "bg-slate-900 border-slate-900 text-white shadow-md ring-4 ring-slate-100";
             }
 
+            let badgeMarkup = "";
+            if (isCompleted) {
+                badgeMarkup = `<span class="inline-flex rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 mt-1.5">✓ Completed</span>`;
+            } else if (isActive) {
+                badgeMarkup = `<span class="inline-flex rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 mt-1.5 animate-pulse">⏳ Pending</span>`;
+            }
+
             const item = document.createElement("div");
             item.className = `flex gap-3.5 p-4 border rounded-2xl transition-all duration-300 ${statusClass}`;
             item.innerHTML = `
@@ -346,6 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <div>
                     <h4 class="font-bold text-sm tracking-tight ${isActive ? 'text-white' : 'text-slate-900'}">${m.label}</h4>
                     <p class="text-[0.75rem] mt-0.5 leading-snug ${isActive ? 'text-slate-300' : 'text-slate-500'}">${m.desc}</p>
+                    ${badgeMarkup}
                 </div>
             `;
             grid.appendChild(item);

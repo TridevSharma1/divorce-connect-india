@@ -138,12 +138,21 @@ async def hire_lawyer(
         raise HTTPException(status_code=404, detail="Lawyer not found")
         
     # Create Case Request
+    import random
+    while True:
+        candidate = f"ci:{random.randint(10000, 99999)}"
+        check = await db.execute(select(CaseRequest).where(CaseRequest.custom_id == candidate))
+        if not check.scalar_one_or_none():
+            custom_id = candidate
+            break
+
     new_request = CaseRequest(
         client_id=client.id,
         lawyer_id=lawyer.id,
         message=message,
         status="PENDING",
-        workflow_stage="request_sent"
+        workflow_stage="request_sent",
+        custom_id=custom_id
     )
     
     db.add(new_request)
@@ -180,17 +189,34 @@ async def get_client_profile(
 ):
     res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
     profile = res.scalar_one_or_none()
+    import random
     if not profile:
         # Create a default profile on the fly if missing
+        while True:
+            candidate = f"cl:{random.randint(10000, 99999)}"
+            check = await db.execute(select(ClientProfile).where(ClientProfile.custom_id == candidate))
+            if not check.scalar_one_or_none():
+                custom_id = candidate
+                break
         profile = ClientProfile(
             user_id=current_user.id,
             first_name=current_user.first_name,
             last_name=current_user.last_name,
             gender="other",
             marital_status="single",
-            mobile_number=""
+            mobile_number="",
+            custom_id=custom_id
         )
         db.add(profile)
+        await db.commit()
+        await db.refresh(profile)
+    elif not profile.custom_id:
+        while True:
+            candidate = f"cl:{random.randint(10000, 99999)}"
+            check = await db.execute(select(ClientProfile).where(ClientProfile.custom_id == candidate))
+            if not check.scalar_one_or_none():
+                profile.custom_id = candidate
+                break
         await db.commit()
         await db.refresh(profile)
         
@@ -205,7 +231,8 @@ async def get_client_profile(
         "pincode": profile.pincode or "",
         "date_of_birth": profile.date_of_birth.strftime("%Y-%m-%d") if profile.date_of_birth else "",
         "profile_picture": profile.profile_picture,
-        "email": current_user.email
+        "email": current_user.email,
+        "custom_id": profile.custom_id
     }
 
 @router.post("/profile")
