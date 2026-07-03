@@ -6,6 +6,7 @@ from typing import Dict, Any
 from ..database import get_db
 from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
 from ..security import get_current_user
+from .cloudinary_utils import upload_to_cloudinary
 
 router = APIRouter()
 
@@ -460,12 +461,7 @@ async def update_lawyer_profile_endpoint(
                 
         pic_url = profile.profile_picture
         if profile_picture and profile_picture.filename:
-            import os
-            os.makedirs("media/profile_pictures", exist_ok=True)
-            file_location = f"media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
-            with open(file_location, "wb+") as file_object:
-                file_object.write(await profile_picture.read())
-            pic_url = f"/media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
+            pic_url = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
 
         update_request = LawyerProfileUpdateRequest(
             lawyer_id=profile.id,
@@ -531,12 +527,7 @@ async def update_lawyer_profile_endpoint(
     
     # Handle image upload
     if profile_picture and profile_picture.filename:
-        import os
-        os.makedirs("media/profile_pictures", exist_ok=True)
-        file_location = f"media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
-        with open(file_location, "wb+") as file_object:
-            file_object.write(await profile_picture.read())
-        profile.profile_picture = f"/media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
+        profile.profile_picture = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
         
     await db.commit()
 

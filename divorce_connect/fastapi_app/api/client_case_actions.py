@@ -6,6 +6,7 @@ from typing import List, Dict, Any
 from ..database import get_db
 from ..models import User, ClientProfile, CaseRequest, CaseDocument, LawyerProfile, CaseDocumentVerification
 from ..security import get_current_user
+from .cloudinary_utils import upload_to_cloudinary
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 
@@ -176,14 +177,8 @@ async def upload_case_document(
     case = case_res.scalar_one_or_none()
     if not case:
         raise HTTPException(status_code=404, detail="Case request not found")
-    # Save file to static/uploads (ensure directory exists)
-    import os, shutil, uuid
-    upload_dir = os.path.join(os.getcwd(), "static", "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}_{file.filename}"
-    file_path = os.path.join(upload_dir, filename)
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Upload document directly to Cloudinary and preserve the secure URL.
+    document_url = await upload_to_cloudinary(file, folder="case_documents")
     # Update or Create DB record
     existing_doc_res = await db.execute(
         select(CaseDocument).where(
@@ -194,7 +189,7 @@ async def upload_case_document(
     existing_doc = existing_doc_res.scalar_one_or_none()
     
     if existing_doc:
-        existing_doc.document_file = filename
+        existing_doc.document_file = document_url
         # Reset verification status
         ver_res = await db.execute(
             select(CaseDocumentVerification).where(CaseDocumentVerification.document_id == existing_doc.id)
@@ -216,7 +211,7 @@ async def upload_case_document(
         new_doc = CaseDocument(
             case_request_id=case.id,
             document_type=document_type,
-            document_file=filename,
+            document_file=document_url,
         )
         db.add(new_doc)
         await db.flush()
@@ -410,16 +405,7 @@ async def send_case_message(
     # Handle file attachment
     filename = None
     if file and file.filename:
-        import os, shutil, uuid
-        upload_dir = os.path.join(os.getcwd(), "media", "chat_attachments")
-        os.makedirs(upload_dir, exist_ok=True)
-        filename = f"{uuid.uuid4().hex}_{file.filename}"
-        file_path = os.path.join(upload_dir, filename)
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Save exact relative path for media compatibility
-        filename = f"chat_attachments/{filename}"
+        filename = await upload_to_cloudinary(file, folder="chat_attachments")
 
     new_msg = CaseMessage(
         case_id=case.id,

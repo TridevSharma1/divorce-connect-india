@@ -173,6 +173,17 @@ async def get_document_verification_list(
             continue
             
         case_docs = []
+        def normalize_document_file_url(file_path: str) -> str:
+            if not file_path:
+                return "#"
+            if file_path.startswith("http://") or file_path.startswith("https://") or file_path.startswith("//"):
+                return file_path
+            if file_path.startswith("/"):
+                return file_path
+            if file_path.startswith("media/") or file_path.startswith("static/"):
+                return f"/{file_path}"
+            return f"/static/uploads/{file_path}"
+
         for doc in docs:
             ver_res = await db.execute(
                 select(CaseDocumentVerification)
@@ -189,18 +200,19 @@ async def get_document_verification_list(
                 await db.commit()
                 await db.refresh(ver)
             
+            pdf_url = normalize_document_file_url(doc.document_file)
             case_docs.append({
                 "id": doc.id,
                 "document_type": doc.document_type,
                 "document_type_display": doc_types.get(doc.document_type, doc.document_type.capitalize()),
                 "uploaded_at": doc.uploaded_at.strftime("%b %d, %Y · %H:%M") if doc.uploaded_at else "",
-                "document_file_url": f"/static/uploads/{doc.document_file}" if doc.document_file else "#",
+                "document_file_url": pdf_url if doc.document_file else "#",
                 "verification": {
                     "status": ver.status,
                     "rejection_reason": ver.rejection_reason or ""
                 }
             })
-            
+        
         cases_with_pending_docs.append({
             "case_request": {
                 "id": case.id,

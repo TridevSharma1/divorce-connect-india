@@ -8,6 +8,7 @@ import math
 from ..database import get_db
 from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
 from ..security import get_current_user
+from .cloudinary_utils import upload_to_cloudinary
 
 router = APIRouter()
 
@@ -295,16 +296,7 @@ async def update_admin_profile(
     admin_profile.alternate_mobile_number = alternate_mobile_number
     
     if profile_picture and profile_picture.filename:
-        upload_dir = Path("media/profile_pictures")
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        file_extension = Path(profile_picture.filename).suffix
-        filename = f"admin_{current_user.id}_{uuid.uuid4().hex}{file_extension}"
-        filepath = upload_dir / filename
-        
-        with open(filepath, "wb") as buffer:
-            shutil.copyfileobj(profile_picture.file, buffer)
-            
-        admin_profile.profile_picture = f"/media/profile_pictures/{filename}"
+        admin_profile.profile_picture = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
         
     admin_profile.is_profile_complete = True
     admin_profile.is_verified_by_superuser = False

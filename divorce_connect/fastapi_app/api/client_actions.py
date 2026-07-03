@@ -2,13 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile,
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Dict, Any, Optional
-import os
-import shutil
 import datetime
 
 from ..database import get_db
-from ..models import User, LawyerProfile, CaseRequest, ClientProfile, LawyerRating
+from ..models import User, ClientProfile, LawyerProfile, CaseRequest, LawyerRating
 from ..security import get_current_user
+from .cloudinary_utils import upload_to_cloudinary
 
 router = APIRouter()
 
@@ -306,11 +305,7 @@ async def update_client_profile(
             pass
             
     if profile_picture and profile_picture.filename:
-        os.makedirs("media/profile_pictures", exist_ok=True)
-        file_location = f"media/profile_pictures/{current_user.id}_{profile_picture.filename}"
-        with open(file_location, "wb+") as file_object:
-            shutil.copyfileobj(profile_picture.file, file_object)
-        profile.profile_picture = f"/media/profile_pictures/{current_user.id}_{profile_picture.filename}"
+        profile.profile_picture = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
         
     current_user.first_name = first_name
     current_user.last_name = last_name

@@ -467,7 +467,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const normalizedFileUrl = (() => {
                     if (!uploadedDoc.document_file) return '#';
                     const filePath = uploadedDoc.document_file;
-                    if (/^(https?:\/\/|\/|media\/|static\/)/i.test(filePath)) {
+                    if (/^(https?:\/\/|\/\/)/i.test(filePath)) {
+                        return filePath;
+                    }
+                    if (/^(\/|media\/|static\/)/i.test(filePath)) {
                         return filePath.startsWith('/') ? filePath : `/${filePath}`;
                     }
                     if (/^(case_documents\/|uploads\/)/i.test(filePath)) {
@@ -654,6 +657,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let attachmentMarkup = "";
                 if (m.attachment) {
                     const filename = m.attachment.split('/').pop();
+                    const attachmentUrl = /^(https?:)?\/\//i.test(m.attachment) ? m.attachment : `/media/${m.attachment}`;
                     if (checkHarmfulAttachment(filename)) {
                         attachmentMarkup = `
                             <div class="mt-2 p-3 bg-red-50 rounded-xl border border-red-200 flex items-center gap-2 text-red-700">
@@ -665,15 +669,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const isImage = /\.(jpg|jpeg|png|webp|gif|svg|bmp)$/i.test(m.attachment);
                         if (isImage) {
                             attachmentMarkup = `
-                                <div class="mt-2 relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-w-full chat-media-attach cursor-pointer" data-url="/media/${m.attachment}">
-                                    <img src="/media/${m.attachment}" alt="Attachment" class="max-h-60 object-cover rounded-xl" />
+                                <div class="mt-2 relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-w-full chat-media-attach cursor-pointer" data-url="${attachmentUrl}">
+                                    <img src="${attachmentUrl}" alt="Attachment" class="max-h-60 object-cover rounded-xl" />
                                 </div>
                             `;
                         } else {
                             attachmentMarkup = `
-                                <div class="mt-2 p-3 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-2 chat-media-attach cursor-pointer" data-url="/media/${m.attachment}">
+                                <div class="mt-2 p-3 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-2 chat-media-attach cursor-pointer" data-url="${attachmentUrl}">
                                     <span class="text-lg">📁</span>
-                                    <a href="/media/${m.attachment}" target="_blank" class="font-bold underline text-xs break-all text-slate-800" onclick="event.stopPropagation()">${filename}</a>
+                                    <a href="${attachmentUrl}" target="_blank" class="font-bold underline text-xs break-all text-slate-800" onclick="event.stopPropagation()">${filename}</a>
                                 </div>
                             `;
                         }
