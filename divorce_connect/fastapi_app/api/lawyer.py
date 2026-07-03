@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from typing import Dict, Any
 
 from ..database import get_db
-from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification
+from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
 from ..security import get_current_user
 
 router = APIRouter()
@@ -172,8 +172,8 @@ async def respond_case_request(
         raise HTTPException(status_code=404, detail="Case request not found")
         
     if action == "accept":
-        req.status = "ACTIVE"
-        req.workflow_stage = "document_upload"
+        req.status = "DOCUMENTS_PENDING"
+        req.workflow_stage = "DOCUMENT_VERIFICATION"
     elif action == "reject":
         req.status = "REJECTED"
         
@@ -416,6 +416,73 @@ async def update_lawyer_profile_endpoint(
         profile = LawyerProfile(user_id=current_user.id)
         db.add(profile)
         
+    if profile.verified:
+        # Check if there is already a pending update request
+        pending_res = await db.execute(
+            select(LawyerProfileUpdateRequest)
+            .where(LawyerProfileUpdateRequest.lawyer_id == profile.id, LawyerProfileUpdateRequest.status == "PENDING")
+        )
+        if pending_res.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="You already have a profile update pending approval.")
+
+        dob_parsed = None
+        if date_of_birth:
+            try:
+                dob_parsed = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            except:
+                pass
+                
+        pic_url = profile.profile_picture
+        if profile_picture and profile_picture.filename:
+            import os
+            os.makedirs("media/profile_pictures", exist_ok=True)
+            file_location = f"media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
+            with open(file_location, "wb+") as file_object:
+                file_object.write(await profile_picture.read())
+            pic_url = f"/media/profile_pictures/lawyer_{current_user.id}_{profile_picture.filename}"
+
+        update_request = LawyerProfileUpdateRequest(
+            lawyer_id=profile.id,
+            full_name=full_name,
+            gender=gender,
+            date_of_birth=dob_parsed,
+            years_of_experience=years_of_experience,
+            specialization=specialization,
+            consultation_fee=consultation_fee,
+            office_city=office_city,
+            bio=bio,
+            mobile_number=mobile_number,
+            alternate_mobile_number=alternate_mobile_number,
+            profile_picture=pic_url,
+            status="PENDING"
+        )
+        db.add(update_request)
+        await db.commit()
+
+        try:
+            from ..notifications import create_and_broadcast_notification
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=current_user.id,
+                title="Profile Update Submitted",
+                message="Your profile update has been submitted and is pending verification.",
+                url="/lawyer_profile/"
+            )
+            admin_res = await db.execute(select(User).where((User.is_staff == True) | (User.role == "admin")))
+            for admin in admin_res.scalars().all():
+                await create_and_broadcast_notification(
+                    db=db,
+                    user_id=admin.id,
+                    title="Lawyer Update Request",
+                    message=f"Lawyer {profile.full_name} has requested a profile update.",
+                    url=f"/adminpanel/lawyer/update-request/{update_request.id}/"
+                )
+        except Exception as e:
+            print("Notification error:", e)
+
+        return {"message": "Profile update submitted successfully for admin approval."}
+
+    # Initial setup path (Not Verified Yet)
     profile.full_name = full_name
     profile.gender = gender
     if date_of_birth:
