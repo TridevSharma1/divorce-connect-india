@@ -6,7 +6,7 @@ import datetime
 import math
 
 from ..database import get_db
-from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification
+from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
 from ..security import get_current_user
 
 router = APIRouter()
@@ -169,7 +169,26 @@ async def get_admin_dashboard(
         for doc, case, client in pending_docs_rows
     ]
 
+    # Fetch real pending lawyer profile update requests
+    pending_updates_res = await db.execute(
+        select(LawyerProfileUpdateRequest, LawyerProfile)
+        .join(LawyerProfile, LawyerProfileUpdateRequest.lawyer_id == LawyerProfile.id)
+        .where(LawyerProfileUpdateRequest.status == 'PENDING')
+        .order_by(LawyerProfileUpdateRequest.id.desc())
+    )
+    pending_updates = pending_updates_res.all()
+    pending_update_requests = [
+        {
+            "id": req.id,
+            "lawyer_name": lawyer.full_name,
+            "custom_id": lawyer.custom_id,
+            "submitted_at": req.submitted_at.strftime("%b %d, %Y") if req.submitted_at else ""
+        }
+        for req, lawyer in pending_updates
+    ]
+
     return {
+        "pending_update_requests": pending_update_requests,
         "is_complete": is_complete,
         "is_verified": is_verified,
         "profile": {

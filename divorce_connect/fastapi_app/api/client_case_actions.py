@@ -87,6 +87,12 @@ async def get_case_detail(
         await db.commit()
         await db.refresh(case)
 
+    # Self-healing: auto-advance stage if status is documents pending/submitted but stage is still CASE_CREATED
+    if case.status in ["DOCUMENTS_PENDING", "DOCUMENTS_SUBMITTED"] and case.workflow_stage == "CASE_CREATED":
+        case.workflow_stage = "DOCUMENT_VERIFICATION"
+        await db.commit()
+        await db.refresh(case)
+
     # Fetch lawyer details
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == case.lawyer_id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()

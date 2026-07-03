@@ -235,6 +235,113 @@ async def dynamic_page(request: Request, page_path: str):
     if page_path.endswith("/"):
         page_path = page_path[:-1]
 
+    if "adminpanel/lawyer/update-request" in page_path:
+        parts = page_path.strip("/").split("/")
+        req_id = int(parts[-1])
+        
+        from sqlalchemy import select
+        from .database import AsyncSessionLocal
+        from .models import LawyerProfile, LawyerProfileUpdateRequest, User
+        
+        async with AsyncSessionLocal() as db:
+            update_req_res = await db.execute(select(LawyerProfileUpdateRequest).where(LawyerProfileUpdateRequest.id == req_id))
+            update_request = update_req_res.scalar_one_or_none()
+            if not update_request:
+                raise HTTPException(status_code=404, detail="Update request not found")
+                
+            lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == update_request.lawyer_id))
+            lawyer = lawyer_res.scalar_one_or_none()
+            if not lawyer:
+                raise HTTPException(status_code=404, detail="Lawyer profile not found")
+
+            if request.method == "POST":
+                form = await request.form()
+                action = form.get("action")
+                notes = form.get("notes") or ""
+                rejection_reason = form.get("rejection_reason") or ""
+                
+                if action == "approve":
+                    if update_request.full_name:
+                        lawyer.full_name = update_request.full_name
+                    if update_request.gender:
+                        lawyer.gender = update_request.gender
+                    if update_request.date_of_birth:
+                        lawyer.date_of_birth = update_request.date_of_birth
+                    if update_request.bar_registration_number:
+                        lawyer.bar_registration_number = update_request.bar_registration_number
+                    if update_request.state_bar_council:
+                        lawyer.state_bar_council = update_request.state_bar_council
+                    if update_request.years_of_experience is not None:
+                        lawyer.years_of_experience = update_request.years_of_experience
+                    if update_request.specialization:
+                        lawyer.specialization = update_request.specialization
+                    if update_request.bio:
+                        lawyer.bio = update_request.bio
+                    if update_request.consultation_fee is not None:
+                        lawyer.consultation_fee = update_request.consultation_fee
+                    if update_request.office_city:
+                        lawyer.office_city = update_request.office_city
+                    if update_request.mobile_number:
+                        lawyer.mobile_number = update_request.mobile_number
+                    if update_request.alternate_mobile_number:
+                        lawyer.alternate_mobile_number = update_request.alternate_mobile_number
+                    if update_request.profile_picture:
+                        lawyer.profile_picture = update_request.profile_picture
+                        
+                    db.add(lawyer)
+                    update_request.status = "APPROVED"
+                    update_request.admin_notes = notes
+                    db.add(update_request)
+                    await db.commit()
+                    
+                    try:
+                        from .notifications import create_and_broadcast_notification
+                        await create_and_broadcast_notification(
+                            db=db,
+                            user_id=lawyer.user_id,
+                            title="Profile Update Approved",
+                            message="Your lawyer profile update request has been approved and applied.",
+                            url="/lawyer_profile/"
+                        )
+                    except Exception:
+                        pass
+                        
+                    return RedirectResponse(url="/admin_dashboard/", status_code=303)
+                    
+                elif action == "reject":
+                    update_request.status = "REJECTED"
+                    update_request.admin_notes = notes or rejection_reason
+                    db.add(update_request)
+                    await db.commit()
+                    
+                    try:
+                        from .notifications import create_and_broadcast_notification
+                        await create_and_broadcast_notification(
+                            db=db,
+                            user_id=lawyer.user_id,
+                            title="Profile Update Rejected",
+                            message=f"Your profile update request was rejected. Reason: {notes or rejection_reason}",
+                            url="/lawyer_profile_edit/"
+                        )
+                    except Exception:
+                        pass
+                        
+                    return RedirectResponse(url="/admin_dashboard/", status_code=303)
+            
+            class SimpleUser:
+                email = ""
+            user_res = await db.execute(select(User).where(User.id == lawyer.user_id))
+            user_obj = user_res.scalar_one_or_none() or SimpleUser()
+            context = {
+                "request": request,
+                "lawyer": lawyer,
+                "update_request": update_request,
+                "user_obj": user_obj
+            }
+
+        template_name = "lawyer_update_request_detail.html"
+        return templates.TemplateResponse(request, template_name, context)
+
     if page_path in ["forgot-password", "forgot_password"]:
         if request.method == "POST":
             form = await request.form()

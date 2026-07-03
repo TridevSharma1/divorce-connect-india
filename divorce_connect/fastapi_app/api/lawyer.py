@@ -446,6 +446,8 @@ async def update_lawyer_profile_endpoint(
             full_name=full_name,
             gender=gender,
             date_of_birth=dob_parsed,
+            bar_registration_number=bar_registration_number,
+            state_bar_council=state_bar_council,
             years_of_experience=years_of_experience,
             specialization=specialization,
             consultation_fee=consultation_fee,

@@ -251,6 +251,8 @@ def lawyer_profile_edit_view(request):
                 lawyer=profile,
                 full_name=request.POST.get('full_name'),
                 gender=request.POST.get('gender'),
+                bar_registration_number=request.POST.get('bar_registration_number'),
+                state_bar_council=request.POST.get('state_bar_council'),
                 years_of_experience=request.POST.get('years_of_experience') or profile.years_of_experience,
                 specialization=request.POST.get('specialization'),
                 consultation_fee=consultation_fee_value,

@@ -355,6 +355,8 @@ def lawyer_update_request_detail_view(request, request_id):
             lawyer.full_name = update_request.full_name or lawyer.full_name
             lawyer.gender = update_request.gender or lawyer.gender
             lawyer.date_of_birth = update_request.date_of_birth or lawyer.date_of_birth
+            lawyer.bar_registration_number = update_request.bar_registration_number or lawyer.bar_registration_number
+            lawyer.state_bar_council = update_request.state_bar_council or lawyer.state_bar_council
             lawyer.years_of_experience = update_request.years_of_experience if update_request.years_of_experience is not None else lawyer.years_of_experience
             lawyer.specialization = update_request.specialization or lawyer.specialization
             lawyer.bio = update_request.bio or lawyer.bio

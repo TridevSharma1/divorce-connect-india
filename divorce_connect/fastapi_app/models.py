@@ -113,6 +113,26 @@ class LawyerProfile(Base):
     
     user = relationship("User", backref="lawyer_profile")
 
+    @property
+    def get_gender_display(self):
+        return {
+            "MALE": "Male",
+            "FEMALE": "Female",
+            "OTHER": "Other"
+        }.get(self.gender, self.gender or "")
+
+    @property
+    def get_specialization_display(self):
+        return {
+            "MUTUAL": "Mutual Consent Divorce",
+            "CONTESTED": "Contested Divorce",
+            "MAINTENANCE": "Alimony & Maintenance",
+            "CUSTODY": "Child Custody",
+            "DOMESTIC": "Domestic Violence & Protection",
+            "MEDIATION": "Family Mediation & Counseling",
+            "OTHER": "Other Family Law Matters"
+        }.get(self.specialization, self.specialization or "")
+
 
 class AdminPanelProfile(Base):
     __tablename__ = "adminpanel_adminpanelprofile"
@@ -243,6 +263,8 @@ class LawyerProfileUpdateRequest(Base):
     full_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     gender: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     date_of_birth: Mapped[Optional[datetime.date]] = mapped_column(Date, nullable=True)
+    bar_registration_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    state_bar_council: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     years_of_experience: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     specialization: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -255,5 +277,25 @@ class LawyerProfileUpdateRequest(Base):
     submitted_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
     admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    @property
+    def get_gender_display(self):
+        return {
+            "MALE": "Male",
+            "FEMALE": "Female",
+            "OTHER": "Other"
+        }.get(self.gender, self.gender or "")
+
+    @property
+    def get_specialization_display(self):
+        return {
+            "MUTUAL": "Mutual Consent Divorce",
+            "CONTESTED": "Contested Divorce",
+            "MAINTENANCE": "Alimony & Maintenance",
+            "CUSTODY": "Child Custody",
+            "DOMESTIC": "Domestic Violence & Protection",
+            "MEDIATION": "Family Mediation & Counseling",
+            "OTHER": "Other Family Law Matters"
+        }.get(self.specialization, self.specialization or "")
 
 

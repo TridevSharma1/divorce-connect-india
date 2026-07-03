@@ -641,6 +641,8 @@ class LawyerProfileUpdateRequest(models.Model):
     full_name = models.CharField(max_length=100, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=Gender.choices, blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
+    bar_registration_number = models.CharField(max_length=50, blank=True, null=True)
+    state_bar_council = models.CharField(max_length=100, blank=True, null=True)
     years_of_experience = models.PositiveIntegerField(null=True, blank=True)
     specialization = models.CharField(max_length=50, choices=Specialization.choices, blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True, null=True)
