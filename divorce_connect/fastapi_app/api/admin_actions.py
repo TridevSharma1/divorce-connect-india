@@ -122,6 +122,7 @@ async def list_cases_for_admin(
             "client_id": client.id,
             "client_email": cu.email,
             "lawyer_name": lawyer.full_name,
+            "lawyer_id": lawyer.id,
             "lawyer_email": lu.email
         })
     return cases

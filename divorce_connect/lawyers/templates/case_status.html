@@ -8,8 +8,41 @@
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ── Shimmer Skeleton Loader ── */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="min-h-screen bg-white" id="dashboard-container" style="display: none;">
+<!-- ── Shimmer Loading Placeholder ── -->
+<div id="loading-skeleton-container" class="min-h-screen bg-white py-12 px-6">
+    <div style="display:flex; flex-direction:column; gap:2rem; max-w-7xl mx-auto;">
+        <!-- Header skeleton -->
+        <div class="skeleton" style="height: 100px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Tab bar skeleton -->
+        <div class="skeleton" style="height: 50px; border-radius: 0.5rem; width: 300px;"></div>
+        <!-- List card skeleton -->
+        <div class="skeleton" style="height: 180px; border-radius: 1rem; width: 100%;"></div>
+        <div class="skeleton" style="height: 180px; border-radius: 1rem; width: 100%;"></div>
+    </div>
+</div>
+
+<div class="min-h-screen bg-white" id="dashboard-container" style="display: none;">
         <!-- Page Header -->
         <div class="py-8 px-6 border-b border-gray-200">
             <h1 class="text-4xl font-bold text-black mb-2">Client Roster & Case Status</h1>
@@ -115,15 +148,18 @@
                 });
 
                 if (!res.ok) {
-                    if (res.status === 403) {
+                    if (res.status === 401) {
+                        window.location.href = "/login/";
+                    } else if (res.status === 403) {
                         window.location.href = "/lawyer_dashboard/";
-                        return;
+                    } else {
+                        console.error("Failed to fetch cases list");
                     }
-                    console.error("Failed to fetch cases list");
                     return;
                 }
 
                 const data = await res.json();
+                document.getElementById("loading-skeleton-container").style.display = "none";
                 document.getElementById("dashboard-container").style.display = "block";
 
                 // Hydrate Ready Cases
@@ -152,7 +188,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">${caseItem.created_at}</td>
                             <td class="px-6 py-4 text-right">
-                                <a href="/lawyer_accept_case/" class="text-green-600 hover:text-green-800 font-semibold">Accept Case</a>
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="text-green-600 hover:text-green-800 font-semibold">Accept Case</a>
                             </td>
                         `;
                         readyList.appendChild(tr);
@@ -185,7 +221,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">${caseItem.created_at}</td>
                             <td class="px-6 py-4 text-right">
-                                <a href="/lawyer_case_detail/" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                             </td>
                         `;
                         activeList.appendChild(tr);
@@ -220,7 +256,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">${caseItem.created_at}</td>
                             <td class="px-6 py-4 text-right">
-                                <a href="/lawyer_view_case_documents/" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="text-blue-600 hover:text-blue-800 font-semibold">View</a>
                             </td>
                         `;
                         pendingList.appendChild(tr);

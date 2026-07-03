@@ -90,3 +90,28 @@ async def mark_notification_read(
     await db.commit()
     await db.refresh(notification)
     return notification
+
+from pydantic import BaseModel
+class DirectNotificationIn(BaseModel):
+    user_id: int
+    title: str
+    message: str
+    url: str | None = None
+
+@router.post("/send-direct", status_code=status.HTTP_200_OK)
+async def send_direct_notification(
+    payload: DirectNotificationIn,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Internal endpoint to send/broadcast a notification to a specific user.
+    """
+    from ..notifications import create_and_broadcast_notification
+    await create_and_broadcast_notification(
+        db=db,
+        user_id=payload.user_id,
+        title=payload.title,
+        message=payload.message,
+        url=payload.url
+    )
+    return {"status": "success"}

@@ -2,6 +2,26 @@
 
 {% block title %}Earnings & Payouts - DivorceConnect India{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ── Shimmer Skeleton Loader ── */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block navbar %}
 <div id="nav-lawyer-static" class="flex items-center gap-8">
     {% include 'includes/navbar_lawyer.html' %}
@@ -9,7 +29,23 @@
 {% endblock %}
 
 {% block content %}
-    <div class="min-h-screen bg-white" id="dashboard-container" style="display: none;">
+<!-- ── Shimmer Loading Placeholder ── -->
+<div id="loading-skeleton-container" class="min-h-screen bg-white py-12 px-6">
+    <div style="display:flex; flex-direction:column; gap:2rem; max-w-7xl mx-auto;">
+        <!-- Header skeleton -->
+        <div class="skeleton" style="height: 100px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Metrics cards skeleton -->
+        <div class="grid grid-cols-3 gap-4" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div class="skeleton" style="height: 120px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 120px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 120px; border-radius: 1rem;"></div>
+        </div>
+        <!-- Chart skeleton -->
+        <div class="skeleton" style="height: 250px; border-radius: 1rem; width: 100%;"></div>
+    </div>
+</div>
+
+<div class="min-h-screen bg-white" id="dashboard-container" style="display: none;">
         <!-- Header Section -->
         <header class="border-b border-gray-200 py-8">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -187,6 +223,7 @@
                 const data = await res.json();
 
                 // Show Container
+                document.getElementById("loading-skeleton-container").style.display = "none";
                 document.getElementById("dashboard-container").style.display = "block";
 
                 // Populate Metrics
@@ -231,7 +268,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
                                     <span class="inline-block w-2 h-2 rounded-full ${t.status_dot_class}"></span>
-                                    <span class="text-xs uppercase tracking-wider text-gray-600">${t.status_label}</span>
+                                    <span class="tx-status-label text-xs uppercase tracking-wider text-gray-600">${t.status_label}</span>
                                 </div>
                             </td>
                         `;
@@ -257,7 +294,7 @@
                         if (row.cells.length < 5) return;
                         
                         const text = row.textContent.toLowerCase();
-                        const statusDot = row.querySelector('span:nth-child(2)');
+                        const statusDot = row.querySelector('.tx-status-label');
                         const status = statusDot ? statusDot.textContent.trim().toLowerCase() : "";
 
                         const matchesSearch = text.includes(searchTerm);

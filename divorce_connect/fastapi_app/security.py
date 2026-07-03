@@ -14,8 +14,8 @@ from .models import User
 # Settings
 SECRET_KEY = os.getenv("SECRET_KEY", "replace-with-a-secure-secret-key-in-prod")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 # 1 year
+REFRESH_TOKEN_EXPIRE_DAYS = 365
 
 pwd_context = CryptContext(schemes=["django_pbkdf2_sha256", "bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")

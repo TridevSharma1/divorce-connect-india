@@ -410,7 +410,11 @@ def confirm_delete_account_view(request, token):
 
 def redirect_to_dashboard(user):
     """Redirect user to their role-specific dashboard."""
-    if hasattr(user, 'lawyer_profile'):
+    if user.is_superuser or user.is_staff:
+        if hasattr(user, 'admin_profile') and not user.admin_profile.is_profile_complete:
+            return redirect('/adminpanel/profile/edit/')
+        return redirect('/adminpanel/dashboard/')
+    elif hasattr(user, 'lawyer_profile'):
         if not user.lawyer_profile.is_profile_complete:
             return redirect('/lawyers/profile/edit/')
         return redirect('/lawyers/dashboard/')

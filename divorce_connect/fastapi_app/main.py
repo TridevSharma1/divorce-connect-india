@@ -298,6 +298,9 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "earning_dashboard.html"
     elif page_path in ["lawyer_case_orders", "case-orders"]:
         template_name = "case_order.html"
+    elif page_path in ["lawyer_case_detail", "lawyer-case-detail"]:
+        query_str = f"?{request.query_params}" if request.query_params else ""
+        return RedirectResponse(url=f"/client_case_detail/{query_str}", status_code=307)
     elif page_path in ["lawyer_case_status", "case-status"]:
         template_name = "case_status.html"
     elif page_path in ["lawyer_settings", "settings"]:

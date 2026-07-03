@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block title %}Case Details — DivorceConnect Admin{% endblock %}
 
 {% block extra_css %}
@@ -226,20 +225,7 @@
         white-space: nowrap;
     }
 
-    /* Verified by strip */
-    .cd-verified-strip {
-        margin: 0 1.25rem;
-        padding: 0.6rem 0.85rem;
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        border-radius: 0.5rem;
-        margin-bottom: 0.75rem;
-        font-size: 0.78rem;
-        color: #166534;
-    }
-    .cd-verified-strip strong { color: #14532d; }
-
-    /* Rejection strip */
+    /* Rejection reason style */
     .cd-rejection-strip {
         margin: 0 1.25rem;
         padding: 0.6rem 0.85rem;
@@ -272,6 +258,8 @@
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
     }
     .cd-btn-download {
         background: #f4f4f5;
@@ -282,15 +270,19 @@
         background: #e4e4e7;
         border-color: #a1a1aa;
     }
-    .cd-btn-review {
-        background: #0a0a0a;
+    .cd-btn-approve {
+        background: #16a34a;
         color: #ffffff;
-        border: 1px solid #0a0a0a;
     }
-    .cd-btn-review:hover {
-        background: #1a1a1a;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        transform: translateY(-1px);
+    .cd-btn-approve:hover {
+        background: #15803d;
+    }
+    .cd-btn-reject {
+        background: #dc2626;
+        color: #ffffff;
+    }
+    .cd-btn-reject:hover {
+        background: #b91c1c;
     }
 
     /* ── Empty state ── */
@@ -400,6 +392,7 @@
         height: 100%;
         background: linear-gradient(to right, #0a0a0a, #3f3f46);
         border-radius: 999px;
+        width: 0%;
         transition: width 0.6s ease;
     }
 
@@ -435,13 +428,140 @@
     }
     .cd-next-action strong { font-size: 0.8rem; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.5px; }
     .cd-next-action p { font-size: 0.85rem; color: #3f3f46; margin: 0.3rem 0 0; }
-    .cd-next-action p.green  { color: #15803d; }
-    .cd-next-action p.red    { color: #b91c1c; }
+
+    /* ── Rejection Modal ── */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-card {
+        background: #ffffff;
+        border-radius: 1.25rem;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        margin: 1.5rem;
+    }
+    .modal-backdrop.active .modal-card {
+        transform: scale(1);
+    }
+    .modal-body {
+        padding: 1.75rem;
+    }
+    .modal-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+    }
+    .modal-desc {
+        color: #64748b;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+        margin-top: 0;
+    }
+    .modal-textarea {
+        width: 100%;
+        height: 100px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 2px solid #e2e8f0;
+        font-size: 0.9rem;
+        outline: none;
+        resize: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .modal-textarea:focus {
+        border-color: #0f172a;
+    }
+    .modal-footer {
+        display: flex;
+        border-top: 1px solid #e2e8f0;
+    }
+    .modal-btn {
+        flex: 1;
+        padding: 1.1rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-align: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .modal-btn-cancel {
+        color: #64748b;
+        border-right: 1px solid #e2e8f0;
+    }
+    .modal-btn-confirm {
+        color: #dc2626;
+    }
+    .modal-btn-confirm:hover {
+        background: #fff5f5;
+    }
+
+    /* ── Shimmer Skeleton Loader ── */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="cd-page">
+<!-- ── Shimmer Loading Placeholder ── -->
+<div id="loading-skeleton-container" class="cd-page">
+    <div class="max-w-6xl mx-auto" style="display:flex; flex-direction:column; gap:2rem;">
+        <!-- Hero skeleton -->
+        <div class="skeleton" style="height: 140px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Info cards grid skeleton -->
+        <div class="skeleton" style="height: 120px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Grid header skeleton -->
+        <div class="skeleton" style="height: 30px; width: 200px;"></div>
+        <!-- Documents cards grid skeleton -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+            <div class="skeleton" style="height: 250px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 250px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 250px; border-radius: 1rem;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="cd-page" id="dashboard-container" style="display: none;">
 <div class="max-w-6xl mx-auto">
 
     <!-- ── Hero ── -->
@@ -450,7 +570,7 @@
             <h1>Case Details</h1>
             <p>Review all submitted documents for this case</p>
         </div>
-        <a href="/case_documents_verification_list/" class="cd-back-btn">
+        <a href="/admin_pending_cases/" class="cd-back-btn">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -470,120 +590,38 @@
             <!-- Client -->
             <div class="cd-info-cell">
                 <p class="cd-info-label">Client</p>
-                <p class="cd-info-value">{{ case_request.client.get_full_name }}</p>
-                <p class="cd-info-sub">{{ case_request.client.user.email }}</p>
+                <p class="cd-info-value" id="case-client-name">-</p>
+                <p class="cd-info-sub" id="case-client-email">-</p>
             </div>
             <!-- Lawyer -->
             <div class="cd-info-cell">
                 <p class="cd-info-label">Lawyer</p>
-                <p class="cd-info-value">{{ case_request.lawyer.full_name }}</p>
-                <p class="cd-info-sub">{{ case_request.lawyer.user.email }}</p>
+                <p class="cd-info-value" id="case-lawyer-name">-</p>
+                <p class="cd-info-sub" id="case-lawyer-email">-</p>
             </div>
             <!-- Case Status -->
             <div class="cd-info-cell">
                 <p class="cd-info-label">Case Status</p>
-                <p class="cd-info-value" style="margin-top:0.25rem;">
-                    {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
-                        <span class="cd-status-badge review">⏳ Under Review</span>
-                    {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
-                        <span class="cd-status-badge verified">✓ All Verified</span>
-                    {% elif case_request.status == 'ACCEPTED' %}
-                        <span class="cd-status-badge accepted">✓ Accepted</span>
-                    {% else %}
-                        <span class="cd-status-badge default">{{ case_request.get_status_display }}</span>
-                    {% endif %}
+                <p class="cd-info-value" style="margin-top:0.25rem;" id="case-status-badge-container">
+                    -
                 </p>
             </div>
             <!-- Documents count -->
             <div class="cd-info-cell">
                 <p class="cd-info-label">Documents</p>
-                <p class="cd-info-value">{{ documents.count }}</p>
+                <p class="cd-info-value" id="case-docs-count">-</p>
                 <p class="cd-info-sub">Total Submitted</p>
             </div>
         </div>
     </div>
 
     <!-- ── Documents Grid ── -->
-    {% if documents %}
     <p class="cd-section-label">Submitted Documents</p>
-    <div class="cd-docs-grid">
-        {% for document in documents %}
-        <div class="cd-doc-card">
-
-            <!-- Header -->
-            <div class="cd-doc-header">
-                <p class="cd-doc-title">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                    </svg>
-                    {{ document.get_document_type_display }}
-                </p>
-                <!-- Status badge -->
-                {% if document.casedocumentverification %}
-                    {% if document.casedocumentverification.status == 'VERIFIED' %}
-                    <span class="cd-doc-badge verified">✓ Verified</span>
-                    {% elif document.casedocumentverification.status == 'PENDING' %}
-                    <span class="cd-doc-badge pending">⏳ Pending</span>
-                    {% elif document.casedocumentverification.status == 'REJECTED' %}
-                    <span class="cd-doc-badge rejected">✗ Rejected</span>
-                    {% endif %}
-                {% else %}
-                <span class="cd-doc-badge not-started">⏳ Not Started</span>
-                {% endif %}
-            </div>
-
-            <!-- Body -->
-            <div class="cd-doc-body">
-                <p class="cd-doc-meta">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <strong>Uploaded:</strong> {{ document.uploaded_at|date:"F d, Y · H:i" }}
-                </p>
-                <span class="cd-doc-filename">{{ document.document_file.name|slice:"20:" }}…</span>
-            </div>
-
-            <!-- Verified by -->
-            {% if document.casedocumentverification.verified_by %}
-            <div class="cd-verified-strip">
-                <strong>Verified by:</strong> {{ document.casedocumentverification.verified_by.email }}<br>
-                <strong>Date:</strong> {{ document.casedocumentverification.verified_at|date:"F d, Y · H:i" }}
-            </div>
-            {% endif %}
-
-            <!-- Rejection reason -->
-            {% if document.casedocumentverification.rejection_reason %}
-            <div class="cd-rejection-strip">
-                <strong>Rejection Reason:</strong><br>
-                {{ document.casedocumentverification.rejection_reason }}
-            </div>
-            {% endif %}
-
-            <!-- Footer actions -->
-            <div class="cd-doc-footer">
-                <a href="{{ document.document_file.url }}" class="cd-btn cd-btn-download" download>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    Download
-                </a>
-                {% if document.casedocumentverification and document.casedocumentverification.status == 'PENDING' %}
-                <a href="/case_document_verify/" class="cd-btn cd-btn-review">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Review
-                </a>
-                {% endif %}
-            </div>
-
-        </div>
-        {% endfor %}
+    <div class="cd-docs-grid" id="documents-grid-container">
+        <!-- Dynamic rendering -->
     </div>
 
-    {% else %}
-    <!-- ── Empty State ── -->
-    <div class="cd-empty">
+    <div class="cd-empty hidden" id="empty-documents-state">
         <div class="cd-empty-icon">
             <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -592,10 +630,9 @@
         <h3>No Documents Found</h3>
         <p>This case has no submitted documents yet.</p>
     </div>
-    {% endif %}
 
     <!-- ── Verification Summary ── -->
-    <div class="cd-summary-card">
+    <div class="cd-summary-card mt-8">
         <div class="cd-summary-header">
             <svg class="w-5 h-5 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -608,67 +645,40 @@
             <div class="cd-sum-grid">
                 <div class="cd-sum-tile">
                     <p class="cd-sum-tile-label">Total</p>
-                    <p class="cd-sum-tile-value">{{ total_docs }}</p>
+                    <p class="cd-sum-tile-value" id="summary-total">-</p>
                 </div>
                 <div class="cd-sum-tile">
                     <p class="cd-sum-tile-label">Verified</p>
-                    <p class="cd-sum-tile-value green">{{ verified_docs }}</p>
+                    <p class="cd-sum-tile-value green" id="summary-verified">-</p>
                 </div>
                 <div class="cd-sum-tile">
                     <p class="cd-sum-tile-label">Rejected</p>
-                    <p class="cd-sum-tile-value red">{{ rejected_docs }}</p>
+                    <p class="cd-sum-tile-value red" id="summary-rejected">-</p>
                 </div>
                 <div class="cd-sum-tile">
                     <p class="cd-sum-tile-label">Pending</p>
-                    <p class="cd-sum-tile-value yellow">{{ pending_docs }}</p>
+                    <p class="cd-sum-tile-value yellow" id="summary-pending">-</p>
                 </div>
             </div>
 
             <!-- Progress bar -->
-            {% if total_docs > 0 %}
             <div class="cd-progress-label">
                 <span>Verification Progress</span>
-                <span>{{ verified_docs }} / {{ total_docs }} documents verified</span>
+                <span id="summary-progress-text">- documents verified</span>
             </div>
             <div class="cd-progress-track">
-                {% if verified_docs > 0 %}
-                <div class="cd-progress-bar" id="cdProgressBar" data-width="{% widthratio verified_docs total_docs 100 %}"></div>
-                {% else %}
-                <div class="cd-progress-bar" id="cdProgressBar" data-width="0"></div>
-                {% endif %}
+                <div class="cd-progress-bar" id="cdProgressBar"></div>
             </div>
-            {% endif %}
 
             <!-- Overall status -->
-            <div class="cd-status-row">
-                {% if all_verified %}
-                    <span class="cd-status-pill all-ok">✓ All Verified — Ready</span>
-                    <p class="cd-status-note">All documents have been verified. The lawyer can now accept and begin work on the case.</p>
-                {% elif any_rejected %}
-                    <span class="cd-status-pill has-reject">✗ Resubmission Required</span>
-                    <p class="cd-status-note">{{ rejected_docs }} document(s) were rejected. The client must resubmit or resolve the issues.</p>
-                {% elif pending_docs > 0 %}
-                    <span class="cd-status-pill in-review">⏳ Pending Review</span>
-                    <p class="cd-status-note">{{ pending_docs }} document(s) are still awaiting verification.</p>
-                {% else %}
-                    <span class="cd-status-pill no-docs">No Documents</span>
-                {% endif %}
+            <div class="cd-status-row" id="overall-status-pill-container">
+                <!-- Dynamic status badges -->
             </div>
 
             <!-- Next action -->
-            <div class="cd-next-action">
+            <div class="cd-next-action" id="next-action-container">
                 <strong>Next Action</strong>
-                {% if case_request.status == 'DOCUMENTS_SUBMITTED' %}
-                    {% if pending_docs > 0 %}
-                        <p>Review the {{ pending_docs }} remaining document(s) using the buttons above.</p>
-                    {% elif rejected_docs > 0 %}
-                        <p class="red">Notify the client to resubmit or correct the {{ rejected_docs }} rejected document(s).</p>
-                    {% endif %}
-                {% elif case_request.status == 'DOCUMENTS_VERIFIED' %}
-                    <p class="green">Awaiting the lawyer to accept the case and begin work.</p>
-                {% else %}
-                    <p>{{ case_request.get_status_display }}</p>
-                {% endif %}
+                <p id="next-action-text">-</p>
             </div>
 
         </div>
@@ -676,10 +686,332 @@
 
 </div>
 </div>
+
+<!-- Rejection Modal Backdrop -->
+<div id="rejection-modal" class="modal-backdrop">
+    <div class="modal-card">
+        <div class="modal-body">
+            <h3 class="modal-title">Reject Document</h3>
+            <p class="modal-desc">Please explain the reason for rejection so the client can understand and resubmit the correct file.</p>
+            <textarea id="rejection-reason-input" class="modal-textarea" placeholder="e.g. Aadhaar copy is blurry or expired"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-rejection-btn" class="modal-btn modal-btn-cancel">Cancel</button>
+            <button id="confirm-rejection-btn" class="modal-btn modal-btn-confirm">Reject Document</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var bar = document.getElementById('cdProgressBar');
-        if (bar) { bar.style.width = (bar.dataset.width || '0') + '%'; }
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    function getCaseId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('case_id') || params.get('id');
+    }
+
+    const caseId = getCaseId();
+    if (!caseId) {
+        alert("Case ID is missing.");
+        window.location.href = "/admin_pending_cases/";
+        return;
+    }
+
+    async function loadCaseData() {
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) {
+                if (res.status === 403) {
+                    window.location.href = "/admin_dashboard/";
+                    return;
+                }
+                throw new Error("Failed to load case detail");
+            }
+            const data = await res.json();
+
+            // Populate Overview Card
+            document.getElementById("case-client-name").innerText = `${data.client_details.first_name} ${data.client_details.last_name}`;
+            document.getElementById("case-client-email").innerText = data.client_details.email || "No email";
+            document.getElementById("case-lawyer-name").innerText = data.lawyer_details.full_name;
+            document.getElementById("case-lawyer-email").innerText = data.lawyer_details.email || "No email";
+            document.getElementById("case-docs-count").innerText = data.documents.length;
+
+            // Status Badge
+            const statusContainer = document.getElementById("case-status-badge-container");
+            statusContainer.innerHTML = "";
+            let statusBadge = document.createElement("span");
+            if (data.status === 'DOCUMENTS_SUBMITTED') {
+                statusBadge.className = "cd-status-badge review";
+                statusBadge.innerText = "⏳ Under Review";
+            } else if (data.status === 'DOCUMENTS_VERIFIED') {
+                statusBadge.className = "cd-status-badge verified";
+                statusBadge.innerText = "✓ All Verified";
+            } else if (data.status === 'ACCEPTED' || data.status === 'ACTIVE') {
+                statusBadge.className = "cd-status-badge accepted";
+                statusBadge.innerText = "✓ Accepted";
+            } else {
+                statusBadge.className = "cd-status-badge default";
+                statusBadge.innerText = data.status.replace(/_/g, ' ');
+            }
+            statusContainer.appendChild(statusBadge);
+
+            // Render Documents Grid
+            renderDocumentsGrid(data.documents);
+
+            // Calculate & Render Summary
+            renderSummary(data.documents, data.status);
+
+            document.getElementById("loading-skeleton-container").style.display = "none";
+            document.getElementById("dashboard-container").style.display = "block";
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function renderDocumentsGrid(docs) {
+        const grid = document.getElementById("documents-grid-container");
+        const emptyState = document.getElementById("empty-documents-state");
+        grid.innerHTML = "";
+
+        if (docs.length === 0) {
+            grid.classList.add("hidden");
+            emptyState.classList.remove("hidden");
+            return;
+        }
+
+        grid.classList.remove("hidden");
+        emptyState.classList.add("hidden");
+
+        docs.forEach(doc => {
+            const card = document.createElement("div");
+            card.className = "cd-doc-card";
+
+            // Status Badge
+            let badgeClass = "not-started";
+            let badgeText = "⏳ Not Started";
+            if (doc.verification_status === "VERIFIED") {
+                badgeClass = "verified";
+                badgeText = "✓ Verified";
+            } else if (doc.verification_status === "PENDING") {
+                badgeClass = "pending";
+                badgeText = "⏳ Pending";
+            } else if (doc.verification_status === "REJECTED") {
+                badgeClass = "rejected";
+                badgeText = "✗ Rejected";
+            }
+
+            // Rejection reason strip
+            let rejectionMarkup = "";
+            if (doc.verification_status === "REJECTED" && doc.rejection_reason) {
+                rejectionMarkup = `
+                    <div class="cd-rejection-strip">
+                        <strong>Rejection Reason:</strong><br>
+                        ${doc.rejection_reason}
+                    </div>
+                `;
+            }
+
+            // Footer Actions Markup
+            let footerActions = `
+                <a href="/static/uploads/${doc.document_file}" target="_blank" class="cd-btn cd-btn-download" download>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Download
+                </a>
+            `;
+
+            if (doc.verification_status === "PENDING") {
+                footerActions += `
+                    <button class="cd-btn cd-btn-approve" onclick="verifyDoc(${doc.id}, 'approve')">
+                        Approve
+                    </button>
+                    <button class="cd-btn cd-btn-reject" onclick="verifyDoc(${doc.id}, 'reject')">
+                        Reject
+                    </button>
+                `;
+            }
+
+            const docTypeDisplay = doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+            card.innerHTML = `
+                <!-- Header -->
+                <div class="cd-doc-header">
+                    <p class="cd-doc-title">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        ${docTypeDisplay}
+                    </p>
+                    <span class="cd-doc-badge ${badgeClass}">${badgeText}</span>
+                </div>
+
+                <!-- Body -->
+                <div class="cd-doc-body">
+                    <p class="cd-doc-meta">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <strong>Uploaded:</strong> ${new Date(doc.uploaded_at).toLocaleString()}
+                    </p>
+                    <span class="cd-doc-filename">${doc.document_file}</span>
+                </div>
+
+                ${rejectionMarkup}
+
+                <!-- Footer actions -->
+                <div class="cd-doc-footer">
+                    ${footerActions}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderSummary(docs, caseStatus) {
+        const total = docs.length;
+        const verified = docs.filter(d => d.verification_status === "VERIFIED").length;
+        const rejected = docs.filter(d => d.verification_status === "REJECTED").length;
+        const pending = docs.filter(d => d.verification_status === "PENDING").length;
+
+        document.getElementById("summary-total").innerText = total;
+        document.getElementById("summary-verified").innerText = verified;
+        document.getElementById("summary-rejected").innerText = rejected;
+        document.getElementById("summary-pending").innerText = pending;
+
+        document.getElementById("summary-progress-text").innerText = `${verified} / ${total} documents verified`;
+        
+        const progressPct = total > 0 ? (verified / total) * 100 : 0;
+        document.getElementById("cdProgressBar").style.width = `${progressPct}%`;
+
+        // Overall status pills
+        const pillContainer = document.getElementById("overall-status-pill-container");
+        pillContainer.innerHTML = "";
+
+        let statusPill = document.createElement("span");
+        let statusNote = document.createElement("p");
+        statusNote.className = "cd-status-note";
+
+        if (total === 0) {
+            statusPill.className = "cd-status-pill no-docs";
+            statusPill.innerText = "No Documents";
+            statusNote.innerText = "No documents submitted yet.";
+        } else if (verified === total) {
+            statusPill.className = "cd-status-pill all-ok";
+            statusPill.innerText = "✓ All Verified — Ready";
+            statusNote.innerText = "All documents have been verified. The lawyer can now accept and begin work.";
+        } else if (rejected > 0) {
+            statusPill.className = "cd-status-pill has-reject";
+            statusPill.innerText = "✗ Resubmission Required";
+            statusNote.innerText = `${rejected} document(s) were rejected. The client must resubmit.`;
+        } else {
+            statusPill.className = "cd-status-pill in-review";
+            statusPill.innerText = "⏳ Pending Review";
+            statusNote.innerText = `${pending} document(s) are awaiting verification.`;
+        }
+
+        pillContainer.appendChild(statusPill);
+        pillContainer.appendChild(statusNote);
+
+        // Next Action description
+        const nextActionText = document.getElementById("next-action-text");
+        if (caseStatus === 'DOCUMENTS_SUBMITTED') {
+            if (pending > 0) {
+                nextActionText.innerHTML = `Review the ${pending} remaining document(s) using the buttons above.`;
+            } else if (rejected > 0) {
+                nextActionText.innerHTML = `<span class="red">Notify the client to resubmit or correct the ${rejected} rejected document(s).</span>`;
+            } else {
+                nextActionText.innerText = "Audit completed.";
+            }
+        } else if (caseStatus === 'DOCUMENTS_VERIFIED') {
+            nextActionText.innerHTML = `<span class="green">Awaiting the lawyer to accept the case and begin work.</span>`;
+        } else {
+            nextActionText.innerText = caseStatus.replace(/_/g, ' ');
+        }
+    }
+
+    const modal = document.getElementById("rejection-modal");
+    const textarea = document.getElementById("rejection-reason-input");
+    const cancelBtn = document.getElementById("cancel-rejection-btn");
+    const confirmBtn = document.getElementById("confirm-rejection-btn");
+    let activeRejectionResolve = null;
+
+    function showRejectionModal() {
+        return new Promise((resolve) => {
+            textarea.value = "";
+            modal.classList.add("active");
+            activeRejectionResolve = resolve;
+        });
+    }
+
+    cancelBtn.addEventListener("click", () => {
+        modal.classList.remove("active");
+        if (activeRejectionResolve) {
+            activeRejectionResolve(null);
+            activeRejectionResolve = null;
+        }
     });
+
+    confirmBtn.addEventListener("click", () => {
+        const val = textarea.value.trim();
+        if (!val) {
+            if (typeof showToastNotification === 'function') {
+                showToastNotification("Warning", "Please enter a rejection reason.");
+            } else {
+                alert("Please enter a reason.");
+            }
+            return;
+        }
+        modal.classList.remove("active");
+        if (activeRejectionResolve) {
+            activeRejectionResolve(val);
+            activeRejectionResolve = null;
+        }
+    });
+
+    window.verifyDoc = async (docId, action) => {
+        let reason = "";
+        if (action === "reject") {
+            reason = await showRejectionModal();
+            if (reason === null) return;
+        }
+
+        try {
+            const res = await fetch(`/api/client/admin/documents/${docId}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action, rejection_reason: reason })
+            });
+
+            if (res.ok) {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Success", `Document ${action}d successfully`);
+                }
+                loadCaseData();
+            } else {
+                const err = await res.json();
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Error", err.detail || "Verification action failed");
+                } else {
+                    alert(err.detail || "Verification action failed");
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    await loadCaseData();
+});
 </script>
 {% endblock %}

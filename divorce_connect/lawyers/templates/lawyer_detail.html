@@ -43,26 +43,7 @@
         transition: all .8s ease;
     }
 
-    /* Ripple */
-    button {
-        overflow: hidden;
-        position: relative;
-    }
 
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        transform: scale(0);
-        animation: ripple .7s linear;
-        background: rgba(255, 255, 255, .35);
-    }
-
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
 
     /* Floating */
     .floating {
@@ -713,7 +694,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     lawyerId = urlParams.get('id');
 
     if (!lawyerId) {
-        alert("Lawyer ID is required");
+        sessionStorage.setItem("queued_toast", JSON.stringify({
+            title: "Error",
+            message: "Lawyer ID is required"
+        }));
         window.location.href = "/lawyers/";
         return;
     }
@@ -931,7 +915,11 @@ document.getElementById("hire-form").addEventListener("submit", async (e) => {
     const msg = document.getElementById("hire-message").value.trim();
 
     if (!msg) {
-        alert("Please describe your legal issue.");
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Warning", "Please describe your legal issue.");
+        } else {
+            alert("Please describe your legal issue.");
+        }
         return;
     }
 
@@ -942,14 +930,33 @@ document.getElementById("hire-form").addEventListener("submit", async (e) => {
         });
 
         if (res.ok) {
-            alert("Hire request submitted successfully!");
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: "Success",
+                message: "Hire request submitted successfully!"
+            }));
             window.location.reload();
         } else {
             const err = await res.json();
-            alert(err.detail || "Hire request submission failed.");
+            if (err.detail === "profile_incomplete") {
+                sessionStorage.setItem("queued_toast", JSON.stringify({
+                    title: "Profile Incomplete",
+                    message: "Please complete your profile details before hiring a lawyer."
+                }));
+                window.location.href = "/profile/edit/";
+            } else {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Error", err.detail || "Hire request submission failed.");
+                } else {
+                    alert(err.detail || "Hire request submission failed.");
+                }
+            }
         }
     } catch (e) {
-        alert("Network error.");
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Error", "Network error.");
+        } else {
+            alert("Network error.");
+        }
     }
 });
 
@@ -961,7 +968,11 @@ document.getElementById("rating-form").addEventListener("submit", async (e) => {
     const reviewText = document.getElementById("review_text").value.trim();
 
     if (!ratingVal || ratingVal < 1 || ratingVal > 5) {
-        alert("Please select a valid star rating before submitting.");
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Warning", "Please select a valid star rating before submitting.");
+        } else {
+            alert("Please select a valid star rating before submitting.");
+        }
         return;
     }
 
@@ -977,14 +988,25 @@ document.getElementById("rating-form").addEventListener("submit", async (e) => {
         });
 
         if (res.ok) {
-            alert("Thanks for rating this lawyer! Your review has been recorded.");
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: "Review Submitted",
+                message: "Thanks for rating this lawyer! Your review has been recorded."
+            }));
             window.location.reload();
         } else {
             const err = await res.json();
-            alert(err.detail || "Review submission failed.");
+            if (typeof showToastNotification === 'function') {
+                showToastNotification("Error", err.detail || "Review submission failed.");
+            } else {
+                alert(err.detail || "Review submission failed.");
+            }
         }
     } catch (e) {
-        alert("Network error.");
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Error", "Network error.");
+        } else {
+            alert("Network error.");
+        }
     }
 });
 </script>

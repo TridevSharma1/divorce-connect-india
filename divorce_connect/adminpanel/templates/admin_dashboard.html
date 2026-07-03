@@ -245,77 +245,11 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
+async function loadDashboardData() {
     const token = localStorage.getItem("access_token");
     if (!token) {
         window.location.href = "/login/";
         return;
-    }
-
-    // Define showToast function for real-time messages
-    window.showToast = function(messageText) {
-        let container = document.getElementById('toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            container.className = 'fixed top-24 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none';
-            document.body.appendChild(container);
-        }
-
-        const toast = document.createElement('div');
-        toast.className = 'toast-message pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-2xl border border-gray-100 bg-white transform transition-all duration-500 translate-x-[120%] opacity-0';
-        toast.setAttribute('role', 'alert');
-
-        toast.innerHTML = `
-            <div class="flex-shrink-0 mt-0.5">
-                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-[0.9rem] font-semibold text-gray-900 leading-snug">${messageText}</p>
-            </div>
-            <button onclick="this.closest('.toast-message').remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        `;
-
-        container.appendChild(toast);
-
-        // Slide in
-        setTimeout(() => {
-            toast.classList.remove('translate-x-[120%]', 'opacity-0');
-            toast.classList.add('translate-x-0', 'opacity-100');
-        }, 50);
-
-        // Auto dismiss after 6 seconds
-        setTimeout(() => {
-            if (document.body.contains(toast)) {
-                toast.classList.remove('translate-x-0', 'opacity-100');
-                toast.classList.add('translate-x-[120%]', 'opacity-0');
-                setTimeout(() => toast.remove(), 500);
-            }
-        }, 6000);
-    };
-
-    // Establish WebSocket Connection using token payload user id
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const userId = payload.user_id || payload.sub;
-        if (userId) {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}/ws/notifications/${userId}?token=${encodeURIComponent(token)}`;
-            const ws = new WebSocket(wsUrl);
-
-            ws.onmessage = function(event) {
-                console.log("Real-time Alert:", event.data);
-                showToast(event.data);
-            };
-
-            ws.onerror = function(err) {
-                console.warn("WebSocket connection error:", err);
-            };
-        }
-    } catch (e) {
-        console.error("Failed to set up WebSocket notifications:", e);
     }
 
     try {
@@ -325,6 +259,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!res.ok) {
             console.error("Failed to load dashboard data", res.status);
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = "/login/";
+            }
             return;
         }
 
@@ -400,8 +337,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             lawList.innerHTML = html;
             const badge = document.getElementById("badge-pending-lawyers");
-            badge.innerText = data.pending_lawyer_requests.length + " Pending";
-            badge.classList.remove("hidden");
+            if (badge) {
+                badge.innerText = data.pending_lawyer_requests.length + " Pending";
+                badge.classList.remove("hidden");
+            }
         } else {
             lawList.innerHTML = `
                 <div class="text-center py-10">
@@ -411,6 +350,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <p class="text-gray-700 font-semibold">All lawyers verified!</p>
                 </div>
             `;
+            const badge = document.getElementById("badge-pending-lawyers");
+            if (badge) {
+                badge.classList.add("hidden");
+            }
         }
         
         const docList = document.getElementById("document-verification-list");
@@ -440,6 +383,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (err) {
         console.error("Error fetching admin dashboard", err);
     }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadDashboardData();
+});
+
+window.addEventListener("notification_received", (e) => {
+    console.log("Real-time notification event received, refreshing dashboard data...", e.detail);
+    loadDashboardData();
 });
 </script>
 {% endblock %}

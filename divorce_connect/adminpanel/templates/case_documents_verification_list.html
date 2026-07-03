@@ -131,6 +131,18 @@
         justify-content: space-between;
         gap: 1rem;
         flex-wrap: wrap;
+        cursor: pointer;
+        user-select: none;
+    }
+    .dv-case-body {
+        transition: max-height 0.25s ease-out;
+        overflow: hidden;
+    }
+    .dv-case-card.collapsed .dv-case-body {
+        display: none;
+    }
+    .dv-case-card.collapsed .dv-collapse-icon {
+        transform: rotate(-90deg);
     }
     .dv-case-title {
         font-family: 'Playfair Display', serif;
@@ -327,10 +339,140 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
+
+    /* ── Rejection Modal ── */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .modal-card {
+        background: #ffffff;
+        border-radius: 1.25rem;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        margin: 1.5rem;
+    }
+    .modal-backdrop.active .modal-card {
+        transform: scale(1);
+    }
+    .modal-body {
+        padding: 1.75rem;
+    }
+    .modal-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+    }
+    .modal-desc {
+        color: #64748b;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
+        margin-top: 0;
+    }
+    .modal-textarea {
+        width: 100%;
+        height: 100px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 2px solid #e2e8f0;
+        font-size: 0.9rem;
+        outline: none;
+        resize: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .modal-textarea:focus {
+        border-color: #0f172a;
+    }
+    .modal-footer {
+        display: flex;
+        border-top: 1px solid #e2e8f0;
+    }
+    .modal-btn {
+        flex: 1;
+        padding: 1.1rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-align: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .modal-btn-cancel {
+        color: #64748b;
+        border-right: 1px solid #e2e8f0;
+    }
+    .modal-btn-cancel:hover {
+        background: #f8fafc;
+    }
+    .modal-btn-confirm {
+        color: #dc2626;
+    }
+    .modal-btn-confirm:hover {
+        background: #fff5f5;
+    }
+
+    /* ── Shimmer Skeleton Loader ── */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- ── Shimmer Loading Placeholder ── -->
+<div id="loading-skeleton-container" class="dv-page">
+    <div class="max-w-6xl mx-auto" style="display:flex; flex-direction:column; gap:2rem;">
+        <!-- Hero skeleton -->
+        <div class="skeleton" style="height: 140px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Stats cards skeleton -->
+        <div class="grid grid-cols-3 gap-4" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div class="skeleton" style="height: 100px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 100px; border-radius: 1rem;"></div>
+            <div class="skeleton" style="height: 100px; border-radius: 1rem;"></div>
+        </div>
+        <!-- Case card skeleton -->
+        <div class="skeleton" style="height: 200px; border-radius: 1rem; width: 100%;"></div>
+    </div>
+</div>
+
 <div class="dv-page" id="dashboard-container" style="display: none;">
     <div class="max-w-6xl mx-auto">
 
@@ -413,7 +555,71 @@
     </div>
 </div>
 
+<!-- Rejection Modal Backdrop -->
+<div id="rejection-modal" class="modal-backdrop">
+    <div class="modal-card">
+        <div class="modal-body">
+            <h3 class="modal-title">Reject Document</h3>
+            <p class="modal-desc">Please explain the reason for rejection so the client can understand and resubmit the correct file.</p>
+            <textarea id="rejection-reason-input" class="modal-textarea" placeholder="e.g. Aadhaar copy is blurry or expired"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-rejection-btn" class="modal-btn modal-btn-cancel">Cancel</button>
+            <button id="confirm-rejection-btn" class="modal-btn modal-btn-confirm">Reject Document</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    window.toggleCaseCollapse = function(headerEl) {
+        const card = headerEl.closest(".dv-case-card");
+        const icon = headerEl.querySelector(".dv-collapse-icon");
+        const isCollapsed = card.classList.toggle("collapsed");
+        if (isCollapsed) {
+            icon.style.transform = "rotate(-90deg)";
+        } else {
+            icon.style.transform = "rotate(0deg)";
+        }
+    };
+
+    const modal = document.getElementById("rejection-modal");
+    const textarea = document.getElementById("rejection-reason-input");
+    const cancelBtn = document.getElementById("cancel-rejection-btn");
+    const confirmBtn = document.getElementById("confirm-rejection-btn");
+    let activeRejectionResolve = null;
+
+    function showRejectionModal() {
+        return new Promise((resolve) => {
+            textarea.value = "";
+            modal.classList.add("active");
+            activeRejectionResolve = resolve;
+        });
+    }
+
+    cancelBtn.addEventListener("click", () => {
+        modal.classList.remove("active");
+        if (activeRejectionResolve) {
+            activeRejectionResolve(null);
+            activeRejectionResolve = null;
+        }
+    });
+
+    confirmBtn.addEventListener("click", () => {
+        const val = textarea.value.trim();
+        if (!val) {
+            if (typeof showToastNotification !== 'undefined') {
+                showToastNotification("Warning", "Please enter a rejection reason.");
+            } else {
+                alert("Please enter a reason.");
+            }
+            return;
+        }
+        modal.classList.remove("active");
+        if (activeRejectionResolve) {
+            activeRejectionResolve(val);
+            activeRejectionResolve = null;
+        }
+    });
     async function loadVerificationList() {
         const token = localStorage.getItem("access_token");
         if (!token) {
@@ -529,7 +735,7 @@
 
                     card.innerHTML = `
                         <!-- Case Header -->
-                        <div class="dv-case-header">
+                        <div class="dv-case-header" onclick="toggleCaseCollapse(this)">
                             <div>
                                 <p class="dv-case-title">
                                     ${caseData.case_request.client.get_full_name}
@@ -542,20 +748,26 @@
                                     Submitted ${caseData.case_request.documents_submitted_at}
                                 </p>
                             </div>
-                            <a href="/case_details_for_admin/" class="dv-view-all-btn">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                View All
-                            </a>
+                            <div style="display:flex; align-items:center; gap:1.25rem; flex-shrink:0;">
+                                <a href="/case_details_for_admin/?case_id=${caseData.case_request.id}" class="dv-view-all-btn" onclick="event.stopPropagation()">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    View All
+                                </a>
+                                <span class="dv-collapse-icon" style="color:white; font-size:0.75rem; font-weight:bold; transition:transform 0.2s; display:inline-block; transform:rotate(0deg);">▼</span>
+                            </div>
                         </div>
-                        ${docsHtml}
+                        <div class="dv-case-body">
+                            ${docsHtml}
+                        </div>
                     `;
                     casesContainer.appendChild(card);
                 });
             }
 
+            document.getElementById("loading-skeleton-container").style.display = "none";
             document.getElementById("dashboard-container").style.display = "block";
 
         } catch (err) {
@@ -568,8 +780,8 @@
         let rejection_reason = "";
         
         if (action === 'reject') {
-            rejection_reason = prompt("Please enter the reason for rejection:");
-            if (rejection_reason === null) return; // cancel click
+            rejection_reason = await showRejectionModal();
+            if (rejection_reason === null) return;
         }
 
         try {

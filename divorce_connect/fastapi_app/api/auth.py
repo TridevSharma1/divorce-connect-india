@@ -24,6 +24,25 @@ from ..security import (
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+async def get_user_role(user: User, db: AsyncSession) -> str:
+    """Dynamically determine the user's role based on superuser/staff flags and profile existence."""
+    if user.is_superuser or user.is_staff:
+        return "admin"
+    
+    lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == user.id))
+    if lawyer_res.scalar_one_or_none():
+        return "lawyer"
+        
+    admin_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == user.id))
+    if admin_res.scalar_one_or_none():
+        return "admin"
+        
+    client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == user.id))
+    if client_res.scalar_one_or_none():
+        return "client"
+        
+    return user.role
+
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_details(
     current_user: User = Depends(get_current_user),
@@ -32,18 +51,7 @@ async def get_current_user_details(
     """
     Get the currently logged in user based on the JWT token.
     """
-    role = "client"
-    lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
-    if lawyer_res.scalar_one_or_none():
-        role = "lawyer"
-    else:
-        admin_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
-        if admin_res.scalar_one_or_none():
-            role = "admin"
-        else:
-            client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
-            if client_res.scalar_one_or_none():
-                role = "client"
+    role = await get_user_role(current_user, db)
 
     return {
         "id": current_user.id,
@@ -494,10 +502,11 @@ async def verify_otp(
     except Exception as e:
         logger.error(f"Failed to send welcome back email: {e}")
         
+    user_role = await get_user_role(user, db)
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "role": user.role
+        "role": user_role
     }
 
 @router.post("/verify-register-otp")
@@ -549,6 +558,7 @@ async def verify_register_otp(
         data={"sub": user.email, "user_id": user.id}, expires_delta=access_token_expires
     )
     
+    user_role = await get_user_role(user, db)
     try:
         from ..notifications import send_email
         role_labels = {
@@ -560,7 +570,7 @@ async def verify_register_otp(
             "emails/registration_email.html",
             {
                 "user_name": user.get_full_name(),
-                "role_label": role_labels.get(user.role, "User Account"),
+                "role_label": role_labels.get(user_role, "User Account"),
             }
         )
         send_email(
@@ -575,6 +585,6 @@ async def verify_register_otp(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "role": user.role
+        "role": user_role
     }
 

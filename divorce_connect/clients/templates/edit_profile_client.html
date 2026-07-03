@@ -488,36 +488,7 @@
 </div>
 
 <script>
-    // Define Toast notification helper if showToast isn't loaded globally
-    window.showToast = window.showToast || function(msg) {
-        let container = document.getElementById('toast-container');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            container.className = 'fixed top-24 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none';
-            document.body.appendChild(container);
-        }
-        const toast = document.createElement('div');
-        toast.className = 'toast-message pointer-events-auto bg-white border border-zinc-200 rounded-2xl shadow-lg p-4 flex items-start gap-3 transform transition-all duration-500 translate-x-[120%] opacity-0';
-        toast.innerHTML = `
-            <div class="flex-shrink-0 mt-0.5">
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div class="flex-1">
-                <p class="text-sm font-medium text-zinc-800">${msg}</p>
-            </div>
-        `;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.classList.remove('translate-x-[120%]', 'opacity-0');
-            toast.classList.add('translate-x-0', 'opacity-100');
-        }, 50);
-        setTimeout(() => {
-            toast.classList.remove('translate-x-0', 'opacity-100');
-            toast.classList.add('translate-x-[120%]', 'opacity-0');
-            setTimeout(() => toast.remove(), 500);
-        }, 5000);
-    };
+
 
     document.addEventListener("DOMContentLoaded", async () => {
         const token = localStorage.getItem("access_token");
@@ -593,11 +564,11 @@
                     });
 
                     if (res.ok) {
-                        showToast("Profile updated successfully!");
-                        // Refresh details
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                        sessionStorage.setItem("queued_toast", JSON.stringify({
+                            title: "Profile Updated",
+                            message: "Your profile has been successfully updated."
+                        }));
+                        window.location.reload();
                     } else {
                         const errData = await res.json();
                         alert(errData.detail || "Failed to update profile.");

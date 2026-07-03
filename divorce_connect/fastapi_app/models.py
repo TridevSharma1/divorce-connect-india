@@ -147,6 +147,18 @@ class CaseRequest(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
 
 
+class CaseMessage(Base):
+    __tablename__ = "lawyers_casemessage"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    case_id: Mapped[int] = mapped_column(ForeignKey("lawyers_caserequest.id"))
+    sender_type: Mapped[str] = mapped_column(String(10))
+    sender_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("accounts_baseuser.id"), nullable=True)
+    text: Mapped[str] = mapped_column(Text)
+    attachment: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+
+
 class CaseDocument(Base):
     __tablename__ = "lawyers_casedocument"
     id: Mapped[int] = mapped_column(primary_key=True)

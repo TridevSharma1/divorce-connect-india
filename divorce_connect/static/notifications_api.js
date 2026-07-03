@@ -130,11 +130,12 @@ function updateBadgeUI(count, badge) {
   if (count > 0) {
     badge.innerText = count;
     badge.classList.remove('hidden');
-    // For lawyer dot badge which uses simple opacity/visibility classes
+    badge.style.setProperty('display', 'inline-flex', 'important');
     badge.classList.remove('opacity-0');
   } else {
     badge.innerText = '';
     badge.classList.add('hidden');
+    badge.style.setProperty('display', 'none', 'important');
   }
 }
 
@@ -261,6 +262,10 @@ function connectNotificationWS() {
 
     // Refresh navbar to render the new notification from DB
     updateNavbarNotifications();
+
+    // Dispatch custom event for pages to update data in real-time
+    const eventObj = new CustomEvent("notification_received", { detail: { title, message } });
+    window.dispatchEvent(eventObj);
   };
 
   notificationWS.onclose = function(e) {

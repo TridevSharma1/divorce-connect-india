@@ -487,6 +487,7 @@ class CaseDocument(models.Model):
         ('income_proof', 'Income Proof'),
         ('passport', 'Passport'),
         ('affidavit', 'Affidavits'),
+        ('court_notice', 'Court Notices'),
     ]
 
     case_request = models.ForeignKey(

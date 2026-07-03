@@ -281,9 +281,42 @@ class AdminPanelProfile(models.Model):
         Admin users must remain active so they can log in, complete profile details,
         and wait for superuser verification.
         """
+        is_new = self.pk is None
+        old_verified = False
+        if not is_new:
+            try:
+                old_verified = AdminPanelProfile.objects.get(pk=self.pk).is_verified_by_superuser
+            except Exception:
+                pass
+
         self.user.is_staff = self.is_verified_by_superuser
         self.user.save(update_fields=['is_staff'])
         super().save(*args, **kwargs)
+
+        if self.is_verified_by_superuser and not old_verified:
+            try:
+                from accounts.models import Notification
+                import requests
+                # 1. Create DB notification
+                Notification.objects.create(
+                    user=self.user,
+                    title="Profile Verified",
+                    message="Your admin profile has been verified and activated by superuser.",
+                    url="/admin_dashboard/"
+                )
+                # 2. Trigger real-time toast via FastAPI Websocket helper
+                requests.post(
+                    "http://127.0.0.1:8000/api/notifications/send-direct",
+                    json={
+                        "user_id": self.user.id,
+                        "title": "Profile Verified",
+                        "message": "Your admin profile has been verified and activated by superuser.",
+                        "url": "/admin_dashboard/"
+                    },
+                    timeout=2
+                )
+            except Exception as e:
+                print("Failed to send FastAPI notification:", e)
 
     def soft_delete(self):
         self.is_deleted = True
@@ -370,3 +403,48 @@ class AdminPanelProfileUpdateRequest(models.Model):
 
     def __str__(self):
         return f"Update request for {self.admin_profile.full_name} - {self.get_status_display()}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        old_status = 'PENDING'
+        if not is_new:
+            try:
+                old_status = AdminPanelProfileUpdateRequest.objects.get(pk=self.pk).status
+            except Exception:
+                pass
+        
+        super().save(*args, **kwargs)
+
+        if not is_new and old_status == 'PENDING' and self.status in ['APPROVED', 'REJECTED']:
+            try:
+                from accounts.models import Notification
+                import requests
+                
+                title = "Profile Update Approved" if self.status == 'APPROVED' else "Profile Update Rejected"
+                message = (
+                    "Your admin profile update request was approved by superuser."
+                    if self.status == 'APPROVED'
+                    else f"Your admin profile update request was rejected by superuser. Notes: {self.admin_notes or 'No notes provided'}"
+                )
+                
+                # 1. Create DB notification
+                Notification.objects.create(
+                    user=self.admin_profile.user,
+                    title=title,
+                    message=message,
+                    url="/admin_dashboard/"
+                )
+                
+                # 2. Trigger real-time toast via FastAPI Websocket helper
+                requests.post(
+                    "http://127.0.0.1:8000/api/notifications/send-direct",
+                    json={
+                        "user_id": self.admin_profile.user.id,
+                        "title": title,
+                        "message": message,
+                        "url": "/admin_dashboard/"
+                    },
+                    timeout=2
+                )
+            except Exception as e:
+                print("Failed to send FastAPI notification:", e)

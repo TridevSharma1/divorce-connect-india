@@ -47,6 +47,9 @@
 
             if (!res.ok) {
                 console.error("Failed to fetch cases");
+                if (res.status === 401 || res.status === 403) {
+                    window.location.href = "/login/";
+                }
                 return;
             }
 

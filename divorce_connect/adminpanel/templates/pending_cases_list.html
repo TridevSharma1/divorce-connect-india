@@ -256,13 +256,17 @@
                                 <span class="pc-value">${caseItem.lawyer_name}</span>
                             </div>
                             <div class="pc-field">
+                                <span class="pc-label">Lawyer ID</span>
+                                <span class="pc-value">${caseItem.lawyer_id}</span>
+                            </div>
+                            <div class="pc-field">
                                 <span class="pc-label">Lawyer Email</span>
                                 <span class="pc-value">${caseItem.lawyer_email}</span>
                             </div>
                         </div>
 
                         <div class="pc-actions">
-                            <a href="/case_details_for_admin/" class="pc-button">View Case Details</a>
+                            <a href="/case_details_for_admin/?case_id=${caseItem.id}" class="pc-button">View Case Details</a>
                         </div>
                     `;
                     container.appendChild(card);

@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from typing import Dict, Any
 
 from ..database import get_db
-from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile
+from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification
 from ..security import get_current_user
 
 router = APIRouter()
@@ -288,8 +288,9 @@ async def get_lawyer_cases(
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
         
     res = await db.execute(
-        select(CaseRequest, ClientProfile)
+        select(CaseRequest, ClientProfile, User)
         .join(ClientProfile, CaseRequest.client_id == ClientProfile.id)
+        .join(User, ClientProfile.user_id == User.id)
         .where(CaseRequest.lawyer_id == lawyer_profile.id)
         .order_by(CaseRequest.updated_at.desc())
     )
@@ -300,11 +301,11 @@ async def get_lawyer_cases(
     pending_verification = []
     rejected_cases = []
     
-    for req, client_p in rows:
+    for req, client_p, client_user in rows:
         case_data = {
             "id": req.id,
             "client_name": client_p.first_name + " " + client_p.last_name,
-            "client_email": client_p.email,
+            "client_email": client_user.email,
             "created_at": req.created_at.strftime("%b %d, %Y") if req.created_at else "",
             "updated_at": req.updated_at.strftime("%b %d, %Y") if req.updated_at else "",
             "status": req.status,
@@ -313,7 +314,7 @@ async def get_lawyer_cases(
         }
         if req.status == "DOCUMENTS_VERIFIED":
             ready_cases.append(case_data)
-        elif req.status in ["ACCEPTED", "ACTIVE"]:
+        elif req.status in ["ACCEPTED", "ACTIVE", "COMPLETED"]:
             active_cases.append(case_data)
         elif req.status in ["PENDING", "DOCUMENTS_PENDING", "DOCUMENTS_SUBMITTED"]:
             pending_verification.append(case_data)
@@ -451,6 +452,53 @@ async def update_lawyer_profile_endpoint(
         pass
         
     return {"message": "Profile updated successfully"}
+
+
+@router.post("/cases/{case_id}/accept")
+async def lawyer_accept_case(
+    case_id: int,
+    current_user: User = Depends(check_verified_lawyer),
+    db: AsyncSession = Depends(get_db)
+):
+    lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found")
+        
+    case_res = await db.execute(
+        select(CaseRequest).where(CaseRequest.id == case_id, CaseRequest.lawyer_id == lawyer_profile.id)
+    )
+    case = case_res.scalar_one_or_none()
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found or not assigned to you")
+        
+    if case.status != "DOCUMENTS_VERIFIED":
+        raise HTTPException(status_code=400, detail="Case cannot be accepted. Documents must be verified first.")
+        
+    case.status = "ACCEPTED"
+    case.workflow_stage = "LAWYER_ASSIGNED"
+    
+    await db.commit()
+    
+    # Notify client
+    try:
+        from ..notifications import create_and_broadcast_notification
+        from .client_actions import ClientProfile
+        client_profile_res = await db.execute(select(ClientProfile).where(ClientProfile.id == case.client_id))
+        client_profile = client_profile_res.scalar_one_or_none()
+        if client_profile:
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=client_profile.user_id,
+                title="Case Accepted",
+                message=f"Lawyer {lawyer_profile.full_name} has accepted your case and verified your documents.",
+                url=f"/client_case_detail/?case_id={case.id}"
+            )
+    except Exception as e:
+        print("Failed to notify client:", e)
+        
+    return {"status": "success", "message": "Case accepted successfully"}
+
 
 
 

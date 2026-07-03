@@ -17,7 +17,7 @@ async def get_admin_dashboard(
     db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
     
-    if not current_user.is_staff:
+    if not (current_user.is_staff or current_user.is_superuser or current_user.role == 'admin'):
         raise HTTPException(status_code=403, detail="Not authorized to access admin dashboard")
 
     admin_profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
@@ -202,7 +202,7 @@ async def get_admin_profile(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    if not current_user.is_staff:
+    if not (current_user.is_staff or current_user.is_superuser or current_user.role == 'admin'):
         raise HTTPException(status_code=403, detail="Not authorized")
         
     admin_profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
@@ -252,7 +252,7 @@ async def update_admin_profile(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    if not current_user.is_staff:
+    if not (current_user.is_staff or current_user.is_superuser or current_user.role == 'admin'):
         raise HTTPException(status_code=403, detail="Not authorized")
         
     admin_profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))

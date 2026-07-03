@@ -128,8 +128,8 @@ async def hire_lawyer(
     # Find client profile associated with current user
     client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
     client = client_res.scalar_one_or_none()
-    if not client:
-        raise HTTPException(status_code=400, detail="Only clients can hire lawyers. Please complete client profile.")
+    if not client or not client.first_name or not client.last_name or not client.gender or not client.marital_status or not client.mobile_number or not client.date_of_birth or not client.address or not client.pincode:
+        raise HTTPException(status_code=400, detail="profile_incomplete")
         
     # Check if lawyer exists
     lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == lawyer_id))
