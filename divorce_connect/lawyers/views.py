@@ -36,7 +36,7 @@ def lawyer_detail_view(request, lawyer_id):
         client_request = CaseRequest.objects.filter(
             client=request.user.client_profile,
             lawyer=lawyer,
-            status__in=['PENDING', 'ACCEPTED']
+            status__in=['PENDING', 'DOCUMENTS_PENDING', 'DOCUMENTS_SUBMITTED', 'DOCUMENTS_VERIFIED', 'ACCEPTED', 'ACTIVE']
         ).order_by('-created_at').first()
         has_rated = LawyerRating.objects.filter(
             client=request.user.client_profile,

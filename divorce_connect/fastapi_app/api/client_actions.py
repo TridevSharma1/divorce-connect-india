@@ -62,7 +62,20 @@ async def get_lawyer_details(
     has_rated = False
     if client:
         req_res = await db.execute(
-            select(CaseRequest).where(CaseRequest.client_id == client.id, CaseRequest.lawyer_id == lawyer_id)
+            select(CaseRequest)
+            .where(
+                CaseRequest.client_id == client.id,
+                CaseRequest.lawyer_id == lawyer_id,
+                CaseRequest.status.in_([
+                    "PENDING",
+                    "DOCUMENTS_PENDING",
+                    "DOCUMENTS_SUBMITTED",
+                    "DOCUMENTS_VERIFIED",
+                    "ACCEPTED",
+                    "ACTIVE"
+                ])
+            )
+            .order_by(CaseRequest.updated_at.desc())
         )
         req = req_res.scalar_one_or_none()
         if req:
@@ -136,6 +149,27 @@ async def hire_lawyer(
     lawyer = lawyer_res.scalar_one_or_none()
     if not lawyer:
         raise HTTPException(status_code=404, detail="Lawyer not found")
+
+    # Prevent duplicate active/pending requests for the same lawyer
+    existing_req_res = await db.execute(
+        select(CaseRequest)
+        .where(
+            CaseRequest.client_id == client.id,
+            CaseRequest.lawyer_id == lawyer.id,
+            CaseRequest.status.in_([
+                "PENDING",
+                "DOCUMENTS_PENDING",
+                "DOCUMENTS_SUBMITTED",
+                "DOCUMENTS_VERIFIED",
+                "ACCEPTED",
+                "ACTIVE"
+            ])
+        )
+        .order_by(CaseRequest.updated_at.desc())
+    )
+    existing_request = existing_req_res.scalar_one_or_none()
+    if existing_request:
+        raise HTTPException(status_code=400, detail="existing_request")
         
     # Create Case Request
     import random

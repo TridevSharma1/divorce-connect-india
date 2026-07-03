@@ -320,6 +320,7 @@ async def get_lawyer_cases(
     
     ready_cases = []
     active_cases = []
+    completed_cases = []
     pending_verification = []
     rejected_cases = []
     
@@ -336,8 +337,10 @@ async def get_lawyer_cases(
         }
         if req.status == "DOCUMENTS_VERIFIED":
             ready_cases.append(case_data)
-        elif req.status in ["ACCEPTED", "ACTIVE", "COMPLETED"]:
+        elif req.status in ["ACCEPTED", "ACTIVE"]:
             active_cases.append(case_data)
+        elif req.status == "COMPLETED":
+            completed_cases.append(case_data)
         elif req.status in ["PENDING", "DOCUMENTS_PENDING", "DOCUMENTS_SUBMITTED"]:
             pending_verification.append(case_data)
         elif req.status == "REJECTED":
@@ -346,6 +349,7 @@ async def get_lawyer_cases(
     return {
         "ready_cases": ready_cases,
         "active_cases": active_cases,
+        "completed_cases": completed_cases,
         "pending_verification": pending_verification,
         "rejected_cases": rejected_cases
     }
