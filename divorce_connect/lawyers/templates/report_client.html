@@ -1,21 +1,22 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report a Client — DivorceConnect India</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        .font-playfair { font-family: 'Playfair Display', serif; }
-        .font-inter { font-family: 'Inter', sans-serif; }
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-white text-gray-900">
+{% block title %}Report a Client — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .font-inter { font-family: 'Inter', sans-serif; }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<div id="nav-lawyer-static" class="flex items-center gap-8">
+    {% include 'includes/navbar_lawyer.html' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white text-gray-900 min-h-screen flex flex-col">
 
     <!-- Header Section -->
     <header class="py-12 text-center border-b border-gray-100">
@@ -40,7 +41,7 @@
     </section>
 
     <!-- Main Content -->
-    <main class="py-12 px-6 bg-white">
+    <main class="py-12 px-6 bg-white flex-grow">
         <div class="max-w-3xl mx-auto">
             <!-- Report Form Card -->
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
@@ -107,6 +108,7 @@
                                 id="fileInput"
                                 name="evidence"
                                 accept=".jpg,.jpeg,.png,.pdf"
+                                multiple
                                 class="absolute inset-0 opacity-0 cursor-pointer"
                                 aria-label="File upload">
                         </div>
@@ -152,55 +154,136 @@
         </div>
     </div>
 
-    <!-- Vanilla JS -->
-    <script>
-        // Note: form submission is handled on the server-side. Do not prevent default submission here.
+</div>
+{% endblock %}
 
-        // File upload display
-        document.getElementById('uploadZone').addEventListener('click', function() {
-            document.getElementById('fileInput').click();
-        });
+{% block extra_js %}
+<script>
+    let selectedFiles = [];
+    const token = localStorage.getItem("access_token");
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name || '';
-            if (fileName) {
-                document.getElementById('fileName').textContent = fileName;
-                document.getElementById('fileNameDisplay').classList.remove('hidden');
-            } else {
-                document.getElementById('fileNameDisplay').classList.add('hidden');
-            }
-        });
-
-        // Drag-and-drop support
-        const uploadZone = document.getElementById('uploadZone');
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('border-gray-400', 'bg-gray-100');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                document.getElementById('fileInput').files = files;
-                const fileName = files[0].name;
-                document.getElementById('fileName').textContent = fileName;
-                document.getElementById('fileNameDisplay').classList.remove('hidden');
-            }
-        });
-
-        // Modal close function
-        function closeModal() {
-            document.getElementById('confirmationModal').classList.add('hidden');
-            document.getElementById('reportForm').reset();
-            document.getElementById('fileNameDisplay').classList.add('hidden');
+    document.addEventListener("DOMContentLoaded", async () => {
+        if (!token) {
+            window.location.href = "/login/";
+            return;
         }
-    </script>
 
-</body>
-</html>
+        // Fetch clients
+        try {
+            const res = await fetch("/api/lawyer/clients", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                const clients = await res.json();
+                const select = document.getElementById("clientSelect");
+                select.innerHTML = '<option value="">— Select a client —</option>';
+                clients.forEach(client => {
+                    const opt = document.createElement("option");
+                    opt.value = client.id;
+                    opt.textContent = client.full_name;
+                    select.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            console.error("Error loading clients:", e);
+        }
+    });
+
+    function updateFileDisplay() {
+        const display = document.getElementById('fileNameDisplay');
+        const nameSpan = document.getElementById('fileName');
+        if (selectedFiles.length > 0) {
+            const names = selectedFiles.map(f => `${f.name} (${(f.size / (1024 * 1024)).toFixed(2)}MB)`).join(", ");
+            nameSpan.textContent = names;
+            display.classList.remove('hidden');
+        } else {
+            display.classList.add('hidden');
+        }
+    }
+
+    function validateAndAddFiles(files) {
+        for (let file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`File ${file.name} exceeds the 5MB size limit.`);
+                return false;
+            }
+        }
+        selectedFiles = Array.from(files);
+        updateFileDisplay();
+        return true;
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        validateAndAddFiles(e.target.files);
+    });
+
+    // Drag-and-drop support
+    const uploadZone = document.getElementById('uploadZone');
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('border-gray-400', 'bg-gray-100');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+        if (e.dataTransfer.files.length > 0) {
+            validateAndAddFiles(e.dataTransfer.files);
+        }
+    });
+
+    // Form submit handler
+    const form = document.getElementById("reportForm");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const clientId = document.getElementById("clientSelect").value;
+        const reason = document.getElementById("reasonSelect").value;
+        const description = document.getElementById("detailsTextarea").value;
+
+        if (!clientId) {
+            alert("Please select a client to report.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("client", clientId);
+        formData.append("reason", reason);
+        formData.append("description", description);
+
+        selectedFiles.forEach(file => {
+            formData.append("evidence", file);
+        });
+
+        try {
+            const res = await fetch("/api/lawyer/report-client", {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token },
+                body: formData
+            });
+
+            if (res.ok) {
+                document.getElementById('confirmationModal').classList.remove('hidden');
+            } else {
+                const err = await res.json();
+                alert(err.detail || "Failed to submit report.");
+            }
+        } catch (err) {
+            alert("Network error. Please try again.");
+        }
+    });
+
+    // Modal close function
+    function closeModal() {
+        document.getElementById('confirmationModal').classList.add('hidden');
+        document.getElementById('reportForm').reset();
+        selectedFiles = [];
+        document.getElementById('fileNameDisplay').classList.add('hidden');
+        window.location.href = "/lawyer_dashboard/";
+    }
+</script>
+{% endblock %}

@@ -40,7 +40,7 @@
   <div class="body">
     <div class="status-pill">Notice of Report</div>
     <h1 class="headline">Notification of a<br>Report Filed Against You</h1>
-    <p class="intro">Dear <strong>{{ lawyer_name }}</strong>, this is an official notification that a report has been filed against you on our platform.</p>
+    <p class="intro">Dear <strong>{% if recipient_name %}{{ recipient_name }}{% else %}{{ lawyer_name }}{% endif %}</strong>, this is an official notification that a report has been filed against you on our platform.</p>
     <div class="info-block">
       <p>📋 &nbsp;<strong>Reason:</strong> {{ report_reason }}</p>
       <p style="margin-top: 10px;">📝 &nbsp;<strong>Details:</strong> {{ report_description }}</p>

@@ -256,11 +256,28 @@ def send_lawyer_reported_notification_email(lawyer_name, lawyer_email, report_re
         template_name="emails/reported_notification_email.html",
         context={
             "lawyer_name": lawyer_name,
+            "recipient_name": lawyer_name,
             "report_reason": report_reason,
             "report_description": report_description,
             "report_id": report_id,
         },
         recipient_email=lawyer_email,
+        purpose=PURPOSE_OPERATIONS,
+    )
+
+
+def send_client_reported_notification_email(client_name, client_email, report_reason, report_description, report_id=None):
+    """Send report notification email to the reported client via operations SMTP."""
+    _send_html_email(
+        subject="🛡️ Notice of Report Filed — DivorceConnect India",
+        template_name="emails/reported_notification_email.html",
+        context={
+            "recipient_name": client_name,
+            "report_reason": report_reason,
+            "report_description": report_description,
+            "report_id": report_id,
+        },
+        recipient_email=client_email,
         purpose=PURPOSE_OPERATIONS,
     )
 
