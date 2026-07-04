@@ -235,6 +235,78 @@ async def dynamic_page(request: Request, page_path: str):
     if page_path.endswith("/"):
         page_path = page_path[:-1]
 
+    if "adminpanel/reports" in page_path:
+        parts = page_path.strip("/").split("/")
+        report_id = int(parts[-1])
+        
+        from sqlalchemy import select
+        from .database import AsyncSessionLocal
+        from .models import TrustReport, User, ClientProfile, LawyerProfile, Notification
+        
+        async with AsyncSessionLocal() as db:
+            report_res = await db.execute(select(TrustReport).where(TrustReport.id == report_id))
+            report = report_res.scalar_one_or_none()
+            if not report:
+                raise HTTPException(status_code=404, detail="Trust report not found")
+                
+            reporter_res = await db.execute(select(User).where(User.id == report.reporter_id))
+            reporter_user = reporter_res.scalar_one_or_none()
+            
+            reported_client = None
+            if report.reported_client_id:
+                client_res = await db.execute(select(ClientProfile).where(ClientProfile.id == report.reported_client_id))
+                reported_client = client_res.scalar_one_or_none()
+                if reported_client:
+                    cl_user_res = await db.execute(select(User).where(User.id == reported_client.user_id))
+                    reported_client.user = cl_user_res.scalar_one_or_none()
+                
+            reported_lawyer = None
+            if report.reported_lawyer_id:
+                lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == report.reported_lawyer_id))
+                reported_lawyer = lawyer_res.scalar_one_or_none()
+                if reported_lawyer:
+                    lw_user_res = await db.execute(select(User).where(User.id == reported_lawyer.user_id))
+                    reported_lawyer.user = lw_user_res.scalar_one_or_none()
+
+            if request.method == "POST":
+                form = await request.form()
+                action = form.get("action")
+                notes = (form.get("admin_notes") or "").strip()
+                
+                report.admin_notes = notes
+                
+                if action == "approve":
+                    report.status = "APPROVED"
+                elif action == "warn":
+                    report.status = "WARNED"
+                elif action == "ban":
+                    report.status = "BANNED"
+                    if reported_client:
+                        reported_client.is_deleted = True
+                        db.add(reported_client)
+                    if reported_lawyer:
+                        reported_lawyer.is_deleted = True
+                        db.add(reported_lawyer)
+                elif action == "reject":
+                    report.status = "REJECTED"
+                    
+                db.add(report)
+                await db.commit()
+                return RedirectResponse(url="/admin_dashboard/", status_code=303)
+                
+            # Attach for Django-style template queries
+            report.reporter = reporter_user
+            report.reported_client = reported_client
+            report.reported_lawyer = reported_lawyer
+            report.formatted_id = f"ri::{report.id:05d}"
+            
+            context = {
+                "request": request,
+                "report": report
+            }
+            template_name = "trust_report_detail.html"
+            return templates.TemplateResponse(request, template_name, context)
+
     if "adminpanel/lawyer/update-request" in page_path:
         parts = page_path.strip("/").split("/")
         req_id = int(parts[-1])

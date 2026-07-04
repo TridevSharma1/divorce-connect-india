@@ -275,6 +275,7 @@ def trust_report_detail_view(request, report_id):
         messages.success(request, 'Trust report updated successfully.')
         return redirect('trust_report_list')
 
+    report.formatted_id = f"ri::{report.id:05d}"
     return render(request, 'trust_report_detail.html', {
         'report': report,
         'user': request.user,

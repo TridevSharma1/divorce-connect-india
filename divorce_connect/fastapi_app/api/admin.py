@@ -6,7 +6,7 @@ import datetime
 import math
 
 from ..database import get_db
-from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
+from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, TrustReport
 from ..security import get_current_user
 from .cloudinary_utils import upload_to_cloudinary
 
@@ -189,6 +189,51 @@ async def get_admin_dashboard(
         for req, lawyer in pending_updates
     ]
 
+    # Fetch all trust reports
+    reports_query = await db.execute(
+        select(TrustReport, User)
+        .join(User, TrustReport.reporter_id == User.id)
+        .order_by(TrustReport.created_at.desc())
+    )
+    reports_rows = reports_query.all()
+    
+    pending_reports = []
+    for report, reporter_user in reports_rows:
+        reporter_name = f"{reporter_user.first_name} {reporter_user.last_name}".strip() or reporter_user.email
+        reporter_role = reporter_user.role.capitalize() if reporter_user.role else "User"
+        
+        reported_name = "Unknown"
+        reported_type = "Unknown"
+        
+        if report.reported_client_id:
+            client_profile_res = await db.execute(select(ClientProfile).where(ClientProfile.id == report.reported_client_id))
+            client_prof = client_profile_res.scalar_one_or_none()
+            if client_prof:
+                reported_name = f"{client_prof.first_name} {client_prof.last_name}".strip()
+                reported_type = "Client"
+        elif report.reported_lawyer_id:
+            lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == report.reported_lawyer_id))
+            lawyer_prof = lawyer_profile_res.scalar_one_or_none()
+            if lawyer_prof:
+                reported_name = lawyer_prof.full_name
+                reported_type = "Lawyer"
+                
+        pending_reports.append({
+            "id": report.id,
+            "formatted_id": f"ri::{report.id:05d}",
+            "reporter_name": reporter_name,
+            "reporter_role": reporter_role,
+            "reported_name": reported_name,
+            "reported_type": reported_type,
+            "reason": report.reason,
+            "description": report.description,
+            "status": report.status,
+            "evidence": report.evidence,
+            "created_at": report.created_at.strftime("%b %d, %Y, %I:%M %p")
+        })
+
+    pending_reports_count = sum(1 for r in pending_reports if r["status"] == "PENDING")
+
     return {
         "pending_update_requests": pending_update_requests,
         "is_complete": is_complete,
@@ -205,8 +250,8 @@ async def get_admin_dashboard(
             "active_cases_count": active_cases_count,
             "pending_case_requests_count": pending_case_requests,
             "pending_documents_count": pending_docs,
-            "flagged_accounts_count": 0,
-            "pending_reports_count": 0
+            "flagged_accounts_count": len(pending_reports),
+            "pending_reports_count": pending_reports_count
         },
         "charts": {
             "revenue_trend": revenue_trend,
@@ -216,7 +261,7 @@ async def get_admin_dashboard(
         },
         "pending_lawyer_requests": pending_lawyer_requests,
         "pending_documents": pending_documents,
-        "pending_reports": []
+        "pending_reports": pending_reports
     }
 
 @router.get("/profile")
