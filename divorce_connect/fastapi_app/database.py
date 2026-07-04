@@ -26,7 +26,13 @@ def normalize_database_url(url: str) -> str:
 
 DATABASE_URL = normalize_database_url(DATABASE_URL)
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+import sys
+if "pytest" in sys.modules or os.getenv("TESTING") == "1":
+    from sqlalchemy.pool import NullPool
+    engine = create_async_engine(DATABASE_URL, echo=True, poolclass=NullPool)
+else:
+    engine = create_async_engine(DATABASE_URL, echo=True)
+
 AsyncSessionLocal = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )

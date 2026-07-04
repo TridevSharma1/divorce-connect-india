@@ -43,6 +43,28 @@ async def list_verified_lawyers(
         for lawyer in lawyers
     ]
 
+@router.get("/lawyers/active")
+async def get_active_lawyers(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    res = await db.execute(
+        select(LawyerProfile)
+        .where(LawyerProfile.verified == True, LawyerProfile.is_profile_complete == True, LawyerProfile.is_deleted == False)
+        .order_by(LawyerProfile.full_name)
+    )
+    lawyers = res.scalars().all()
+    return [
+        {
+            "id": l.id,
+            "full_name": l.full_name,
+            "specialization": l.specialization,
+            "specialization_display": l.get_specialization_display
+        }
+        for l in lawyers
+    ]
+
+
 @router.get("/lawyers/{lawyer_id}")
 async def get_lawyer_details(
     lawyer_id: int,
@@ -387,5 +409,142 @@ async def rate_lawyer(
 
     await db.commit()
     return {"message": "Rating submitted successfully", "average_rating": lawyer.rating}
+
+
+
+@router.post("/report-lawyer")
+async def submit_trust_report(
+    lawyer: int = Form(...),
+    reason: str = Form(...),
+    description: str = Form(...),
+    evidence: List[UploadFile] = File(None),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    import zipfile
+    import io
+    import uuid
+    from pathlib import Path
+    from ..models import TrustReport, Notification
+
+    # Find client profile associated with current user
+    client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
+    client = client_res.scalar_one_or_none()
+    if not client:
+        raise HTTPException(status_code=400, detail="Only client users can submit reports.")
+
+    # Find reported lawyer profile
+    lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == lawyer))
+    reported_lawyer = lawyer_res.scalar_one_or_none()
+    if not reported_lawyer:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found.")
+
+    # Fetch lawyer user
+    lawyer_user_res = await db.execute(select(User).where(User.id == reported_lawyer.user_id))
+    reported_lawyer_user = lawyer_user_res.scalar_one_or_none()
+
+    # Process evidence files: zip them together
+    evidence_url = None
+    if evidence:
+        # Check if there's actually files uploaded (filename could be empty)
+        valid_files = [f for f in evidence if f.filename and len(f.filename.strip()) > 0]
+        if valid_files:
+            zip_buffer = io.BytesIO()
+            total_size = 0
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                for file in valid_files:
+                    file_content = await file.read()
+                    file_size = len(file_content)
+                    if file_size > 5 * 1024 * 1024:
+                        raise HTTPException(status_code=400, detail=f"File {file.filename} exceeds the 5MB size limit.")
+                    total_size += file_size
+                    if file_size > 0:
+                        zip_file.writestr(file.filename, file_content)
+            
+            if total_size > 0:
+                zip_buffer.seek(0)
+                filename = f"evidence_{uuid.uuid4().hex}.zip"
+                upload_dir = Path("media/report_evidence")
+                upload_dir.mkdir(parents=True, exist_ok=True)
+                file_path = upload_dir / filename
+                with open(file_path, "wb") as f:
+                    f.write(zip_buffer.getvalue())
+                evidence_url = f"report_evidence/{filename}" # Relative to media directory as Django expects
+
+    # Create TrustReport
+    report = TrustReport(
+        reporter_id=current_user.id,
+        reported_lawyer_id=reported_lawyer.id,
+        reason=reason,
+        description=description,
+        evidence=evidence_url,
+        status="PENDING"
+    )
+    db.add(report)
+    await db.flush() # Populate report.id
+
+    # Create notifications
+    formatted_report_id = f"ri::{report.id:05d}"
+
+    client_notification = Notification(
+        user_id=current_user.id,
+        title="Report Submitted",
+        message=f"Your report against {reported_lawyer.full_name} has been received and is under review. Report ID: {formatted_report_id}",
+        url="/client_dashboard/"
+    )
+    db.add(client_notification)
+
+    if reported_lawyer_user:
+        lawyer_notification = Notification(
+            user_id=reported_lawyer_user.id,
+            title="A report has been filed against you",
+            message=f"An anonymous client has submitted a report. Admin will review and take action. Report ID: {formatted_report_id}",
+            url="/lawyers/dashboard/"
+        )
+        db.add(lawyer_notification)
+
+    # Notify all admin users
+    admin_users_res = await db.execute(select(User).where(User.is_staff == True, User.is_active == True))
+    admin_users = admin_users_res.scalars().all()
+    for admin in admin_users:
+        admin_notification = Notification(
+            user_id=admin.id,
+            title="New Trust Report Filed",
+            message=f"Client {client.first_name} {client.last_name} reported Lawyer {reported_lawyer.full_name}. Report ID: {formatted_report_id}",
+            url=f"/adminpanel/reports/{report.id}/"
+        )
+        db.add(admin_notification)
+
+    await db.commit()
+
+    # Send emails
+    from utils.email_utils import send_report_submitted_email, send_lawyer_reported_notification_email
+    
+    # 1. Send confirmation to client
+    try:
+        send_report_submitted_email(
+            reporter_name=f"{client.first_name} {client.last_name}",
+            reporter_email=current_user.email,
+            reported_name=reported_lawyer.full_name,
+            report_reason=reason,
+            report_id=formatted_report_id
+        )
+    except Exception:
+        pass
+
+    # 2. Send notice to the reported lawyer (without client details)
+    if reported_lawyer_user:
+        try:
+            send_lawyer_reported_notification_email(
+                lawyer_name=reported_lawyer.full_name,
+                lawyer_email=reported_lawyer_user.email,
+                report_reason=reason,
+                report_description=description,
+                report_id=formatted_report_id
+            )
+        except Exception:
+            pass
+
+    return {"message": "Report submitted successfully"}
 
 

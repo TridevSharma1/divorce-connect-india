@@ -373,13 +373,34 @@ async function loadDashboardData() {
         
         const docList = document.getElementById("document-verification-list");
         if (data.pending_documents.length > 0) {
-            let html = "";
+            // Group by case_id
+            const grouped = {};
             for (let doc of data.pending_documents) {
+                if (!grouped[doc.case_id]) {
+                    grouped[doc.case_id] = {
+                        case_id: doc.case_id,
+                        client_name: doc.client_name,
+                        client_custom_id: doc.client_custom_id,
+                        documents: []
+                    };
+                }
+                grouped[doc.case_id].documents.push(doc);
+            }
+
+            let html = "";
+            for (let caseId in grouped) {
+                const group = grouped[caseId];
                 html += `
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">${doc.document_name || 'Document'}</h4>
-                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
+                <div class="p-4 border border-gray-200 rounded-lg hover:bg-slate-50/50 transition-colors">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm leading-tight">${group.client_name || 'Client'}</h4>
+                            <p class="text-xs text-gray-500 mt-1 font-medium">Client ID: <span class="text-slate-700 font-semibold">${group.client_custom_id || 'N/A'}</span></p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
+                            <a href="/adminpanel/documents/verify/?case_id=${group.case_id}" class="px-4 py-2 bg-slate-950 text-white rounded-lg font-bold text-xs hover:bg-slate-800 transition duration-150">Verify</a>
+                        </div>
                     </div>
                 </div>`;
             }

@@ -299,3 +299,20 @@ class LawyerProfileUpdateRequest(Base):
         }.get(self.specialization, self.specialization or "")
 
 
+class TrustReport(Base):
+    __tablename__ = "adminpanel_trustreport"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reporter_id: Mapped[int] = mapped_column(ForeignKey("accounts_baseuser.id"))
+    reported_client_id: Mapped[Optional[int]] = mapped_column(ForeignKey("clients_clientprofile.id"), nullable=True)
+    reported_lawyer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("lawyers_lawyerprofile.id"), nullable=True)
+    reason: Mapped[str] = mapped_column(String(140))
+    description: Mapped[str] = mapped_column(Text)
+    evidence: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
+    reviewed_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("accounts_baseuser.id"), nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+

@@ -33,6 +33,17 @@
   .footer p { font-size:12px; color:#9ca3af; line-height:1.7; }
   .footer a { color:#0a0a0a; text-decoration:none; font-weight:600; }
   .security-badge { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e4e4e7; border-radius:100px; padding:6px 14px; font-size:11.5px; color:#374151; font-weight:500; margin-top:12px; }
+  
+  /* Next steps and CTA button styles */
+  .next-steps-section { margin-top: 32px; margin-bottom: 32px; }
+  .next-steps-title { font-size: 18px; font-weight: 700; color: #0a0a0a; margin-bottom: 16px; }
+  .next-steps-intro { font-size: 15px; color: #374151; margin-bottom: 16px; line-height: 1.7; }
+  .next-steps-list { list-style: none; margin-bottom: 28px; padding-left: 0; }
+  .next-steps-list li { position: relative; padding-left: 20px; font-size: 14.5px; color: #4b5563; line-height: 1.6; margin-bottom: 10px; }
+  .next-steps-list li::before { content: "•"; position: absolute; left: 0; color: #0a0a0a; font-weight: bold; }
+  .cta-button { display: inline-block; background: #0a0a0a; color: #ffffff !important; text-decoration: none; text-align: center; font-size: 14px; font-weight: 700; letter-spacing: 1px; padding: 16px 32px; border-radius: 8px; margin-bottom: 24px; text-transform: uppercase; }
+  .cta-button:hover { background: #2a2a2a; }
+  .report-id-text { font-size: 13.5px; color: #4b5563; line-height: 1.6; margin-bottom: 24px; }
 </style>
 </head>
 <body>
@@ -46,21 +57,25 @@
   <div class="body">
     <div class="status-pill">Report Submitted</div>
     <h1 class="headline">Your Report Has Been<br>Successfully Received</h1>
-    <p class="intro">Dear <strong>{{ reporter_name }}</strong>, thank you for helping us maintain a safe and trustworthy legal environment. Your report against <strong>{{ reported_name }}</strong> has been received and is now under review by our Trust &amp; Safety team.</p>
-    <div class="timeline">
-      <div class="timeline-item">
-        <div class="tl-dot">1</div>
-        <div class="tl-content"><h4>Report Submitted</h4><p>Received on {{ submitted_date }}.</p></div>
-      </div>
-      <div class="timeline-item">
-        <div class="tl-dot">2</div>
-        <div class="tl-content"><h4>Under Review</h4><p>Our Trust &amp; Safety team is reviewing your report.</p></div>
-      </div>
-      <div class="timeline-item">
-        <div class="tl-dot">3</div>
-        <div class="tl-content"><h4>Action Taken</h4><p>Appropriate action will be taken within 3–5 business days.</p></div>
-      </div>
+    
+    <p class="intro">Hello <strong>{{ reporter_name }}</strong>,</p>
+    
+    <p class="intro" style="margin-top: -16px;">Thank you for your lawyer report on <strong>{{ submitted_date }}</strong>. We'll take a careful look at this content.</p>
+    
+    <div class="next-steps-section">
+      <h3 class="next-steps-title">What happens next</h3>
+      <p class="next-steps-intro">After our review, we may:</p>
+      <ul class="next-steps-list">
+        <li>Remove the lawyer profile, if it violates our Code of Conduct / Guidelines</li>
+        <li>Place restrictions on the lawyer profile, if they have violated service standards</li>
+        <li>Keep the lawyer profile active, if the report does not violate our policies</li>
+      </ul>
     </div>
+
+    {% if report_id %}
+    <p class="report-id-text">Report ID: {{ report_id }}</p>
+    {% endif %}
+
     <div class="info-block">
       <p>📋 &nbsp;<strong>Reason reported:</strong> {{ report_reason }}</p>
     </div>

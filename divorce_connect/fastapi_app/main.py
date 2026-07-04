@@ -424,7 +424,7 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "report_client.html"
     elif page_path in ["admin_pending_cases", "pending-cases"]:
         template_name = "pending_cases_list.html"
-    elif page_path in ["case_documents_verification_list", "case-documents-verification"]:
+    elif page_path in ["case_documents_verification_list", "case-documents-verification", "adminpanel/documents/verify"]:
         template_name = "case_documents_verification_list.html"
     elif page_path in ["admin_profile", "admin-profile"]:
         template_name = "profile_admin.html"

@@ -3,6 +3,17 @@ Dual SMTP email utility.
 Auth emails  → sharikahmed731@gmail.com
 Operations emails → tridevx9@gmail.com
 """
+import os
+import django
+
+if not os.environ.get("DJANGO_SETTINGS_MODULE"):
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "divorce_connect.settings")
+
+try:
+    django.setup()
+except Exception:
+    pass
+
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -22,9 +33,9 @@ def _send_html_email(subject, template_name, context, recipient_email, purpose):
 
     try:
         loop = asyncio.get_running_loop()
-        loop.create_task(send_email_task.kiq(recipient_email, subject, html_body, purpose))
+        loop.create_task(send_email_task(recipient_email, subject, html_body, purpose))
     except RuntimeError:
-        asyncio.run(send_email_task.kiq(recipient_email, subject, html_body, purpose))
+        asyncio.run(send_email_task(recipient_email, subject, html_body, purpose))
 
 
 
@@ -150,7 +161,7 @@ def send_case_accepted_email(case_request):
     )
 
 
-def send_report_submitted_email(reporter_name, reporter_email, reported_name, report_reason):
+def send_report_submitted_email(reporter_name, reporter_email, reported_name, report_reason, report_id=None):
     """Send report confirmation email to the reporter via operations SMTP."""
     now = timezone.localtime(timezone.now())
     _send_html_email(
@@ -160,7 +171,8 @@ def send_report_submitted_email(reporter_name, reporter_email, reported_name, re
             "reporter_name": reporter_name,
             "reported_name": reported_name,
             "report_reason": report_reason,
-            "submitted_date": now.strftime("%d %b %Y, %I:%M %p"),
+            "submitted_date": now.strftime("%d %b %Y"),
+            "report_id": report_id,
         },
         recipient_email=reporter_email,
         purpose=PURPOSE_OPERATIONS,
@@ -233,6 +245,22 @@ def send_report_action_to_reported(report):
             "action_date": timezone.localtime(timezone.now()).strftime("%d %b %Y, %I:%M %p"),
         },
         recipient_email=reported_user.email,
+        purpose=PURPOSE_OPERATIONS,
+    )
+
+
+def send_lawyer_reported_notification_email(lawyer_name, lawyer_email, report_reason, report_description, report_id=None):
+    """Send report notification email to the reported lawyer via operations SMTP."""
+    _send_html_email(
+        subject="🛡️ Notice of Report Filed — DivorceConnect India",
+        template_name="emails/reported_notification_email.html",
+        context={
+            "lawyer_name": lawyer_name,
+            "report_reason": report_reason,
+            "report_description": report_description,
+            "report_id": report_id,
+        },
+        recipient_email=lawyer_email,
         purpose=PURPOSE_OPERATIONS,
     )
 

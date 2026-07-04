@@ -661,9 +661,13 @@
                 emptyState.classList.add("hidden");
                 casesWrapper.classList.remove("hidden");
 
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetCaseId = urlParams.get('case_id');
+
                 data.cases_with_pending_docs.forEach(caseData => {
+                    const isTarget = targetCaseId && String(caseData.case_request.id) === String(targetCaseId);
                     const card = document.createElement("div");
-                    card.className = "dv-case-card";
+                    card.className = isTarget ? "dv-case-card" : "dv-case-card collapsed";
 
                     // Build documents list
                     let docsHtml = "";
@@ -756,7 +760,7 @@
                                     </svg>
                                     View All
                                 </a>
-                                <span class="dv-collapse-icon" style="color:white; font-size:0.75rem; font-weight:bold; transition:transform 0.2s; display:inline-block; transform:rotate(0deg);">▼</span>
+                                <span class="dv-collapse-icon" style="color:white; font-size:0.75rem; font-weight:bold; transition:transform 0.2s; display:inline-block; transform:rotate(${isTarget ? '0deg' : '-90deg'});">▼</span>
                             </div>
                         </div>
                         <div class="dv-case-body">

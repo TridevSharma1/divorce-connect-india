@@ -57,9 +57,9 @@ def send_email(to_address: str, subject: str, html_body: str, purpose: str = "op
     
     async def safe_kiq():
         try:
-            await send_email_task.kiq(to_address, subject, html_body, purpose)
+            await send_email_task(to_address, subject, html_body, purpose)
         except Exception as e:
-            logger.error(f"Taskiq SendTaskError in background email task: {e}")
+            logger.error(f"Error sending email in background task: {e}")
             
     logger.info(f"Scheduling background task to send {purpose} email to {to_address}")
     try:

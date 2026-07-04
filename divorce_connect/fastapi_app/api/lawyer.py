@@ -443,6 +443,18 @@ async def update_lawyer_profile_endpoint(
         profile = LawyerProfile(user_id=current_user.id)
         db.add(profile)
         
+    # Check if bar_registration_number is already registered to another lawyer
+    if bar_registration_number:
+        query = select(LawyerProfile).where(LawyerProfile.bar_registration_number == bar_registration_number)
+        if profile.id is not None:
+            query = query.where(LawyerProfile.id != profile.id)
+        existing_bar_res = await db.execute(query)
+        if existing_bar_res.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This Bar Registration Number is already registered to another lawyer."
+            )
+        
     if profile.verified:
         # Check if there is already a pending update request
         pending_res = await db.execute(

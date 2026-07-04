@@ -165,7 +165,8 @@ async def get_admin_dashboard(
             "document_id": doc.id,
             "case_id": case.id,
             "document_name": doc.document_type.replace('_', ' ').capitalize(),
-            "client_name": f"{client.first_name} {client.last_name}"
+            "client_name": f"{client.first_name} {client.last_name}",
+            "client_custom_id": client.custom_id
         }
         for doc, case, client in pending_docs_rows
     ]

@@ -579,16 +579,18 @@ def report_client_view(request):
             evidence=evidence
         )
 
+        formatted_report_id = f"ri::{report.id:05d}"
+
         Notification.objects.create(
             user=request.user,
             title='Report Submitted',
-            message=f'Your report against {reported_client.get_full_name()} has been received and is under review.',
+            message=f'Your report against {reported_client.get_full_name()} has been received and is under review. Report ID: {formatted_report_id}',
             url='/lawyers/dashboard/'
         )
         Notification.objects.create(
             user=reported_client.user,
             title='A report has been filed against you',
-            message=f'{current_lawyer.full_name} has submitted a report. Admin will review and take action.',
+            message=f'{current_lawyer.full_name} has submitted a report. Admin will review and take action. Report ID: {formatted_report_id}',
             url='/dashboard/'
         )
 
@@ -598,7 +600,7 @@ def report_client_view(request):
             Notification.objects.create(
                 user=admin,
                 title="New Trust Report Filed",
-                message=f"Lawyer {current_lawyer.full_name} reported Client {reported_client.get_full_name()}.",
+                message=f"Lawyer {current_lawyer.full_name} reported Client {reported_client.get_full_name()}. Report ID: {formatted_report_id}",
                 url=f"/adminpanel/reports/{report.id}/"
             )
 
@@ -609,6 +611,7 @@ def report_client_view(request):
                 reporter_email=request.user.email,
                 reported_name=reported_client.get_full_name(),
                 report_reason=reason,
+                report_id=formatted_report_id,
             )
         except Exception:
             pass
