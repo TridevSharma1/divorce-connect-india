@@ -1,4 +1,4 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -208,7 +208,7 @@
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <img src="{{ url_for('static', path='Assets/LOGO.png') }}" alt="DivorceConnect India" class="h-12 w-auto">
+                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-12 w-auto">
                     </a>
                 </div>
 
@@ -377,7 +377,7 @@
     {% endif %}
 
     <script src="/static/js/auth.js"></script>
-    <script src="{{ url_for('static', path='notifications_api.js') }}"></script>
+    <script src="{% static 'notifications_api.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

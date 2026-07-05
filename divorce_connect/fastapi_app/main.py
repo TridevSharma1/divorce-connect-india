@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from types import SimpleNamespace
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query, status
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Query, status, Depends, Form
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,7 +12,7 @@ from .security import SECRET_KEY, ALGORITHM
 from .database import engine
 from .models import Base
 from .broker import broker
-from .api import auth, notifs, lawyer, admin, admin_actions, client_actions, client_case_actions, payments, reminders
+from .api import auth, notifs, lawyer, admin, admin_actions, client_actions, client_case_actions, payments, reminders, superuser
 from .notifications import manager
 import logging
 
@@ -22,10 +23,11 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIRS = [
     BASE_DIR / "templates",
-    BASE_DIR / "clients" / "templates",
-    BASE_DIR / "lawyers" / "templates",
-    BASE_DIR / "adminpanel" / "templates",
-    BASE_DIR / "accounts" / "templates",
+    BASE_DIR / "templates" / "accounts",
+    BASE_DIR / "templates" / "accounts" / "emails",
+    BASE_DIR / "templates" / "clients",
+    BASE_DIR / "templates" / "lawyers",
+    BASE_DIR / "templates" / "adminpanel",
 ]
 STATIC_DIR = BASE_DIR / "static"
 MEDIA_DIR = BASE_DIR / "media"
@@ -157,6 +159,7 @@ app.include_router(client_actions.router, prefix="/api/client", tags=["Client Ac
 app.include_router(client_case_actions.router, prefix="/api/client", tags=["Client Case Actions"])
 app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 app.include_router(reminders.router, prefix="/api/reminders", tags=["Reminders"])
+app.include_router(superuser.router, prefix="/api/superuser", tags=["Superuser"])
 
 @app.websocket("/ws/notifications/{user_id}")
 async def websocket_notifications(
@@ -213,9 +216,29 @@ async def logout_page(request: Request):
     """
     return HTMLResponse(content=html_content, status_code=200)
 
+@app.get("/superuser_login/", tags=["Frontend"])
+@app.get("/superuser_login", tags=["Frontend"])
+async def superuser_login_page(request: Request):
+    """
+    Renders the dedicated Superuser Login page.
+    """
+    return templates.TemplateResponse(request, "superuser_login.html")
+
+
 # --- Frontend Template Routes ---
 from fastapi import HTTPException
 import jinja2
+
+@app.get("/superuser_dashboard/", tags=["Frontend"])
+@app.get("/superuser_dashboard", tags=["Frontend"])
+async def superuser_dashboard_page(request: Request):
+    """
+    Renders the native FastAPI Superuser Panel.
+    Auth is handled client-side via JWT (localStorage token).
+    The API routes at /api/superuser/* enforce is_superuser=True.
+    """
+    return templates.TemplateResponse(request, "superuser_dashboard.html")
+
 
 @app.get("/", tags=["Frontend"])
 async def landing_page(request: Request):
@@ -472,7 +495,7 @@ async def dynamic_page(request: Request, page_path: str):
     elif page_path in ["client_profile", "profile/edit"]:
         template_name = "edit_profile_client.html"
     elif page_path in ["lawyer_profile", "lawyers/profile"]:
-        template_name = "profile_lawyer.html"
+        template_name = "lawyers/profile_lawyer.html"
     elif page_path in ["delete-account", "api/auth/delete-account"]:
         template_name = "request_delete_account.html"
     elif page_path in ["lawyer_earnings", "earnings"]:

@@ -316,3 +316,66 @@ class TrustReport(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
 
+class LawyerVerificationRequest(Base):
+    """
+    Tracks lawyer verification requests submitted to admin for review.
+    Maps to the adminpanel_lawyerverificationrequest table.
+    """
+    __tablename__ = "adminpanel_lawyerverificationrequest"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    lawyer_id: Mapped[int] = mapped_column(
+        ForeignKey("lawyers_lawyerprofile.id", ondelete="CASCADE"), unique=True
+    )
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    submitted_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.utcnow
+    )
+    reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
+    reviewed_by_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("accounts_baseuser.id", ondelete="SET NULL"), nullable=True
+    )
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    lawyer: Mapped["LawyerProfile"] = relationship("LawyerProfile", backref="verification_request")
+    reviewed_by: Mapped[Optional["User"]] = relationship(
+        "User", foreign_keys=[reviewed_by_id], backref="reviewed_lawyer_verifications"
+    )
+
+
+class AdminPanelProfileUpdateRequest(Base):
+    """
+    Holds pending admin profile edits waiting for superuser approval.
+    Maps to the adminpanel_adminpanelprofileupdaterequest table.
+    """
+    __tablename__ = "adminpanel_adminpanelprofileupdaterequest"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    admin_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("adminpanel_adminpanelprofile.id", ondelete="CASCADE")
+    )
+    # Shadow fields — all nullable (only set fields are submitted for approval)
+    full_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    gender: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    date_of_birth: Mapped[Optional[datetime.date]] = mapped_column(Date, nullable=True)
+    mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
+    alternate_mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
+    profile_picture: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    submitted_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.utcnow
+    )
+    reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)
+    reviewed_by_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("accounts_baseuser.id", ondelete="SET NULL"), nullable=True
+    )
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    admin_profile: Mapped["AdminPanelProfile"] = relationship(
+        "AdminPanelProfile", backref="update_requests"
+    )
+    reviewed_by: Mapped[Optional["User"]] = relationship(
+        "User", foreign_keys=[reviewed_by_id], backref="reviewed_admin_profile_updates"
+    )

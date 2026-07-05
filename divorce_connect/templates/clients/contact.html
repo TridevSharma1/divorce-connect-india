@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us | DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .playfair {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+    }
+
+    input, textarea {
+        transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+        outline: none;
+    }
+
+    .map-grayscale {
+        filter: grayscale(100%) contrast(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Header Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h1 class="playfair text-5xl md:text-6xl text-[#0a0a0a] mb-6 leading-tight">
+                Get in Touch.
+            </h1>
+            <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                Have a question about our platform? Our team is here to provide the clarity and support you need.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content: Two-Column Layout -->
+    <section class="py-12 md:py-16">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+
+                <!-- Column 1: Contact Information & Map -->
+                <div>
+                    <!-- Contact Details -->
+                    <div class="space-y-8">
+                        <!-- Email -->
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0">
+                                <svg class="w-6 h-6 text-[#0a0a0a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-500 text-gray-500 uppercase tracking-wide mb-1">Email</p>
+                                <a href="mailto:support@divorceconnect.in" class="text-[#0a0a0a] text-lg hover:text-gray-700 transition">
+                                    support@divorceconnect.in
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Office Address -->
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0">
+                                <svg class="w-6 h-6 text-[#0a0a0a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-500 text-gray-500 uppercase tracking-wide mb-1">Office</p>
+                                <p class="text-[#0a0a0a] text-lg leading-relaxed">
+                                    Corporate Headquarters<br/>
+                                    Cyber City, Gurugram<br/>
+                                    Haryana, India
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Business Hours -->
+                        <div class="flex gap-6">
+                            <div class="flex-shrink-0">
+                                <svg class="w-6 h-6 text-[#0a0a0a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-500 text-gray-500 uppercase tracking-wide mb-1">Business Hours</p>
+                                <p class="text-[#0a0a0a] text-lg">
+                                    Monday – Friday<br/>
+                                    9:00 AM – 6:00 PM IST
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grayscale Google Map -->
+                    <div class="mt-12">
+                        <iframe
+                            class="w-full h-80 rounded-xl map-grayscale border border-gray-200"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3506.7326889454066!2d77.0468915!3d28.4089427!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d1a8a8a8a8a8d%3A0x8a8a8a8a8a8a8a8a!2sCyber%20City%2C%20Gurugram%2C%20Haryana%20122022!5e0!3m2!1sen!2sin!4v1234567890"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- Column 2: Contact Form -->
+                <div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+                        <form method="POST" action="" class="space-y-6">
+                            <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+
+                            <!-- Full Name -->
+                            <div>
+                                <label for="full_name" class="block text-sm font-500 text-[#0a0a0a] mb-3">
+                                    Full Name
+                                </label>
+                                <input
+                                    type="text"
+                                    id="full_name"
+                                    name="full_name"
+                                    required
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/10"
+                                    placeholder="Your full name">
+                            </div>
+
+                            <!-- Email Address -->
+                            <div>
+                                <label for="email" class="block text-sm font-500 text-[#0a0a0a] mb-3">
+                                    Email Address
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    required
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/10"
+                                    placeholder="your.email@example.com">
+                            </div>
+
+                            <!-- Subject -->
+                            <div>
+                                <label for="subject" class="block text-sm font-500 text-[#0a0a0a] mb-3">
+                                    Subject
+                                </label>
+                                <input
+                                    type="text"
+                                    id="subject"
+                                    name="subject"
+                                    required
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/10"
+                                    placeholder="What is this about?">
+                            </div>
+
+                            <!-- Message -->
+                            <div>
+                                <label for="message" class="block text-sm font-500 text-[#0a0a0a] mb-3">
+                                    Message
+                                </label>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    rows="5"
+                                    required
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-[#0a0a0a] focus:ring-2 focus:ring-[#0a0a0a]/10 resize-none"
+                                    placeholder="Please share your inquiry..."></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button
+                                type="submit"
+                                class="w-full bg-[#0a0a0a] text-white font-500 py-3 rounded-lg hover:bg-gray-900 transition duration-200 mt-8">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

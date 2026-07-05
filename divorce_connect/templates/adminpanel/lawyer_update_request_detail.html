@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Lawyer Profile Update - DivorceConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-10">
+        <a href="/admin_dashboard/" class="text-blue-600 hover:text-blue-800 font-semibold">← Back to Dashboard</a>
+        <div class="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h1 class="text-5xl font-bold serif-heading">Review Lawyer Profile Update</h1>
+                <p class="text-gray-600 mt-2">Compare the requested profile changes against the lawyer's current details before approving or rejecting.</p>
+            </div>
+            <div class="rounded-3xl border border-slate-200 bg-slate-50 px-6 py-4">
+                <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Update Request</p>
+                <p class="mt-3 text-sm text-slate-700">Submitted on <span class="font-semibold text-slate-900">{{ update_request.submitted_at|date:'d M, Y H:i' }}</span></p>
+                <p class="mt-2 text-sm text-slate-700">Request ID <span class="font-semibold text-slate-900">#{{ update_request.id }}</span></p>
+                <p class="mt-2 inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Pending Review</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[1.7fr_1fr] gap-8">
+        <div class="space-y-6">
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.25em] text-slate-500 font-semibold">Requested Changes</p>
+                        <h2 class="mt-3 text-3xl font-black text-slate-900">Compare updates vs current profile</h2>
+                    </div>
+                    {% if update_request.profile_picture %}
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-center">
+                        <p class="text-sm uppercase tracking-[0.25em] text-slate-500 font-semibold">New Photo</p>
+                        <img src="{{ update_request.profile_picture.url }}" alt="Updated Profile" class="mt-4 h-32 w-32 rounded-3xl object-cover mx-auto" />
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-10 grid gap-6 lg:grid-cols-2">
+                    <div class="space-y-6">
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Full Name</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.full_name|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.full_name }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Gender</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.get_gender_display|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.get_gender_display }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Date of Birth</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.date_of_birth|date:'d M, Y'|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.date_of_birth|date:'d M, Y' }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Experience</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.years_of_experience|default:'No change requested' }} years</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.years_of_experience }} years</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Specialization</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.get_specialization_display|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.get_specialization_display }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Consultation Fee</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">₹{{ update_request.consultation_fee|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: ₹{{ lawyer.consultation_fee }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Office City</p>
+                            <div class="mt-3 flex items-center justify-between gap-4">
+                                <p class="font-semibold text-slate-900">{{ update_request.office_city|default:'No change requested' }}</p>
+                                <span class="text-sm text-slate-500">Current: {{ lawyer.office_city|default:'Not provided' }}</span>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                            <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Contact Numbers</p>
+                            <div class="mt-3 space-y-2">
+                                <div class="flex items-center justify-between gap-4">
+                                    <span class="font-semibold text-slate-900">Mobile: {{ update_request.mobile_number|default:'No change' }}</span>
+                                    <span class="text-sm text-slate-500">Current: {{ lawyer.mobile_number }}</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-4">
+                                    <span class="font-semibold text-slate-900">Alternate: {{ update_request.alternate_mobile_number|default:'No change' }}</span>
+                                    <span class="text-sm text-slate-500">Current: {{ lawyer.alternate_mobile_number|default:'Not provided' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 rounded-3xl border border-slate-200 bg-white p-6">
+                    <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Biography</p>
+                    <div class="mt-4 grid gap-6 lg:grid-cols-2">
+                        <div>
+                            <p class="text-sm text-slate-500">Requested Bio</p>
+                            <p class="mt-2 text-slate-900 whitespace-pre-line">{{ update_request.bio|default:'No change requested' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500">Current Bio</p>
+                            <p class="mt-2 text-slate-900 whitespace-pre-line">{{ lawyer.bio|default:'No bio provided' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm sticky top-24">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Review Actions</p>
+                        <h2 class="mt-3 text-2xl font-bold text-slate-900">Approve or reject the update</h2>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-3 py-1 text-sm font-semibold text-yellow-700">Pending Review</span>
+                </div>
+                <form method="POST" class="mt-8 space-y-5">
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700">Admin Notes</label>
+                        <textarea name="notes" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="Add optional notes for the lawyer..."></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="w-full rounded-3xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-emerald-700">Approve and Apply Updates</button>
+                </form>
+                <button type="button" onclick="document.getElementById('rejectPanel').classList.remove('hidden')" class="mt-4 w-full rounded-3xl bg-red-600 px-6 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-red-700">Reject Update</button>
+            </div>
+
+            <div id="rejectPanel" class="hidden bg-white p-8 rounded-3xl border border-red-200 shadow-sm">
+                <h2 class="text-2xl font-bold text-red-700">Reject Update Request</h2>
+                <form method="POST" class="mt-6 space-y-5">
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700">Rejection Reason</label>
+                        <textarea name="rejection_reason" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-900 shadow-sm focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100" placeholder="Explain why this request is rejected..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700">Additional Notes</label>
+                        <textarea name="notes" rows="3" class="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" placeholder="Optional admin comments..."></textarea>
+                    </div>
+                    <button type="submit" name="action" value="reject" class="w-full rounded-3xl bg-red-600 px-6 py-4 text-base font-semibold text-white shadow-sm transition hover:bg-red-700">Submit Rejection</button>
+                    <button type="button" onclick="document.getElementById('rejectPanel').classList.add('hidden')" class="w-full rounded-3xl bg-slate-100 px-6 py-4 text-base font-semibold text-slate-900 transition hover:bg-slate-200">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

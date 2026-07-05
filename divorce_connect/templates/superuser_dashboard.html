@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Superuser Panel — DivorceConnect India</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+*{font-family:'Inter',sans-serif;box-sizing:border-box}
+body{background:#0d1117;color:#e2e8f0;margin:0}
+[x-cloak]{display:none!important}
+
+/* Layout */
+.sidebar{width:268px;min-height:100vh;background:#161b2e;border-right:1px solid #21283c;position:fixed;top:0;left:0;z-index:30;overflow-y:auto;display:flex;flex-direction:column}
+.main-wrap{margin-left:268px;min-height:100vh}
+
+/* Cards */
+.card{background:#161b2e;border:1px solid #21283c;border-radius:12px}
+
+/* Form inputs - ALL ARE EDITABLE */
+.f-input{width:100%;background:#0d1117;border:1px solid #2d3a50;color:#e2e8f0;border-radius:8px;padding:10px 13px;font-size:14px;outline:none;transition:border-color .18s,box-shadow .18s}
+.f-input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.f-input::placeholder{color:#3d4f66}
+.f-textarea{width:100%;background:#0d1117;border:1px solid #2d3a50;color:#e2e8f0;border-radius:8px;padding:10px 13px;font-size:14px;outline:none;resize:vertical;min-height:90px;transition:border-color .18s}
+.f-textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.f-select{width:100%;background:#0d1117;border:1px solid #2d3a50;color:#e2e8f0;border-radius:8px;padding:10px 13px;font-size:14px;outline:none;cursor:pointer;transition:border-color .18s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}
+.f-select:focus{border-color:#6366f1}
+.f-select option{background:#1e293b;color:#e2e8f0}
+.f-readonly{width:100%;background:#0a0e1a;border:1px solid #1a2235;color:#4a5568;border-radius:8px;padding:10px 13px;font-size:14px;cursor:default;word-break:break-all;min-height:40px}
+
+/* Toggle */
+.tog-wrap{display:inline-flex;align-items:center;gap:12px;padding:4px 0}
+.tog-track{position:relative;width:46px;height:26px;border-radius:9999px;border:none;cursor:pointer;transition:background .2s;outline:none;flex-shrink:0}
+.tog-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:9999px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff}
+.btn-primary:hover{background:linear-gradient(135deg,#4f46e5,#3730a3);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-danger{background:#1c0a0a;color:#f87171;border:1px solid #7f1d1d55}
+.btn-danger:hover{background:#2d0d0d}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2d3a50}
+.btn-ghost:hover{color:#e2e8f0;border-color:#6366f1}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.badge-green{background:#052e16;color:#4ade80;border:1px solid #16653488}
+.badge-red{background:#2d050588;color:#f87171;border:1px solid #7f1d1d88}
+.badge-yellow{background:#2d1a0088;color:#fbbf24;border:1px solid #78350f88}
+.badge-blue{background:#0c1a3a88;color:#60a5fa;border:1px solid #1e3a8a88}
+.badge-gray{background:#1e293b;color:#94a3b8;border:1px solid #33415588}
+
+/* Nav */
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 14px 7px 24px;font-size:13px;color:#94a3b8;border-radius:8px;margin:1px 6px;cursor:pointer;transition:all .12s;user-select:none}
+.nav-item:hover{color:#e2e8f0;background:rgba(99,102,241,.09)}
+.nav-item.active{color:#fff;background:rgba(99,102,241,.18);border-left:2px solid #6366f1;padding-left:22px}
+.nav-group-hd{width:100%;display:flex;align-items:center;justify-content:space-between;padding:7px 14px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#3d4f66;cursor:pointer;transition:color .12s}
+.nav-group-hd:hover{color:#64748b}
+
+/* Table */
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{background:#1a2338;color:#5e738a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:11px 14px;white-space:nowrap;border-bottom:1px solid #21283c}
+tbody tr{cursor:pointer;transition:background .1s;border-bottom:1px solid #21283c33}
+tbody tr:hover{background:#1e293b55}
+tbody tr.sel-row{background:#1e2d4a}
+td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Section cards in detail view */
+.sec-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:22px 24px;margin-bottom:14px}
+.sec-title{color:#e2e8f0;font-size:14px;font-weight:600;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid #1e293b}
+.field-label{display:block;font-size:12px;font-weight:500;color:#6b8095;margin-bottom:6px}
+.help-text{font-size:11px;color:#3d4f66;margin-top:5px}
+
+/* Toast */
+.toast-bar{position:fixed;bottom:22px;right:22px;z-index:999;padding:13px 18px;border-radius:10px;font-size:13px;font-weight:500;min-width:260px;pointer-events:none}
+
+/* Sticky detail header */
+.detail-top{position:sticky;top:0;z-index:20;background:#0d1117dd;backdrop-filter:blur(10px);border-bottom:1px solid #21283c;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#161b2e;border:1px solid #21283c;border-radius:14px;padding:28px;max-width:430px;width:100%}
+
+/* Scrollbar */
+.slim-scroll::-webkit-scrollbar{width:4px}.slim-scroll::-webkit-scrollbar-track{background:transparent}.slim-scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.anim-up{animation:slideUp .22s ease}
+</style>
+</head>
+<body x-data="SU()" x-init="boot()" @keydown.escape.window="esc()">
+
+<!-- ───────── TOAST ───────── -->
+<div x-show="toast.on" x-cloak x-transition class="toast-bar"
+     :class="toast.ok ? 'bg-emerald-900 border border-emerald-700 text-emerald-200' : 'bg-red-900 border border-red-700 text-red-200'"
+     x-text="toast.msg"></div>
+
+<!-- ───────── DELETE CONFIRM (single record) ───────── -->
+<div class="modal-bg" x-show="delOpen" x-cloak @click.self="delOpen=false">
+  <div class="modal-box anim-up" @click.stop>
+    <h2 class="text-white font-semibold text-lg mb-1">Delete this record?</h2>
+    <p class="text-slate-400 text-sm mb-6">Record <span class="font-mono text-white" x-text="'#'+(formData.id||'')"></span> will be permanently removed. This cannot be undone.</p>
+    <div class="flex justify-end gap-3">
+      <button class="btn btn-ghost" @click="delOpen=false">Cancel</button>
+      <button class="btn btn-danger" @click="doDelete()" :disabled="busy">
+        <span x-text="busy ? 'Deleting...' : 'Yes, Delete'"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── BULK DELETE CONFIRM ───────── -->
+<div class="modal-bg" x-show="bulkDelOpen" x-cloak @click.self="bulkDelOpen=false">
+  <div class="modal-box anim-up" @click.stop style="max-width:480px">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-xl bg-red-900/50 border border-red-800/50 flex items-center justify-center text-red-400 text-lg">&#128465;</div>
+      <div>
+        <h2 class="text-white font-semibold text-base">Delete Selected Records?</h2>
+        <p class="text-slate-500 text-xs mt-0.5">This action is permanent and irreversible.</p>
+      </div>
+    </div>
+    <div class="bg-red-900/20 border border-red-800/40 rounded-xl p-4 mb-5">
+      <p class="text-red-300 text-sm">
+        You are about to permanently delete
+        <span class="font-bold text-red-200" x-text="sel.length"></span>
+        record(s) from
+        <span class="font-bold text-red-200" x-text="schema ? schema.label : ''"></span>.
+      </p>
+      <p class="text-slate-500 text-xs mt-2">To confirm, type <span class="text-white font-mono">DELETE</span> below:</p>
+      <input type="text" x-model="bulkDelConfirm" placeholder="Type DELETE to confirm"
+             class="f-input mt-2" style="border-color:#7f1d1d55" />
+    </div>
+    <div class="flex justify-end gap-3">
+      <button class="btn btn-ghost" @click="bulkDelOpen=false; bulkDelConfirm='';">Cancel</button>
+      <button class="btn btn-danger" @click="confirmBulkDelete()"
+              :disabled="bulkDelConfirm !== 'DELETE' || busy">
+        <span x-text="busy ? 'Deleting...' : 'Delete ' + sel.length + ' Records'"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── SIDEBAR ───────── -->
+<aside class="sidebar slim-scroll">
+  <!-- Logo -->
+  <div class="px-5 py-5 border-b border-slate-800/50 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg">DC</div>
+      <div>
+        <p class="text-white font-semibold text-sm leading-tight">DivorceConnect</p>
+        <p class="text-indigo-400 text-xs font-medium">Superuser Panel</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- User chip -->
+  <div class="mx-3 mt-3 px-3 py-2.5 bg-slate-800/50 rounded-xl border border-slate-700/40 flex items-center gap-2.5 flex-shrink-0">
+    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+         x-text="me ? me.email[0].toUpperCase() : 'S'"></div>
+    <div class="min-w-0">
+      <p class="text-white text-xs font-medium truncate" x-text="me ? me.email : 'Loading...'"></p>
+      <p class="text-emerald-400 text-xs">Superuser</p>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="py-2 flex-1 overflow-y-auto slim-scroll mt-1">
+    <template x-for="grp in NAV" :key="grp.label">
+      <div>
+        <button class="nav-group-hd" @click="grp.open = !grp.open">
+          <span x-text="grp.label"></span>
+          <svg class="w-3 h-3 transition-transform" :class="grp.open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="grp.open" x-transition>
+          <template x-for="item in grp.items" :key="item.k">
+            <div class="nav-item" :class="activeKey === item.k ? 'active' : ''" @click="loadModel(item.k)">
+              <span x-text="item.icon" style="font-size:14px"></span>
+              <span x-text="item.label"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+  </nav>
+
+  <!-- Footer -->
+  <div class="p-4 border-t border-slate-800/60 flex-shrink-0 space-y-1">
+    <a href="/admin_dashboard/" class="flex items-center gap-2 text-slate-400 hover:text-white text-xs transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-800/50">
+      &#127968; Admin Dashboard
+    </a>
+    <button @click="logout()" class="flex items-center gap-2 text-red-400 hover:text-red-300 text-xs transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-red-900/20">
+      &#128682; Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ───────── MAIN ───────── -->
+<main class="main-wrap">
+
+  <!-- ══════════ LIST VIEW ══════════ -->
+  <div x-show="view === 'list'" x-cloak>
+    <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <h1 class="text-white font-semibold text-xl" x-text="schema ? schema.label : ''"></h1>
+        <p class="text-slate-500 text-xs mt-0.5"><span class="text-slate-300" x-text="total"></span> total records</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <input type="text" x-model="srch" @input.debounce.300ms="pg=1; loadList()" placeholder="Search…" class="f-input w-52" style="padding-left:34px" />
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" style="font-size:13px">&#128269;</span>
+        </div>
+        <button class="btn btn-primary" @click="openAdd()">&#43; Add Record</button>
+      </div>
+    </header>
+
+    <!-- Bulk toolbar -->
+    <div class="px-6 py-2 border-b border-slate-800/40 min-h-[46px] flex items-center gap-4">
+      <span class="text-slate-500 text-xs">Page <span class="text-white font-medium" x-text="pg"></span> of <span x-text="pages"></span></span>
+      <div x-show="sel.length > 0" x-transition class="ml-auto flex items-center gap-2">
+        <span class="text-indigo-400 text-xs font-medium" x-text="sel.length + ' selected'"></span>
+        <template x-for="ba in bkActions" :key="ba.key">
+          <button class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" :class="ba.cls" @click="runBulk(ba)" x-text="ba.label"></button>
+        </template>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="px-6 py-4">
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th class="w-10 text-center"><input type="checkbox" @change="chkAll($event)" class="rounded" /></th>
+                <template x-for="col in listCols" :key="col"><th x-text="col"></th></template>
+                <th style="min-width:100px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-if="listBusy">
+                <tr><td :colspan="listCols.length + 2" class="text-center py-20 text-slate-500">
+                  <div class="flex flex-col items-center gap-3">
+                    <div class="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-sm">Loading records…</span>
+                  </div>
+                </td></tr>
+              </template>
+              <template x-if="!listBusy && rows.length === 0">
+                <tr><td :colspan="listCols.length + 2" class="text-center py-20 text-slate-500">
+                  <div class="flex flex-col items-center gap-3">
+                    <span style="font-size:2rem">&#128219;</span>
+                    <span class="text-sm">No records found</span>
+                  </div>
+                </td></tr>
+              </template>
+              <template x-for="row in rows" :key="row.id">
+                <tr @click="openDetail(row)" :class="sel.includes(row.id) ? 'sel-row' : ''">
+                  <td class="text-center" @click.stop>
+                    <input type="checkbox" :checked="sel.includes(row.id)" @change="chkOne(row.id)" class="rounded" />
+                  </td>
+                  <template x-for="col in listCols" :key="col">
+                    <td><span x-html="cellHtml(col, row[col])"></span></td>
+                  </template>
+                  <td @click.stop>
+                    <div class="flex items-center gap-1.5">
+                      <button class="px-3 py-1.5 text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-900/30 hover:bg-indigo-600/50 rounded-lg transition-all" @click="openDetail(row)">Edit</button>
+                      <button class="px-3 py-1.5 text-xs font-semibold text-red-400 hover:text-red-300 bg-red-900/20 hover:bg-red-900/40 rounded-lg transition-all" @click.stop="quickDel(row.id)">Del</button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-5 py-3 border-t border-slate-800">
+          <button class="btn btn-ghost text-xs" :disabled="pg <= 1" @click="pg--; loadList()">&#8592; Prev</button>
+          <div class="flex items-center gap-1">
+            <template x-for="p in pgRange" :key="p">
+              <button class="w-8 h-8 rounded-lg text-sm transition-all font-medium"
+                      :class="p === pg ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'"
+                      @click="pg = p; loadList()" x-text="p"></button>
+            </template>
+          </div>
+          <button class="btn btn-ghost text-xs" :disabled="pg >= pages" @click="pg++; loadList()">Next &#8594;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ DETAIL / ADD VIEW ══════════ -->
+  <div x-show="view === 'detail' || view === 'add'" x-cloak class="anim-up">
+    <!-- Sticky top bar -->
+    <div class="detail-top">
+      <div class="flex items-center gap-2 min-w-0 flex-1">
+        <button class="btn btn-ghost text-xs flex items-center gap-1.5" @click="backList()">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+          <span x-text="schema ? schema.label : 'Back'"></span>
+        </button>
+        <span class="text-slate-600">/</span>
+        <span class="text-white font-semibold text-sm truncate"
+              x-text="view === 'add' ? 'New Record' : 'Record #' + (formData.id || '')"></span>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="btn btn-ghost text-xs" @click="backList()">Cancel</button>
+        <button x-show="view === 'detail'" x-cloak class="btn btn-danger text-xs" @click="delOpen = true">&#128465; Delete</button>
+        <button class="btn btn-primary text-xs" @click="saveRec()" :disabled="busy">
+          <span x-text="busy ? 'Saving…' : (view === 'add' ? 'Create Record' : 'Save Changes')"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div x-show="detBusy" class="flex items-center justify-center py-32 text-slate-500">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <span class="text-sm">Loading record…</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div x-show="!detBusy" class="px-6 py-5 max-w-4xl">
+
+      <!-- ID + model badge -->
+      <div x-show="view === 'detail'" class="flex items-center gap-2 mb-5 flex-wrap">
+        <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs font-mono"
+              x-text="'ID: ' + (formData.id || '')"></span>
+        <span class="px-3 py-1.5 bg-indigo-900/30 border border-indigo-800/50 rounded-lg text-indigo-300 text-xs"
+              x-text="schema ? schema.label : ''"></span>
+      </div>
+
+      <!-- Sections rendered from schema -->
+      <template x-if="schema">
+        <div>
+          <template x-for="sec in schema.sections" :key="sec.title">
+            <div class="sec-card">
+              <div class="sec-title" x-text="sec.title"></div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <template x-for="f in sec.fields" :key="f.name">
+
+                  <!-- FIELD WRAPPER: full-width for textarea/image/fullWidth flag -->
+                  <div :class="(f.fullWidth || f.type === 'textarea' || f.type === 'image') ? 'md:col-span-2' : ''">
+                    <label class="field-label" x-text="f.label"></label>
+
+                    <!-- ── READONLY ── -->
+                    <template x-if="f.type === 'ro'">
+                      <div class="f-readonly" x-text="formData[f.name] != null && formData[f.name] !== '' ? String(formData[f.name]) : '—'"></div>
+                    </template>
+
+                    <!-- ── TEXT INPUT ── -->
+                    <template x-if="f.type === 'text'">
+                      <input type="text" class="f-input"
+                             x-model="formData[f.name]"
+                             :placeholder="f.placeholder || ''" />
+                    </template>
+
+                    <!-- ── EMAIL ── -->
+                    <template x-if="f.type === 'email'">
+                      <input type="email" class="f-input"
+                             x-model="formData[f.name]"
+                             :placeholder="f.placeholder || 'user@example.com'" />
+                    </template>
+
+                    <!-- ── URL ── -->
+                    <template x-if="f.type === 'url'">
+                      <input type="url" class="f-input"
+                             x-model="formData[f.name]"
+                             :placeholder="f.placeholder || 'https://'" />
+                    </template>
+
+                    <!-- ── NUMBER ── -->
+                    <template x-if="f.type === 'number'">
+                      <input type="number" class="f-input"
+                             x-model.number="formData[f.name]"
+                             :placeholder="f.placeholder || ''" />
+                    </template>
+
+                    <!-- ── DATE ── -->
+                    <template x-if="f.type === 'date'">
+                      <input type="date" class="f-input"
+                             x-model="formData[f.name]" />
+                    </template>
+
+                    <!-- ── TEXTAREA ── -->
+                    <template x-if="f.type === 'textarea'">
+                      <textarea class="f-textarea"
+                                x-model="formData[f.name]"
+                                rows="4"
+                                :placeholder="f.placeholder || ''"></textarea>
+                    </template>
+
+                    <!-- ── SELECT ── -->
+                    <template x-if="f.type === 'select'">
+                      <select class="f-select" x-model="formData[f.name]">
+                        <option value="">— Select —</option>
+                        <template x-for="ch in (f.choices || [])" :key="ch.value !== undefined ? ch.value : ch">
+                          <option :value="ch.value !== undefined ? ch.value : ch"
+                                  x-text="ch.label !== undefined ? ch.label : ch"
+                                  :selected="formData[f.name] == (ch.value !== undefined ? ch.value : ch)"></option>
+                        </template>
+                      </select>
+                    </template>
+
+                    <!-- ── BOOLEAN TOGGLE ── -->
+                    <template x-if="f.type === 'bool'">
+                      <div class="tog-wrap">
+                        <button type="button" class="tog-track"
+                                :style="formData[f.name] ? 'background:#10b981' : 'background:#374151'"
+                                @click="formData[f.name] = !formData[f.name]">
+                          <span class="tog-thumb"
+                                :style="formData[f.name] ? 'transform:translateX(20px)' : 'transform:translateX(0)'"></span>
+                        </button>
+                        <span class="text-sm font-medium"
+                              :class="formData[f.name] ? 'text-emerald-400' : 'text-slate-500'"
+                              x-text="formData[f.name] ? 'Yes (True)' : 'No (False)'"></span>
+                      </div>
+                    </template>
+
+                    <!-- ── IMAGE URL with preview ── -->
+                    <template x-if="f.type === 'image'">
+                      <div>
+                        <input type="text" class="f-input mb-2"
+                               x-model="formData[f.name]"
+                               placeholder="https://res.cloudinary.com/…" />
+                        <template x-if="formData[f.name]">
+                          <div class="flex items-center gap-4 mt-1">
+                            <img :src="formData[f.name]"
+                                 class="w-16 h-16 rounded-xl object-cover border border-slate-700 bg-slate-800"
+                                 @error="$el.style.display='none'" />
+                            <a :href="formData[f.name]" target="_blank"
+                               class="text-indigo-400 hover:text-indigo-300 text-xs transition-colors">
+                               &#8599; Open Image
+                            </a>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+
+                    <!-- ── HELP TEXT ── -->
+                    <template x-if="f.help">
+                      <p class="help-text" x-text="f.help"></p>
+                    </template>
+                  </div>
+
+                </template>
+              </div>
+            </div>
+          </template>
+
+          <!-- Bottom save bar -->
+          <div class="flex items-center justify-between py-5 border-t border-slate-800 mt-2">
+            <p class="text-slate-500 text-xs">Changes are written directly to the PostgreSQL database.</p>
+            <div class="flex items-center gap-3">
+              <button class="btn btn-ghost" @click="backList()">Cancel</button>
+              <button x-show="view === 'detail'" x-cloak class="btn btn-danger" @click="delOpen = true">Delete Record</button>
+              <button class="btn btn-primary" @click="saveRec()" :disabled="busy"
+                      x-text="busy ? 'Saving…' : (view === 'add' ? 'Create Record' : 'Save Changes')"></button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   MODEL SCHEMAS  — schema-driven form for every model
+═══════════════════════════════════════════════════════════════ */
+const SCHEMAS = {
+  users: {
+    label:'Base Users', endpoint:'/api/superuser/users',
+    listCols:['id','email','first_name','last_name','role','is_active','is_superuser','date_joined'],
+    sections:[
+      { title:'Account Information', fields:[
+        {name:'id',         label:'ID',                     type:'ro'},
+        {name:'email',      label:'Email Address',          type:'email'},
+        {name:'username',   label:'Username',               type:'text'},
+        {name:'first_name', label:'First Name',             type:'text'},
+        {name:'last_name',  label:'Last Name',              type:'text'},
+        {name:'razorpay_customer_id', label:'Razorpay Customer ID', type:'text'},
+        {name:'password',   label:'Password Hash',          type:'text', help:'Raw hash — editing this replaces the stored hash directly.'},
+      ]},
+      { title:'Role & Permissions', fields:[
+        {name:'role',         label:'Role',             type:'select', choices:[{value:'client',label:'Client'},{value:'lawyer',label:'Lawyer'},{value:'admin',label:'Admin'}]},
+        {name:'is_active',    label:'Active',           type:'bool'},
+        {name:'is_staff',     label:'Staff Status',     type:'bool'},
+        {name:'is_superuser', label:'Superuser Status', type:'bool'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'date_joined', label:'Date Joined',  type:'ro'},
+        {name:'last_login',  label:'Last Login',   type:'ro'},
+        {name:'created_at',  label:'Created At',   type:'ro'},
+        {name:'updated_at',  label:'Updated At',   type:'ro'},
+      ]},
+    ],
+  },
+
+  'delete-tokens': {
+    label:'Delete Account Tokens', endpoint:'/api/superuser/delete-tokens',
+    listCols:['id','user_id','token','is_used','created_at'],
+    sections:[
+      { title:'Token Details', fields:[
+        {name:'id',       label:'ID',          type:'ro'},
+        {name:'user_id',  label:'User ID (FK)',type:'number'},
+        {name:'token',    label:'Token (UUID)',type:'text'},
+        {name:'is_used',  label:'Used',        type:'bool'},
+        {name:'created_at',label:'Created At', type:'ro'},
+      ]},
+    ],
+  },
+
+  notifications: {
+    label:'Notifications', endpoint:'/api/superuser/notifications',
+    listCols:['id','user_id','title','is_read','created_at'],
+    sections:[
+      { title:'Notification', fields:[
+        {name:'id',        label:'ID',         type:'ro'},
+        {name:'user_id',   label:'User ID (FK)', type:'number'},
+        {name:'title',     label:'Title',      type:'text'},
+        {name:'message',   label:'Message',    type:'textarea', fullWidth:true},
+        {name:'url',       label:'Action URL', type:'text'},
+        {name:'is_read',   label:'Read',       type:'bool'},
+        {name:'created_at',label:'Created At', type:'ro'},
+      ]},
+    ],
+  },
+
+  'otp-codes': {
+    label:'OTP Codes', endpoint:'/api/superuser/otp-codes',
+    listCols:['id','user_id','code','is_used','created_at'],
+    sections:[
+      { title:'OTP', fields:[
+        {name:'id',       label:'ID',          type:'ro'},
+        {name:'user_id',  label:'User ID (FK)',type:'number'},
+        {name:'code',     label:'OTP Code',    type:'text'},
+        {name:'is_used',  label:'Used',        type:'bool'},
+        {name:'created_at',label:'Created At', type:'ro'},
+      ]},
+    ],
+  },
+
+  'admin-profiles': {
+    label:'Admin Panel Profiles', endpoint:'/api/superuser/admin-profiles',
+    listCols:['id','user_id','full_name','mobile_number','is_verified_by_superuser','is_deleted'],
+    sections:[
+      { title:'Personal Information', fields:[
+        {name:'id',       label:'ID',           type:'ro'},
+        {name:'user_id',  label:'User ID (FK)', type:'number'},
+        {name:'full_name',label:'Full Name',    type:'text'},
+        {name:'gender',   label:'Gender',       type:'select', choices:[{value:'male',label:'Male'},{value:'female',label:'Female'},{value:'other',label:'Other'}]},
+        {name:'date_of_birth',label:'Date of Birth',type:'date'},
+      ]},
+      { title:'Contact', fields:[
+        {name:'mobile_number',    label:'Mobile Number',    type:'text'},
+        {name:'alternate_mobile_number', label:'Alternate Mobile', type:'text'},
+        {name:'profile_picture',  label:'Profile Picture',  type:'image', fullWidth:true},
+      ]},
+      { title:'Status', fields:[
+        {name:'is_profile_complete',      label:'Profile Complete',        type:'bool'},
+        {name:'is_verified_by_superuser', label:'Verified by Superuser',   type:'bool'},
+        {name:'is_deleted',               label:'Soft Deleted',            type:'bool'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'date_of_join',label:'Date of Join',type:'ro'},
+        {name:'updated_at',  label:'Updated At',  type:'ro'},
+      ]},
+    ],
+  },
+
+  'admin-update-requests': {
+    label:'Admin Profile Update Requests', endpoint:'/api/superuser/admin-update-requests',
+    listCols:['id','admin_profile_id','full_name','status','submitted_at'],
+    sections:[
+      { title:'Request Status', fields:[
+        {name:'id',               label:'ID',                type:'ro'},
+        {name:'admin_profile_id', label:'Admin Profile ID',  type:'number'},
+        {name:'status',           label:'Status',            type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
+        {name:'admin_notes',      label:'Admin Notes',       type:'textarea', fullWidth:true},
+      ]},
+      { title:'Requested Changes', fields:[
+        {name:'full_name',   label:'Full Name', type:'text'},
+        {name:'gender',      label:'Gender',    type:'select', choices:[{value:'male',label:'Male'},{value:'female',label:'Female'},{value:'other',label:'Other'}]},
+        {name:'date_of_birth',label:'Date of Birth',type:'date'},
+        {name:'mobile_number',label:'Mobile Number',type:'text'},
+        {name:'alternate_mobile_number',label:'Alternate Mobile',type:'text'},
+        {name:'profile_picture',label:'Profile Picture',type:'image',fullWidth:true},
+      ]},
+      { title:'Review Info', fields:[
+        {name:'reviewed_by_id',label:'Reviewed By (User ID)',type:'ro'},
+        {name:'submitted_at',  label:'Submitted At',         type:'ro'},
+        {name:'reviewed_at',   label:'Reviewed At',          type:'ro'},
+      ]},
+    ],
+  },
+
+  'lawyer-verification-requests': {
+    label:'Lawyer Verification Requests', endpoint:'/api/superuser/lawyer-verification-requests',
+    listCols:['id','lawyer_id','status','submitted_at','reviewed_at'],
+    sections:[
+      { title:'Verification', fields:[
+        {name:'id',        label:'ID',              type:'ro'},
+        {name:'lawyer_id', label:'Lawyer Profile ID',type:'number'},
+        {name:'status',    label:'Status',          type:'select', choices:[{value:'pending',label:'Pending'},{value:'approved',label:'Approved'},{value:'rejected',label:'Rejected'}]},
+        {name:'rejection_reason',label:'Rejection Reason',type:'textarea',fullWidth:true},
+        {name:'notes',     label:'Internal Notes',  type:'textarea',fullWidth:true},
+      ]},
+      { title:'Review Info', fields:[
+        {name:'reviewed_by_id',label:'Reviewed By (User ID)',type:'ro'},
+        {name:'submitted_at',  label:'Submitted At',         type:'ro'},
+        {name:'reviewed_at',   label:'Reviewed At',          type:'ro'},
+      ]},
+    ],
+  },
+
+  'trust-reports': {
+    label:'Trust Reports', endpoint:'/api/superuser/trust-reports',
+    listCols:['id','reporter_id','reason','status','created_at'],
+    sections:[
+      { title:'Report Details', fields:[
+        {name:'id',                  label:'ID',                    type:'ro'},
+        {name:'reporter_id',         label:'Reporter (User ID)',     type:'number'},
+        {name:'reported_client_id',  label:'Reported Client ID',    type:'number'},
+        {name:'reported_lawyer_id',  label:'Reported Lawyer ID',    type:'number'},
+        {name:'reason',              label:'Reason',                type:'text'},
+        {name:'description',         label:'Description',           type:'textarea', fullWidth:true},
+        {name:'evidence',            label:'Evidence URL',          type:'text', fullWidth:true},
+      ]},
+      { title:'Admin Review', fields:[
+        {name:'status',      label:'Status',       type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'WARNED',label:'Warned'},{value:'BANNED',label:'Banned'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Dismissed'}]},
+        {name:'admin_notes', label:'Admin Notes',  type:'textarea', fullWidth:true},
+        {name:'reviewed_by_id',label:'Reviewed By (User ID)',type:'ro'},
+        {name:'reviewed_at', label:'Reviewed At',  type:'ro'},
+        {name:'created_at',  label:'Created At',   type:'ro'},
+        {name:'updated_at',  label:'Updated At',   type:'ro'},
+      ]},
+    ],
+  },
+
+  groups: {
+    label:'Auth Groups', endpoint:'/api/superuser/groups',
+    listCols:['id','name'],
+    sections:[
+      { title:'Group', fields:[
+        {name:'id',  label:'ID',         type:'ro'},
+        {name:'name',label:'Group Name', type:'text'},
+      ]},
+    ],
+  },
+
+  'client-profiles': {
+    label:'Client Profiles', endpoint:'/api/superuser/client-profiles',
+    listCols:['id','user_id','first_name','last_name','mobile_number','marital_status','is_deleted'],
+    sections:[
+      { title:'Personal Information', fields:[
+        {name:'id',             label:'ID',              type:'ro'},
+        {name:'user_id',        label:'User ID (FK)',     type:'number'},
+        {name:'custom_id',      label:'Custom ID',        type:'text'},
+        {name:'first_name',     label:'First Name',       type:'text'},
+        {name:'last_name',      label:'Last Name',        type:'text'},
+        {name:'gender',         label:'Gender',           type:'select', choices:[{value:'MALE',label:'Male'},{value:'FEMALE',label:'Female'},{value:'OTHER',label:'Other'}]},
+        {name:'date_of_birth',  label:'Date of Birth',    type:'date'},
+        {name:'marital_status', label:'Marital Status',   type:'select', choices:[{value:'single',label:'Single'},{value:'married',label:'Married'},{value:'divorced',label:'Divorced'},{value:'widowed',label:'Widowed'}]},
+      ]},
+      { title:'Contact & Address', fields:[
+        {name:'mobile_number',           label:'Mobile Number',   type:'text'},
+        {name:'alternate_mobile_number', label:'Alternate Mobile',type:'text'},
+        {name:'address',                 label:'Address',         type:'textarea', fullWidth:true},
+        {name:'pincode',                 label:'Pincode',         type:'text'},
+        {name:'profile_picture',         label:'Profile Picture', type:'image', fullWidth:true},
+      ]},
+      { title:'Status', fields:[
+        {name:'is_deleted',label:'Soft Deleted',type:'bool'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'date_of_join',label:'Date of Join',type:'ro'},
+        {name:'updated_at',  label:'Updated At',  type:'ro'},
+      ]},
+    ],
+  },
+
+  'lawyer-profiles': {
+    label:'Lawyer Profiles', endpoint:'/api/superuser/lawyer-profiles',
+    listCols:['id','user_id','full_name','specialization','verified','is_deleted','custom_id'],
+    sections:[
+      { title:'Professional Information', fields:[
+        {name:'id',                   label:'ID',                     type:'ro'},
+        {name:'user_id',              label:'User ID (FK)',            type:'number'},
+        {name:'custom_id',            label:'Custom ID',              type:'text'},
+        {name:'full_name',            label:'Full Name',              type:'text'},
+        {name:'gender',               label:'Gender',                 type:'select', choices:[{value:'MALE',label:'Male'},{value:'FEMALE',label:'Female'},{value:'OTHER',label:'Other'}]},
+        {name:'date_of_birth',        label:'Date of Birth',          type:'date'},
+        {name:'bar_registration_number',label:'Bar Registration No.', type:'text'},
+        {name:'state_bar_council',    label:'State Bar Council',      type:'text'},
+        {name:'years_of_experience',  label:'Years of Experience',    type:'number'},
+        {name:'specialization',       label:'Specialization',         type:'select', choices:[
+          {value:'MUTUAL',label:'Mutual Consent Divorce'},
+          {value:'CONTESTED',label:'Contested Divorce'},
+          {value:'MAINTENANCE',label:'Alimony & Maintenance'},
+          {value:'CUSTODY',label:'Child Custody'},
+          {value:'DOMESTIC',label:'Domestic Violence & Protection'},
+          {value:'MEDIATION',label:'Family Mediation & Counseling'},
+          {value:'OTHER',label:'Other Family Law Matters'},
+        ]},
+        {name:'office_city',          label:'Office City',            type:'text'},
+        {name:'consultation_fee',     label:'Consultation Fee (₹)',   type:'number'},
+        {name:'bio',                  label:'Bio / Description',      type:'textarea', fullWidth:true},
+      ]},
+      { title:'Contact', fields:[
+        {name:'mobile_number',           label:'Mobile Number',   type:'text'},
+        {name:'alternate_mobile_number', label:'Alternate Mobile',type:'text'},
+        {name:'profile_picture',         label:'Profile Picture', type:'image', fullWidth:true},
+      ]},
+      { title:'Ratings (auto-calculated)', fields:[
+        {name:'rating',       label:'Average Rating', type:'ro'},
+        {name:'rating_count', label:'Rating Count',   type:'ro'},
+        {name:'rating_total', label:'Rating Total',   type:'ro'},
+      ]},
+      { title:'Status & Verification', fields:[
+        {name:'verified',           label:'Verified',         type:'bool'},
+        {name:'is_profile_complete',label:'Profile Complete', type:'bool'},
+        {name:'is_deleted',         label:'Soft Deleted',     type:'bool'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'date_joined',label:'Date Joined',type:'ro'},
+        {name:'updated_at', label:'Updated At', type:'ro'},
+      ]},
+    ],
+  },
+
+  'case-document-verifications': {
+    label:'Case Document Verifications', endpoint:'/api/superuser/case-document-verifications',
+    listCols:['id','document_id','status','verified_at','verified_by_id'],
+    sections:[
+      { title:'Verification', fields:[
+        {name:'id',               label:'ID',               type:'ro'},
+        {name:'document_id',      label:'Document ID (FK)', type:'number'},
+        {name:'status',           label:'Status',           type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
+        {name:'rejection_reason', label:'Rejection Reason', type:'textarea', fullWidth:true},
+        {name:'verified_by_id',   label:'Verified By (User ID)', type:'number'},
+        {name:'verified_at',      label:'Verified At',      type:'ro'},
+      ]},
+    ],
+  },
+
+  'case-documents': {
+    label:'Case Documents', endpoint:'/api/superuser/case-documents',
+    listCols:['id','case_request_id','document_type','uploaded_at'],
+    sections:[
+      { title:'Document', fields:[
+        {name:'id',              label:'ID',               type:'ro'},
+        {name:'case_request_id', label:'Case Request ID (FK)', type:'number'},
+        {name:'document_type',   label:'Document Type',    type:'select', choices:[
+          {value:'MARRIAGE_CERT',label:'Marriage Certificate'},{value:'ID_PROOF',label:'ID Proof'},
+          {value:'ADDRESS_PROOF',label:'Address Proof'},{value:'INCOME_PROOF',label:'Income Proof'},
+          {value:'COURT_ORDER',label:'Court Order'},{value:'OTHER',label:'Other'},
+        ]},
+        {name:'document_file',   label:'File URL',         type:'text', fullWidth:true},
+        {name:'uploaded_at',     label:'Uploaded At',      type:'ro'},
+      ]},
+    ],
+  },
+
+  'case-requests': {
+    label:'Case Requests', endpoint:'/api/superuser/case-requests',
+    listCols:['id','client_id','lawyer_id','status','workflow_stage','custom_id','created_at'],
+    sections:[
+      { title:'Case Information', fields:[
+        {name:'id',               label:'ID',               type:'ro'},
+        {name:'custom_id',        label:'Custom ID',         type:'text'},
+        {name:'client_id',        label:'Client Profile ID', type:'number'},
+        {name:'lawyer_id',        label:'Lawyer Profile ID', type:'number'},
+        {name:'message',          label:'Client Message',   type:'textarea', fullWidth:true},
+        {name:'response_message', label:"Lawyer's Response",type:'textarea', fullWidth:true},
+      ]},
+      { title:'Status & Workflow', fields:[
+        {name:'status', label:'Case Status', type:'select', choices:[
+          {value:'PENDING',label:'Pending'},{value:'ACCEPTED',label:'Accepted'},{value:'REJECTED',label:'Rejected'},
+          {value:'DOCUMENTS_PENDING',label:'Documents Pending'},{value:'DOCUMENTS_SUBMITTED',label:'Documents Submitted'},
+          {value:'DOCUMENTS_VERIFIED',label:'Documents Verified'},{value:'ACTIVE',label:'Active'},{value:'COMPLETED',label:'Completed'},
+        ]},
+        {name:'workflow_stage',label:'Workflow Stage',type:'text'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'documents_submitted_at',    label:'Documents Submitted At',     type:'ro'},
+        {name:'documents_verified_at',     label:'Documents Verified At',      type:'ro'},
+        {name:'workflow_stage_updated_at', label:'Workflow Stage Updated At',  type:'ro'},
+        {name:'created_at',                label:'Created At',                 type:'ro'},
+        {name:'updated_at',                label:'Updated At',                 type:'ro'},
+      ]},
+    ],
+  },
+
+  'case-messages': {
+    label:'Case Messages', endpoint:'/api/superuser/case-messages',
+    listCols:['id','case_id','sender_type','sender_user_id','is_read','created_at'],
+    sections:[
+      { title:'Message', fields:[
+        {name:'id',             label:'ID',               type:'ro'},
+        {name:'case_id',        label:'Case Request ID (FK)',type:'number'},
+        {name:'sender_type',    label:'Sender Type',      type:'select', choices:[{value:'client',label:'Client'},{value:'lawyer',label:'Lawyer'},{value:'admin',label:'Admin'}]},
+        {name:'sender_user_id', label:'Sender User ID',   type:'number'},
+        {name:'text',           label:'Message Text',     type:'textarea', fullWidth:true},
+        {name:'attachment',     label:'Attachment URL',   type:'text', fullWidth:true},
+        {name:'is_read',        label:'Is Read',          type:'bool'},
+        {name:'created_at',     label:'Created At',       type:'ro'},
+      ]},
+    ],
+  },
+
+  'lawyer-ratings': {
+    label:'Lawyer Ratings', endpoint:'/api/superuser/lawyer-ratings',
+    listCols:['id','lawyer_id','client_id','score','created_at'],
+    sections:[
+      { title:'Rating', fields:[
+        {name:'id',          label:'ID',                    type:'ro'},
+        {name:'lawyer_id',   label:'Lawyer Profile ID (FK)',type:'number'},
+        {name:'client_id',   label:'Client Profile ID (FK)',type:'number'},
+        {name:'score',       label:'Score (1–5)',           type:'number'},
+        {name:'review_text', label:'Review Text',           type:'textarea', fullWidth:true},
+        {name:'created_at',  label:'Created At',            type:'ro'},
+      ]},
+    ],
+  },
+
+  'lawyer-update-requests': {
+    label:'Lawyer Profile Update Requests', endpoint:'/api/superuser/lawyer-update-requests',
+    listCols:['id','lawyer_id','full_name','status','submitted_at'],
+    sections:[
+      { title:'Request Status', fields:[
+        {name:'id',        label:'ID',               type:'ro'},
+        {name:'lawyer_id', label:'Lawyer Profile ID',type:'number'},
+        {name:'status',    label:'Status',           type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
+        {name:'admin_notes',label:'Admin Notes',     type:'textarea', fullWidth:true},
+      ]},
+      { title:'Requested Changes', fields:[
+        {name:'full_name',              label:'Full Name',           type:'text'},
+        {name:'gender',                 label:'Gender',              type:'select', choices:[{value:'MALE',label:'Male'},{value:'FEMALE',label:'Female'},{value:'OTHER',label:'Other'}]},
+        {name:'date_of_birth',          label:'Date of Birth',       type:'date'},
+        {name:'bar_registration_number',label:'Bar Registration No.',type:'text'},
+        {name:'state_bar_council',      label:'State Bar Council',   type:'text'},
+        {name:'years_of_experience',    label:'Years of Experience', type:'number'},
+        {name:'specialization',         label:'Specialization',      type:'select', choices:[
+          {value:'MUTUAL',label:'Mutual Consent'},{value:'CONTESTED',label:'Contested'},{value:'MAINTENANCE',label:'Maintenance'},
+          {value:'CUSTODY',label:'Child Custody'},{value:'DOMESTIC',label:'Domestic Violence'},{value:'MEDIATION',label:'Mediation'},{value:'OTHER',label:'Other'},
+        ]},
+        {name:'bio',              label:'Bio',               type:'textarea', fullWidth:true},
+        {name:'consultation_fee', label:'Consultation Fee',  type:'number'},
+        {name:'office_city',      label:'Office City',       type:'text'},
+        {name:'mobile_number',    label:'Mobile Number',     type:'text'},
+        {name:'alternate_mobile_number',label:'Alternate Mobile',type:'text'},
+        {name:'profile_picture',  label:'Profile Picture',   type:'image', fullWidth:true},
+      ]},
+      { title:'Review Info', fields:[
+        {name:'submitted_at',label:'Submitted At',type:'ro'},
+        {name:'reviewed_at', label:'Reviewed At', type:'ro'},
+      ]},
+    ],
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION CONFIG
+═══════════════════════════════════════════════════════════════ */
+const NAV_DATA = [
+  { label:'ACCOUNTS', open:true, items:[
+    {k:'users',icon:'👥',label:'Base Users'},
+    {k:'delete-tokens',icon:'🗝️',label:'Delete Account Tokens'},
+    {k:'notifications',icon:'🔔',label:'Notifications'},
+    {k:'otp-codes',icon:'🔢',label:'OTP Codes'},
+  ]},
+  { label:'ADMIN PANEL', open:false, items:[
+    {k:'admin-profiles',icon:'🏢',label:'Admin Profiles'},
+    {k:'admin-update-requests',icon:'✏️',label:'Admin Update Requests'},
+    {k:'lawyer-verification-requests',icon:'⚖️',label:'Lawyer Verifications'},
+    {k:'trust-reports',icon:'🚩',label:'Trust Reports'},
+  ]},
+  { label:'AUTH', open:false, items:[
+    {k:'groups',icon:'👫',label:'Groups'},
+  ]},
+  { label:'CLIENTS', open:false, items:[
+    {k:'client-profiles',icon:'🙍',label:'Client Profiles'},
+  ]},
+  { label:'LAWYERS', open:false, items:[
+    {k:'lawyer-profiles',icon:'👨‍⚖️',label:'Lawyer Profiles'},
+    {k:'case-document-verifications',icon:'📋',label:'Doc Verifications'},
+    {k:'case-documents',icon:'📄',label:'Case Documents'},
+    {k:'case-requests',icon:'📨',label:'Case Requests'},
+    {k:'case-messages',icon:'💬',label:'Case Messages'},
+    {k:'lawyer-ratings',icon:'⭐',label:'Lawyer Ratings'},
+    {k:'lawyer-update-requests',icon:'🔄',label:'Lawyer Update Requests'},
+  ]},
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   ALPINE.JS APP
+═══════════════════════════════════════════════════════════════ */
+function SU() {
+  return {
+    token: localStorage.getItem('superuser_access_token') || '',
+    me: null,
+    NAV: NAV_DATA,
+
+    // view state
+    view: 'list',
+    activeKey: '',
+    schema: null,
+
+    // list state
+    rows: [], total: 0, pg: 1, pages: 1, pgRange: [],
+    listCols: [], srch: '', sel: [], listBusy: false,
+
+    // detail state
+    formData: {}, detBusy: false, busy: false,
+
+    // modals
+    delOpen: false,
+    bulkDelOpen: false,
+    bulkDelConfirm: '',
+    toast: { on: false, msg: '', ok: true },
+
+
+    // ── Boot ────────────────────────────────────────────────────────────────
+    async boot() {
+      if (!this.token) { window.location.href = '/superuser_login/'; return; }
+      try {
+        this.me = await this.req('GET', '/api/auth/me');
+      } catch {
+        window.location.href = '/superuser_login/';
+        return;
+      }
+      this.loadModel('users');
+    },
+
+    // ── Load model ──────────────────────────────────────────────────────────
+    loadModel(key) {
+      const s = SCHEMAS[key];
+      if (!s) return;
+      this.schema   = s;
+      this.activeKey = key;
+      this.listCols  = s.listCols || [];
+      this.sel       = [];
+      this.srch      = '';
+      this.pg        = 1;
+      this.view      = 'list';
+      this.loadList();
+    },
+
+    // ── Fetch list ──────────────────────────────────────────────────────────
+    async loadList() {
+      if (!this.schema) return;
+      this.listBusy = true;
+      try {
+        const qs = new URLSearchParams({ page: this.pg });
+        if (this.srch) qs.set('search', this.srch);
+        const data = await this.req('GET', `${this.schema.endpoint}?${qs}`);
+        this.rows  = data.results || [];
+        this.total = data.total   || 0;
+        this.pages = Math.max(1, Math.ceil(this.total / 25));
+        // build page range
+        const r = [], lo = Math.max(1, this.pg - 2), hi = Math.min(this.pages, this.pg + 2);
+        for (let i = lo; i <= hi; i++) r.push(i);
+        this.pgRange = r;
+      } catch (e) {
+        this.pop('Failed to load: ' + e.message, false);
+      } finally {
+        this.listBusy = false;
+      }
+    },
+
+    // ── Open detail ─────────────────────────────────────────────────────────
+    async openDetail(row) {
+      this.view = 'detail';
+      this.detBusy = true;
+      this.formData = {};
+      try {
+        const rec = await this.req('GET', `${this.schema.endpoint}/${row.id}`);
+        this.formData = this.cook(rec);
+      } catch (e) {
+        this.pop('Could not load record: ' + e.message, false);
+        this.view = 'list';
+      } finally {
+        this.detBusy = false;
+      }
+    },
+
+    // ── Open add ────────────────────────────────────────────────────────────
+    openAdd() {
+      this.formData = {};
+      // Pre-fill bool fields as false
+      if (this.schema) {
+        for (const sec of this.schema.sections) {
+          for (const f of sec.fields) {
+            if (f.type === 'bool') this.formData[f.name] = false;
+          }
+        }
+      }
+      this.view = 'add';
+      this.detBusy = false;
+    },
+
+    // ── Cook record: parse dates for inputs, coerce booleans ────────────────
+    cook(rec) {
+      const out = { ...rec };
+      if (!this.schema) return out;
+      for (const sec of this.schema.sections) {
+        for (const f of sec.fields) {
+          const v = out[f.name];
+          if (f.type === 'date' && v) {
+            out[f.name] = String(v).split('T')[0];
+          }
+          if (f.type === 'bool') {
+            out[f.name] = v === true || v === 1 || v === 'true' || v === '1';
+          }
+          if (f.type === 'number' && v !== null && v !== undefined) {
+            out[f.name] = v;
+          }
+        }
+      }
+      return out;
+    },
+
+    // ── Save (create or update) ──────────────────────────────────────────────
+    async saveRec() {
+      if (!this.schema) return;
+      this.busy = true;
+      try {
+        // Skip auto-timestamp fields on PUT
+        const skipOnPut = new Set(['id','created_at','updated_at','date_joined','last_login',
+          'date_of_join','submitted_at','reviewed_at','verified_at','uploaded_at',
+          'documents_submitted_at','documents_verified_at','workflow_stage_updated_at']);
+
+        const payload = {};
+        for (const sec of this.schema.sections) {
+          for (const f of sec.fields) {
+            if (f.type === 'ro') continue;
+            if (this.view === 'detail' && skipOnPut.has(f.name)) continue;
+            const v = this.formData[f.name];
+            if (v !== null && v !== undefined && v !== '') {
+              payload[f.name] = v;
+            } else if (f.type === 'bool') {
+              payload[f.name] = false; // explicitly send false for booleans
+            }
+          }
+        }
+
+        if (this.view === 'add') {
+          const created = await this.req('POST', this.schema.endpoint, payload);
+          this.formData = this.cook(created);
+          this.view = 'detail';
+          this.pop('Record created successfully!', true);
+        } else {
+          const updated = await this.req('PUT', `${this.schema.endpoint}/${this.formData.id}`, payload);
+          this.formData = this.cook(updated);
+          this.pop('Changes saved!', true);
+        }
+      } catch (e) {
+        this.pop('Save failed: ' + e.message, false);
+      } finally {
+        this.busy = false;
+      }
+    },
+
+    // ── Quick delete from list ───────────────────────────────────────────────
+    async quickDel(id) {
+      if (!confirm(`Permanently delete record #${id}?`)) return;
+      try {
+        await this.req('DELETE', `${this.schema.endpoint}/${id}`);
+        this.pop('Record deleted.', true);
+        this.rows  = this.rows.filter(r => r.id !== id);
+        this.total = Math.max(0, this.total - 1);
+      } catch (e) {
+        this.pop('Delete failed: ' + e.message, false);
+      }
+    },
+
+    // ── Confirm delete from detail ───────────────────────────────────────────
+    async doDelete() {
+      this.busy = true;
+      try {
+        await this.req('DELETE', `${this.schema.endpoint}/${this.formData.id}`);
+        this.pop('Record deleted.', true);
+        this.delOpen = false;
+        this.backList();
+      } catch (e) {
+        this.pop('Delete failed: ' + e.message, false);
+      } finally {
+        this.busy = false;
+      }
+    },
+
+    backList() {
+      this.view = 'list';
+      this.delOpen = false;
+      this.loadList();
+    },
+
+    // ── Selection ────────────────────────────────────────────────────────────
+    chkOne(id) {
+      const i = this.sel.indexOf(id);
+      i > -1 ? this.sel.splice(i, 1) : this.sel.push(id);
+    },
+    chkAll(e) {
+      this.sel = e.target.checked ? this.rows.map(r => r.id) : [];
+    },
+
+    // ── Bulk actions ─────────────────────────────────────────────────────────
+    get bkActions() {
+      const k = this.activeKey, a = [];
+
+      // ── Model-specific actions ──
+      if (k === 'admin-profiles') {
+        a.push({key:'verify-admin',   label:'Verify',   cls:'bg-emerald-900/50 text-emerald-400 border border-emerald-800/50'});
+        a.push({key:'unverify-admin', label:'Unverify', cls:'bg-yellow-900/50 text-yellow-400 border border-yellow-800/50'});
+      }
+      if (k === 'admin-update-requests')
+        a.push({key:'approve-admin-update', label:'Approve Updates', cls:'bg-emerald-900/50 text-emerald-400 border border-emerald-800/50'});
+      if (k === 'lawyer-update-requests')
+        a.push({key:'approve-lawyer-update', label:'Approve Updates', cls:'bg-emerald-900/50 text-emerald-400 border border-emerald-800/50'});
+      if (['client-profiles','lawyer-profiles','admin-profiles'].includes(k)) {
+        const m = k.includes('client') ? 'client' : k.includes('lawyer') ? 'lawyer' : 'admin';
+        a.push({key:'soft-delete', label:'Soft Delete', cls:'bg-yellow-900/50 text-yellow-400 border border-yellow-800/50', extra:{model:m}});
+        a.push({key:'restore',     label:'Restore',     cls:'bg-blue-900/50 text-blue-400 border border-blue-800/50', extra:{model:m}});
+      }
+
+      // ── DELETE SELECTED — shown for every model ──
+      a.push({
+        key: '__bulk_delete__',
+        label: 'Delete Selected',
+        cls: 'bg-red-950/70 text-red-400 border border-red-800/60 hover:bg-red-900/70',
+        isBulkDel: true,
+      });
+
+      return a;
+    },
+
+    // ── Run a bulk action ────────────────────────────────────────────────────
+    async runBulk(a) {
+      if (!this.sel.length) { this.pop('Select at least one record first.', false); return; }
+
+      // Special flow for bulk delete — opens confirm modal
+      if (a.isBulkDel) {
+        this.bulkDelConfirm = '';
+        this.bulkDelOpen = true;
+        return;
+      }
+
+      // All other bulk actions
+      try {
+        const body = { ids: this.sel, ...(a.extra || {}) };
+        const r = await this.req('POST', `/api/superuser/${a.key}`, body);
+        const ok = (r.results || []).filter(x => x.status !== 'not_found').length;
+        this.pop(`${a.label}: ${ok} record(s) updated.`, true);
+        this.sel = [];
+        await this.loadList();
+      } catch (e) { this.pop('Action failed: ' + e.message, false); }
+    },
+
+    // ── Execute confirmed bulk delete ────────────────────────────────────────
+    async confirmBulkDelete() {
+      if (this.bulkDelConfirm !== 'DELETE') return;
+      this.busy = true;
+      try {
+        const r = await this.req('POST', '/api/superuser/bulk-delete', {
+          ids: this.sel,
+          model: this.activeKey,
+        });
+        const n = r.deleted || 0;
+        this.pop(`Deleted ${n} record(s) permanently.`, true);
+        this.bulkDelOpen = false;
+        this.bulkDelConfirm = '';
+        this.sel = [];
+        await this.loadList();
+      } catch (e) {
+        this.pop('Bulk delete failed: ' + e.message, false);
+      } finally {
+        this.busy = false;
+      }
+    },
+
+    // ── Cell HTML ─────────────────────────────────────────────────────────────
+    cellHtml(col, val) {
+      if (val === null || val === undefined) return '<span style="color:#3d4f66">—</span>';
+      if (val === true)  return '<span class="badge badge-green">Yes</span>';
+      if (val === false) return '<span class="badge badge-red">No</span>';
+      const STATUS = {PENDING:'badge-yellow',APPROVED:'badge-green',ACTIVE:'badge-green',COMPLETED:'badge-blue',REJECTED:'badge-red',WARNED:'badge-yellow',BANNED:'badge-red',pending:'badge-yellow',approved:'badge-green',rejected:'badge-red'};
+      if (col === 'status' || col === 'verified' || col === 'is_deleted') {
+        const cls = STATUS[val] || 'badge-gray';
+        return `<span class="badge ${cls}">${val}</span>`;
+      }
+      const s = String(val);
+      return s.length > 45 ? `<span title="${s.replace(/"/g,"'")}">${s.slice(0,43)}…</span>` : s;
+    },
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    logout() {
+      localStorage.removeItem('superuser_access_token');
+      window.location.href = '/superuser_login/';
+    },
+
+    esc() {
+      if (this.bulkDelOpen) { this.bulkDelOpen = false; this.bulkDelConfirm = ''; return; }
+      if (this.delOpen) { this.delOpen = false; return; }
+      if (this.view !== 'list') this.backList();
+    },
+
+
+    // ── HTTP helper ───────────────────────────────────────────────────────────
+    async req(method, url, body = null) {
+      const opts = {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+      };
+      if (body && method !== 'GET') opts.body = JSON.stringify(body);
+      const res = await fetch(url, opts);
+      if (res.status === 401) { window.location.href = '/superuser_login/'; throw new Error('Session expired'); }
+      if (res.status === 403) throw new Error('Forbidden — superuser required');
+      if (res.status === 204 || res.status === 200 && res.headers.get('content-length') === '0') return {};
+      if (!res.ok) {
+        let detail = res.statusText;
+        try { const j = await res.json(); detail = j.detail || JSON.stringify(j); } catch {}
+        throw new Error(detail);
+      }
+      return res.json();
+    },
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    pop(msg, ok = true) {
+      this.toast = { on: true, msg, ok };
+      setTimeout(() => { this.toast.on = false; }, 3800);
+    },
+  };
+}
+</script>
+</body>
+</html>

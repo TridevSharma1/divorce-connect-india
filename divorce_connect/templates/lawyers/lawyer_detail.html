@@ -1,0 +1,1013 @@
+{% extends 'base.html' %}
+
+{% block title %}Lawyer Profile - DivorceConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: #090909 !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #111;
+    }
+
+    /* Glass */
+    .glass {
+        backdrop-filter: blur(18px);
+    }
+
+    /* Hover */
+    .hover-card {
+        transition: .35s;
+    }
+
+    /* Sections */
+    .animate-section {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all .8s ease;
+    }
+
+
+
+    /* Floating */
+    .floating {
+        animation: floating 5s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+        0% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-12px);
+        }
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    /* Shine */
+    .shine {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .shine:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255, 255, 255, .15),
+            transparent
+        );
+        transition: 1s;
+    }
+
+    .shine:hover:before {
+        left: 100%;
+    }
+
+    /* Glow */
+    .glow:hover {
+        box-shadow: 0 0 25px rgba(255, 255, 255, .18);
+    }
+
+    /* Selection */
+    ::selection {
+        background: white;
+        color: black;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#090909] text-white relative overflow-hidden" id="profile-container" style="display: none;">
+
+    <!-- Background Glow Blobs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-60 -left-60 w-[700px] h-[700px] rounded-full bg-white/5 blur-[180px]"></div>
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gray-500/10 blur-[150px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 py-16">
+
+        <!-- Back Button -->
+        <a href="/lawyers/" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition mb-10">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back to Lawyers
+        </a>
+
+        <!-- Main Profile Card -->
+        <div class="rounded-[35px] border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden shadow-2xl">
+            <div class="grid lg:grid-cols-3">
+
+                <!-- LEFT SIDE -->
+                <div class="bg-gradient-to-br from-black via-[#111] to-[#202020] p-10 flex flex-col items-center">
+                    <img id="lawyer-avatar" class="w-52 h-52 rounded-full object-cover border-[6px] border-white shadow-2xl hidden" src="" alt="">
+                    <div id="lawyer-avatar-placeholder" class="w-52 h-52 rounded-full border-[6px] border-white bg-gray-700 flex items-center justify-center text-7xl font-bold">
+                        -
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <h1 class="text-4xl font-black tracking-wide" id="lawyer-name">
+                            Loading...
+                        </h1>
+                        <p class="mt-3 text-gray-400 text-lg" id="lawyer-specialization">
+                            -
+                        </p>
+                        <div class="mt-8 inline-flex items-center px-5 py-2 rounded-full border border-yellow-500 text-yellow-400 text-sm">
+                            ★ Verified Lawyer
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div class="lg:col-span-2 p-12">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <span class="bg-white text-black font-bold px-5 py-2 rounded-full" id="badge-rating">
+                            0.0/5 Rating
+                        </span>
+                        <span class="bg-white/10 px-5 py-2 rounded-full" id="badge-reviews">
+                            0 Reviews
+                        </span>
+                        <span class="bg-white/10 px-5 py-2 rounded-full" id="badge-experience">
+                            0 Years Exp
+                        </span>
+                    </div>
+
+                    <h2 class="mt-8 text-5xl font-black leading-tight">
+                        Professional Legal Representation For Your Family Matters
+                    </h2>
+
+                    <p class="mt-6 text-gray-400 text-lg leading-8 max-w-3xl" id="lawyer-bio">
+                        Loading legal counsel bio...
+                    </p>
+
+                    <!-- STATS -->
+                    <div class="grid md:grid-cols-4 gap-6 mt-12">
+                        <div class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition duration-300">
+                            <div class="text-gray-400 text-sm uppercase">Experience</div>
+                            <div class="mt-3 text-4xl font-black" id="stat-experience">0</div>
+                            <div class="text-gray-500">Years</div>
+                        </div>
+
+                        <div class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+                            <div class="text-gray-400 text-sm uppercase">Rating</div>
+                            <div class="mt-3 text-4xl font-black" id="stat-rating">0.0</div>
+                            <div class="text-yellow-400">★★★★★</div>
+                        </div>
+
+                        <div class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+                            <div class="text-gray-400 text-sm uppercase">Fee</div>
+                            <div class="mt-3 text-3xl font-black" id="stat-fee">₹0</div>
+                            <div class="text-gray-500">Per Consultation</div>
+                        </div>
+
+                        <div class="rounded-3xl bg-[#161616] border border-white/10 p-6 hover:-translate-y-2 transition">
+                            <div class="text-gray-400 text-sm uppercase">City</div>
+                            <div class="mt-3 text-3xl font-black break-words" id="stat-city">N/A</div>
+                            <div class="text-gray-500">Office Location</div>
+                        </div>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="flex flex-wrap gap-5 mt-12">
+                        <a href="#hire" class="px-10 py-4 rounded-full bg-white text-black font-bold hover:scale-105 transition">
+                            Hire Lawyer
+                        </a>
+                        <a href="#reviews" class="px-10 py-4 rounded-full border border-white hover:bg-white hover:text-black transition">
+                            Client Reviews
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- PROFESSIONAL DETAILS -->
+        <!-- ========================================================= -->
+        <section class="mt-16">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Professional Profile
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- LEFT CARD -->
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-10 hover:border-white/20 transition duration-300">
+                    <h2 class="text-3xl font-black mb-10">Professional Information</h2>
+                    <div class="space-y-8">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+                            <div>
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">Experience</p>
+                                <h3 class="text-2xl font-bold mt-2" id="info-experience">0 Years</h3>
+                            </div>
+                            <div class="text-5xl">⚖️</div>
+                        </div>
+
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+                            <div>
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">Specialization</p>
+                                <h3 class="text-xl font-semibold mt-2" id="info-specialization">-</h3>
+                            </div>
+                            <div class="text-5xl">📚</div>
+                        </div>
+
+                        <div class="flex justify-between items-center border-b border-white/10 pb-5">
+                            <div>
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">Registration Number</p>
+                                <h3 class="text-xl font-semibold mt-2 break-all" id="info-registration">-</h3>
+                            </div>
+                            <div class="text-5xl">🪪</div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500 text-sm uppercase tracking-widest">State Bar Council</p>
+                                <h3 class="text-xl font-semibold mt-2" id="info-bar-council">-</h3>
+                            </div>
+                            <div class="text-5xl">🏛️</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT CARD -->
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-10 hover:border-white/20 transition duration-300">
+                    <h2 class="text-3xl font-black mb-10">Office Details</h2>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">Consultation Fee</p>
+                            <h3 class="text-3xl font-black mt-4" id="office-fee">₹0</h3>
+                            <p class="text-gray-500 mt-2">Per Consultation</p>
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">Office City</p>
+                            <h3 class="text-3xl font-black mt-4 break-all" id="office-city">N/A</h3>
+                            <p class="text-gray-500 mt-2">Location</p>
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">Reviews</p>
+                            <h3 class="text-3xl font-black mt-4" id="office-reviews">0</h3>
+                            <p class="text-gray-500 mt-2">Client Reviews</p>
+                        </div>
+
+                        <div class="rounded-3xl bg-black/40 border border-white/10 p-7">
+                            <p class="text-gray-500 uppercase text-xs tracking-widest">Average Rating</p>
+                            <h3 class="text-3xl font-black mt-4" id="office-rating">0.0</h3>
+                            <p class="text-yellow-400 mt-2">★★★★★</p>
+                        </div>
+                    </div>
+
+                    <!-- PREMIUM BADGES -->
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5 text-sm">Verified Professional</span>
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5 text-sm">Secure Consultation</span>
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5 text-sm">Confidential Service</span>
+                        <span class="px-5 py-3 rounded-full border border-white/10 bg-white/5 text-sm">Online Available</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- ABOUT LAWYER -->
+        <!-- ========================================================= -->
+        <section class="mt-20">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    About The Lawyer
+                </p>
+            </div>
+
+            <div class="rounded-[35px] bg-[#121212] border border-white/10 p-12">
+                <div class="grid lg:grid-cols-2 gap-14">
+                    <!-- LEFT -->
+                    <div>
+                        <h2 class="text-4xl font-black mb-8">Legal Professional</h2>
+                        <p class="text-gray-400 leading-9 text-lg">
+                            <span id="about-name">-</span> is an experienced legal professional dedicated to protecting clients' rights through ethical, confidential and result-oriented legal representation.
+                            Specializing in <span class="text-white font-semibold" id="about-specialization">-</span>, every consultation is handled with professionalism, transparency and complete client confidentiality.
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-5 mt-10">
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+                                <div class="text-4xl mb-3">⚖️</div>
+                                <h3 class="font-bold text-xl">Legal Advice</h3>
+                                <p class="text-gray-500 mt-2 text-sm">Personalized consultation.</p>
+                            </div>
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+                                <div class="text-4xl mb-3">🏛️</div>
+                                <h3 class="font-bold text-xl">Court Representation</h3>
+                                <p class="text-gray-500 mt-2 text-sm">Representation in court proceedings.</p>
+                            </div>
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+                                <div class="text-4xl mb-3">📑</div>
+                                <h3 class="font-bold text-xl">Documentation</h3>
+                                <p class="text-gray-500 mt-2 text-sm">Drafting and reviewing legal documents.</p>
+                            </div>
+                            <div class="rounded-3xl bg-black/40 border border-white/10 p-6">
+                                <div class="text-4xl mb-3">🤝</div>
+                                <h3 class="font-bold text-xl">Mediation</h3>
+                                <p class="text-gray-500 mt-2 text-sm">Peaceful dispute resolution.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div>
+                        <div class="rounded-3xl bg-black border border-white/10 p-8">
+                            <h3 class="text-2xl font-bold mb-8">Personal Information</h3>
+                            <div class="space-y-8">
+                                <div class="flex justify-between border-b border-white/5 pb-4">
+                                    <span class="text-gray-500">Full Name</span>
+                                    <span class="font-semibold" id="personal-name">-</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-4">
+                                    <span class="text-gray-500">Gender</span>
+                                    <span class="font-semibold capitalize" id="personal-gender">-</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-4">
+                                    <span class="text-gray-500">Date of Birth</span>
+                                    <span class="font-semibold" id="personal-dob">Not Available</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Office City</span>
+                                    <span class="font-semibold" id="personal-city">N/A</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- CONTACT INFORMATION -->
+        <!-- ========================================================= -->
+        <section class="mt-20">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Contact Information
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition duration-300">
+                    <div class="text-5xl mb-6">📞</div>
+                    <h3 class="text-2xl font-bold">Primary Mobile</h3>
+                    <p class="mt-4 text-gray-400 text-lg" id="contact-mobile">-</p>
+                </div>
+
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition duration-300 hidden" id="contact-alternate-box">
+                    <div class="text-5xl mb-6">☎️</div>
+                    <h3 class="text-2xl font-bold">Alternate Number</h3>
+                    <p class="mt-4 text-gray-400 text-lg" id="contact-alternate">-</p>
+                </div>
+
+                <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition duration-300">
+                    <div class="text-5xl mb-6">📍</div>
+                    <h3 class="text-2xl font-bold">Office Location</h3>
+                    <p class="mt-4 text-gray-400 text-lg" id="contact-city">Not Specified</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- PRACTICE AREAS -->
+        <!-- ========================================================= -->
+        <section class="mt-20 mb-10">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Practice Areas
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">⚖️</div>
+                    <h3 class="text-xl font-bold">Family Law</h3>
+                    <p class="mt-3 text-gray-500 text-sm">Divorce, separation and legal family matters.</p>
+                </div>
+
+                <div class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">👨👩👧</div>
+                    <h3 class="text-xl font-bold">Child Custody</h3>
+                    <p class="mt-3 text-gray-500 text-sm">Child custody and visitation rights.</p>
+                </div>
+
+                <div class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">📄</div>
+                    <h3 class="text-xl font-bold">Legal Documentation</h3>
+                    <p class="mt-3 text-gray-500 text-sm">Agreements, notices and court paperwork.</p>
+                </div>
+
+                <div class="rounded-3xl bg-[#121212] border border-white/10 p-8 hover:bg-white hover:text-black transition duration-300">
+                    <div class="text-5xl mb-5">🤝</div>
+                    <h3 class="text-xl font-bold">Legal Consultation</h3>
+                    <p class="mt-3 text-gray-500 text-sm">Online and in-person professional consultation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- CLIENT RATINGS -->
+        <!-- ========================================================= -->
+        <section id="reviews" class="mt-24">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Client Reviews
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- LEFT SIDE -->
+                <div class="rounded-[35px] bg-[#121212] border border-white/10 p-10">
+                    <p class="text-gray-400 uppercase tracking-widest text-sm">Overall Rating</p>
+                    <h2 class="text-7xl font-black mt-6" id="overall-rating">0.0</h2>
+                    <div class="flex text-yellow-400 text-3xl mt-4">★★★★★</div>
+                    <p class="mt-5 text-gray-500">
+                        Based on <strong class="text-white" id="overall-reviews-count">0</strong> verified client reviews.
+                    </p>
+
+                    <!-- Dynamic Review breakdown -->
+                    <div class="space-y-5 mt-12">
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>5 Stars</span>
+                                <span id="bar-5-pct">95%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-black">
+                                <div class="h-2 rounded-full bg-white w-[95%]" id="bar-5"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>4 Stars</span>
+                                <span id="bar-4-pct">4%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-black">
+                                <div class="h-2 rounded-full bg-white w-[4%]" id="bar-4"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>3 Stars</span>
+                                <span id="bar-3-pct">1%</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-black">
+                                <div class="h-2 rounded-full bg-white w-[1%]" id="bar-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE: RATE THE LAWYER -->
+                <div class="lg:col-span-2 rounded-[35px] bg-[#121212] border border-white/10 p-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <div>
+                            <h2 class="text-3xl font-black">Reviews & Feedback</h2>
+                            <p class="text-gray-500 mt-2">Write a review or check past client feedback history below.</p>
+                        </div>
+                    </div>
+
+                    <!-- Submitted review display -->
+                    <div id="rated-submitted-box" class="rounded-3xl border border-green-500/30 bg-green-500/10 p-8 mb-8 hidden">
+                        <h3 class="text-2xl font-bold text-green-400">✓ Review Submitted</h3>
+                        <p class="text-gray-400 mt-3">Thank you for rating this lawyer. Your feedback helps other clients find experienced legal help.</p>
+                    </div>
+
+                    <!-- Rating Form -->
+                    <div id="rating-form-box" class="mb-10">
+                        <form id="rating-form" class="space-y-8">
+                            <input type="hidden" name="rating" id="rating-input" value="0">
+                            <div>
+                                <label class="block mb-4 text-gray-400 uppercase tracking-widest text-sm">Select Rating</label>
+                                <div class="flex gap-4 text-6xl">
+                                    <span data-rating-star data-value="1" class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">★</span>
+                                    <span data-rating-star data-value="2" class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">★</span>
+                                    <span data-rating-star data-value="3" class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">★</span>
+                                    <span data-rating-star data-value="4" class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">★</span>
+                                    <span data-rating-star data-value="5" class="cursor-pointer text-gray-700 hover:text-yellow-400 transition duration-200">★</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block mb-4 text-gray-400 uppercase tracking-widest text-sm">Write Review</label>
+                                <textarea id="review_text" name="review_text" rows="5" class="w-full rounded-3xl bg-black border border-white/10 p-6 text-white focus:outline-none focus:border-white" placeholder="Tell future clients about your experience..."></textarea>
+                            </div>
+
+                            <button type="submit" class="bg-white text-black px-10 py-4 rounded-full font-bold hover:bg-gray-200 transition">
+                                Submit Review
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Past Reviews List -->
+                    <div class="mt-8 border-t border-white/10 pt-8">
+                        <h3 class="text-xl font-bold mb-6 text-white">Latest Reviews</h3>
+                        <div id="reviews-history-list" class="space-y-6">
+                            <p class="text-gray-500 italic">No reviews submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- HIRE LAWYER -->
+        <!-- ========================================================= -->
+        <section id="hire" class="mt-24 mb-24">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="uppercase tracking-[6px] text-gray-500 text-sm font-semibold">
+                    Hire This Lawyer
+                </p>
+            </div>
+
+            <div class="rounded-[40px] overflow-hidden border border-white/10 bg-[#121212]">
+                <div class="grid lg:grid-cols-3">
+
+                    <!-- LEFT -->
+                    <div class="bg-gradient-to-b from-[#0a0a0a] via-[#101010] to-[#181818] p-12 border-r border-white/10">
+                        <div class="w-24 h-24 rounded-full bg-white text-black flex items-center justify-center text-5xl">⚖️</div>
+                        <h2 class="text-4xl font-black mt-10">Need Legal Help?</h2>
+                        <p class="text-gray-400 mt-6 leading-8">
+                            Hire an experienced lawyer for confidential legal consultation, court representation, documentation, family disputes and professional legal guidance.
+                        </p>
+
+                        <div class="mt-12 space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-bold">✓</div>
+                                <div>
+                                    <h4 class="font-semibold">Verified Professional</h4>
+                                    <p class="text-gray-500 text-sm">Identity & Registration Verified</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-bold">⏰</div>
+                                <div>
+                                    <h4 class="font-semibold">Fast Response</h4>
+                                    <p class="text-gray-500 text-sm">Usually replies within 24 hours</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center font-bold">🔒</div>
+                                <div>
+                                    <h4 class="font-semibold">Confidential</h4>
+                                    <p class="text-gray-500 text-sm">Your information stays secure</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: HIRE SUBMISSION -->
+                    <div class="lg:col-span-2 p-12">
+                        <!-- Case Request status box -->
+                        <div id="hired-status-box" class="rounded-3xl border border-white/10 bg-black p-10 hidden">
+                            <div class="flex justify-between items-center mb-10">
+                                <div>
+                                    <h2 class="text-3xl font-black">Request Status</h2>
+                                    <p class="text-gray-500 mt-3">Your request has been sent successfully.</p>
+                                </div>
+                                <div class="px-6 py-3 rounded-full bg-white text-black font-bold uppercase" id="case-status-badge">
+                                    PENDING
+                                </div>
+                            </div>
+
+                            <div class="space-y-8">
+                                <div class="flex gap-5">
+                                    <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center font-bold text-white">✓</div>
+                                    <div>
+                                        <h3 class="font-semibold">Request Submitted</h3>
+                                        <p class="text-gray-500">Your legal request has been received.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-5">
+                                    <div class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold" id="status-step-2">2</div>
+                                    <div>
+                                        <h3 class="font-semibold">Lawyer Review</h3>
+                                        <p class="text-gray-500">Waiting for lawyer response.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-5">
+                                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-gray-400" id="status-step-3">3</div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-500" id="status-step-3-title">Consultation</h3>
+                                        <p class="text-gray-500">Schedule your meeting after approval.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 rounded-2xl bg-[#181818] p-8 hidden" id="lawyer-msg-box">
+                                <h4 class="font-bold mb-4">Lawyer's Message</h4>
+                                <p class="text-gray-400" id="lawyer-msg-text"></p>
+                            </div>
+
+                            <a href="/client_cases/" class="inline-flex mt-10 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-gray-300 transition">
+                                View My Cases
+                            </a>
+                        </div>
+
+                        <!-- Client Hire Form -->
+                        <div id="intake-form-box">
+                            <form id="hire-form" class="space-y-8">
+                                <div>
+                                    <label class="block mb-4 uppercase tracking-widest text-sm text-gray-500">Describe Your Legal Issue</label>
+                                    <textarea id="hire-message" rows="8" class="w-full rounded-3xl bg-black border border-white/10 p-8 text-white focus:border-white focus:outline-none" placeholder="Briefly explain your legal matter, timeline, expectations, and any important information..."></textarea>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-6">
+                                    <div class="rounded-3xl bg-black border border-white/10 p-6">
+                                        <div class="text-4xl mb-4">📞</div>
+                                        <h3 class="font-bold">Consultation</h3>
+                                        <p class="text-gray-500 mt-2">Online & Offline</p>
+                                    </div>
+                                    <div class="rounded-3xl bg-black border border-white/10 p-6">
+                                        <div class="text-4xl mb-4">⚖️</div>
+                                        <h3 class="font-bold">Representation</h3>
+                                        <p class="text-gray-500 mt-2">Court Assistance</p>
+                                    </div>
+                                    <div class="rounded-3xl bg-black border border-white/10 p-6">
+                                        <div class="text-4xl mb-4">🔐</div>
+                                        <h3 class="font-bold">Confidential</h3>
+                                        <p class="text-gray-500 mt-2">100% Secure</p>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full py-5 rounded-full bg-white text-black text-lg font-bold hover:bg-gray-200 transition duration-300">
+                                    Hire This Lawyer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+let lawyerId = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    lawyerId = urlParams.get('id');
+
+    if (!lawyerId) {
+        sessionStorage.setItem("queued_toast", JSON.stringify({
+            title: "Error",
+            message: "Lawyer ID is required"
+        }));
+        window.location.href = "/lawyers/";
+        return;
+    }
+
+    // Star Selection Handler
+    const stars = document.querySelectorAll("[data-rating-star]");
+    const ratingInput = document.getElementById("rating-input");
+
+    if (stars.length && ratingInput) {
+        function updateStars(value) {
+            stars.forEach((star) => {
+                const v = Number(star.dataset.value);
+                if (v <= value) {
+                    star.classList.remove("text-gray-700");
+                    star.classList.add("text-yellow-400", "scale-125");
+                } else {
+                    star.classList.remove("text-yellow-400", "scale-125");
+                    star.classList.add("text-gray-700");
+                }
+            });
+            ratingInput.value = value;
+        }
+
+        stars.forEach((star) => {
+            star.addEventListener("mouseenter", () => {
+                updateStars(Number(star.dataset.value));
+            });
+            star.addEventListener("click", () => {
+                updateStars(Number(star.dataset.value));
+            });
+        });
+
+        stars[0].parentElement.addEventListener("mouseleave", () => {
+            updateStars(Number(ratingInput.value) || 0);
+        });
+    }
+
+    // Load Lawyer Details
+    try {
+        const res = await fetch(`/api/client/lawyers/${lawyerId}`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to load lawyer profile");
+            return;
+        }
+
+        const data = await res.json();
+
+        // Reveal Profile Grid
+        document.getElementById("profile-container").style.display = "block";
+
+        // Prepopulate text blocks
+        document.getElementById("lawyer-name").innerText = data.full_name;
+        document.getElementById("lawyer-specialization").innerText = (data.specialization || '').toUpperCase();
+        document.getElementById("lawyer-bio").innerText = data.bio || "No biography details shared yet.";
+
+        // Header statistics
+        document.getElementById("badge-rating").innerText = `${data.rating.toFixed(1)}/5 Rating`;
+        document.getElementById("badge-reviews").innerText = `${data.rating_count} Reviews`;
+        document.getElementById("badge-experience").innerText = `${data.years_of_experience} Years Exp`;
+
+        // Card statistics
+        document.getElementById("stat-experience").innerText = data.years_of_experience;
+        document.getElementById("stat-rating").innerText = data.rating.toFixed(1);
+        document.getElementById("stat-fee").innerText = data.consultation_fee > 0 ? `₹${data.consultation_fee}` : "Contact";
+        document.getElementById("stat-city").innerText = data.office_city || "N/A";
+
+        // Professional block details
+        document.getElementById("info-experience").innerText = `${data.years_of_experience} Years`;
+        document.getElementById("info-specialization").innerText = data.specialization || 'General Legal Practice';
+        document.getElementById("info-registration").innerText = data.bar_registration_number || 'Verification In Progress';
+        document.getElementById("info-bar-council").innerText = data.state_bar_council || 'State Bar Council';
+
+        // Office details
+        document.getElementById("office-fee").innerText = data.consultation_fee > 0 ? `₹${data.consultation_fee}` : "Contact";
+        document.getElementById("office-city").innerText = data.office_city || "N/A";
+        document.getElementById("office-reviews").innerText = data.rating_count;
+        document.getElementById("office-rating").innerText = data.rating.toFixed(1);
+
+        // About block
+        document.getElementById("about-name").innerText = data.full_name;
+        document.getElementById("about-specialization").innerText = data.specialization || 'Family Matters';
+
+        // Personal summary details
+        document.getElementById("personal-name").innerText = data.full_name;
+        document.getElementById("personal-gender").innerText = data.gender || 'Other';
+        document.getElementById("personal-dob").innerText = data.date_of_birth ? formatDate(data.date_of_birth) : 'Not Available';
+        document.getElementById("personal-city").innerText = data.office_city || 'N/A';
+
+        // Contact info blocks
+        document.getElementById("contact-mobile").innerText = data.mobile_number || 'Not Disclosed';
+        if (data.alternate_mobile_number) {
+            document.getElementById("contact-alternate").innerText = data.alternate_mobile_number;
+            document.getElementById("contact-alternate-box").classList.remove("hidden");
+        }
+        document.getElementById("contact-city").innerText = data.office_city || 'Not Specified';
+
+        // Avatar configuration
+        if (data.profile_picture) {
+            const avatar = document.getElementById("lawyer-avatar");
+            avatar.src = data.profile_picture;
+            avatar.classList.remove("hidden");
+            document.getElementById("lawyer-avatar-placeholder").classList.add("hidden");
+        } else {
+            document.getElementById("lawyer-avatar-placeholder").innerText = data.full_name.charAt(0);
+        }
+
+        // Setup Rating distributions
+        document.getElementById("overall-rating").innerText = data.rating.toFixed(1);
+        document.getElementById("overall-reviews-count").innerText = data.rating_count;
+
+        // Calculate star simulation distributions
+        let fivePct = 70;
+        let fourPct = 20;
+        let threePct = 10;
+        if (data.rating >= 4.5) {
+            fivePct = 90; fourPct = 8; threePct = 2;
+        } else if (data.rating >= 4.0) {
+            fivePct = 75; fourPct = 20; threePct = 5;
+        } else if (data.rating >= 3.0) {
+            fivePct = 50; fourPct = 30; threePct = 20;
+        } else if (data.rating > 0) {
+            fivePct = 20; fourPct = 30; threePct = 50;
+        } else {
+            fivePct = 0; fourPct = 0; threePct = 0;
+        }
+
+        document.getElementById("bar-5-pct").innerText = `${fivePct}%`;
+        document.getElementById("bar-5").style.width = `${fivePct}%`;
+        document.getElementById("bar-4-pct").innerText = `${fourPct}%`;
+        document.getElementById("bar-4").style.width = `${fourPct}%`;
+        document.getElementById("bar-3-pct").innerText = `${threePct}%`;
+        document.getElementById("bar-3").style.width = `${threePct}%`;
+
+        // Check if user already rated
+        if (data.has_rated) {
+            document.getElementById("rating-form-box").classList.add("hidden");
+            document.getElementById("rated-submitted-box").classList.remove("hidden");
+        }
+
+        // Render reviews history list
+        if (data.reviews && data.reviews.length > 0) {
+            let html = "";
+            for (let rev of data.reviews) {
+                html += `
+                <div class="bg-black/50 border border-white/5 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <span class="font-bold text-white">${rev.client_name}</span>
+                            <span class="text-xs text-gray-500 ml-3">${rev.created_at}</span>
+                        </div>
+                        <div class="text-yellow-400 text-sm font-semibold">
+                            ${'★'.repeat(rev.score)}${'☆'.repeat(5 - rev.score)}
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">${rev.review_text || 'No comments shared.'}</p>
+                </div>`;
+            }
+            document.getElementById("reviews-history-list").innerHTML = html;
+        }
+
+        // Manage Hire Form status
+        if (data.case_request) {
+            document.getElementById("intake-form-box").classList.add("hidden");
+            const statusBox = document.getElementById("hired-status-box");
+            statusBox.classList.remove("hidden");
+
+            const badge = document.getElementById("case-status-badge");
+            badge.innerText = data.case_request.status;
+
+            if (data.case_request.status === "PENDING") {
+                badge.className = "rounded-full bg-yellow-950 border border-yellow-500 text-yellow-400 px-6 py-2 text-sm font-semibold";
+                document.getElementById("status-step-2").innerText = "2";
+                document.getElementById("status-step-2").className = "w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold animate-pulse";
+            } else if (data.case_request.status === "ACTIVE") {
+                badge.className = "rounded-full bg-emerald-950 border border-emerald-500 text-emerald-400 px-6 py-2 text-sm font-semibold";
+                document.getElementById("status-step-2").innerText = "✓";
+                document.getElementById("status-step-2").className = "w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold";
+                document.getElementById("status-step-3").className = "w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold";
+                document.getElementById("status-step-3-title").className = "font-semibold text-white";
+            } else {
+                badge.className = "rounded-full bg-red-950 border border-red-500 text-red-400 px-6 py-2 text-sm font-semibold";
+                document.getElementById("status-step-2").innerText = "✗";
+                document.getElementById("status-step-2").className = "w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center font-bold";
+            }
+
+            if (data.case_request.response_message) {
+                document.getElementById("lawyer-msg-box").classList.remove("hidden");
+                document.getElementById("lawyer-msg-text").innerText = data.case_request.response_message;
+            }
+        }
+
+    } catch (err) {
+        console.error("Error loading lawyer detail:", err);
+    }
+});
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+        const d = new Date(dateStr);
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return d.toLocaleDateString('en-GB', options);
+    } catch (e) {
+        return dateStr;
+    }
+}
+
+// Hire Request Submission
+document.getElementById("hire-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("access_token");
+    const msg = document.getElementById("hire-message").value.trim();
+
+    if (!msg) {
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Warning", "Please describe your legal issue.");
+        } else {
+            alert("Please describe your legal issue.");
+        }
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/client/lawyers/${lawyerId}/hire?message=${encodeURIComponent(msg)}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (res.ok) {
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: "Success",
+                message: "Hire request submitted successfully!"
+            }));
+            window.location.reload();
+        } else {
+            const err = await res.json();
+            if (err.detail === "profile_incomplete") {
+                sessionStorage.setItem("queued_toast", JSON.stringify({
+                    title: "Profile Incomplete",
+                    message: "Please complete your profile details before hiring a lawyer."
+                }));
+                window.location.href = "/profile/edit/";
+            } else {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Error", err.detail || "Hire request submission failed.");
+                } else {
+                    alert(err.detail || "Hire request submission failed.");
+                }
+            }
+        }
+    } catch (e) {
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Error", "Network error.");
+        } else {
+            alert("Network error.");
+        }
+    }
+});
+
+// Rating Form Submission
+document.getElementById("rating-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("access_token");
+    const ratingVal = parseInt(document.getElementById("rating-input").value);
+    const reviewText = document.getElementById("review_text").value.trim();
+
+    if (!ratingVal || ratingVal < 1 || ratingVal > 5) {
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Warning", "Please select a valid star rating before submitting.");
+        } else {
+            alert("Please select a valid star rating before submitting.");
+        }
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("rating", ratingVal);
+    formData.append("review_text", reviewText);
+
+    try {
+        const res = await fetch(`/api/client/lawyers/${lawyerId}/rate`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData
+        });
+
+        if (res.ok) {
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: "Review Submitted",
+                message: "Thanks for rating this lawyer! Your review has been recorded."
+            }));
+            window.location.reload();
+        } else {
+            const err = await res.json();
+            if (typeof showToastNotification === 'function') {
+                showToastNotification("Error", err.detail || "Review submission failed.");
+            } else {
+                alert(err.detail || "Review submission failed.");
+            }
+        }
+    } catch (e) {
+        if (typeof showToastNotification === 'function') {
+            showToastNotification("Error", "Network error.");
+        } else {
+            alert("Network error.");
+        }
+    }
+});
+</script>
+{% endblock %}

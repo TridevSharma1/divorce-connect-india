@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Lawyer{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Back Link -->
+        <div class="mb-8">
+            <a href="/lawyer_dashboard/" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Side: Profile Card & Quick Info -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-[32px] p-6 text-center shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl"></div>
+
+                    <!-- Profile Picture -->
+                    <div class="w-28 h-28 rounded-full border-4 border-white bg-slate-100 shadow-md mx-auto overflow-hidden flex items-center justify-center relative">
+                        <span id="profile_pic_fallback" class="text-3xl font-extrabold text-slate-800 {% if profile.profile_picture %}hidden{% endif %}">
+                            {{ profile.full_name|slice:":1" }}
+                        </span>
+                        <img id="profile_pic" src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% endif %}" alt="Profile Picture" class="w-full h-full object-cover {% if not profile.profile_picture %}hidden{% endif %}">
+                    </div>
+
+                    <!-- Name and Basic Info -->
+                    <h2 id="profile_name" class="text-xl font-bold text-slate-900 mt-4">{{ profile.full_name }}</h2>
+                    <p id="profile_email" class="text-xs text-slate-500 mt-1">{{ profile.user.email }}</p>
+                    
+                    <span id="profile_id_container" class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 rounded-full mt-3 {% if not profile.custom_id %}hidden{% endif %}">
+                        🪪 ID: <span id="profile_custom_id">{{ profile.custom_id }}</span>
+                    </span>
+
+                    <!-- Rating and Status Badges -->
+                    <div class="flex flex-wrap justify-center gap-2 mt-4 pt-4 border-t border-slate-100">
+                        <span id="profile_rating" class="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 rounded-full">
+                            ⭐ {{ profile.rating|default:"0.0" }}/5.0
+                        </span>
+                        
+                        <span id="profile_verification_status" class="inline-flex items-center gap-1 px-3 py-1 {% if profile.verified %}bg-emerald-50 border-emerald-200 text-emerald-800{% else %}bg-amber-50 border-amber-200 text-amber-800{% endif %} text-xs font-bold rounded-full">
+                            {% if profile.verified %}✓ Verified Counselor{% else %}⏳ Verification Pending{% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Edit Profile Action Redirect Button -->
+                    <div class="mt-6">
+                        <a href="/lawyer_profile_edit/" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm shadow-md transition duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                            Edit Profile Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Details Blocks -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Professional Details -->
+                <div class="bg-white border border-slate-200 rounded-[32px] p-6 sm:p-8 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">💼</span>
+                        Professional Credentials
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Bar Registration Number</span>
+                            <span id="bar_reg" class="font-bold text-slate-800">{{ profile.bar_registration_number|default:"Not specified" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">State Bar Council</span>
+                            <span id="state_bar" class="font-semibold text-slate-700">{{ profile.state_bar_council|default:"Not specified" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Specialization Focus</span>
+                            <span id="spec" class="font-bold text-slate-800">{{ profile.get_specialization_display|default:"General Practice" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Experience Years</span>
+                            <span id="exp" class="font-semibold text-slate-700">{{ profile.years_of_experience }} Years Practice</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Consultation Fee</span>
+                            <span id="fee" class="font-bold text-indigo-600 text-lg">₹{{ profile.consultation_fee|default:"0.0" }}/Session</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Office Location</span>
+                            <span id="city" class="font-semibold text-slate-700">{{ profile.office_city|default:"Not specified" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal & Contact Details -->
+                <div class="bg-white border border-slate-200 rounded-[32px] p-6 sm:p-8 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="p-2 bg-blue-50 text-blue-600 rounded-xl">📞</span>
+                        Personal & Contact Info
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Primary Mobile Contact</span>
+                            <span id="mobile" class="font-semibold text-slate-700">{{ profile.mobile_number|default:"Not specified" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Alternate Contact (Optional)</span>
+                            <span id="alt_mobile" class="font-semibold text-slate-700">{{ profile.alternate_mobile_number|default:"None provided" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Gender Identification</span>
+                            <span id="gender" class="font-semibold text-slate-700">{{ profile.get_gender_display|default:"Not specified" }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 block mb-1">Date of Birth</span>
+                            <span id="dob" class="font-semibold text-slate-700">{{ profile.date_of_birth|date:"d M, Y"|default:"Not specified" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Short Biography -->
+                <div class="bg-white border border-slate-200 rounded-[32px] p-6 sm:p-8 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="p-2 bg-purple-50 text-purple-600 rounded-xl">🖋️</span>
+                        Professional Summary & Bio
+                    </h3>
+                    <p id="bio" class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{{ profile.bio|default:"No professional summary bio written yet." }}</p>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        try {
+            const res = await fetch("/api/lawyer/profile", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                
+                // Update text elements
+                document.getElementById("profile_name").innerText = data.full_name || "";
+                
+                if (data.custom_id) {
+                    document.getElementById("profile_custom_id").innerText = data.custom_id;
+                    document.getElementById("profile_id_container").classList.remove("hidden");
+                }
+                
+                if (data.profile_picture) {
+                    document.getElementById("profile_pic").src = data.profile_picture;
+                    document.getElementById("profile_pic").classList.remove("hidden");
+                    document.getElementById("profile_pic_fallback").classList.add("hidden");
+                } else {
+                    document.getElementById("profile_pic_fallback").innerText = (data.full_name || "L").substring(0, 1);
+                    document.getElementById("profile_pic_fallback").classList.remove("hidden");
+                    document.getElementById("profile_pic").classList.add("hidden");
+                }
+                
+                document.getElementById("profile_rating").innerText = `⭐ ${(data.rating || 0.0).toFixed(1)}/5.0`;
+                
+                const verifiedEl = document.getElementById("profile_verification_status");
+                if (data.verified) {
+                    verifiedEl.innerText = "✓ Verified Counselor";
+                    verifiedEl.className = "inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 rounded-full";
+                } else {
+                    verifiedEl.innerText = "⏳ Verification Pending";
+                    verifiedEl.className = "inline-flex items-center gap-1 px-3 py-1 bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 rounded-full";
+                }
+                
+                document.getElementById("bar_reg").innerText = data.bar_registration_number || "Not specified";
+                document.getElementById("state_bar").innerText = data.state_bar_council || "Not specified";
+                document.getElementById("spec").innerText = data.specialization || "General Practice";
+                document.getElementById("exp").innerText = `${data.years_of_experience || 0} Years Practice`;
+                document.getElementById("fee").innerText = `₹${data.consultation_fee || 0.0}/Session`;
+                document.getElementById("city").innerText = data.office_city || "Not specified";
+                
+                document.getElementById("mobile").innerText = data.mobile_number || "Not specified";
+                document.getElementById("alt_mobile").innerText = data.alternate_mobile_number || "None provided";
+                document.getElementById("gender").innerText = data.gender || "Not specified";
+                
+                if (data.date_of_birth) {
+                    const dob = new Date(data.date_of_birth);
+                    document.getElementById("dob").innerText = dob.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                } else {
+                    document.getElementById("dob").innerText = "Not specified";
+                }
+                
+                document.getElementById("bio").innerText = data.bio || "No professional summary bio written yet.";
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+});
+</script>
+{% endblock %}

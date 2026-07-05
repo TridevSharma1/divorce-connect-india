@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Lawyer Verification Queue - DivorceConnect{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-12" id="verification-container" style="display: none;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-slate-900 via-slate-800 to-black text-white shadow-2xl">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.12),transparent_45%)]"></div>
+            <div class="relative p-10 lg:p-14 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                <div>
+                    <span class="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-4 py-1.5 text-xs font-semibold tracking-[0.25em] uppercase">
+                        Admin Panel
+                    </span>
+                    <h1 class="mt-6 text-4xl lg:text-5xl font-black tracking-tight">Lawyer Verification Queue</h1>
+                    <p class="mt-4 max-w-2xl text-gray-300 leading-relaxed text-lg">
+                        Review lawyer verification requests and profile updates before they become visible on the DivorceConnect platform.
+                    </p>
+                </div>
+                <div class="flex-shrink-0">
+                    <a href="/admin_dashboard/" class="inline-flex items-center gap-3 rounded-2xl bg-white text-slate-900 px-6 py-3 font-semibold shadow-lg transition duration-300 hover:scale-105 hover:shadow-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid gap-6 lg:grid-cols-3 mt-10">
+            <div class="group rounded-3xl bg-white border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="uppercase tracking-[0.25em] text-xs text-slate-500 font-semibold">Pending Verifications</p>
+                        <h2 class="mt-5 text-5xl font-black text-slate-900" id="stat-pending-count">0</h2>
+                    </div>
+                    <div class="w-16 h-16 rounded-2xl bg-yellow-100 flex items-center justify-center group-hover:rotate-6 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 2A9 9 0 1112 3a9 9 0 019 9z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-slate-500 leading-relaxed">Lawyers waiting for verification before appearing publicly.</p>
+            </div>
+
+            <div class="group rounded-3xl bg-white border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="uppercase tracking-[0.25em] text-xs text-slate-500 font-semibold">Profile Updates</p>
+                        <h2 class="mt-5 text-5xl font-black text-slate-900" id="stat-update-count">0</h2>
+                    </div>
+                    <div class="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center group-hover:rotate-6 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18 2l4 4-9 9H9v-4l9-9z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-slate-500 leading-relaxed">Lawyer profile modifications waiting for administrator approval.</p>
+            </div>
+
+            <div class="rounded-3xl bg-gradient-to-br from-slate-900 to-black text-white p-8 shadow-xl">
+                <p class="uppercase tracking-[0.25em] text-xs text-gray-300 font-semibold">Admin Action</p>
+                <h2 class="mt-5 text-2xl font-bold">Review Requests</h2>
+                <p class="mt-4 text-gray-300 leading-relaxed">Select any lawyer below to verify documents or approve profile changes.</p>
+            </div>
+        </div>
+
+        <!-- Requests list wrapper -->
+        <div id="requests-list-container" class="mt-12 space-y-6">
+            <div id="pending-list" class="space-y-6"></div>
+        </div>
+
+        <div id="empty-state" class="mt-12 overflow-hidden rounded-[32px] border border-dashed border-slate-300 bg-white shadow-sm hidden">
+            <div class="px-10 py-20 text-center">
+                <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 2A9 9 0 1112 3a9 9 0 019 9z" />
+                    </svg>
+                </div>
+                <h2 class="mt-8 text-3xl font-bold text-slate-900">No Pending Verifications</h2>
+                <p class="mt-4 max-w-xl mx-auto text-slate-500 leading-relaxed">
+                    Great! There are currently no lawyer verification requests or profile update requests waiting for review. All submissions have been processed.
+                </p>
+                <a href="/admin_dashboard/" class="mt-10 inline-flex items-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 text-sm font-semibold text-white shadow-lg transition duration-300 hover:bg-black hover:shadow-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/admin/lawyers/pending", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+        if (!res.ok) {
+            if (res.status === 403) {
+                window.location.href = "/admin_dashboard/";
+                return;
+            }
+            console.error("Failed to load verifications", res.status);
+            return;
+        }
+
+        const lawyers = await res.json();
+        document.getElementById("verification-container").style.display = "block";
+
+        document.getElementById("stat-pending-count").innerText = lawyers.length;
+        document.getElementById("stat-update-count").innerText = "0";
+
+        if (lawyers.length > 0) {
+            const pendingList = document.getElementById("pending-list");
+            pendingList.innerHTML = lawyers.map(lawyer => `
+                <div class="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-900 hover:shadow-2xl">
+                    <div class="p-8">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                            <div class="flex items-center gap-6">
+                                <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 text-2xl font-bold text-white shadow-lg">
+                                    ${lawyer.full_name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Lawyer Verification</p>
+                                    <h2 class="mt-2 text-2xl font-bold text-slate-900 transition group-hover:text-black">
+                                        ${lawyer.full_name}
+                                    </h2>
+                                    <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                                        <span class="rounded-full bg-slate-100 px-3 py-1 font-medium">${lawyer.specialization}</span>
+                                        <span class="rounded-full bg-slate-100 px-3 py-1 font-medium">${lawyer.years_of_experience} Years Experience</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-start lg:items-end gap-6">
+                                <div class="flex gap-2">
+                                    <button onclick="actionLawyer(${lawyer.id}, 'approve')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition">Approve</button>
+                                    <button onclick="actionLawyer(${lawyer.id}, 'reject')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition">Reject</button>
+                                </div>
+                                <p class="text-sm text-slate-500">License: <span class="font-semibold text-slate-700">${lawyer.bar_registration_number}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById("requests-list-container").classList.add("hidden");
+            document.getElementById("empty-state").classList.remove("hidden");
+        }
+
+    } catch (err) {
+        console.error("Error loading verification page", err);
+    }
+});
+
+async function actionLawyer(lawyerId, action) {
+    const token = localStorage.getItem("access_token");
+    try {
+        const res = await fetch(`/api/admin/lawyers/${lawyerId}/verify?action=${action}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+        if (res.ok) {
+            sessionStorage.setItem("queued_toast", JSON.stringify({
+                title: action === 'approve' ? 'Lawyer Approved' : 'Lawyer Rejected',
+                message: `Lawyer has been ${action}d successfully!`
+            }));
+            window.location.reload();
+        } else {
+            const err = await res.json();
+            if (typeof showToastNotification !== 'undefined') {
+                showToastNotification("Error", err.detail || "Action failed");
+            } else {
+                alert(err.detail || "Action failed");
+            }
+        }
+    } catch (e) {
+        if (typeof showToastNotification !== 'undefined') {
+            showToastNotification("Error", "Network error. Please try again.");
+        } else {
+            alert("Network error");
+        }
+    }
+}
+</script>
+{% endblock %}

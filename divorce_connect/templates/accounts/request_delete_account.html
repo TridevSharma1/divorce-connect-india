@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account — DivorceConnect India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .serif { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-lg w-full">
+
+        <!-- Brand -->
+        <div class="text-center mb-8">
+            <a href="/" class="serif text-3xl font-black text-gray-900">Divorce<span class="text-yellow-600">Connect</span> India</a>
+            <p class="text-xs tracking-widest text-gray-400 uppercase mt-1">Account Management</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Red danger bar -->
+            <div class="h-1 bg-gradient-to-r from-red-600 via-red-400 to-red-600"></div>
+
+            <div class="p-8 sm:p-10">
+                <!-- Icon -->
+                <div class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </div>
+
+                <h1 class="serif text-2xl font-black text-gray-900 text-center mb-2">Delete Your Account</h1>
+                <p class="text-sm text-gray-500 text-center mb-8">
+                    This action is <strong class="text-red-600">permanent and irreversible</strong>.<br>
+                    Enter your registered email to receive a confirmation link.
+                </p>
+
+                <!-- Warning card -->
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-8">
+                    <p class="text-xs font-bold text-red-700 uppercase tracking-wider mb-3">⚠️ What you'll lose permanently</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2 text-sm text-red-600"><span class="font-bold mt-0.5">✕</span> Your profile and all account data</li>
+                        <li class="flex items-start gap-2 text-sm text-red-600"><span class="font-bold mt-0.5">✕</span> All case records and legal documents</li>
+                        <li class="flex items-start gap-2 text-sm text-red-600"><span class="font-bold mt-0.5">✕</span> All messages and communication history</li>
+                        <li class="flex items-start gap-2 text-sm text-red-600"><span class="font-bold mt-0.5">✕</span> All notifications and activity</li>
+                    </ul>
+                </div>
+
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                    <div class="{% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %} rounded-lg px-4 py-3 text-sm font-medium">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST" id="delete-form">
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Confirm your registered email address
+                    </label>
+                    <input type="email" name="email" required autofocus
+                        placeholder="yourname@example.com"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none focus:border-red-400 focus:ring-4 focus:ring-red-50 transition-all mb-6">
+
+                    <!-- Confirmation checkbox -->
+                    <label class="flex items-start gap-3 mb-6 cursor-pointer group">
+                        <input type="checkbox" id="confirm-check" required
+                            class="mt-1 w-4 h-4 accent-red-600 rounded flex-shrink-0">
+                        <span class="text-sm text-gray-600 leading-relaxed">
+                            I understand this action is <strong class="text-red-600">permanent</strong> and my account cannot be recovered after deletion.
+                        </span>
+                    </label>
+
+                    <button type="submit" id="delete-btn"
+                        class="w-full bg-red-600 text-white font-bold py-4 rounded-xl hover:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm tracking-wide mb-3">
+                        Send Deletion Confirmation Email →
+                    </button>
+
+                    <a href="javascript:history.back()"
+                        class="block w-full text-center bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-200 transition-all text-sm">
+                        ← Cancel, Keep My Account
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-gray-400 mt-6">
+            🔒 A secure deletion link will be sent to your email. Valid for 30 minutes.
+        </p>
+    </div>
+
+    <script>
+        // Disable button until checkbox is ticked
+        const btn = document.getElementById('delete-btn');
+        const check = document.getElementById('confirm-check');
+        btn.disabled = !check.checked;
+        btn.style.opacity = check.checked ? '1' : '0.5';
+        btn.style.cursor = check.checked ? 'pointer' : 'not-allowed';
+        check.addEventListener('change', () => {
+            btn.disabled = !check.checked;
+            btn.style.opacity = check.checked ? '1' : '0.5';
+            btn.style.cursor = check.checked ? 'pointer' : 'not-allowed';
+        });
+
+        // Intercept form submission
+        const form = document.getElementById('delete-form');
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = form.querySelector('input[type="email"]').value;
+            btn.disabled = true;
+            btn.innerText = "Sending Link...";
+
+            // Clear previous alerts
+            const existingAlerts = form.querySelectorAll('.alert-box');
+            existingAlerts.forEach(a => a.remove());
+
+            try {
+                const res = await fetch('/api/auth/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await res.json();
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert-box mb-6 px-4 py-3 rounded-lg text-sm font-medium border';
+
+                if (res.ok) {
+                    alertDiv.className += ' bg-green-50 border-green-200 text-green-700';
+                    alertDiv.innerText = data.message || "Confirmation link sent successfully.";
+                    form.insertBefore(alertDiv, form.firstChild);
+                    
+                    // Hide inputs
+                    form.querySelector('input[type="email"]').style.display = 'none';
+                    form.querySelector('label').style.display = 'none';
+                    form.querySelector('.group').style.display = 'none';
+                    btn.style.display = 'none';
+                } else {
+                    alertDiv.className += ' bg-red-50 border-red-200 text-red-700';
+                    alertDiv.innerText = data.detail || "Verification failed.";
+                    form.insertBefore(alertDiv, form.firstChild);
+                    btn.disabled = false;
+                    btn.innerText = "Send Deletion Confirmation Email →";
+                }
+            } catch (err) {
+                console.error("Error submitting deactivation request:", err);
+                btn.disabled = false;
+                btn.innerText = "Send Deletion Confirmation Email →";
+            }
+        });
+    </script>
+</body>
+</html>

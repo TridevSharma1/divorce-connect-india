@@ -1,1 +1,1 @@
-webb: gunicorn divorce_connect.wsgi
+web: gunicorn fastapi_app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Incoming Requests - DivorceConnect India{% endblock %}
+
+{% block navbar %}
+<div id="nav-lawyer-static" class="flex items-center gap-8">
+    {% include 'includes/navbar_lawyer.html' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<script>
+(async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+    try {
+        const res = await fetch("/api/lawyer/dashboard", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (!data.is_verified || !data.is_complete) {
+                window.location.href = "/lawyer_dashboard/";
+            } else {
+                document.getElementById("requests-container").style.display = "block";
+            }
+        } else {
+            window.location.href = "/login/";
+        }
+    } catch (e) {
+        console.error(e);
+    }
+})();
+</script>
+    <div class="min-h-screen bg-slate-50" id="requests-container" style="display: none;">
+        <div class="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+                <div class="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.32em] text-slate-500 mb-2">Lawyer workspace</p>
+                        <h1 class="text-4xl font-semibold tracking-tight text-slate-950">Incoming client requests</h1>
+                        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">Review new hire requests, send a fast response, and keep your client intake workflow moving.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="/lawyer_dashboard/" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Dashboard</a>
+                        <a href="/lawyer_earnings/" class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Earnings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+            <div class="grid gap-8 lg:grid-cols-[1.6fr_0.9fr]">
+                <section class="space-y-8">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <h2 class="text-xl font-semibold text-slate-900">Order pipeline</h2>
+                                <p class="mt-2 text-sm text-slate-500">Pending requests are shown in order of receipt. Accept early to improve client confidence.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                                    <span id="stat-pending-count">0</span> pending request(s)
+                                </span>
+                                <span class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                                    <span class="font-semibold text-slate-900">Fast response</span>
+                                    <span class="text-slate-500">keeps clients engaged</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="requests-list" class="space-y-6">
+                        <!-- Hydrated dynamically via JS -->
+                    </div>
+
+                    <div id="empty-state" class="rounded-[32px] border border-dashed border-slate-300 bg-white p-14 text-center shadow-sm hidden">
+                        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="mt-6 text-3xl font-semibold text-slate-900">No pending hire requests</h2>
+                        <p class="mt-3 text-sm leading-6 text-slate-600">Your request queue is empty for now. New client requests will appear here for review.</p>
+                        <div class="mt-8 flex justify-center">
+                            <a href="/lawyer_dashboard/" class="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 transition">Back to dashboard</a>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="space-y-6">
+                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                        <h2 class="text-lg font-semibold text-slate-900">Request overview</h2>
+                        <p class="mt-3 text-sm text-slate-500">Keep an eye on incoming requests and respond clearly to convert interest into active cases.</p>
+                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-3xl bg-slate-50 p-4">
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Pending</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900" id="stat-pending-count-aside">0</p>
+                            </div>
+                            <div class="rounded-3xl bg-slate-50 p-4">
+                                <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Status</p>
+                                <p class="mt-3 text-lg font-semibold text-slate-900" id="stat-status-text">No active</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-base font-semibold text-slate-900">Pro tips</h3>
+                        <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Accept requests quickly to reduce drop-off.</li>
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-slate-400"></span>Use the response note to clarify next steps.</li>
+                            <li class="flex gap-3"><span class="mt-1 inline-block h-2.5 w-2.5 rounded-full bg-slate-400"></span>Keep messages concise and professional.</li>
+                        </ul>
+                    </div>
+
+                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-base font-semibold text-slate-900">Need support?</h3>
+                        <p class="mt-3 text-sm leading-6 text-slate-600">If you have questions about a request or need help with onboarding, our team is available to assist.</p>
+                        <a href="/lawyer_support/" class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition">Contact support</a>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    async function loadIncomingRequests() {
+        try {
+            const res = await fetch("/api/lawyer/case-requests", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) {
+                console.error("Failed to load incoming requests");
+                return;
+            }
+            const allRequests = await res.json();
+            const pendingRequests = allRequests.filter(r => r.status === "PENDING");
+
+            // Update statistics
+            const pendingCount = pendingRequests.length;
+            document.getElementById("stat-pending-count").innerText = pendingCount;
+            document.getElementById("stat-pending-count-aside").innerText = pendingCount;
+            document.getElementById("stat-status-text").innerText = pendingCount > 0 ? "Active" : "No active";
+
+            const container = document.getElementById("requests-list");
+            const emptyState = document.getElementById("empty-state");
+
+            container.innerHTML = "";
+
+            if (pendingCount === 0) {
+                emptyState.classList.remove("hidden");
+            } else {
+                emptyState.classList.add("hidden");
+                pendingRequests.forEach(req => {
+                    const article = document.createElement("article");
+                    article.className = "overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md";
+                    article.innerHTML = `
+                        <div class="p-6 sm:p-8">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                <div class="space-y-2">
+                                    <p class="text-sm font-medium uppercase tracking-[0.24em] text-indigo-600">New client request</p>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <h3 class="text-2xl font-semibold text-slate-900">${req.client_name}</h3>
+                                        <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">Pending</span>
+                                    </div>
+                                    <p class="text-sm text-slate-500">Received ${req.created_at}</p>
+                                </div>
+                                <div class="flex gap-2 text-sm">
+                                    <span class="rounded-full bg-slate-100 px-4 py-2 text-slate-700">Request #${req.id}</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 rounded-3xl bg-slate-50 p-5">
+                                <div class="flex items-center justify-between gap-4">
+                                    <span class="text-xs uppercase tracking-[0.24em] text-slate-500">Client message</span>
+                                    <span class="text-xs text-slate-400">Information supplied by client</span>
+                                </div>
+                                <p class="mt-3 text-sm leading-7 text-slate-700">${req.message || "No message provided by the client."}</p>
+                            </div>
+
+                            <div class="mt-6 space-y-4">
+                                <div>
+                                    <label for="response_message_${req.id}" class="block text-sm font-semibold text-slate-700">Response note</label>
+                                    <textarea id="response_message_${req.id}" rows="4" class="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100" placeholder="Send a quick note to the client..."></textarea>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button onclick="respondToRequest(${req.id}, 'accept')" class="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">Accept request</button>
+                                    <button onclick="respondToRequest(${req.id}, 'reject')" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50">Reject request</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(article);
+                });
+            }
+        } catch (e) {
+            console.error("Error loading incoming requests:", e);
+        }
+    }
+
+    window.respondToRequest = async function(reqId, action) {
+        const msgVal = document.getElementById(`response_message_${reqId}`).value.trim();
+        try {
+            const res = await fetch(`/api/lawyer/case-requests/${reqId}/respond?action=${action}&response_message=${encodeURIComponent(msgVal)}`, {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Success", `Request successfully ${action}ed.`);
+                }
+                loadIncomingRequests();
+            } else {
+                const err = await res.json();
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Error", err.detail || `Failed to ${action} request`);
+                } else {
+                    alert(err.detail || `Failed to ${action} request`);
+                }
+            }
+        } catch (e) {
+            console.error("Error responding to request:", e);
+        }
+    };
+
+    await loadIncomingRequests();
+});
+</script>
+{% endblock %}

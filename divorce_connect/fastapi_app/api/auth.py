@@ -67,14 +67,16 @@ async def get_current_user_details(
 def render_email_template(template_name: str, context: dict) -> str:
     from pathlib import Path
     from jinja2 import Environment, FileSystemLoader
-    
+
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
+    # Consolidated template paths — emails live in templates/accounts/emails/
     TEMPLATES_DIRS = [
         BASE_DIR / "templates",
-        BASE_DIR / "clients" / "templates",
-        BASE_DIR / "lawyers" / "templates",
-        BASE_DIR / "adminpanel" / "templates",
-        BASE_DIR / "accounts" / "templates",
+        BASE_DIR / "templates" / "accounts",
+        BASE_DIR / "templates" / "accounts" / "emails",
+        BASE_DIR / "templates" / "clients",
+        BASE_DIR / "templates" / "lawyers",
+        BASE_DIR / "templates" / "adminpanel",
     ]
     dirs = [str(d) for d in TEMPLATES_DIRS if d.exists()]
     env = Environment(loader=FileSystemLoader(dirs))

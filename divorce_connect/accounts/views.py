@@ -195,37 +195,35 @@ def register_view(request):
             first_name = form.cleaned_data['first_name']
             last_name  = form.cleaned_data['last_name']
 
+            # Generate OTP (6 digits)
+            import random
+            import string
+            import time
+            otp_code = ''.join(random.choices(string.digits, k=6))
+
             # Don't create the user yet — stash data in session for OTP verification
             request.session['reg_email']      = email
             request.session['reg_password']   = password
             request.session['reg_first_name'] = first_name
             request.session['reg_last_name']  = last_name
             request.session['reg_role']       = role
+            request.session['reg_otp']        = otp_code
+            request.session['reg_otp_created_at'] = time.time()
+            request.session['otp_purpose']    = 'register'
 
-            # Create a temporary user object to generate OTP (not saved)
-            # We need a saved user to use OTPCode FK — so create a minimal
-            # "pending" user and delete if OTP fails. Use a marker on the session.
-            user, created = BaseUser.objects.get_or_create(
+            # Create an in-memory user instance to send the OTP email (do not save to DB)
+            user = BaseUser(
                 email=email,
-                defaults={
-                    'username': email,
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'is_active': False,   # inactive until OTP verified
-                }
+                username=email,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=False
             )
-            if created:
-                user.set_password(password)
-                user.save()
 
-            otp = OTPCode.generate_for_user(user)
             try:
-                send_register_otp_email(user, otp.code)
+                send_register_otp_email(user, otp_code)
             except Exception:
                 pass
-
-            request.session['reg_user_id']    = user.pk
-            request.session['otp_purpose']    = 'register'
 
             return redirect('verify_register_otp')
         else:
@@ -238,58 +236,54 @@ def register_view(request):
 
 def verify_register_otp_view(request):
     """Step 2 of registration: verify OTP, activate account, send welcome email."""
-    user_id = request.session.get('reg_user_id')
     email   = request.session.get('reg_email', '')
     purpose = request.session.get('otp_purpose', '')
+    otp_code = request.session.get('reg_otp')
+    otp_created_at = request.session.get('reg_otp_created_at')
 
-    if not user_id or purpose != 'register':
-        return redirect('register')
-
-    try:
-        user = BaseUser.objects.get(pk=user_id)
-    except BaseUser.DoesNotExist:
-        messages.error(request, 'Session expired. Please register again.')
+    if not email or purpose != 'register' or not otp_code or not otp_created_at:
         return redirect('register')
 
     if request.method == 'POST':
         entered = request.POST.get('otp', '').strip()
 
-        otp_obj = OTPCode.objects.filter(
-            user=user, is_used=False, code=entered
-        ).order_by('-created_at').first()
+        import time
+        is_expired = (time.time() - otp_created_at) > 600
 
-        if otp_obj and not otp_obj.is_expired():
-            otp_obj.is_used = True
-            otp_obj.save()
-
+        if entered == otp_code and not is_expired:
             role       = request.session.get('reg_role', 'client')
             first_name = request.session.get('reg_first_name', '')
             last_name  = request.session.get('reg_last_name', '')
+            password   = request.session.get('reg_password', '')
 
-            # Activate user and create profile
-            user.first_name = first_name
-            user.last_name  = last_name
-            user.is_active  = True
-            user.save()
+            # Now create the user in the database
+            user = BaseUser.objects.create_user(
+                email=email,
+                username=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=True
+            )
 
-            # Create role-specific profile if not already done
-            if role == 'client' and not hasattr(user, 'client_profile'):
+            # Create role-specific profile
+            if role == 'client':
                 ClientProfile.objects.create(
                     user=user, first_name=first_name, last_name=last_name, mobile_number=''
                 )
-            elif role == 'lawyer' and not hasattr(user, 'lawyer_profile'):
+            elif role == 'lawyer':
                 LawyerProfile.objects.create(
                     user=user, full_name=f"{first_name} {last_name}",
                     mobile_number='', bar_registration_number='PENDING', state_bar_council=''
                 )
-            elif role == 'admin' and not hasattr(user, 'admin_profile'):
+            elif role == 'admin':
                 AdminPanelProfile.objects.create(
                     user=user, full_name=f"{first_name} {last_name}", mobile_number=''
                 )
 
             # Clean up session
             for key in ['reg_email','reg_password','reg_first_name','reg_last_name',
-                        'reg_role','reg_user_id','otp_purpose']:
+                        'reg_role','reg_otp','reg_otp_created_at','otp_purpose']:
                 request.session.pop(key, None)
 
             # Send welcome registration email
@@ -305,12 +299,10 @@ def verify_register_otp_view(request):
                 return redirect('/adminpanel/profile/edit/')
             return redirect_to_dashboard(user)
 
-        elif otp_obj and otp_obj.is_expired():
+        elif is_expired:
             messages.error(request, 'This OTP has expired. Please register again.')
-            # Clean up inactive user
-            user.delete()
             for key in ['reg_email','reg_password','reg_first_name','reg_last_name',
-                        'reg_role','reg_user_id','otp_purpose']:
+                        'reg_role','reg_otp','reg_otp_created_at','otp_purpose']:
                 request.session.pop(key, None)
             return redirect('register')
         else:

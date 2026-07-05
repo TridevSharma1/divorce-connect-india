@@ -106,3 +106,69 @@ class NotificationAPITests(APITestCase):
         # Verify db status updated
         self.notif1.refresh_from_db()
         self.assertTrue(self.notif1.is_read)
+
+
+class RegistrationFlowTests(TestCase):
+    def test_registration_flow_prevents_db_creation_until_otp_verified(self):
+        # 1. Post to registration view
+        response = self.client.post(reverse('register'), {
+            'role': 'client',
+            'first_name': 'Test',
+            'last_name': 'Client',
+            'email': 'new.client@example.com',
+            'password1': 'StrongPassword123!',
+            'password2': 'StrongPassword123!',
+        })
+        
+        # Should redirect to verify register OTP page
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('verify_register_otp'))
+        
+        # Assert user is NOT in database yet
+        self.assertFalse(User.objects.filter(email='new.client@example.com').exists())
+        
+        # Verify session stores the generated OTP code and purpose
+        session = self.client.session
+        self.assertEqual(session['otp_purpose'], 'register')
+        self.assertEqual(session['reg_email'], 'new.client@example.com')
+        otp_code = session['reg_otp']
+        self.assertTrue(otp_code)
+        
+        # 2. Post correct OTP to verify_register_otp
+        response = self.client.post(reverse('verify_register_otp'), {
+            'otp': otp_code,
+        })
+        
+        # Should redirect to dashboard (or welcome)
+        self.assertEqual(response.status_code, 302)
+        
+        # Assert user is now successfully created in database
+        self.assertTrue(User.objects.filter(email='new.client@example.com').exists())
+        
+        user = User.objects.get(email='new.client@example.com')
+        self.assertTrue(user.is_active)
+        self.assertEqual(user.first_name, 'Test')
+        self.assertEqual(user.last_name, 'Client')
+        
+        # Verify client profile is also created
+        self.assertTrue(hasattr(user, 'client_profile'))
+
+    def test_registration_flow_with_invalid_otp_fails(self):
+        response = self.client.post(reverse('register'), {
+            'role': 'lawyer',
+            'first_name': 'Test',
+            'last_name': 'Lawyer',
+            'email': 'new.lawyer@example.com',
+            'password1': 'StrongPassword123!',
+            'password2': 'StrongPassword123!',
+        })
+        self.assertEqual(response.status_code, 302)
+        
+        # Post incorrect OTP
+        response = self.client.post(reverse('verify_register_otp'), {
+            'otp': '000000', # wrong OTP
+        })
+        
+        # Should render verify page with error message (returns 200 OK)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.filter(email='new.lawyer@example.com').exists())

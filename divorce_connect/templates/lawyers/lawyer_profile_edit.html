@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Lawyer{% endblock %}
+
+{% block navbar %}
+<div id="nav-lawyer-static" class="flex items-center gap-8">
+    {% include 'includes/navbar_lawyer.html' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16" id="dashboard-container" style="display: none;">
+    <!-- Header -->
+    <div class="mb-12">
+        <a href="/lawyer_dashboard/" class="text-blue-600 hover:text-blue-800 font-semibold mb-4 inline-block">← Back to Dashboard</a>
+        <h1 class="text-5xl font-bold serif-heading mb-3">Complete Your Profile</h1>
+        <p class="text-gray-600 text-lg">Fill in all details to complete your professional profile. Admin will verify your credentials.</p>
+    </div>
+
+    <!-- Profile Form -->
+    <div class="bg-white rounded-lg border-2 border-gray-200 p-8">
+        <form id="profileForm" method="post" enctype="multipart/form-data" class="space-y-8">
+            <!-- Personal Information Section -->
+            <div class="border-b pb-6">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Personal Information</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Full Name -->
+                    <div>
+                        <label for="full_name" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Full Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="full_name" name="full_name" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label for="gender" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Gender <span class="text-red-500">*</span>
+                        </label>
+                        <select id="gender" name="gender" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="md:col-span-2">
+                        <label for="date_of_birth" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Date of Birth
+                        </label>
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information Section -->
+            <div class="border-b pb-6">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Professional Information</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Bar Registration Number -->
+                    <div>
+                        <label for="bar_registration_number" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Bar Registration Number <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="bar_registration_number" name="bar_registration_number" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">e.g., DL/2020/12345</p>
+                    </div>
+
+                    <!-- State Bar Council -->
+                    <div>
+                        <label for="state_bar_council" class="block text-sm font-semibold text-gray-900 mb-2">
+                            State Bar Council <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="state_bar_council" name="state_bar_council" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Years of Experience -->
+                    <div>
+                        <label for="years_of_experience" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Years of Experience <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="years_of_experience" name="years_of_experience" required min="0" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Specialization -->
+                    <div>
+                        <label for="specialization" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Specialization <span class="text-red-500">*</span>
+                        </label>
+                        <select id="specialization" name="specialization" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white">
+                            <option value="">Select Specialization</option>
+                            <option value="Mutual Consent Divorce">Mutual Consent Divorce</option>
+                            <option value="Contested Divorce">Contested Divorce</option>
+                            <option value="Alimony & Maintenance">Alimony & Maintenance</option>
+                            <option value="Child Custody">Child Custody</option>
+                            <option value="Domestic Violence">Domestic Violence</option>
+                            <option value="Property Division">Property Division</option>
+                        </select>
+                    </div>
+
+                    <!-- Consultation Fee -->
+                    <div>
+                        <label for="consultation_fee" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Consultation Fee (₹)
+                        </label>
+                        <input type="number" id="consultation_fee" name="consultation_fee" min="0" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">Hourly rate in rupees (optional)</p>
+                    </div>
+
+                    <!-- Office City -->
+                    <div>
+                        <label for="office_city" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Office City
+                        </label>
+                        <input type="text" id="office_city" name="office_city" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="md:col-span-2">
+                        <label for="bio" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Bio
+                        </label>
+                        <textarea id="bio" name="bio" rows="6" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition resize-none"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Professional biography (max 500 characters)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information Section -->
+            <div class="border-b pb-6">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Contact Information</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Mobile Number -->
+                    <div>
+                        <label for="mobile_number" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Mobile Number <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" id="mobile_number" name="mobile_number" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">Indian format: 10 digits or +919876543210</p>
+                    </div>
+
+                    <!-- Alternate Mobile -->
+                    <div>
+                        <label for="alternate_mobile_number" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Alternate Mobile Number
+                        </label>
+                        <input type="tel" id="alternate_mobile_number" name="alternate_mobile_number" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture Section -->
+            <div class="border-b pb-6">
+                <h2 class="text-2xl font-bold serif-heading mb-6">Profile Picture</h2>
+                
+                <div class="flex items-center gap-6 mb-4">
+                    <img id="profilePreview" src="" alt="Profile Preview" class="w-20 h-20 rounded-full object-cover bg-gray-100 border hidden">
+                    <div>
+                        <label for="profile_picture" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Upload Picture
+                        </label>
+                        <input type="file" id="profile_picture" name="profile_picture" accept=".jpg,.jpeg,.png" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">JPG or PNG format, at least 200x200px, max 5MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-6 border-t border-gray-200">
+                <button
+                    type="submit"
+                    class="bg-black text-white font-semibold px-8 py-3 rounded-lg hover:bg-gray-800 transition"
+                >
+                    Submit Profile for Verification
+                </button>
+                <a href="/lawyer_dashboard/" class="text-gray-700 font-semibold px-8 py-3 rounded-lg border-2 border-gray-300 hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Info Note -->
+    <div class="mt-8 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+        <p class="text-sm text-blue-900">
+            <strong>Important:</strong> All fields marked with * are required. Your bar registration number must be unique. Once submitted, an admin will verify your credentials within 24-48 hours.
+        </p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/lawyer/profile", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            if (!res.ok) {
+                console.error("Failed to fetch profile details");
+                return;
+            }
+
+            const data = await res.json();
+            document.getElementById("dashboard-container").style.display = "block";
+
+            // Pre-fill inputs
+            document.getElementById("full_name").value = data.full_name || "";
+            document.getElementById("gender").value = data.gender || "";
+            document.getElementById("date_of_birth").value = data.date_of_birth || "";
+            document.getElementById("bar_registration_number").value = data.bar_registration_number || "";
+            document.getElementById("state_bar_council").value = data.state_bar_council || "";
+            document.getElementById("years_of_experience").value = data.years_of_experience || 0;
+            document.getElementById("specialization").value = data.specialization || "";
+            document.getElementById("consultation_fee").value = data.consultation_fee || 0;
+            document.getElementById("office_city").value = data.office_city || "";
+            document.getElementById("bio").value = data.bio || "";
+            document.getElementById("mobile_number").value = data.mobile_number || "";
+            document.getElementById("alternate_mobile_number").value = data.alternate_mobile_number || "";
+
+            if (data.profile_picture) {
+                const img = document.getElementById("profilePreview");
+                img.src = data.profile_picture;
+                img.classList.remove("hidden");
+            }
+
+        } catch (err) {
+            console.error("Error loading lawyer profile editor:", err);
+        }
+
+        // Form Submit Handler
+        const form = document.getElementById("profileForm");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch("/api/lawyer/profile", {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + token },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    sessionStorage.setItem("queued_toast", JSON.stringify({
+                        title: "Profile Submitted",
+                        message: "Profile submitted successfully! Admin will verify your account shortly."
+                    }));
+                    window.location.href = "/lawyer_dashboard/";
+                } else {
+                    const err = await res.json();
+                    if (typeof showToastNotification !== 'undefined') {
+                        showToastNotification("Error", err.detail || "Failed to update profile.");
+                    } else {
+                        alert(err.detail || "Failed to update profile.");
+                    }
+                }
+            } catch (err) {
+                if (typeof showToastNotification !== 'undefined') {
+                    showToastNotification("Error", "Network error. Please try again.");
+                } else {
+                    alert("Network error. Please try again.");
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

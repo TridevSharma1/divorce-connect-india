@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Superuser Login — DivorceConnect India</title>
+  <meta name="description" content="Superuser administration login for DivorceConnect India." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0d16; }
+    .glow { box-shadow: 0 0 60px rgba(99,102,241,.18), 0 0 120px rgba(139,92,246,.08); }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .float { animation: float 4s ease-in-out infinite; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation: fadeUp .5s ease forwards; }
+    .input-field {
+      width:100%; padding:11px 14px; background:#111827; border:1px solid #1f2937;
+      border-radius:10px; color:#e2e8f0; font-size:14px; outline:none; transition:border-color .2s;
+    }
+    .input-field:focus { border-color:#6366f1; }
+    .input-field::placeholder { color:#4b5563; }
+    .btn-login {
+      width:100%; padding:13px; background:linear-gradient(135deg,#6366f1,#8b5cf6);
+      border:none; border-radius:10px; color:#fff; font-size:14px; font-weight:600;
+      cursor:pointer; transition:opacity .2s, transform .15s;
+    }
+    .btn-login:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); }
+    .btn-login:disabled { opacity:.6; cursor:not-allowed; }
+    [x-cloak] { display:none !important; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4" x-data="loginApp()" x-init="init()">
+
+  <div class="fixed inset-0 pointer-events-none" style="background:radial-gradient(ellipse 80% 80% at 50% -20%,rgba(99,102,241,.15),transparent)"></div>
+  <div class="fixed inset-0 pointer-events-none" style="background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:40px 40px"></div>
+
+  <div class="relative z-10 w-full max-w-md fade-up">
+    <div class="glow bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl p-8">
+      <div class="flex flex-col items-center mb-8">
+        <div class="float w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-2xl mb-4">DC</div>
+        <h1 class="text-white text-2xl font-semibold">Superuser Panel</h1>
+        <p class="text-gray-500 text-sm mt-1">DivorceConnect India &middot; Admin Access</p>
+      </div>
+
+      <div x-show="error" x-cloak x-transition class="mb-5 px-4 py-3 bg-red-900/40 border border-red-800/60 rounded-xl text-red-300 text-sm flex items-center gap-2">
+        <span>&#9888;</span><span x-text="error"></span>
+      </div>
+
+      <form @submit.prevent="login()">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 font-medium mb-1.5">Email Address</label>
+            <input id="su-email" type="email" x-model="email" class="input-field" placeholder="superuser@example.com" required autocomplete="email" />
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 font-medium mb-1.5">Password</label>
+            <div class="relative">
+              <input id="su-password" :type="showPw ? 'text' : 'password'" x-model="password" class="input-field pr-10" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required autocomplete="current-password" />
+              <button type="button" @click="showPw = !showPw" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors text-xs" x-text="showPw ? 'Hide' : 'Show'"></button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn-login mt-6" :disabled="loading">
+          <span x-show="!loading">Sign In as Superuser</span>
+          <span x-show="loading" x-cloak>Authenticating...</span>
+        </button>
+      </form>
+
+      <div class="mt-6 flex items-center justify-between text-xs text-gray-600">
+        <span>Superuser access only</span>
+        <a href="/" class="hover:text-gray-400 transition-colors">Back to Main Site</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+function loginApp() {
+  return {
+    email: '', password: '', showPw: false,
+    loading: false, error: '',
+    init() {
+      if (localStorage.getItem('superuser_access_token')) {
+        window.location.href = '/superuser_dashboard/';
+      }
+    },
+    async login() {
+      this.error = '';
+      this.loading = true;
+      try {
+        const form = new URLSearchParams();
+        form.append('username', this.email.trim().toLowerCase());
+        form.append('password', this.password);
+        const res = await fetch('/api/superuser/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: form.toString(),
+        });
+        const data = await res.json();
+        if (!res.ok) { this.error = data.detail || 'Login failed.'; return; }
+        localStorage.setItem('superuser_access_token', data.access_token);
+        window.location.href = '/superuser_dashboard/';
+      } catch (e) {
+        this.error = 'Network error. Please check your connection.';
+      } finally {
+        this.loading = false;
+      }
+    },
+  };
+}
+</script>
+</body>
+</html>

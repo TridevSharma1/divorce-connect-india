@@ -1,0 +1,916 @@
+{% extends 'base.html' %}
+
+{% block title %}Case Details – DivorceConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Shimmer Skeleton Loader ── */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    .skeleton {
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── Shimmer Loading Placeholder ── -->
+<div id="loading-skeleton-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div style="display:flex; flex-direction:column; gap:2rem;">
+        <!-- Hero skeleton -->
+        <div class="skeleton" style="height: 140px; border-radius: 1.5rem; width: 100%;"></div>
+        <!-- Steps tracking pipeline skeleton -->
+        <div class="skeleton" style="height: 60px; border-radius: 1rem; width: 100%;"></div>
+        <!-- Grid workspace skeleton -->
+        <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <!-- Left panel skeleton -->
+            <div style="grid-column: span 8 / span 8;">
+                <div class="skeleton" style="height: 350px; border-radius: 1.5rem; width: 100%;"></div>
+            </div>
+            <!-- Right panel skeleton -->
+            <div style="grid-column: span 4 / span 4;">
+                <div class="skeleton" style="height: 350px; border-radius: 1.5rem; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="detail-page-container" style="display: none;">
+    <!-- Top Case Header Card -->
+    <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 mb-8 shadow-xl border border-slate-800">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <span class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-bold uppercase tracking-wider mb-2">Case file</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold serif-heading">Case #<span id="header-case-id"></span></h1>
+                <p class="text-slate-400 text-sm mt-1">Initiated on <span id="header-case-created"></span></p>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 items-center">
+                <div class="bg-white/5 border border-white/10 rounded-2xl px-5 py-3">
+                    <span class="block text-xs uppercase tracking-wider text-slate-400 font-semibold">General Status</span>
+                    <span class="text-lg font-bold" id="header-case-status">-</span>
+                </div>
+                <!-- Lawyer-only Stage Changer Dropdown -->
+                <div id="lawyer-stage-selector-container" class="hidden bg-white/5 border border-white/10 rounded-2xl px-5 py-3">
+                    <span class="block text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Set Case Stage</span>
+                    <select id="lawyer-stage-select" class="bg-slate-800 text-white text-sm font-semibold rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-700">
+                        <option value="CASE_CREATED">Case Created</option>
+                        <option value="DOCUMENT_VERIFICATION">Document Verification</option>
+                        <option value="LAWYER_ASSIGNED">Lawyer Assigned</option>
+                        <option value="PETITION_DRAFTED">Petition Drafted</option>
+                        <option value="PETITION_FILED">Petition Filed</option>
+                        <option value="FIRST_MOTION">First Motion</option>
+                        <option value="SECOND_MOTION">Second Motion</option>
+                        <option value="DECREE_ISSUED">Decree Issued</option>
+                        <option value="COMPLETED">Completed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lawyer Accept Case Action Block -->
+    <div id="lawyer-accept-action-card" class="hidden bg-emerald-50 border border-emerald-300 rounded-3xl p-6 sm:p-8 mb-8 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div>
+                <h3 class="text-xl font-bold text-emerald-950">Accept and Commence Work</h3>
+                <p class="text-sm text-emerald-800 mt-1">All client documents have been verified. You can now accept this case and initiate client communication.</p>
+            </div>
+            <button id="accept-case-action-btn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md transition duration-200 flex-shrink-0">
+                Accept Case
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Columns: Progress Flow and Chat -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Progress Flow tracking system -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">Case Milestones & Tracking</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="tracking-milestones-grid">
+                    <!-- Dynamic rendering of progress cards -->
+                </div>
+            </div>
+
+            <!-- Chat Option -->
+            <div class="bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col h-[550px] overflow-hidden">
+                <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-950" id="chat-header-title">Conversation</h3>
+                        <p class="text-xs text-slate-500">Secure end-to-end legal communication channel</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Active
+                    </span>
+                </div>
+
+                <!-- Messages -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50" id="chat-messages-container">
+                    <!-- Dynamic chat messages go here -->
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="border-t border-slate-200 p-4 bg-white">
+                    <form id="chat-input-form" class="flex gap-3 items-center">
+                        <label for="chat-file-input" class="cursor-pointer p-3 bg-slate-100 hover:bg-slate-200 transition text-slate-600 rounded-xl flex-shrink-0" title="Attach Document">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                            </svg>
+                        </label>
+                        <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.odt,.pages,.key,.numbers,.csv" class="hidden">
+                        
+                        <input type="text" id="chat-text-input" placeholder="Write message..." class="flex-1 px-4 py-3 bg-slate-100 rounded-xl text-sm border-0 focus:ring-2 focus:ring-slate-950 focus:bg-white transition text-slate-900">
+                        
+                        <button type="submit" class="p-3 bg-slate-950 text-white rounded-xl hover:bg-slate-900 transition flex-shrink-0">
+                            <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </form>
+                    <div id="chat-file-badge" class="hidden mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-xs font-semibold text-indigo-700 rounded-lg">
+                        <span id="chat-file-name" class="max-w-[200px] truncate">File</span>
+                        <button type="button" id="clear-chat-file" class="text-indigo-400 hover:text-indigo-900 font-bold">&times;</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right 1 Column: Lawyer details & Documents -->
+        <div class="space-y-8">
+            
+            <!-- Lawyer details / Client details -->
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm" id="user-details-card">
+                <h3 class="text-xl font-bold text-slate-950 mb-6" id="user-details-title">Assigned Counselor</h3>
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        <img id="detail-user-picture" class="w-full h-full object-cover hidden" src="" alt="Profile">
+                        <div id="detail-user-avatar-fallback" class="text-slate-400">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900" id="detail-user-name">Loading...</h4>
+                        <p class="text-sm text-slate-500" id="detail-user-subtitle">-</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 border-t border-slate-100 pt-6 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Contact Number</span>
+                        <span class="font-semibold text-slate-900" id="detail-user-mobile">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Email Address</span>
+                        <span class="font-semibold text-slate-900 break-all" id="detail-user-email">-</span>
+                    </div>
+                    <div id="detail-user-extra-fields" class="space-y-4">
+                        <!-- Extra fields for lawyer/client mapped dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Case Documents Section -->
+    <div class="mt-8 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-[32px] p-6 sm:p-8 shadow-sm">
+        <h3 class="text-xl font-bold text-slate-950 mb-3">Case Documents</h3>
+        <p class="text-xs text-slate-500 mb-6">Mandatory document checklist for client verification.</p>
+        
+        <input type="file" id="doc-file-input" class="hidden">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="documents-list-container">
+            <!-- Dynamic rendering of files in premium glass cards -->
+        </div>
+    </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    function getCaseId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('case_id') || params.get('id');
+    }
+
+    const caseId = getCaseId();
+    if (!caseId) {
+        alert("Case ID is missing.");
+        window.location.href = "/dashboard/";
+        return;
+    }
+
+    const MILESTONES = [
+        { key: "CASE_CREATED", label: "Case Created", desc: "Case files initialized" },
+        { key: "DOCUMENT_VERIFICATION", label: "Document Verification", desc: "Submitted documents audited" },
+        { key: "LAWYER_ASSIGNED", label: "Lawyer Assigned", desc: "Legal counselor matched" },
+        { key: "PETITION_DRAFTED", label: "Petition Drafted", desc: "Petition legal drafts prepared" },
+        { key: "PETITION_FILED", label: "Petition Filed", desc: "Filed in Court of Law" },
+        { key: "FIRST_MOTION", label: "First Motion", desc: "First motion hearing" },
+        { key: "SECOND_MOTION", label: "Second Motion", desc: "Second motion hearing" },
+        { key: "DECREE_ISSUED", label: "Decree Issued", desc: "Decree issued by court" },
+        { key: "COMPLETED", label: "Completed", desc: "Case completed successfully" }
+    ];
+
+    const REQUIRED_DOCS = [
+        { key: "aadhaar", label: "Aadhaar Card" },
+        { key: "pan", label: "PAN Card" },
+        { key: "marriage_cert", label: "Marriage Certificate" },
+        { key: "address_proof", label: "Address Proof" },
+        { key: "income_proof", label: "Income Proof" },
+        { key: "passport", label: "Passport" },
+        { key: "affidavit", label: "Affidavits" }
+    ];
+
+    let activeDocUploadType = null;
+
+    let isLawyer = false;
+
+    // Load case metadata and details
+    async function loadCaseDetails() {
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) throw new Error("Failed to load case");
+            const data = await res.json();
+            
+            isLawyer = data.is_lawyer;
+
+            // Render Header info
+            document.getElementById("header-case-id").innerText = data.custom_id || data.id;
+            document.getElementById("header-case-created").innerText = new Date(data.created_at).toLocaleDateString(undefined, {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            document.getElementById("header-case-status").innerText = data.status.replace(/_/g, ' ');
+
+            // Setup workflow timeline
+            renderWorkflowTimeline(data.workflow_stage);
+
+            // Setup Details card based on role
+            renderDetailsCard(data);
+
+            // Setup Stage Changer Dropdown if Lawyer
+            if (isLawyer) {
+                document.getElementById("lawyer-stage-selector-container").classList.remove("hidden");
+                const selectElement = document.getElementById("lawyer-stage-select");
+                selectElement.value = data.workflow_stage;
+            }
+
+            // Setup Accept Case action block
+            const acceptBlock = document.getElementById("lawyer-accept-action-card");
+            if (isLawyer && data.status === "DOCUMENTS_VERIFIED") {
+                acceptBlock.classList.remove("hidden");
+            } else {
+                acceptBlock.classList.add("hidden");
+            }
+
+            // Enable/disable chat based on status
+            const chatForm = document.getElementById("chat-input-form");
+            const chatTextInput = document.getElementById("chat-text-input");
+            const isAccepted = data.status === "ACCEPTED" || data.status === "COMPLETED" || data.status === "ACTIVE";
+            if (!isAccepted) {
+                chatTextInput.disabled = true;
+                chatTextInput.placeholder = "Chat activates after case is accepted.";
+                chatForm.querySelector("button[type='submit']").disabled = true;
+            } else {
+                chatTextInput.disabled = false;
+                chatTextInput.placeholder = "Write message...";
+                chatForm.querySelector("button[type='submit']").disabled = false;
+            }
+
+            // Render Documents
+            renderDocuments(data.documents);
+
+            document.getElementById("loading-skeleton-container").style.display = "none";
+            document.getElementById("detail-page-container").style.display = "block";
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Render Milestone Tracking Timeline
+    function renderWorkflowTimeline(currentStage) {
+        const grid = document.getElementById("tracking-milestones-grid");
+        grid.innerHTML = "";
+
+        const currentIdx = MILESTONES.findIndex(m => m.key === currentStage);
+
+        MILESTONES.forEach((m, idx) => {
+            const isCompleted = idx < currentIdx;
+            const isActive = idx === currentIdx;
+            
+            let statusClass = "bg-slate-50 border-slate-200 text-slate-400";
+            let iconMarkup = `<span class="text-xs font-bold">${idx + 1}</span>`;
+
+            if (isCompleted) {
+                statusClass = "bg-emerald-50 border-emerald-200 text-emerald-800";
+                iconMarkup = `
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                `;
+            } else if (isActive) {
+                statusClass = "bg-slate-900 border-slate-900 text-white shadow-md ring-4 ring-slate-100";
+            }
+
+            let badgeMarkup = "";
+            if (isCompleted) {
+                badgeMarkup = `<span class="inline-flex rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 mt-1.5">✓ Completed</span>`;
+            } else if (isActive) {
+                badgeMarkup = `<span class="inline-flex rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 mt-1.5 animate-pulse">⏳ Pending</span>`;
+            }
+
+            const item = document.createElement("div");
+            item.className = `flex gap-3.5 p-4 border rounded-2xl transition-all duration-300 ${statusClass}`;
+            item.innerHTML = `
+                <div class="w-7 h-7 rounded-full border border-current flex items-center justify-center flex-shrink-0">
+                    ${iconMarkup}
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm tracking-tight ${isActive ? 'text-white' : 'text-slate-900'}">${m.label}</h4>
+                    <p class="text-[0.75rem] mt-0.5 leading-snug ${isActive ? 'text-slate-300' : 'text-slate-500'}">${m.desc}</p>
+                    ${badgeMarkup}
+                </div>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    // Render Client/Lawyer Details Card
+    function renderDetailsCard(data) {
+        const nameEl = document.getElementById("detail-user-name");
+        const subtitleEl = document.getElementById("detail-user-subtitle");
+        const mobileEl = document.getElementById("detail-user-mobile");
+        const emailEl = document.getElementById("detail-user-email");
+        const picEl = document.getElementById("detail-user-picture");
+        const picFallback = document.getElementById("detail-user-avatar-fallback");
+        const extraFields = document.getElementById("detail-user-extra-fields");
+        
+        extraFields.innerHTML = "";
+
+        if (isLawyer) {
+            // Logged in user is Lawyer -> Show Client Details
+            document.getElementById("user-details-title").innerText = "Client Details";
+            document.getElementById("chat-header-title").innerText = "Chat with Client";
+            
+            const client = data.client_details;
+            nameEl.innerText = `${client.first_name} ${client.last_name}`;
+            subtitleEl.innerText = "Client case request sender";
+            mobileEl.innerText = client.mobile_number || "Not specified";
+            emailEl.innerText = client.email || "Not specified";
+            
+            picEl.classList.add("hidden");
+            picFallback.classList.remove("hidden");
+        } else {
+            // Logged in user is Client -> Show Lawyer Details
+            document.getElementById("user-details-title").innerText = "Assigned Lawyer";
+            document.getElementById("chat-header-title").innerText = "Chat with Lawyer";
+            
+            const lawyer = data.lawyer_details;
+            if (lawyer) {
+                nameEl.innerText = lawyer.full_name;
+                subtitleEl.innerText = lawyer.specialization || "Legal Consultant";
+                mobileEl.innerText = lawyer.mobile_number || "Not specified";
+                emailEl.innerText = lawyer.email || "Not specified";
+
+                if (lawyer.profile_picture) {
+                    picEl.src = lawyer.profile_picture;
+                    picEl.classList.remove("hidden");
+                    picFallback.classList.add("hidden");
+                } else {
+                    picEl.classList.add("hidden");
+                    picFallback.classList.remove("hidden");
+                }
+
+                // Add rating & extra fields
+                extraFields.innerHTML = `
+                    <div class="flex justify-between items-center border-t border-slate-100 pt-4">
+                        <span class="text-slate-500">Rating</span>
+                        <span class="font-semibold text-amber-500 flex items-center gap-0.5">
+                            ★ ${lawyer.rating.toFixed(1)}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Consultation Fee</span>
+                        <span class="font-bold text-slate-900">₹${lawyer.consultation_fee.toFixed(2)}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">City / Office</span>
+                        <span class="font-semibold text-slate-900">${lawyer.office_city}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Years of Experience</span>
+                        <span class="font-semibold text-slate-900">${lawyer.years_of_experience} Years</span>
+                    </div>
+                `;
+            } else {
+                nameEl.innerText = "Assigning Lawyer...";
+                subtitleEl.innerText = "Please wait";
+            }
+        }
+    }
+
+    // Render Documents List
+    function renderDocuments(docs) {
+        const container = document.getElementById("documents-list-container");
+        container.innerHTML = "";
+
+        // Determine if all documents are verified
+        const allVerified = docs.length > 0 && docs.every(d => d.verification_status === "VERIFIED");
+
+        REQUIRED_DOCS.forEach(req => {
+            const uploadedDoc = docs.find(d => d.document_type === req.key);
+            const div = document.createElement("div");
+            div.className = "p-5 bg-white/60 backdrop-blur-sm border border-slate-200/60 rounded-[24px] hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col justify-between min-h-[160px]";
+            
+            let statusMarkup = "";
+            let actionMarkup = "";
+            
+            if (uploadedDoc) {
+                const status = uploadedDoc.verification_status || "PENDING";
+                let badgeClass = "bg-amber-100 text-amber-800";
+                let statusLabel = "⏳ Pending";
+                
+                if (status === "VERIFIED") {
+                    badgeClass = "bg-emerald-100 text-emerald-800";
+                    statusLabel = "✓ Verified";
+                } else if (status === "REJECTED") {
+                    badgeClass = "bg-red-100 text-red-800";
+                    statusLabel = `✗ Rejected`;
+                }
+                
+                const canViewVerifiedDoc = !isLawyer || status === "VERIFIED";
+                const displayFileName = canViewVerifiedDoc ? uploadedDoc.document_file : "🔒 Locked until verified by Admin";
+                const normalizedFileUrl = (() => {
+                    if (!uploadedDoc.document_file) return '#';
+                    const filePath = uploadedDoc.document_file;
+                    if (/^(https?:\/\/|\/\/)/i.test(filePath)) {
+                        return filePath;
+                    }
+                    if (/^(\/|media\/|static\/)/i.test(filePath)) {
+                        return filePath.startsWith('/') ? filePath : `/${filePath}`;
+                    }
+                    if (/^(case_documents\/|uploads\/)/i.test(filePath)) {
+                        return `/media/${filePath}`;
+                    }
+                    return `/static/uploads/${filePath}`;
+                })();
+                
+                statusMarkup = `
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <span class="text-[0.65rem] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Checklist</span>
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${req.label}</h4>
+                            </div>
+                            <span class="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ${badgeClass}">
+                                ${statusLabel}
+                            </span>
+                        </div>
+                        <div class="py-2.5 px-3 bg-slate-50/70 border border-slate-100 rounded-xl flex items-center gap-2">
+                            <span class="text-lg flex-shrink-0">📄</span>
+                            <span class="text-xs text-slate-600 truncate font-medium flex-1">${displayFileName}</span>
+                        </div>
+                        ${status === "REJECTED" ? `<p class="text-[10px] text-red-600 font-medium">Reason: ${uploadedDoc.rejection_reason || 'Invalid file'}</p>` : ''}
+                    </div>
+                `;
+                
+                let reuploadBtn = "";
+                if (status === "REJECTED" && !isLawyer) {
+                    reuploadBtn = `
+                        <button class="px-3 py-1.5 bg-slate-950 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition" onclick="triggerChecklistUpload('${req.key}')">
+                            Re-upload
+                        </button>
+                    `;
+                }
+                
+                let viewFileBtn = "";
+                if (canViewVerifiedDoc) {
+                    viewFileBtn = `
+                        <a href="${normalizedFileUrl}" target="_blank" class="px-4 py-2 bg-slate-100 text-slate-800 border border-slate-200 rounded-xl font-semibold text-xs hover:bg-slate-200 transition">
+                            View File
+                        </a>
+                    `;
+                } else {
+                    viewFileBtn = `
+                        <span class="px-4 py-2 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl font-semibold text-xs select-none">
+                            🔒 Locked
+                        </span>
+                    `;
+                }
+                
+                actionMarkup = `
+                    <div class="flex gap-2 justify-end mt-4 pt-3 border-t border-slate-100/80">
+                        ${reuploadBtn}
+                        ${viewFileBtn}
+                    </div>
+                `;
+            } else {
+                statusMarkup = `
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <span class="text-[0.65rem] uppercase tracking-wider text-slate-400 font-semibold block mb-1">Checklist</span>
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${req.label}</h4>
+                            </div>
+                            <span class="inline-flex rounded-full bg-slate-100 text-slate-600 px-2.5 py-0.5 text-[10px] font-bold">
+                                ⚠️ Empty
+                            </span>
+                        </div>
+                        <div class="py-2.5 px-3 bg-red-50/30 border border-red-100/30 rounded-xl flex items-center gap-2 text-red-500">
+                            <span class="text-lg flex-shrink-0">📭</span>
+                            <span class="text-xs font-semibold">Verification Pending Upload</span>
+                        </div>
+                    </div>
+                `;
+                
+                if (!isLawyer) {
+                    actionMarkup = `
+                        <div class="flex justify-end mt-4 pt-3 border-t border-slate-100/80">
+                            <button class="px-4 py-2 bg-slate-950 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition flex items-center gap-1.5" onclick="triggerChecklistUpload('${req.key}')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                </svg>
+                                Upload File
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionMarkup = `
+                        <div class="mt-4 pt-3 border-t border-slate-100/80 flex justify-end">
+                            <p class="text-xs text-slate-400 italic">Waiting for client</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            div.innerHTML = `
+                ${statusMarkup}
+                ${actionMarkup}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Expose trigger function globally for inline onclick handlers
+    window.triggerChecklistUpload = function(docType) {
+        activeDocUploadType = docType;
+        document.getElementById("doc-file-input").click();
+    };
+
+    function checkSuspiciousLink(url) {
+        if (/\.(exe|bat|cmd|sh|vbs|msi|scr|pif|js|dmg|pkg)$/i.test(url)) {
+            return { isDangerous: true, reason: "Executable or script links are blocked" };
+        }
+        try {
+            const urlObj = new URL(url);
+            const hostname = urlObj.hostname.toLowerCase();
+            const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+            if (ipRegex.test(hostname)) {
+                return { isDangerous: true, reason: "Direct IP address links are blocked" };
+            }
+            const suspiciousKeywords = ["phish", "malware", "free-money", "hack", "virus", "ngrok-free.app", "serveo.net", "localtonet.com"];
+            if (suspiciousKeywords.some(kw => hostname.includes(kw))) {
+                return { isDangerous: true, reason: "Suspicious or tunneling domain detected" };
+            }
+        } catch (e) {}
+        return { isDangerous: false };
+    }
+
+    function checkHarmfulAttachment(filename) {
+        if (!filename) return false;
+        const dangerousExt = /\.(exe|bat|cmd|sh|vbs|msi|scr|pif|js|dmg|pkg|py|pl|asp|aspx|php|jsp|html|htm)$/i;
+        const hasDoubleExt = /\.[a-z0-9]+\.[a-z0-9]+$/i.test(filename) && dangerousExt.test(filename);
+        return dangerousExt.test(filename) || hasDoubleExt;
+    }
+
+    function urlizeText(text) {
+        if (!text) return "";
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return text.replace(urlRegex, function(url) {
+            const check = checkSuspiciousLink(url);
+            if (check.isDangerous) {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-700 border border-red-200" title="${check.reason}">⚠️ Blocked Link</span>`;
+            }
+            return `<a href="${url}" target="_blank" class="text-blue-500 hover:underline font-semibold" onclick="event.stopPropagation()">${url}</a>`;
+        });
+    }
+
+    // Load Chat Messages
+    async function loadChatMessages() {
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}/messages`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!res.ok) return;
+            const messages = await res.json();
+            
+            const container = document.getElementById("chat-messages-container");
+            const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 40;
+            
+            container.innerHTML = "";
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 text-sm">
+                        No messages in this chat. Write a message below to start the conversation.
+                    </div>
+                `;
+                return;
+            }
+
+            const currentPayload = JSON.parse(atob(token.split('.')[1]));
+            const currentUserId = currentPayload.user_id || currentPayload.sub;
+
+            messages.forEach(m => {
+                const isMe = m.sender_user_id === currentUserId;
+                const card = document.createElement("div");
+                card.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} space-y-1`;
+                
+                const timeStr = new Date(m.created_at).toLocaleTimeString(undefined, {
+                    hour: 'numeric', minute: '2-digit'
+                });
+
+                let attachmentMarkup = "";
+                if (m.attachment) {
+                    const filename = m.attachment.split('/').pop();
+                    const attachmentUrl = /^(https?:)?\/\//i.test(m.attachment) ? m.attachment : `/media/${m.attachment}`;
+                    if (checkHarmfulAttachment(filename)) {
+                        attachmentMarkup = `
+                            <div class="mt-2 p-3 bg-red-50 rounded-xl border border-red-200 flex items-center gap-2 text-red-700">
+                                <span class="text-lg">🛡️</span>
+                                <div class="text-xs font-bold">Blocked: Harmful File (${filename})</div>
+                            </div>
+                        `;
+                    } else {
+                        const isImage = /\.(jpg|jpeg|png|webp|gif|svg|bmp)$/i.test(m.attachment);
+                        if (isImage) {
+                            attachmentMarkup = `
+                                <div class="mt-2 relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-w-full chat-media-attach cursor-pointer" data-url="${attachmentUrl}">
+                                    <img src="${attachmentUrl}" alt="Attachment" class="max-h-60 object-cover rounded-xl" />
+                                </div>
+                            `;
+                        } else {
+                            attachmentMarkup = `
+                                <div class="mt-2 p-3 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-2 chat-media-attach cursor-pointer" data-url="${attachmentUrl}">
+                                    <span class="text-lg">📁</span>
+                                    <a href="${attachmentUrl}" target="_blank" class="font-bold underline text-xs break-all text-slate-800" onclick="event.stopPropagation()">${filename}</a>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="max-w-[75%] rounded-2xl px-5 py-3 ${isMe ? 'bg-slate-950 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-900 rounded-tl-none'} shadow-sm">
+                        <p class="text-sm leading-snug whitespace-pre-wrap">${urlizeText(m.text)}</p>
+                        ${attachmentMarkup}
+                    </div>
+                    <span class="text-[0.68rem] text-slate-400 px-1.5">${timeStr}</span>
+                `;
+                container.appendChild(card);
+            });
+
+            if (wasAtBottom) {
+                container.scrollTop = container.scrollHeight;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Update case workflow stage (Lawyer Action)
+    const stageSelect = document.getElementById("lawyer-stage-select");
+    if (stageSelect) {
+        stageSelect.addEventListener("change", async () => {
+            const selectedStage = stageSelect.value;
+            try {
+                const res = await fetch(`/api/client/cases/${caseId}/stage`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ stage: selectedStage })
+                });
+                
+                if (res.ok) {
+                    if (typeof showToastNotification === 'function') {
+                        showToastNotification("Stage Updated", `Case moved to milestone: ${selectedStage.replace(/_/g, ' ')}`);
+                    }
+                    loadCaseDetails();
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || "Failed to update milestone");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }
+
+    // Chat Attachment Management
+    const chatFileInput = document.getElementById("chat-file-input");
+    const chatFileBadge = document.getElementById("chat-file-badge");
+    const chatFileName = document.getElementById("chat-file-name");
+    const clearChatFile = document.getElementById("clear-chat-file");
+
+    chatFileInput.addEventListener("change", () => {
+        const file = chatFileInput.files[0];
+        if (file) {
+            chatFileName.innerText = file.name;
+            chatFileBadge.classList.remove("hidden");
+        }
+    });
+
+    clearChatFile.addEventListener("click", () => {
+        chatFileInput.value = "";
+        chatFileBadge.classList.add("hidden");
+    });
+
+    // Chat Message Submit Handler
+    document.getElementById("chat-input-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const textInput = document.getElementById("chat-text-input");
+        const textVal = textInput.value.trim();
+        const file = chatFileInput.files[0];
+
+        if (!textVal && !file) return;
+
+        const form = new FormData();
+        form.append("text", textVal);
+        if (file) {
+            form.append("file", file);
+        }
+
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}/messages`, {
+                method: 'POST',
+                headers: { "Authorization": "Bearer " + token },
+                body: form
+            });
+
+            if (res.ok) {
+                textInput.value = "";
+                chatFileInput.value = "";
+                chatFileBadge.classList.add("hidden");
+                loadChatMessages();
+                
+                // Scroll container to bottom
+                const container = document.getElementById("chat-messages-container");
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 50);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    // Document Upload Management
+    const docFileInput = document.getElementById("doc-file-input");
+
+    docFileInput.addEventListener("change", async () => {
+        const file = docFileInput.files[0];
+        if (!file) return;
+
+        const type = activeDocUploadType || "other";
+        const form = new FormData();
+        form.append("file", file);
+
+        try {
+            const res = await fetch(`/api/client/cases/${caseId}/documents?document_type=${type}`, {
+                method: 'POST',
+                headers: { "Authorization": "Bearer " + token },
+                body: form
+            });
+
+            if (res.ok) {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Success", "Document uploaded successfully");
+                }
+                docFileInput.value = "";
+                loadCaseDetails();
+            } else {
+                const err = await res.json();
+                alert(err.detail || "Document upload failed");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    // Accept Case Button Action
+    const acceptBtn = document.getElementById("accept-case-action-btn");
+    if (acceptBtn) {
+        acceptBtn.addEventListener("click", async () => {
+            try {
+                const res = await fetch(`/api/lawyer/cases/${caseId}/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    if (typeof showToastNotification === 'function') {
+                        showToastNotification("Case Accepted", "You have successfully accepted this case.");
+                    }
+                    loadCaseDetails();
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || "Failed to accept case");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }
+
+    // Run Initial Load
+    await loadCaseDetails();
+    await loadChatMessages();
+
+    // Scroll chat to bottom initially
+    const container = document.getElementById("chat-messages-container");
+    container.scrollTop = container.scrollHeight;
+
+    // Listen to real-time notifications to update chat/status dynamically
+    window.addEventListener("notification_received", (e) => {
+        const eventData = e.detail;
+        if (eventData && eventData.title.toLowerCase().includes("chat")) {
+            console.log("New chat message received, reloading chat log...");
+            loadChatMessages();
+        } else if (eventData && eventData.title.toLowerCase().includes("progress")) {
+            console.log("Case progressed status update, reloading workflow timeline...");
+            loadCaseDetails();
+        }
+    });
+
+    // Custom Context Menu for Media Downloads
+    const ctxMenu = document.createElement("div");
+    ctxMenu.id = "chat-context-menu";
+    ctxMenu.className = "fixed bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 z-[99999] hidden min-w-[160px]";
+    ctxMenu.innerHTML = `
+        <button id="ctx-download-btn" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+            📥 Download File
+        </button>
+    `;
+    document.body.appendChild(ctxMenu);
+
+    const ctxDownloadBtn = document.getElementById("ctx-download-btn");
+    let activeMediaUrl = "";
+
+    document.addEventListener("contextmenu", (e) => {
+        const attachContainer = e.target.closest(".chat-media-attach");
+        if (attachContainer) {
+            e.preventDefault();
+            activeMediaUrl = attachContainer.getAttribute("data-url");
+            ctxMenu.style.left = `${e.clientX}px`;
+            ctxMenu.style.top = `${e.clientY}px`;
+            ctxMenu.classList.remove("hidden");
+        } else {
+            ctxMenu.classList.add("hidden");
+        }
+    });
+
+    document.addEventListener("click", () => {
+        ctxMenu.classList.add("hidden");
+    });
+
+    ctxDownloadBtn.addEventListener("click", () => {
+        if (activeMediaUrl) {
+            const a = document.createElement("a");
+            a.href = activeMediaUrl;
+            a.download = activeMediaUrl.split("/").pop();
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    });
+});
+</script>
+{% endblock %}

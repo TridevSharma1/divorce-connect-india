@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Welcome Back — DivorceConnect India</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#f4f4f5; font-family:'Inter',Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrapper { max-width:620px; margin:40px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 40px rgba(0,0,0,0.10); }
+  .header { background:#0a0a0a; padding:48px 48px 36px; text-align:center; }
+  .header-emoji { font-size:46px; margin-bottom:14px; }
+  .header-logo { font-family:'Playfair Display',Georgia,serif; font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; }
+  .header-logo span { color:#d4af6a; }
+  .header-tagline { color:#9ca3af; font-size:12px; letter-spacing:2px; text-transform:uppercase; margin-top:6px; }
+  .hero-bar { height:4px; background:linear-gradient(90deg,#d4af6a 0%,#f5d694 50%,#d4af6a 100%); }
+  .body { padding:48px 48px 40px; }
+  .headline { font-family:'Playfair Display',Georgia,serif; font-size:30px; font-weight:800; color:#0a0a0a; line-height:1.2; margin-bottom:16px; letter-spacing:-0.5px; }
+  .headline span { color:#d4af6a; }
+  .intro { font-size:15px; color:#374151; line-height:1.8; margin-bottom:32px; }
+  .session-card { background:#0a0a0a; border-radius:14px; padding:28px; margin-bottom:32px; }
+  .session-card-label { font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:#6b7280; font-weight:600; margin-bottom:16px; }
+  .session-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #1f1f1f; }
+  .session-row:last-child { border-bottom:none; }
+  .session-row .s-label { font-size:13px; color:#9ca3af; }
+  .session-row .s-value { font-size:13px; font-weight:600; color:#ffffff; }
+  .session-row .s-value.gold { color:#d4af6a; }
+  .quick-links { margin-bottom:32px; }
+  .quick-links-title { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#9ca3af; font-weight:600; margin-bottom:14px; }
+  .link-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .link-item { background:#f9f9f9; border:1px solid #e4e4e7; border-radius:10px; padding:16px; text-decoration:none; transition:all 0.2s; }
+  .link-item:hover { background:#0a0a0a; border-color:#0a0a0a; }
+  .link-item:hover .li-icon,
+  .link-item:hover .li-text { color:#d4af6a; }
+  .link-item:hover .li-label { color:#9ca3af; }
+  .li-icon { font-size:20px; margin-bottom:6px; }
+  .li-text { font-size:13px; font-weight:700; color:#0a0a0a; display:block; }
+  .li-label { font-size:11px; color:#9ca3af; display:block; margin-top:2px; }
+  .cta-btn { display:block; background:#0a0a0a; color:#ffffff; text-decoration:none; text-align:center; font-size:15px; font-weight:700; letter-spacing:0.5px; padding:16px 32px; border-radius:10px; margin-bottom:28px; }
+  .divider { height:1px; background:#e4e4e7; margin:28px 0; }
+  .note { font-size:13px; color:#9ca3af; line-height:1.65; }
+  .security-tip { display:flex; gap:12px; align-items:flex-start; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:16px; margin-bottom:28px; }
+  .security-tip .tip-icon { font-size:20px; flex-shrink:0; }
+  .security-tip p { font-size:13px; color:#92400e; line-height:1.55; }
+  .footer { background:#f4f4f5; padding:28px 48px; text-align:center; border-top:1px solid #e4e4e7; }
+  .footer p { font-size:12px; color:#9ca3af; line-height:1.7; }
+  .footer a { color:#0a0a0a; text-decoration:none; font-weight:600; }
+  .security-badge { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e4e4e7; border-radius:100px; padding:6px 14px; font-size:11.5px; color:#374151; font-weight:500; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="header-emoji">👋</div>
+    <div class="header-logo">Divorce<span>Connect</span> India</div>
+    <div class="header-tagline">Trusted Legal Services</div>
+  </div>
+  <div class="hero-bar"></div>
+  <div class="body">
+    <h1 class="headline">Welcome Back,<br><span>{{ user_name }}</span></h1>
+    <p class="intro">You've successfully signed in to your DivorceConnect India account. Your session is now active and secure.</p>
+
+    <div class="session-card">
+      <div class="session-card-label">Session Details</div>
+      <div class="session-row">
+        <span class="s-label">Account</span>
+        <span class="s-value">{{ user_email }}</span>
+      </div>
+      <div class="session-row">
+        <span class="s-label">Login Time</span>
+        <span class="s-value gold">{{ login_time }}</span>
+      </div>
+      <div class="session-row">
+        <span class="s-label">Status</span>
+        <span class="s-value gold">✓ Verified &amp; Active</span>
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <div class="quick-links-title">Quick Access</div>
+      <div class="link-grid">
+        <a href="http://127.0.0.1:8000/" class="link-item">
+          <div class="li-icon">⚖️</div>
+          <span class="li-text">Find a Lawyer</span>
+          <span class="li-label">Browse verified lawyers</span>
+        </a>
+        <a href="http://127.0.0.1:8000/cases/" class="link-item">
+          <div class="li-icon">📋</div>
+          <span class="li-text">My Cases</span>
+          <span class="li-label">Track your case status</span>
+        </a>
+        <a href="http://127.0.0.1:8000/dashboard/" class="link-item">
+          <div class="li-icon">📊</div>
+          <span class="li-text">Dashboard</span>
+          <span class="li-label">View your overview</span>
+        </a>
+        <a href="http://127.0.0.1:8000/support/" class="link-item">
+          <div class="li-icon">💬</div>
+          <span class="li-text">Support</span>
+          <span class="li-label">Get help anytime</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="security-tip">
+      <div class="tip-icon">🔐</div>
+      <p>If this wasn't you, please <strong>change your password immediately</strong> and contact us at <a href="mailto:support@divorceconnect.in" style="color:#92400e;font-weight:700;">support@divorceconnect.in</a>.</p>
+    </div>
+
+    <a class="cta-btn" href="http://127.0.0.1:8000/dashboard/">Go to My Dashboard →</a>
+
+    <div class="divider"></div>
+    <p class="note">This email was sent automatically upon login. You cannot reply to this message.</p>
+  </div>
+  <div class="footer">
+    <p>© 2025 DivorceConnect India — All rights reserved.<br>
+    <a href="https://divorceconnect.in">divorceconnect.in</a> &nbsp;·&nbsp; <a href="mailto:support@divorceconnect.in">support@divorceconnect.in</a></p>
+    <div class="security-badge">🔒 &nbsp; Secured &amp; Encrypted Communication</div>
+  </div>
+</div>
+</body>
+</html>
