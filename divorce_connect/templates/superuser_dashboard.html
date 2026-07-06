@@ -562,6 +562,41 @@ const SCHEMAS = {
     ],
   },
 
+  'get-in-touch': {
+    label:'Get in Touch', endpoint:'/api/superuser/get-in-touch',
+    listCols:['id','full_name','email','subject','created_at'],
+    sections:[
+      { title:'Inquiry Details', fields:[
+        {name:'id',         label:'ID',           type:'ro'},
+        {name:'full_name',  label:'Full Name',    type:'text'},
+        {name:'email',      label:'Email Address',type:'text'},
+        {name:'subject',    label:'Subject',      type:'text'},
+        {name:'message',    label:'Message',      type:'textarea', fullWidth:true},
+        {name:'created_at', label:'Created At',   type:'ro'},
+      ]},
+    ],
+  },
+
+  'system-issues': {
+    label:'System Issues', endpoint:'/api/superuser/system-issues',
+    listCols:['id','full_name','email','category','subject','created_at'],
+    sections:[
+      { title:'Reporter Info', fields:[
+        {name:'id',         label:'ID',           type:'ro'},
+        {name:'full_name',  label:'Full Name',    type:'text'},
+        {name:'email',      label:'Email Address',type:'text'},
+        {name:'role',       label:'Role',         type:'text'},
+      ]},
+      { title:'Issue Details', fields:[
+        {name:'category',   label:'Category',     type:'text'},
+        {name:'subject',    label:'Subject',      type:'text'},
+        {name:'description',label:'Description',  type:'textarea', fullWidth:true},
+        {name:'evidence_file', label:'Evidence File Path', type:'text'},
+        {name:'created_at', label:'Created At',   type:'ro'},
+      ]},
+    ],
+  },
+
   'admin-profiles': {
     label:'Admin Panel Profiles', endpoint:'/api/superuser/admin-profiles',
     listCols:['id','user_id','full_name','mobile_number','is_verified_by_superuser','is_deleted'],
@@ -890,6 +925,8 @@ const NAV_DATA = [
     {k:'delete-tokens',icon:'🗝️',label:'Delete Account Tokens'},
     {k:'notifications',icon:'🔔',label:'Notifications'},
     {k:'otp-codes',icon:'🔢',label:'OTP Codes'},
+    {k:'get-in-touch',icon:'💬',label:'Get in Touch'},
+    {k:'system-issues',icon:'🐛',label:'System Issues'},
   ]},
   { label:'ADMIN PANEL', open:false, items:[
     {k:'admin-profiles',icon:'🏢',label:'Admin Profiles'},
@@ -944,10 +981,19 @@ function SU() {
 
     // ── Boot ────────────────────────────────────────────────────────────────
     async boot() {
-      if (!this.token) { window.location.href = '/superuser_login/'; return; }
+      if (!this.token) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("superuser_access_token");
+        window.location.href = '/superuser_login/';
+        return;
+      }
       try {
         this.me = await this.req('GET', '/api/auth/me');
       } catch {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("superuser_access_token");
         window.location.href = '/superuser_login/';
         return;
       }
@@ -1235,8 +1281,13 @@ function SU() {
       };
       if (body && method !== 'GET') opts.body = JSON.stringify(body);
       const res = await fetch(url, opts);
-      if (res.status === 401) { window.location.href = '/superuser_login/'; throw new Error('Session expired'); }
-      if (res.status === 403) throw new Error('Forbidden — superuser required');
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("superuser_access_token");
+        window.location.href = '/superuser_login/';
+        throw new Error(res.status === 401 ? 'Session expired' : 'Forbidden — superuser required');
+      }
       if (res.status === 204 || res.status === 200 && res.headers.get('content-length') === '0') return {};
       if (!res.ok) {
         let detail = res.statusText;

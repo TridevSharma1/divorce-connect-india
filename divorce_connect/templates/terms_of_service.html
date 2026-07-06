@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Compliance & Trust Framework</span>
+            <h1 class="font-playfair text-4xl md:text-5xl font-bold mt-3 mb-4">Terms of Service</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Review the legal guidelines and agreement governing your use of DivorceConnect India.
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm min-h-[500px]">
+            <div class="border-b border-zinc-100 pb-6 mb-8">
+                <h2 class="font-playfair text-3xl font-bold text-black mb-2">Terms of Service</h2>
+                <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                <p>
+                    Welcome to DivorceConnect India. By registering an account, accessing our portal, or engaging lawyers through the marketplace, you agree to be bound by these Terms of Service.
+                </p>
+
+                <!-- Section 2.1 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">1. User Eligibility & Verification Gates</h3>
+                    <p class="mb-3">
+                        To protect platform integrity, all registrations must pass specific validation requirements:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>
+                            <strong class="text-zinc-800">Clients:</strong> Granted immediate access to navigate the informational portal and browse directory profiles. Full case engagement is restricted until identity verification has been approved.
+                        </li>
+                        <li>
+                            <strong class="text-zinc-800">Lawyers:</strong> Prohibited from accepting client cases, appearing in search results, or initiating communication until their profile completion rate is 100% and their credentials have been officially verified by our administration team.
+                        </li>
+                        <li>
+                            <strong class="text-zinc-800">Admins:</strong> System actions and audit privileges are blocked until approved and authorized by the Superuser.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 2.2 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Case Lifecycle & The 9-Stage Tracking Workflow</h3>
+                    <p class="mb-3">
+                        When a client hires an active lawyer on our marketplace, the dispute follows a structural, 9-stage tracking lifecycle:
+                    </p>
+                    <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-semibold text-zinc-800">
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">1. Case Created</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">2. Document Verification</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">3. Lawyer Assigned</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">4. Petition Drafted</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">5. Petition Filed</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">6. First Motion</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">7. Second Motion</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">8. Decree Issued</div>
+                            <div class="p-3 bg-white border border-zinc-100 rounded-xl text-center">9. Completed</div>
+                        </div>
+                    </div>
+                    <p class="mt-3">
+                        Clients bear the sole responsibility for submitting authentic documents and details at Stage 2. Lawyers retain exclusive administrative authority to update tracking phases as the dispute proceeds in the respective family court.
+                    </p>
+                </div>
+
+                <!-- Section 2.3 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Platform Conduct & The 3-Strike Warning Rule</h3>
+                    <p class="mb-3">
+                        We maintain a zero-tolerance policy against platform manipulation, harassment, and malicious filings. Any user (client or lawyer) can report misconduct by uploading screenshots or chat log evidence:
+                    </p>
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-5 text-red-900 text-xs leading-relaxed">
+                        <strong class="text-red-950 block mb-1">🚫 Automated Account Ban Policy</strong>
+                        Every validated report processed by the administration panel can result in an official warning. Any account (lawyer or client) that receives <strong>three (3) official warnings</strong> will be automatically and permanently banned from the DivorceConnect India database. Banned users are instantly logged out, their active access tokens are invalidated, and their credentials are blacklisted.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

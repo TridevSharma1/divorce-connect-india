@@ -260,6 +260,84 @@ async def dynamic_page(request: Request, page_path: str):
     if page_path.endswith("/"):
         page_path = page_path[:-1]
 
+    if page_path == "contact":
+        if request.method == "POST":
+            form = await request.form()
+            full_name = (form.get("full_name") or "").strip()
+            email = (form.get("email") or "").strip()
+            subject = (form.get("subject") or "").strip()
+            message = (form.get("message") or "").strip()
+            
+            if not full_name or not email or not subject or not message:
+                return RedirectResponse(url="/contact/?error=missing-fields", status_code=303)
+                
+            from .models import GetInTouch
+            from .database import AsyncSessionLocal
+            
+            async with AsyncSessionLocal() as db:
+                git = GetInTouch(
+                    full_name=full_name,
+                    email=email,
+                    subject=subject,
+                    message=message
+                )
+                db.add(git)
+                await db.commit()
+                
+            return RedirectResponse(url="/contact/?success=true", status_code=303)
+
+    if page_path == "report-issue":
+        if request.method == "POST":
+            form = await request.form()
+            full_name = (form.get("full_name") or "").strip()
+            email = (form.get("email") or "").strip()
+            role = (form.get("role") or "guest").strip()
+            category = (form.get("category") or "").strip()
+            subject = (form.get("subject") or "").strip()
+            description = (form.get("description") or "").strip()
+            evidence = form.get("evidence")
+            
+            if not full_name or not email or not category or not subject or not description:
+                return RedirectResponse(url="/report-issue/?error=missing-fields", status_code=303)
+                
+            evidence_file_path = None
+            if evidence and getattr(evidence, "filename", None):
+                filename = evidence.filename
+                # Clean filename
+                clean_name = "".join(c for c in filename if c.isalnum() or c in "._-")
+                import uuid
+                unique_prefix = uuid.uuid4().hex[:8]
+                clean_name = f"{unique_prefix}_{clean_name}"
+                
+                # Make sure media/system_issues folder exists
+                save_dir = Path("media/system_issues")
+                save_dir.mkdir(parents=True, exist_ok=True)
+                
+                dest = save_dir / clean_name
+                # Read upload and write to file
+                content = await evidence.read()
+                with open(dest, "wb") as f:
+                    f.write(content)
+                evidence_file_path = f"system_issues/{clean_name}"
+                
+            from .models import SystemIssue
+            from .database import AsyncSessionLocal
+            
+            async with AsyncSessionLocal() as db:
+                issue = SystemIssue(
+                    full_name=full_name,
+                    email=email,
+                    role=role,
+                    category=category,
+                    subject=subject,
+                    description=description,
+                    evidence_file=evidence_file_path
+                )
+                db.add(issue)
+                await db.commit()
+                
+            return RedirectResponse(url="/report-issue/?success=true", status_code=303)
+
     if "adminpanel/reports" in page_path:
         parts = page_path.strip("/").split("/")
         report_id = int(parts[-1])
@@ -643,6 +721,14 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "profile_admin.html"
     elif page_path in ["admin_profile_edit", "admin-profile-edit"]:
         template_name = "admin_profile_edit.html"
+    elif page_path in ["privacy-policy", "privacy_policy"]:
+        template_name = "privacy_policy.html"
+    elif page_path in ["terms-of-service", "terms_of_service"]:
+        template_name = "terms_of_service.html"
+    elif page_path in ["refund-policy", "refund_policy"]:
+        template_name = "refund_policy.html"
+    elif page_path in ["report-issue", "report_issue"]:
+        template_name = "report_issue.html"
     elif not page_path.endswith(".html"):
         template_name = f"{page_path}.html"
     else:

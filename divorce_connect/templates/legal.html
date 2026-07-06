@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}Legal & Compliance — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+    .legal-tab-active {
+        color: #000000 !important;
+        border-left-color: #d4af6a !important;
+        background-color: #fcfaf6 !important;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20" x-data="legalController">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Compliance & Trust Framework</span>
+            <h1 class="font-playfair text-4xl md:text-5xl font-bold mt-3 mb-4">Platform Regulations</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Review the legal guidelines, privacy frameworks, and refund protocols governing the DivorceConnect India marketplace ecosystem for the year 2026.
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Left Sticky Navigation Sidebar -->
+            <aside class="lg:col-span-1">
+                <div class="sticky top-28 bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm space-y-2">
+                    <h3 class="text-xs uppercase tracking-widest text-zinc-400 font-bold px-3 mb-4">Legal Documents</h3>
+                    
+                    <button @click="activeTab = 'privacy'; window.location.hash = 'privacy'" 
+                            :class="activeTab === 'privacy' ? 'legal-tab-active' : ''"
+                            class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-zinc-500 hover:text-black border-l-4 border-transparent hover:bg-zinc-50 transition-all duration-200 flex items-center justify-between">
+                        <span>1. Privacy Policy</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    
+                    <button @click="activeTab = 'terms'; window.location.hash = 'terms'" 
+                            :class="activeTab === 'terms' ? 'legal-tab-active' : ''"
+                            class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-zinc-500 hover:text-black border-l-4 border-transparent hover:bg-zinc-50 transition-all duration-200 flex items-center justify-between">
+                        <span>2. Terms of Service</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    
+                    <button @click="activeTab = 'refund'; window.location.hash = 'refund'" 
+                            :class="activeTab === 'refund' ? 'legal-tab-active' : ''"
+                            class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-zinc-500 hover:text-black border-l-4 border-transparent hover:bg-zinc-50 transition-all duration-200 flex items-center justify-between">
+                        <span>3. Refund Policy</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+
+                    <div class="border-t border-zinc-100 pt-5 mt-5">
+                        <div class="bg-amber-50/60 border border-amber-100 rounded-xl p-4 text-xs text-amber-900 leading-relaxed">
+                            <span class="font-bold block mb-1">⚖️ BCI Compliance Statement</span>
+                            These agreements are drafted in strict accordance with the Information Technology Act, 2000, and Bar Council of India guidelines.
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Legal Content Frame -->
+            <main class="lg:col-span-3">
+                <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm min-h-[600px]">
+
+                    <!-- 1. PRIVACY POLICY -->
+                    <section x-show="activeTab === 'privacy'" x-transition:enter="transition ease-out duration-200" class="space-y-8">
+                        <div class="border-b border-zinc-100 pb-6">
+                            <h2 class="font-playfair text-3xl font-bold text-black mb-2">Privacy Policy</h2>
+                            <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+                        </div>
+
+                        <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                            <p>
+                                DivorceConnect India (“we,” “us,” or “our”) is committed to protecting your privacy and ensuring the highest standards of data security for our users. This Privacy Policy governs the collection, storage, encryption, processing, and permanent deletion of information collected through our legal technology marketplace.
+                            </p>
+
+                            <!-- Section 1.1 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">1. Role-Based Data Collection</h3>
+                                <p class="mb-3">
+                                    Our platform processes distinct categories of personal and operational records tailored to the system roles of our users:
+                                </p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li>
+                                        <strong class="text-zinc-800">Clients:</strong> We collect and index registration details (name, email, mobile number, username), verification status metadata, secure case-tracking history states, payment identifiers, and technical logs generated during user support sessions.
+                                    </li>
+                                    <li>
+                                        <strong class="text-zinc-800">Lawyers:</strong> In addition to basic credentials, we collect verifiable professional records, including Bar Registration Numbers, State Bar Council memberships, years of active practice, billing schedules, and completed client case ratings.
+                                    </li>
+                                    <li>
+                                        <strong class="text-zinc-800">Administrators:</strong> To enforce strict accountability, our database archives immutable audit logs detailing every verification action, updates made to user statuses, and reports evaluated by admin staff.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Section 1.2 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Sensitive Verification Document Handling</h3>
+                                <p class="mb-3">
+                                    The verification of identities and legal claims requires the upload of sensitive records, including Aadhaar cards, PAN cards, Marriage Certificates, Income Proofs, Court Notices, and legal Affidavits. We handle these documents with extreme security precautions:
+                                </p>
+                                <div class="bg-zinc-900 text-zinc-100 rounded-2xl p-5 mb-3 border border-zinc-800">
+                                    <h4 class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold mb-2">🔒 Critical Data Protection Protocol</h4>
+                                    <p class="text-xs leading-relaxed text-zinc-300 font-light">
+                                        All sensitive documents uploaded to the DivorceConnect India platform undergo automated end-to-end encryption at rest using AES-256 standard encryption keys. Only authorized admin panel verifiers with multi-factor authentication are permitted temporary read access. Numeric identification digits (e.g., full Aadhaar or PAN numbers) are never exposed, cached in plain text, or shared with third parties under any circumstances.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Section 1.3 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Data Retention & The 14-Day Purge Pipeline</h3>
+                                <p class="mb-3">
+                                    We believe in user ownership of data. If a client or lawyer initiates an account deletion request, the platform triggers a secure, multi-stage decommissioning process:
+                                </p>
+                                <div class="bg-amber-50/50 border border-amber-100 rounded-xl p-5 text-zinc-700 text-xs leading-relaxed">
+                                    <span class="font-bold text-amber-900 block mb-1">⏱️ Strict 14-Day Cooling Period Rule</span>
+                                    Once a user confirms their deletion request via their email verification link, their account status changes to <strong>'Deactivated'</strong>. For a strict period of fourteen (14) days, their profile is hidden from all searches, and active services are suspended. Upon the expiry of this 14-day cooling window, our database scheduler executes a permanent script that deletes all profile columns, notification tables, and uploaded case files from our storage engines. This process is final and completely irreversible.
+                                </div>
+                            </div>
+
+                            <!-- Section 1.4 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">4. Real-Time Communication & WebSocket Logs</h3>
+                                <p>
+                                    To facilitate coordination, the platform operates a real-time communication portal powered by secure WebSockets. This supports messaging, document attachments, and photo exchanges. All messages and file links sent through the chat are transient, encrypted in transit, and strictly restricted to the assigned lawyer and verified client. No diagnostic logs or plain-text content are archived beyond the necessary lifespan of the active dispute resolution.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 2. TERMS OF SERVICE -->
+                    <section x-show="activeTab === 'terms'" x-transition:enter="transition ease-out duration-200" class="space-y-8">
+                        <div class="border-b border-zinc-100 pb-6">
+                            <h2 class="font-playfair text-3xl font-bold text-black mb-2">Terms of Service</h2>
+                            <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+                        </div>
+
+                        <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                            <p>
+                                Welcome to DivorceConnect India. By registering an account, accessing our portal, or engaging lawyers through the marketplace, you agree to be bound by these Terms of Service.
+                            </p>
+
+                            <!-- Section 2.1 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">1. User Eligibility & Verification Gates</h3>
+                                <p class="mb-3">
+                                    To protect platform integrity, all registrations must pass specific validation requirements:
+                                </p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li>
+                                        <strong class="text-zinc-800">Clients:</strong> Granted immediate access to navigate the informational portal and browse directory profiles. Full case engagement is restricted until identity verification has been approved.
+                                    </li>
+                                    <li>
+                                        <strong class="text-zinc-800">Lawyers:</strong> Prohibited from accepting client cases, appearing in search results, or initiating communication until their profile completion rate is 100% and their credentials have been officially verified by our administration team.
+                                    </li>
+                                    <li>
+                                        <strong class="text-zinc-800">Admins:</strong> System actions and audit privileges are blocked until approved and authorized by the Superuser.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Section 2.2 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Case Lifecycle & The 9-Stage Tracking Workflow</h3>
+                                <p class="mb-3">
+                                    When a client hires an active lawyer on our marketplace, the dispute follows a structural, 9-stage tracking lifecycle:
+                                </p>
+                                <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-semibold text-zinc-800">
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">1. Case Created</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">2. Document Verification</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">3. Lawyer Assigned</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">4. Petition Drafted</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">5. Petition Filed</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">6. First Motion</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">7. Second Motion</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">8. Decree Issued</div>
+                                        <div class="p-3 bg-white border border-zinc-100 rounded-xl">9. Completed</div>
+                                    </div>
+                                </div>
+                                <p class="mt-3">
+                                    Clients bear the sole responsibility for submitting authentic documents and details at Stage 2. Lawyers retain exclusive administrative authority to update tracking phases as the dispute proceeds in the respective family court.
+                                </p>
+                            </div>
+
+                            <!-- Section 2.3 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Platform Conduct & The 3-Strike Warning Rule</h3>
+                                <p class="mb-3">
+                                    We maintain a zero-tolerance policy against platform manipulation, harassment, and malicious filings. Any user (client or lawyer) can report misconduct by uploading screenshots or chat log evidence:
+                                </p>
+                                <div class="bg-red-50 border border-red-100 rounded-xl p-5 text-red-900 text-xs leading-relaxed">
+                                    <strong class="text-red-950 block mb-1">🚫 Automated Account Ban Policy</strong>
+                                    Every validated report processed by the administration panel can result in an official warning. Any account (lawyer or client) that receives <strong>three (3) official warnings</strong> will be automatically and permanently banned from the DivorceConnect India database. Banned users are instantly logged out, their active access tokens are invalidated, and their credentials are blacklisted.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. REFUND POLICY -->
+                    <section x-show="activeTab === 'refund'" x-transition:enter="transition ease-out duration-200" class="space-y-8">
+                        <div class="border-b border-zinc-100 pb-6">
+                            <h2 class="font-playfair text-3xl font-bold text-black mb-2">Refund Policy</h2>
+                            <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+                        </div>
+
+                        <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                            <p>
+                                This Refund Policy outlines the financial terms governing the consultation fees, retainer payments, and verification transactions conducted through our payment gateway integration.
+                            </p>
+
+                            <!-- Section 3.1 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">1. Consultation Fee Escrow Management</h3>
+                                <p>
+                                    All financial transactions between clients and lawyers are routed through our secure platform mediator layer. When a client initiates a hire request, the consultation fee is captured and held in our escrow account. The funds are not released to the lawyer until the case request has been officially accepted, verified, and the initial case stage has commenced.
+                                </p>
+                            </div>
+
+                            <!-- Section 3.2 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Case Rejection & Cancelation Windows</h3>
+                                <p class="mb-3">
+                                    To ensure client protection, consultation fees are fully refundable under the following circumstances:
+                                </p>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li>
+                                        If the lawyer rejects the incoming case request, the platform automatically triggers a 100% refund of the captured fee back to the client's original payment source.
+                                    </li>
+                                    <li>
+                                        If the lawyer fails to respond or take action within the designated 72-hour operational window, the system automatically marks the request as expired and processes a full refund.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Section 3.3 -->
+                            <div>
+                                <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Verification Failures & Fraudulent Submissions</h3>
+                                <p class="mb-3">
+                                    We maintain strict compliance gates. If a client pays a consultation fee but is unable to pass the mandatory document verification review:
+                                </p>
+                                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 text-xs text-zinc-700 leading-relaxed">
+                                    <strong class="text-black block mb-1">⚠️ Verification Rejection Protocol</strong>
+                                    If the document verification fails due to accidental mismatch or formatting errors, the consultation fee will be refunded after deducting a nominal processing charge. However, if the verification is rejected because the user uploaded explicitly falsified documents or fraudulent identity materials, the fee is forfeited to cover administrative validation costs, and the account will be immediately flagged for suspension under our warning guidelines.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Router/Tab Controller -->
+<script>
+    document.addEventListener('alpine:init', () => {
+        // Parse current hash on load, fallback to 'privacy'
+        const initialTab = window.location.hash ? window.location.hash.replace('#', '') : 'privacy';
+        
+        Alpine.data('legalController', () => ({
+            activeTab: ['privacy', 'terms', 'refund'].includes(initialTab) ? initialTab : 'privacy',
+            init() {
+                // Listen to hash changes in case user navigates using footer links
+                window.addEventListener('hashchange', () => {
+                    const newTab = window.location.hash.replace('#', '');
+                    if (['privacy', 'terms', 'refund'].includes(newTab)) {
+                        this.activeTab = newTab;
+                    }
+                });
+            }
+        }));
+    });
+</script>
+{% endblock %}

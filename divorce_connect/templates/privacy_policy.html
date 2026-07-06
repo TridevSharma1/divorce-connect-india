@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Compliance & Trust Framework</span>
+            <h1 class="font-playfair text-4xl md:text-5xl font-bold mt-3 mb-4">Privacy Policy</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Review the legal guidelines and privacy frameworks governing DivorceConnect India.
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm min-h-[500px]">
+            <div class="border-b border-zinc-100 pb-6 mb-8">
+                <h2 class="font-playfair text-3xl font-bold text-black mb-2">Privacy Policy</h2>
+                <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                <p>
+                    DivorceConnect India (“we,” “us,” or “our”) is committed to protecting your privacy and ensuring the highest standards of data security for our users. This Privacy Policy governs the collection, storage, encryption, processing, and permanent deletion of information collected through our legal technology marketplace.
+                </p>
+
+                <!-- Section 1.1 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">1. Role-Based Data Collection</h3>
+                    <p class="mb-3">
+                        Our platform processes distinct categories of personal and operational records tailored to the system roles of our users:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>
+                            <strong class="text-zinc-800">Clients:</strong> We collect and index registration details (name, email, mobile number, username), verification status metadata, secure case-tracking history states, payment identifiers, and technical logs generated during user support sessions.
+                        </li>
+                        <li>
+                            <strong class="text-zinc-800">Lawyers:</strong> In addition to basic credentials, we collect verifiable professional records, including Bar Registration Numbers, State Bar Council memberships, years of active practice, billing schedules, and completed client case ratings.
+                        </li>
+                        <li>
+                            <strong class="text-zinc-800">Administrators:</strong> To enforce strict accountability, our database archives immutable audit logs detailing every verification action, updates made to user statuses, and reports evaluated by admin staff.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 1.2 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Sensitive Verification Document Handling</h3>
+                    <p class="mb-3">
+                        The verification of identities and legal claims requires the upload of sensitive records, including Aadhaar cards, PAN cards, Marriage Certificates, Income Proofs, Court Notices, and legal Affidavits. We handle these documents with extreme security precautions:
+                    </p>
+                    <div class="bg-zinc-900 text-zinc-100 rounded-2xl p-5 mb-3 border border-zinc-800">
+                        <h4 class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold mb-2">🔒 Critical Data Protection Protocol</h4>
+                        <p class="text-xs leading-relaxed text-zinc-300 font-light">
+                            All sensitive documents uploaded to the DivorceConnect India platform undergo automated end-to-end encryption at rest using AES-256 standard encryption keys. Only authorized admin panel verifiers with multi-factor authentication are permitted temporary read access. Numeric identification digits (e.g., full Aadhaar or PAN numbers) are never exposed, cached in plain text, or shared with third parties under any circumstances.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 1.3 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Data Retention & The 14-Day Purge Pipeline</h3>
+                    <p class="mb-3">
+                        We believe in user ownership of data. If a client or lawyer initiates an account deletion request, the platform triggers a secure, multi-stage decommissioning process:
+                    </p>
+                    <div class="bg-amber-50/50 border border-amber-100 rounded-xl p-5 text-zinc-700 text-xs leading-relaxed">
+                        <span class="font-bold text-amber-900 block mb-1">⏱️ Strict 14-Day Cooling Period Rule</span>
+                        Once a user confirms their deletion request via their email verification link, their account status changes to <strong>'Deactivated'</strong>. For a strict period of fourteen (14) days, their profile is hidden from all searches, and active services are suspended. Upon the expiry of this 14-day cooling window, our database scheduler executes a permanent script that deletes all profile columns, notification tables, and uploaded case files from our storage engines. This process is final and completely irreversible.
+                    </div>
+                </div>
+
+                <!-- Section 1.4 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">4. Real-Time Communication & WebSocket Logs</h3>
+                    <p>
+                        To facilitate coordination, the platform operates a real-time communication portal powered by secure WebSockets. This supports messaging, document attachments, and photo exchanges. All messages and file links sent through the chat are transient, encrypted in transit, and strictly restricted to the assigned lawyer and verified client. No diagnostic logs or plain-text content are archived beyond the necessary lifespan of the active dispute resolution.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

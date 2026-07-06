@@ -6,7 +6,7 @@ import datetime
 import math
 
 from ..database import get_db
-from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, TrustReport
+from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, TrustReport, GetInTouch
 from ..security import get_current_user
 from .cloudinary_utils import upload_to_cloudinary
 
@@ -234,6 +234,21 @@ async def get_admin_dashboard(
 
     pending_reports_count = sum(1 for r in pending_reports if r["status"] == "PENDING")
 
+    # Fetch Get in Touch messages
+    git_res = await db.execute(select(GetInTouch).order_by(GetInTouch.created_at.desc()))
+    git_messages = git_res.scalars().all()
+    get_in_touch = [
+        {
+            "id": msg.id,
+            "full_name": msg.full_name,
+            "email": msg.email,
+            "subject": msg.subject,
+            "message": msg.message,
+            "created_at": msg.created_at.strftime("%b %d, %Y, %I:%M %p")
+        }
+        for msg in git_messages
+    ]
+
     return {
         "pending_update_requests": pending_update_requests,
         "is_complete": is_complete,
@@ -261,7 +276,8 @@ async def get_admin_dashboard(
         },
         "pending_lawyer_requests": pending_lawyer_requests,
         "pending_documents": pending_documents,
-        "pending_reports": pending_reports
+        "pending_reports": pending_reports,
+        "get_in_touch": get_in_touch
     }
 
 @router.get("/profile")

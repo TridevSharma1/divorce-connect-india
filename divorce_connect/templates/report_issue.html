@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Report an Issue | DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .playfair {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+    }
+
+    input, select, textarea {
+        transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Header Section -->
+    <section class="py-16 bg-gray-50 border-b border-gray-100">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <span class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-2 block">Help & Support</span>
+            <h1 class="playfair text-4xl md:text-5xl text-[#0a0a0a] mb-4">
+                Report an Issue
+            </h1>
+            <p class="text-base text-gray-600 leading-relaxed max-w-xl mx-auto font-light">
+                Encountered a bug, payment failure, or account issue? Submit this form with details and screenshots so our engineering team can resolve it.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content Form Section -->
+    <section class="py-12 md:py-16 bg-white">
+        <div class="max-w-3xl mx-auto px-6">
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-10">
+                {% if request.query_params.get('success') == 'true' %}
+                <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-sm font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Issue reported successfully! Our engineering team will review and resolve it shortly. Reference Ticket ID generated.</span>
+                </div>
+                {% endif %}
+                {% if request.query_params.get('error') %}
+                <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-900 rounded-xl text-sm font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Please fill in all the required fields correctly and verify files are under 5MB.</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="" enctype="multipart/form-data" class="space-y-6">
+                    <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
+
+                    <!-- Personal Information Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Full Name -->
+                        <div>
+                            <label for="full_name" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Full Name
+                            </label>
+                            <input
+                                type="text"
+                                id="full_name"
+                                name="full_name"
+                                required
+                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5"
+                                placeholder="Your full name">
+                        </div>
+
+                        <!-- Email Address -->
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5"
+                                placeholder="your.email@example.com">
+                        </div>
+                    </div>
+
+                    <!-- Role and Category Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Account Role -->
+                        <div>
+                            <label for="role" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Your Platform Role
+                            </label>
+                            <select
+                                id="role"
+                                name="role"
+                                required
+                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5">
+                                <option value="guest">Guest / Visitor</option>
+                                <option value="client">Verified Client</option>
+                                <option value="lawyer">Registered Lawyer</option>
+                                <option value="admin">Admin / Staff</option>
+                            </select>
+                        </div>
+
+                        <!-- Issue Category -->
+                        <div>
+                            <label for="category" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                                Issue Category
+                            </label>
+                            <select
+                                id="category"
+                                name="category"
+                                required
+                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5">
+                                <option value="bug_report">Technical Bug / Malfunction</option>
+                                <option value="account_login">Account / Login Issues</option>
+                                <option value="payments">Payment / Billing Discrepancy</option>
+                                <option value="verification">Verification Process Error</option>
+                                <option value="other">Other Inquiry / Feedback</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Subject -->
+                    <div>
+                        <label for="subject" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                            Issue Subject
+                        </label>
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            required
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5"
+                            placeholder="Briefly summarize the problem">
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="description" class="block text-sm font-semibold text-[#0a0a0a] mb-2">
+                            Detailed Description
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="5"
+                            required
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#0a0a0a] placeholder-gray-400 focus:bg-white focus:border-black focus:ring-2 focus:ring-black/5 resize-none"
+                            placeholder="Please explain the steps to reproduce the issue, what happened, and what you expected to see..."></textarea>
+                    </div>
+
+                    <!-- Evidence Upload Area -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">
+                            Attach Screenshot / Error Log (Optional)
+                        </label>
+                        <div id="uploadZone" class="relative border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 px-6 py-6 text-center cursor-pointer transition hover:border-gray-400 hover:bg-gray-100">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <p class="font-medium text-gray-800 text-sm mb-1">Click to upload or drag screenshot here</p>
+                            <p class="text-gray-500 text-xs">Max 5MB. Supports JPG, PNG, PDF.</p>
+                            <input
+                                type="file"
+                                id="fileInput"
+                                name="evidence"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                class="absolute inset-0 opacity-0 cursor-pointer"
+                                aria-label="File upload">
+                        </div>
+                        <div id="fileNameDisplay" class="mt-3 text-sm text-gray-600 hidden flex items-center gap-2">
+                            <span class="font-semibold">Selected file:</span> <span id="fileName" class="text-gray-900"></span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end items-center gap-3 pt-6 border-t border-gray-100">
+                        <button type="button" onclick="window.history.back();" class="px-6 py-2.5 text-gray-900 font-semibold text-sm hover:text-black transition">
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-8 py-3 bg-black text-white font-semibold text-sm rounded-lg hover:bg-gray-900 transition duration-200 shadow-sm">
+                            Submit Ticket
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- File selection Javascript -->
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const fileName = document.getElementById('fileName');
+        const uploadZone = document.getElementById('uploadZone');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File exceeds the 5MB size limit.');
+                    fileInput.value = '';
+                    fileNameDisplay.classList.add('hidden');
+                    return;
+                }
+                fileName.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`;
+                fileNameDisplay.classList.remove('hidden');
+            } else {
+                fileNameDisplay.classList.add('hidden');
+            }
+        });
+
+        // Drag & Drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-gray-400', 'bg-gray-100');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-gray-400', 'bg-gray-100');
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File exceeds the 5MB size limit.');
+                    return;
+                }
+                fileInput.files = e.dataTransfer.files;
+                fileName.textContent = `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`;
+                fileNameDisplay.classList.remove('hidden');
+            }
+        });
+    </script>
+{% endblock %}

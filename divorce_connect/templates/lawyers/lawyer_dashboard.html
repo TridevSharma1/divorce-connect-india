@@ -219,6 +219,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!res.ok) {
             console.error("Failed to load dashboard data", res.status);
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/login/";
+            }
             return;
         }
 

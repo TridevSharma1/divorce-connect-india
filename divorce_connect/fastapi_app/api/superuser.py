@@ -23,6 +23,7 @@ from ..models import (
     CaseRequest,
     ClientProfile,
     DeleteAccountToken,
+    GetInTouch,
     LawyerProfile,
     LawyerProfileUpdateRequest,
     LawyerRating,
@@ -31,6 +32,7 @@ from ..models import (
     OTPCode,
     Payment,
     Reminder,
+    SystemIssue,
     TrustReport,
     User,
 )
@@ -743,6 +745,53 @@ async def list_lawyer_update_requests(
     return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
 
 
+@router.get("/get-in-touch")
+async def list_get_in_touch(
+    search: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    _su: User = Depends(check_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    q = select(GetInTouch)
+    if search:
+        q = q.where(
+            or_(
+                GetInTouch.full_name.ilike(f"%{search}%"),
+                GetInTouch.email.ilike(f"%{search}%"),
+                GetInTouch.subject.ilike(f"%{search}%"),
+                GetInTouch.message.ilike(f"%{search}%"),
+            )
+        )
+    q = q.order_by(GetInTouch.id.desc())
+    total = await db.scalar(select(func.count()).select_from(q.subquery()))
+    rows = await db.execute(_paginate(q, page))
+    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+
+
+@router.get("/system-issues")
+async def list_system_issues(
+    search: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    _su: User = Depends(check_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    q = select(SystemIssue)
+    if search:
+        q = q.where(
+            or_(
+                SystemIssue.full_name.ilike(f"%{search}%"),
+                SystemIssue.email.ilike(f"%{search}%"),
+                SystemIssue.subject.ilike(f"%{search}%"),
+                SystemIssue.description.ilike(f"%{search}%"),
+                SystemIssue.category.ilike(f"%{search}%"),
+            )
+        )
+    q = q.order_by(SystemIssue.id.desc())
+    total = await db.scalar(select(func.count()).select_from(q.subquery()))
+    rows = await db.execute(_paginate(q, page))
+    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # BULK ACTION ENDPOINTS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1059,6 +1108,8 @@ MODEL_MAPPINGS = {
     "delete-tokens": DeleteAccountToken,
     "notifications": Notification,
     "otp-codes": OTPCode,
+    "get-in-touch": GetInTouch,
+    "system-issues": SystemIssue,
     "admin-profiles": AdminPanelProfile,
     "admin-update-requests": AdminPanelProfileUpdateRequest,
     "lawyer-verification-requests": LawyerVerificationRequest,

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Refund Policy — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Compliance & Trust Framework</span>
+            <h1 class="font-playfair text-4xl md:text-5xl font-bold mt-3 mb-4">Refund Policy</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Review the financial agreements, escrow releases, and refund rules for DivorceConnect India.
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm min-h-[500px]">
+            <div class="border-b border-zinc-100 pb-6 mb-8">
+                <h2 class="font-playfair text-3xl font-bold text-black mb-2">Refund Policy</h2>
+                <p class="text-xs text-zinc-400">Last Revised: January 15, 2026 | Effective Date: January 15, 2026</p>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-600 text-sm leading-relaxed space-y-6">
+                <p>
+                    This Refund Policy outlines the financial terms governing the consultation fees, retainer payments, and verification transactions conducted through our payment gateway integration.
+                </p>
+
+                <!-- Section 3.1 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">1. Consultation Fee Escrow Management</h3>
+                    <p>
+                        All financial transactions between clients and lawyers are routed through our secure platform mediator layer. When a client initiates a hire request, the consultation fee is captured and held in our escrow account. The funds are not released to the lawyer until the case request has been officially accepted, verified, and the initial case stage has commenced.
+                    </p>
+                </div>
+
+                <!-- Section 3.2 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">2. Case Rejection & Cancelation Windows</h3>
+                    <p class="mb-3">
+                        To ensure client protection, consultation fees are fully refundable under the following circumstances:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>
+                            If the lawyer rejects the incoming case request, the platform automatically triggers a 100% refund of the captured fee back to the client's original payment source.
+                        </li>
+                        <li>
+                            If the lawyer fails to respond or take action within the designated 72-hour operational window, the system automatically marks the request as expired and processes a full refund.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Section 3.3 -->
+                <div>
+                    <h3 class="font-playfair text-lg font-bold text-black mb-3">3. Verification Failures & Fraudulent Submissions</h3>
+                    <p class="mb-3">
+                        We maintain strict compliance gates. If a client pays a consultation fee but is unable to pass the mandatory document verification review:
+                    </p>
+                    <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 text-xs text-zinc-700 leading-relaxed">
+                        <strong class="text-black block mb-1">⚠️ Verification Rejection Protocol</strong>
+                        If the document verification fails due to accidental mismatch or formatting errors, the consultation fee will be refunded after deducting a nominal processing charge. However, if the verification is rejected because the user uploaded explicitly falsified documents or fraudulent identity materials, the fee is forfeited to cover administrative validation costs, and the account will be immediately flagged for suspension under our warning guidelines.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
