@@ -76,6 +76,8 @@ def jinja_date_filter(value, format_str=""):
         return value
     if not isinstance(value, (datetime.date, datetime.datetime)):
         return str(value)
+    if isinstance(value, datetime.datetime):
+        value = value + datetime.timedelta(hours=5, minutes=30)
     django_to_python = {
         "d M, Y · H:i": "%d %b, %Y · %H:%M",
         "d M, Y": "%d %b, %Y",
@@ -290,6 +292,35 @@ async def dynamic_page(request: Request, page_path: str):
                 if reported_lawyer:
                     lw_user_res = await db.execute(select(User).where(User.id == reported_lawyer.user_id))
                     reported_lawyer.user = lw_user_res.scalar_one_or_none()
+            reported_user_obj = None
+            if reported_client:
+                reported_user_obj = reported_client.user
+            elif reported_lawyer:
+                reported_user_obj = reported_lawyer.user
+
+            from sqlalchemy import func
+            
+            # Count warnings against this reported target user
+            warnings_count = 0
+            if reported_client:
+                warnings_count = await db.scalar(
+                    select(func.count(TrustReport.id))
+                    .where(TrustReport.reported_client_id == reported_client.id, TrustReport.status == "WARNED")
+                )
+            elif reported_lawyer:
+                warnings_count = await db.scalar(
+                    select(func.count(TrustReport.id))
+                    .where(TrustReport.reported_lawyer_id == reported_lawyer.id, TrustReport.status == "WARNED")
+                )
+
+            # Count rejected/false reports filed by this reporter
+            false_reports_count = await db.scalar(
+                select(func.count(TrustReport.id))
+                .where(
+                    TrustReport.reporter_id == report.reporter_id,
+                    TrustReport.status == "REJECTED"
+                )
+            )
 
             if request.method == "POST":
                 form = await request.form()
@@ -298,11 +329,42 @@ async def dynamic_page(request: Request, page_path: str):
                 
                 report.admin_notes = notes
                 
+                # Extract variables for email dispatching before database commit (avoiding lazy-loading issues)
+                reporter_email = reporter_user.email if reporter_user else ""
+                reporter_name = (reporter_user.get_full_name() or reporter_user.email) if reporter_user else ""
+                
+                reported_email = ""
+                reported_name = ""
+                if reported_client:
+                    reported_email = reported_client.user.email if reported_client.user else ""
+                    reported_name = f"{reported_client.first_name} {reported_client.last_name}"
+                elif reported_lawyer:
+                    reported_email = reported_lawyer.user.email if reported_lawyer.user else ""
+                    reported_name = reported_lawyer.full_name
+                
+                report_reason = report.reason
+                
+                from utils.email_utils import send_report_action_to_reporter, send_report_action_to_reported, send_reporter_banned_email
+                
                 if action == "approve":
                     report.status = "APPROVED"
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_report_action_to_reporter(reporter_name, reporter_email, reported_name, "APPROVED", "Approved", notes, report_reason)
+                    except Exception:
+                        pass
                 elif action == "warn":
                     report.status = "WARNED"
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_report_action_to_reported(reported_name, reported_email, "WARNED", "Warned", notes)
+                    except Exception:
+                        pass
                 elif action == "ban":
+                    if warnings_count < 3:
+                        raise HTTPException(status_code=400, detail="Banning the target requires at least 3 warnings.")
                     report.status = "BANNED"
                     if reported_client:
                         reported_client.is_deleted = True
@@ -310,11 +372,53 @@ async def dynamic_page(request: Request, page_path: str):
                     if reported_lawyer:
                         reported_lawyer.is_deleted = True
                         db.add(reported_lawyer)
+                    if reported_user_obj:
+                        reported_user_obj.is_active = False
+                        db.add(reported_user_obj)
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_report_action_to_reported(reported_name, reported_email, "BANNED", "Banned", notes)
+                    except Exception:
+                        pass
+                elif action == "ban_reporter":
+                    if false_reports_count < 6:
+                        raise HTTPException(status_code=400, detail="Banning the reporter requires at least 6 false reports.")
+                    
+                    # Deactivate reporter user
+                    if reporter_user:
+                        reporter_user.is_active = False
+                        db.add(reporter_user)
+                        
+                    # Soft delete reporter profiles
+                    from .models import ClientProfile, LawyerProfile
+                    rep_cl_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == report.reporter_id))
+                    rep_cl = rep_cl_res.scalar_one_or_none()
+                    if rep_cl:
+                        rep_cl.is_deleted = True
+                        db.add(rep_cl)
+                    rep_lw_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == report.reporter_id))
+                    rep_lw = rep_lw_res.scalar_one_or_none()
+                    if rep_lw:
+                        rep_lw.is_deleted = True
+                        db.add(rep_lw)
+                        
+                    report.status = "REJECTED"  # Mark current report as rejected
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_reporter_banned_email(reporter_name, reporter_email, notes)
+                    except Exception:
+                        pass
                 elif action == "reject":
                     report.status = "REJECTED"
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_report_action_to_reporter(reporter_name, reporter_email, reported_name, "REJECTED", "Rejected", notes, report_reason)
+                    except Exception:
+                        pass
                     
-                db.add(report)
-                await db.commit()
                 return RedirectResponse(url="/admin_dashboard/", status_code=303)
                 
             # Attach for Django-style template queries
@@ -325,7 +429,9 @@ async def dynamic_page(request: Request, page_path: str):
             
             context = {
                 "request": request,
-                "report": report
+                "report": report,
+                "warnings_count": warnings_count,
+                "false_reports_count": false_reports_count,
             }
             template_name = "trust_report_detail.html"
             return templates.TemplateResponse(request, template_name, context)

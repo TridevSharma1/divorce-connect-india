@@ -112,12 +112,15 @@ async def list_cases_for_admin(
     )
     rows = res.all()
     
+    import datetime
+    local_tz_offset = datetime.timedelta(hours=5, minutes=30)
     cases = []
     for case, client, lawyer, cu, lu in rows:
+        local_updated_at = case.updated_at + local_tz_offset if case.updated_at else None
         cases.append({
             "id": case.id,
             "status": case.status,
-            "updated_at": case.updated_at.strftime("%d %b, %Y · %H:%M") if case.updated_at else "",
+            "updated_at": local_updated_at.strftime("%d %b, %Y · %H:%M") if local_updated_at else "",
             "client_name": client.first_name + " " + client.last_name,
             "client_id": client.id,
             "client_email": cu.email,
@@ -200,12 +203,15 @@ async def get_document_verification_list(
                 await db.commit()
                 await db.refresh(ver)
             
+            import datetime
+            local_tz_offset = datetime.timedelta(hours=5, minutes=30)
+            local_uploaded_at = doc.uploaded_at + local_tz_offset if doc.uploaded_at else None
             pdf_url = normalize_document_file_url(doc.document_file)
             case_docs.append({
                 "id": doc.id,
                 "document_type": doc.document_type,
                 "document_type_display": doc_types.get(doc.document_type, doc.document_type.capitalize()),
-                "uploaded_at": doc.uploaded_at.strftime("%b %d, %Y · %H:%M") if doc.uploaded_at else "",
+                "uploaded_at": local_uploaded_at.strftime("%b %d, %Y · %H:%M") if local_uploaded_at else "",
                 "document_file_url": pdf_url if doc.document_file else "#",
                 "verification": {
                     "status": ver.status,
@@ -213,6 +219,8 @@ async def get_document_verification_list(
                 }
             })
         
+        local_submitted_at = case.documents_submitted_at + local_tz_offset if case.documents_submitted_at else None
+        local_created_at = case.created_at + local_tz_offset if case.created_at else None
         cases_with_pending_docs.append({
             "case_request": {
                 "id": case.id,
@@ -222,7 +230,7 @@ async def get_document_verification_list(
                 "lawyer": {
                     "full_name": lawyer.full_name
                 },
-                "documents_submitted_at": case.documents_submitted_at.strftime("%b %d, %Y · %H:%M") if case.documents_submitted_at else (case.created_at.strftime("%b %d, %Y · %H:%M") if case.created_at else "")
+                "documents_submitted_at": local_submitted_at.strftime("%b %d, %Y · %H:%M") if local_submitted_at else (local_created_at.strftime("%b %d, %Y · %H:%M") if local_created_at else "")
             },
             "documents": case_docs
         })

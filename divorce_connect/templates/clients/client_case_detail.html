@@ -901,14 +901,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         ctxMenu.classList.add("hidden");
     });
 
-    ctxDownloadBtn.addEventListener("click", () => {
+    ctxDownloadBtn.addEventListener("click", async () => {
         if (activeMediaUrl) {
-            const a = document.createElement("a");
-            a.href = activeMediaUrl;
-            a.download = activeMediaUrl.split("/").pop();
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            try {
+                const response = await fetch(activeMediaUrl);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = activeMediaUrl.split("/").pop() || "download";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                console.error("Failed to download file:", error);
+                const a = document.createElement("a");
+                a.href = activeMediaUrl;
+                a.download = activeMediaUrl.split("/").pop();
+                a.target = "_blank";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
         }
     });
 });

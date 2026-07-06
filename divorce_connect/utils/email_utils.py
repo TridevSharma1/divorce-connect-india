@@ -4,20 +4,40 @@ Auth emails  → sharikahmed731@gmail.com
 Operations emails → tridevx9@gmail.com
 """
 import os
-import django
+import jinja2
+from pathlib import Path
+import datetime
 
-if not os.environ.get("DJANGO_SETTINGS_MODULE"):
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "divorce_connect.settings")
+# Initialize Jinja2 Environment for email templates
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIRS = [
+    BASE_DIR / "templates",
+    BASE_DIR / "templates" / "accounts",
+    BASE_DIR / "templates" / "accounts" / "emails",
+]
 
-try:
-    django.setup()
-except Exception:
-    pass
+loader = jinja2.FileSystemLoader([str(d) for d in TEMPLATES_DIRS if d.exists()])
+jinja_env = jinja2.Environment(loader=loader)
 
-from django.core.mail import get_connection, EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.conf import settings
-from django.utils import timezone
+def render_to_string(template_name, context):
+    filename = template_name.split("/")[-1]
+    try:
+        template = jinja_env.get_template(filename)
+        return template.render(context)
+    except Exception:
+        try:
+            template = jinja_env.get_template(template_name)
+            return template.render(context)
+        except Exception as e:
+            raise Exception(f"Failed to render email template {template_name} via Jinja2: {e}")
+
+class FakeTimezone:
+    def now(self):
+        return datetime.datetime.now()
+    def localtime(self, dt):
+        return dt
+
+timezone = FakeTimezone()
 
 # ── Purpose constants ────────────────────────────────────────────────────────
 PURPOSE_AUTH = "auth"
@@ -31,11 +51,23 @@ def _send_html_email(subject, template_name, context, recipient_email, purpose):
     from fastapi_app.tasks import send_email_task
     import asyncio
 
+    async def safe_kiq():
+        import traceback
+        try:
+            await send_email_task.kiq(recipient_email, subject, html_body, purpose)
+        except Exception as e:
+            print(f"Taskiq queuing failed: {e}. Trying direct fallback...")
+            try:
+                await send_email_task(recipient_email, subject, html_body, purpose)
+            except Exception as e2:
+                print("Direct email fallback failed:")
+                traceback.print_exc()
+
     try:
         loop = asyncio.get_running_loop()
-        loop.create_task(send_email_task(recipient_email, subject, html_body, purpose))
+        loop.create_task(safe_kiq())
     except RuntimeError:
-        asyncio.run(send_email_task(recipient_email, subject, html_body, purpose))
+        asyncio.run(safe_kiq())
 
 
 
@@ -194,57 +226,73 @@ def send_delete_account_email(user, confirm_url):
     )
 
 
-def send_report_action_to_reporter(report):
-    """Send action notification to the reporter."""
-    reporter = report.reporter
-    reporter_name = reporter.get_full_name() or reporter.email
-    reported_name = report.target_name
-    action_label = report.get_status_display()
+def send_report_action_to_reporter(reporter_name, reporter_email, reported_name, report_status, action_label, admin_notes, report_reason):
+    """Send action notification to the reporter using specific templates."""
+    template_name = "emails/report_action_reporter_email.html"
+    subject = "🛡️ Action Taken on Your Report — DivorceConnect India"
     
+    if report_status == "APPROVED":
+        template_name = "emails/report_approved_email.html"
+        subject = "✅ Report Approved — DivorceConnect India"
+    elif report_status == "REJECTED":
+        template_name = "emails/report_rejected_email.html"
+        subject = "❌ Report Closed — DivorceConnect India"
+        
     _send_html_email(
-        subject="🛡️ Action Taken on Your Report — DivorceConnect India",
-        template_name="emails/report_action_reporter_email.html",
+        subject=subject,
+        template_name=template_name,
         context={
             "reporter_name": reporter_name,
             "reported_name": reported_name,
-            "action_status": report.status,
+            "action_status": report_status,
             "action_label": action_label,
-            "admin_notes": report.admin_notes or "No additional comments from admin.",
-            "report_reason": report.reason,
+            "admin_notes": admin_notes or "No additional comments from admin.",
+            "report_reason": report_reason,
             "action_date": timezone.localtime(timezone.now()).strftime("%d %b %Y, %I:%M %p"),
         },
-        recipient_email=reporter.email,
+        recipient_email=reporter_email,
         purpose=PURPOSE_OPERATIONS,
     )
 
 
-def send_report_action_to_reported(report):
-    """Send action/warning/ban notification to the reported party."""
-    reported_user = None
-    reported_name = ""
-    if report.reported_client:
-        reported_user = report.reported_client.user
-        reported_name = report.reported_client.get_full_name()
-    elif report.reported_lawyer:
-        reported_user = report.reported_lawyer.user
-        reported_name = report.reported_lawyer.full_name
-        
-    if not reported_user:
-        return
-        
-    action_label = report.get_status_display()
-    
+def send_reporter_banned_email(reporter_name, reporter_email, admin_notes):
+    """Send ban notification to the reporter for system abuse."""
     _send_html_email(
-        subject="🛡️ Important Account Notification — DivorceConnect India",
-        template_name="emails/report_action_reported_email.html",
+        subject="🚫 Account Suspended — DivorceConnect India",
+        template_name="emails/reporter_banned_email.html",
         context={
-            "reported_name": reported_name,
-            "action_status": report.status,
-            "action_label": action_label,
-            "admin_notes": report.admin_notes or "No additional comments from admin.",
+            "reporter_name": reporter_name,
+            "admin_notes": admin_notes or "Account suspended for filing multiple false or malicious reports.",
             "action_date": timezone.localtime(timezone.now()).strftime("%d %b %Y, %I:%M %p"),
         },
-        recipient_email=reported_user.email,
+        recipient_email=reporter_email,
+        purpose=PURPOSE_OPERATIONS,
+    )
+
+
+def send_report_action_to_reported(reported_name, reported_email, report_status, action_label, admin_notes):
+    """Send action/warning/ban notification to the reported party using specific templates."""
+    template_name = "emails/report_action_reported_email.html"
+    subject = "🛡️ Important Account Notification — DivorceConnect India"
+    
+    if report_status == "WARNED":
+        template_name = "emails/reported_warning_email.html"
+        subject = "⚠️ Official Warning Issued — DivorceConnect India"
+    elif report_status == "BANNED":
+        template_name = "emails/reported_banned_email.html"
+        subject = "🚫 Account Suspended — DivorceConnect India"
+        
+    _send_html_email(
+        subject=subject,
+        template_name=template_name,
+        context={
+            "reported_name": reported_name,
+            "action_status": report_status,
+            "action_label": action_label,
+            "admin_notes": admin_notes or "No additional comments from admin.",
+            "action_date": timezone.localtime(timezone.now()).strftime("%d %b %Y, %I:%M %p"),
+        },
+        recipient_email=reported_email,
         purpose=PURPOSE_OPERATIONS,
     )
 

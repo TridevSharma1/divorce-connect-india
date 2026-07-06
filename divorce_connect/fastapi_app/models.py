@@ -315,6 +315,28 @@ class TrustReport(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
+    # Relationships
+    reporter: Mapped["User"] = relationship("User", foreign_keys=[reporter_id])
+    reported_client: Mapped[Optional["ClientProfile"]] = relationship("ClientProfile", foreign_keys=[reported_client_id])
+    reported_lawyer: Mapped[Optional["LawyerProfile"]] = relationship("LawyerProfile", foreign_keys=[reported_lawyer_id])
+
+    @property
+    def target_name(self) -> str:
+        if self.reported_client:
+            return f"{self.reported_client.first_name} {self.reported_client.last_name}"
+        elif self.reported_lawyer:
+            return self.reported_lawyer.full_name
+        return "User"
+
+    def get_status_display(self) -> str:
+        return {
+            "PENDING": "Pending Review",
+            "APPROVED": "Approved",
+            "REJECTED": "Rejected",
+            "WARNED": "Warned",
+            "BANNED": "Banned",
+        }.get(self.status, self.status)
+
 
 class LawyerVerificationRequest(Base):
     """

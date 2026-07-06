@@ -58,6 +58,8 @@
                 </div>
                 {% endif %}
 
+                <div id="js-error-message" class="hidden mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm font-medium text-center"></div>
+
                 <form method="POST" id="otp-form">
                     <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                     <!-- OTP Boxes -->
@@ -104,6 +106,7 @@
         // OTP box navigation
         const boxes = document.querySelectorAll('.otp-input');
         const hidden = document.getElementById('otp-hidden');
+        const errorDiv = document.getElementById('js-error-message');
 
         boxes.forEach((box, idx) => {
             box.addEventListener('input', (e) => {
@@ -179,6 +182,7 @@
         // Submit via AJAX/fetch
         document.getElementById('otp-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            errorDiv.classList.add('hidden');
             updateHidden();
             const otp = hidden.value;
             const email = sessionStorage.getItem("pending_otp_email") || new URLSearchParams(window.location.search).get('email') || '';
@@ -186,12 +190,14 @@
             const verifyBtn = document.getElementById('verify-btn');
             
             if (!email) {
-                alert("Session expired. Please start the login process again.");
-                window.location.href = "/login/";
+                errorDiv.textContent = "Session expired. Please start the login process again.";
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => { window.location.href = "/login/"; }, 2000);
                 return;
             }
             if (otp.length < 6) {
-                alert("Please enter the full 6-digit code.");
+                errorDiv.textContent = "Please enter the full 6-digit code.";
+                errorDiv.classList.remove('hidden');
                 return;
             }
             
@@ -227,12 +233,14 @@
                     }
                 } else {
                     const err = await response.json();
-                    alert(err.detail || "Invalid OTP code.");
+                    errorDiv.textContent = err.detail || "Invalid OTP code.";
+                    errorDiv.classList.remove('hidden');
                     verifyBtn.disabled = false;
                     verifyBtn.textContent = "Verify & Continue →";
                 }
             } catch (err) {
-                alert("Network error occurred.");
+                errorDiv.textContent = "Network error occurred.";
+                errorDiv.classList.remove('hidden');
                 verifyBtn.disabled = false;
                 verifyBtn.textContent = "Verify & Continue →";
             }

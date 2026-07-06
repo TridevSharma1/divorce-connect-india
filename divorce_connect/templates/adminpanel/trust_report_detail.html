@@ -57,6 +57,9 @@
                             <div class="text-sm text-slate-600 space-y-1">
                                 <p><strong>Email:</strong> {{ report.reporter.email }}</p>
                                 <p><strong>Role:</strong> {{ report.reporter.role|title }}</p>
+                                <p class="mt-2 text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-700 inline-block">
+                                    False Reports: <span class="font-bold {% if false_reports_count >= 6 %}text-red-600{% endif %}">{{ false_reports_count }} / 6</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -89,6 +92,9 @@
                                 <p><strong>Role:</strong> Lawyer</p>
                                 <p><strong>Lawyer ID:</strong> {{ report.reported_lawyer.custom_id|default:"N/A" }}</p>
                                 {% endif %}
+                                <p class="mt-2 text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-700 inline-block">
+                                    Active Warnings: <span class="font-bold {% if warnings_count >= 3 %}text-red-600{% endif %}">{{ warnings_count }} / 3</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -132,8 +138,20 @@
                             <textarea id="admin_notes" name="admin_notes" rows="4" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-slate-900 focus:ring-slate-900 text-sm placeholder:text-slate-400" placeholder="Add justification for the action being taken (e.g. warning details, ban reasons, or dismissing comments).">{{ report.admin_notes|default:"" }}</textarea>
                         </div>
 
+                        <!-- Warnings/Banning Criteria Banner -->
+                        {% if warnings_count < 3 or false_reports_count < 6 %}
+                        <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-4 text-xs text-slate-500 space-y-1 mb-4">
+                            {% if warnings_count < 3 %}
+                            <p>⚠️ <strong>Ban Account Eligibility:</strong> Disabled. Requires at least 3 warnings (Current warnings: {{ warnings_count }}/3).</p>
+                            {% endif %}
+                            {% if false_reports_count < 6 %}
+                            <p>⚠️ <strong>Ban Reporter Eligibility:</strong> Disabled. Requires at least 6 false reports submitted by this user (Current: {{ false_reports_count }}/6).</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
                         <!-- Buttons Layout -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pt-2">
                             <!-- Dismiss Action -->
                             <button type="submit" name="action" value="reject" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 ❌ False Report / Reject
@@ -145,8 +163,13 @@
                             </button>
 
                             <!-- Ban Action -->
-                            <button type="submit" name="action" value="ban" class="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                            <button type="submit" name="action" value="ban" {% if warnings_count < 3 %}disabled title="Requires at least 3 warnings (Current warnings: {{ warnings_count }}/3)"{% endif %} class="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 🚫 Ban Account
+                            </button>
+
+                            <!-- Ban Reporter Action -->
+                            <button type="submit" name="action" value="ban_reporter" {% if false_reports_count < 6 %}disabled title="Requires at least 6 false reports (Current: {{ false_reports_count }}/6)"{% endif %} class="w-full bg-red-800 hover:bg-red-900 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                                🚫 Ban Reporter
                             </button>
 
                             <!-- Approve Action -->
