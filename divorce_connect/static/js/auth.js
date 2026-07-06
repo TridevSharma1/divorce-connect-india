@@ -45,18 +45,29 @@ const Auth = {
         const lawyerNav = document.getElementById("nav-lawyer");
         const adminNav = document.getElementById("nav-admin");
 
+        const footerClient = document.getElementById("footer-col-client");
+        const footerLawyer = document.getElementById("footer-col-lawyer");
+        const footerAdmin = document.getElementById("footer-col-admin");
+
         if(guestNav) guestNav.style.display = "none";
         if(clientNav) clientNav.style.display = "none";
         if(lawyerNav) lawyerNav.style.display = "none";
         if(adminNav) adminNav.style.display = "none";
 
+        if(footerClient) footerClient.style.display = "none";
+        if(footerLawyer) footerLawyer.style.display = "none";
+        if(footerAdmin) footerAdmin.style.display = "none";
+
         if (user) {
             if (user.role === "admin" || user.is_staff) {
                 if(adminNav) adminNav.style.display = "flex";
+                if(footerAdmin) footerAdmin.style.display = "block";
             } else if (user.role === "lawyer") {
                 if(lawyerNav) lawyerNav.style.display = "flex";
+                if(footerLawyer) footerLawyer.style.display = "block";
             } else {
                 if(clientNav) clientNav.style.display = "flex";
+                if(footerClient) footerClient.style.display = "block";
             }
             
             // Populate user's name in navbars
@@ -67,6 +78,7 @@ const Auth = {
             
         } else {
             if(guestNav) guestNav.style.display = "flex";
+            if(footerClient) footerClient.style.display = "block";
         }
     }
 };

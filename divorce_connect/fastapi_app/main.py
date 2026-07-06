@@ -307,18 +307,21 @@ async def dynamic_page(request: Request, page_path: str):
                 clean_name = "".join(c for c in filename if c.isalnum() or c in "._-")
                 import uuid
                 unique_prefix = uuid.uuid4().hex[:8]
-                clean_name = f"{unique_prefix}_{clean_name}"
                 
                 # Make sure media/system_issues folder exists
                 save_dir = Path("media/system_issues")
                 save_dir.mkdir(parents=True, exist_ok=True)
                 
-                dest = save_dir / clean_name
-                # Read upload and write to file
+                zip_filename = f"{unique_prefix}_{clean_name}.zip"
+                dest_zip = save_dir / zip_filename
+                
+                # Read upload and write to zip
                 content = await evidence.read()
-                with open(dest, "wb") as f:
-                    f.write(content)
-                evidence_file_path = f"system_issues/{clean_name}"
+                import zipfile
+                with zipfile.ZipFile(dest_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    zip_file.writestr(filename, content)
+                    
+                evidence_file_path = f"system_issues/{zip_filename}"
                 
             from .models import SystemIssue
             from .database import AsyncSessionLocal
@@ -334,6 +337,8 @@ async def dynamic_page(request: Request, page_path: str):
                     evidence_file=evidence_file_path
                 )
                 db.add(issue)
+                await db.flush() # get ID
+                issue.ticket_id = f"ti:{issue.id:05d}"
                 await db.commit()
                 
             return RedirectResponse(url="/report-issue/?success=true", status_code=303)

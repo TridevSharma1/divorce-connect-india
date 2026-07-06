@@ -152,6 +152,7 @@ class AdminPanelProfile(Base):
     date_of_join: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     
     user = relationship("User", backref="admin_profile")
 
@@ -431,6 +432,7 @@ class SystemIssue(Base):
     subject: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     evidence_file: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    ticket_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.utcnow
     )

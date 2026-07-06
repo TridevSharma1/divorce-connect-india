@@ -62,7 +62,7 @@ body{background:#0d1117;color:#e2e8f0;margin:0}
 
 /* Table */
 table{width:100%;border-collapse:separate;border-spacing:0}
-thead th{background:#1a2338;color:#5e738a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:11px 14px;white-space:nowrap;border-bottom:1px solid #21283c}
+thead th{text-align:left;background:#1a2338;color:#5e738a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:11px 14px;white-space:nowrap;border-bottom:1px solid #21283c}
 tbody tr{cursor:pointer;transition:background .1s;border-bottom:1px solid #21283c33}
 tbody tr:hover{background:#1e293b55}
 tbody tr.sel-row{background:#1e2d4a}
@@ -579,10 +579,11 @@ const SCHEMAS = {
 
   'system-issues': {
     label:'System Issues', endpoint:'/api/superuser/system-issues',
-    listCols:['id','full_name','email','category','subject','created_at'],
+    listCols:['id','ticket_id','full_name','email','category','subject','created_at'],
     sections:[
       { title:'Reporter Info', fields:[
         {name:'id',         label:'ID',           type:'ro'},
+        {name:'ticket_id',  label:'Ticket ID',    type:'ro'},
         {name:'full_name',  label:'Full Name',    type:'text'},
         {name:'email',      label:'Email Address',type:'text'},
         {name:'role',       label:'Role',         type:'text'},
@@ -591,7 +592,7 @@ const SCHEMAS = {
         {name:'category',   label:'Category',     type:'text'},
         {name:'subject',    label:'Subject',      type:'text'},
         {name:'description',label:'Description',  type:'textarea', fullWidth:true},
-        {name:'evidence_file', label:'Evidence File Path', type:'text'},
+        {name:'evidence_file', label:'Screenshot/Log (Zip)', type:'file'},
         {name:'created_at', label:'Created At',   type:'ro'},
       ]},
     ],
@@ -599,10 +600,11 @@ const SCHEMAS = {
 
   'admin-profiles': {
     label:'Admin Panel Profiles', endpoint:'/api/superuser/admin-profiles',
-    listCols:['id','user_id','full_name','mobile_number','is_verified_by_superuser','is_deleted'],
+    listCols:['id','custom_id','user_id','full_name','mobile_number','is_verified_by_superuser','is_deleted'],
     sections:[
       { title:'Personal Information', fields:[
         {name:'id',       label:'ID',           type:'ro'},
+        {name:'custom_id',label:'Custom ID',    type:'ro'},
         {name:'user_id',  label:'User ID (FK)', type:'number'},
         {name:'full_name',label:'Full Name',    type:'text'},
         {name:'gender',   label:'Gender',       type:'select', choices:[{value:'male',label:'Male'},{value:'female',label:'Female'},{value:'other',label:'Other'}]},
@@ -787,14 +789,14 @@ const SCHEMAS = {
 
   'case-document-verifications': {
     label:'Case Document Verifications', endpoint:'/api/superuser/case-document-verifications',
-    listCols:['id','document_id','status','verified_at','verified_by_id'],
+    listCols:['id','document_id','status','verified_at','verified_by_custom_id'],
     sections:[
       { title:'Verification', fields:[
         {name:'id',               label:'ID',               type:'ro'},
         {name:'document_id',      label:'Document ID (FK)', type:'number'},
         {name:'status',           label:'Status',           type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
         {name:'rejection_reason', label:'Rejection Reason', type:'textarea', fullWidth:true},
-        {name:'verified_by_id',   label:'Verified By (User ID)', type:'number'},
+        {name:'verified_by_custom_id', label:'Verified By (Admin ID)', type:'text'},
         {name:'verified_at',      label:'Verified At',      type:'ro'},
       ]},
     ],

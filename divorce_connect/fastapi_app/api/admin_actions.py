@@ -119,13 +119,16 @@ async def list_cases_for_admin(
         local_updated_at = case.updated_at + local_tz_offset if case.updated_at else None
         cases.append({
             "id": case.id,
+            "custom_case_id": case.custom_id or f"CS-{case.id:05d}",
             "status": case.status,
             "updated_at": local_updated_at.strftime("%d %b, %Y · %H:%M") if local_updated_at else "",
             "client_name": client.first_name + " " + client.last_name,
             "client_id": client.id,
+            "client_custom_id": client.custom_id or f"CLI-{client.id:05d}",
             "client_email": cu.email,
             "lawyer_name": lawyer.full_name,
             "lawyer_id": lawyer.id,
+            "lawyer_custom_id": lawyer.custom_id or f"LW-{lawyer.id:05d}",
             "lawyer_email": lu.email
         })
     return cases

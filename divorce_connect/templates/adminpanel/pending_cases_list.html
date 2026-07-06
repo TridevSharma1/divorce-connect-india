@@ -238,7 +238,7 @@
                     card.innerHTML = `
                         <div class="pc-card-head">
                             <div>
-                                <p class="pc-card-title">Case #${caseItem.id}</p>
+                                <p class="pc-card-title">Case #${caseItem.custom_case_id || caseItem.id}</p>
                                 <p class="pc-card-meta">Accepted on ${caseItem.updated_at} • Current status: ${caseItem.status}</p>
                             </div>
                             <span class="pc-pill accepted">Accepted</span>
@@ -251,7 +251,7 @@
                             </div>
                             <div class="pc-field">
                                 <span class="pc-label">Client ID</span>
-                                <span class="pc-value">${caseItem.client_id}</span>
+                                <span class="pc-value">${caseItem.client_custom_id || caseItem.client_id}</span>
                             </div>
                             <div class="pc-field">
                                 <span class="pc-label">Client Email</span>
@@ -263,7 +263,7 @@
                             </div>
                             <div class="pc-field">
                                 <span class="pc-label">Lawyer ID</span>
-                                <span class="pc-value">${caseItem.lawyer_id}</span>
+                                <span class="pc-value">${caseItem.lawyer_custom_id || caseItem.lawyer_id}</span>
                             </div>
                             <div class="pc-field">
                                 <span class="pc-label">Lawyer Email</span>
@@ -288,8 +288,12 @@
                 const filtered = acceptedCases.filter(c => 
                     c.client_name.toLowerCase().includes(query) ||
                     String(c.client_id).includes(query) ||
+                    (c.client_custom_id && c.client_custom_id.toLowerCase().includes(query)) ||
                     c.lawyer_name.toLowerCase().includes(query) ||
-                    String(c.id).includes(query)
+                    String(c.lawyer_id).includes(query) ||
+                    (c.lawyer_custom_id && c.lawyer_custom_id.toLowerCase().includes(query)) ||
+                    String(c.id).includes(query) ||
+                    (c.custom_case_id && c.custom_case_id.toLowerCase().includes(query))
                 );
                 renderList(filtered);
             });

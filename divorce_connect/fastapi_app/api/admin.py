@@ -302,8 +302,15 @@ async def get_admin_profile(
         await db.commit()
         await db.refresh(admin_profile)
         
+    if not admin_profile.custom_id:
+        admin_profile.custom_id = f"ad:{admin_profile.id:05d}"
+        db.add(admin_profile)
+        await db.commit()
+        await db.refresh(admin_profile)
+        
     return {
         "id": admin_profile.id,
+        "custom_id": admin_profile.custom_id,
         "full_name": admin_profile.full_name,
         "email": current_user.email,
         "gender": admin_profile.gender,
@@ -344,6 +351,10 @@ async def update_admin_profile(
     if not admin_profile:
         admin_profile = AdminPanelProfile(user_id=current_user.id)
         db.add(admin_profile)
+        await db.flush() # get the id
+        
+    if not admin_profile.custom_id:
+        admin_profile.custom_id = f"ad:{admin_profile.id:05d}"
         
     admin_profile.full_name = full_name
     admin_profile.gender = gender

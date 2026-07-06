@@ -85,6 +85,37 @@ def _serialize(obj) -> Dict[str, Any]:
     return result
 
 
+async def _inject_custom_fields(model_path: str, record, d: Dict[str, Any], db: AsyncSession):
+    if model_path == "case-document-verifications" and getattr(record, "verified_by_id", None):
+        admin_profile_res = await db.execute(
+            select(AdminPanelProfile.custom_id, AdminPanelProfile.id)
+            .where(AdminPanelProfile.user_id == record.verified_by_id)
+        )
+        ap = admin_profile_res.one_or_none()
+        if ap:
+            d["verified_by_custom_id"] = ap[0] or f"ad:{ap[1]:05d}"
+        else:
+            d["verified_by_custom_id"] = None
+    elif model_path == "case-document-verifications":
+        d["verified_by_custom_id"] = None
+    elif model_path == "system-issues":
+        if not d.get("ticket_id") and getattr(record, "id", None):
+            d["ticket_id"] = f"ti:{record.id:05d}"
+    return d
+
+
+def _delete_system_issue_file(record):
+    if hasattr(record, "evidence_file") and record.evidence_file:
+        from pathlib import Path
+        file_path = Path("media") / record.evidence_file
+        if file_path.exists():
+            try:
+                file_path.unlink()
+            except Exception:
+                pass
+
+
+
 # ─── Pydantic Payloads ────────────────────────────────────────────────────────
 
 class IdsPayload(BaseModel):
@@ -636,7 +667,21 @@ async def list_case_document_verifications(
     q = q.order_by(CaseDocumentVerification.id.desc())
     total = await db.scalar(select(func.count()).select_from(q.subquery()))
     rows = await db.execute(_paginate(q, page))
-    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+    verifications = rows.scalars().all()
+    
+    # Pre-fetch all AdminPanelProfiles to map user_id -> custom_id
+    admin_profiles_res = await db.execute(select(AdminPanelProfile.user_id, AdminPanelProfile.id, AdminPanelProfile.custom_id))
+    admin_map = {}
+    for user_id, profile_id, custom_id in admin_profiles_res.all():
+        admin_map[user_id] = custom_id or f"ad:{profile_id:05d}"
+        
+    serialized_results = []
+    for r in verifications:
+        d = _serialize(r)
+        d["verified_by_custom_id"] = admin_map.get(r.verified_by_id) if r.verified_by_id else None
+        serialized_results.append(d)
+        
+    return {"total": total, "page": page, "results": serialized_results}
 
 
 # ── Case Documents ────────────────────────────────────────────────────────────
@@ -784,12 +829,21 @@ async def list_system_issues(
                 SystemIssue.subject.ilike(f"%{search}%"),
                 SystemIssue.description.ilike(f"%{search}%"),
                 SystemIssue.category.ilike(f"%{search}%"),
+                SystemIssue.ticket_id.ilike(f"%{search}%"),
             )
         )
     q = q.order_by(SystemIssue.id.desc())
     total = await db.scalar(select(func.count()).select_from(q.subquery()))
     rows = await db.execute(_paginate(q, page))
-    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+    issues = rows.scalars().all()
+    
+    serialized_results = []
+    for r in issues:
+        d = _serialize(r)
+        await _inject_custom_fields("system-issues", r, d, db)
+        serialized_results.append(d)
+        
+    return {"total": total, "page": page, "results": serialized_results}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1179,6 +1233,8 @@ async def bulk_delete_records(
                 if record is None:
                     results.append({"id": record_id, "status": "not_found"})
                     continue
+                if payload.model == "system-issues":
+                    _delete_system_issue_file(record)
                 await db.delete(record)
                 await db.commit()
                 results.append({"id": record_id, "status": "deleted"})
@@ -1253,7 +1309,7 @@ async def create_any_record(
     db.add(record)
     await db.commit()
     await db.refresh(record)
-    return _serialize(record)
+    return await _inject_custom_fields(model_path, record, _serialize(record), db)
 
 
 @router.put("/{model_path}/{record_id}")
@@ -1332,7 +1388,7 @@ async def update_any_record(
         await db.rollback()
         raise HTTPException(status_code=500, detail=str(exc))
 
-    return _serialize(record)
+    return await _inject_custom_fields(model_path, record, _serialize(record), db)
 
 
 # ─── Generic GET single record ────────────────────────────────────────────────
@@ -1354,7 +1410,7 @@ async def get_any_record(
     record = await db.get(model_cls, record_id)
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
-    return _serialize(record)
+    return await _inject_custom_fields(model_path, record, _serialize(record), db)
 
 
 # ─── Generic DELETE single record ────────────────────────────────────────────
@@ -1378,6 +1434,8 @@ async def delete_any_record(
     record = await db.get(model_cls, record_id)
     if not record:
         raise HTTPException(status_code=404, detail="Record not found")
+    if model_path == "system-issues":
+        _delete_system_issue_file(record)
     try:
         await db.delete(record)
         await db.commit()

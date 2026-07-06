@@ -81,7 +81,7 @@
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <h2 class="text-xl font-bold text-gray-900">${c.lawyer_name}</h2>
-                            <p class="text-xs font-bold text-slate-500 mt-0.5 mb-1">Case #${c.id}</p>
+                            <p class="text-xs font-bold text-slate-500 mt-0.5 mb-1">Case #${c.custom_id || c.id}</p>
                             <p class="text-sm text-gray-500">Requested ${c.created_at}</p>
                         </div>
                         <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${badgeClass}">

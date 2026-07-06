@@ -304,33 +304,98 @@
                 
                 <!-- Column 2: Portals & Features -->
                 <div>
-                    <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Quick Links</h5>
-                    <ul class="space-y-3.5 text-sm">
-                        <li>
-                            <a href="/lawyers_section/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Find a Lawyer</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Counseling Services</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Track My Case</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/register/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Become an Expert</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Client/Guest Footer Column -->
+                    <div id="footer-col-client">
+                        <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Quick Links</h5>
+                        <ul class="space-y-3.5 text-sm">
+                            <li>
+                                <a href="/lawyers_section/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Find a Lawyer</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/counseling/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Counseling Services</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/client_cases/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Track My Case</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/client_profile/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>My Profile</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Lawyer Footer Column -->
+                    <div id="footer-col-lawyer" style="display: none;">
+                        <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Lawyer Portal</h5>
+                        <ul class="space-y-3.5 text-sm">
+                            <li>
+                                <a href="/lawyer_case_orders/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Case Orders</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/lawyer_case_status/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Case Status</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/lawyer_profile/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Manage Profile</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/lawyer_settings/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>My Schedule</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Admin Footer Column -->
+                    <div id="footer-col-admin" style="display: none;">
+                        <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Admin Dashboard</h5>
+                        <ul class="space-y-3.5 text-sm">
+                            <li>
+                                <a href="/case_documents_verification_list/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Verify Documents</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin_pending_cases/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Pending Cases Queue</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/lawyer_verification_list/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Verify Lawyer</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin_dashboard/#lawyer-update-requests-list" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
+                                    <span>Profile Updates</span>
+                                    <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <!-- Column 3: Support & Operations -->
