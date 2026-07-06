@@ -668,12 +668,23 @@ async def submit_client_report(
     if not lawyer_profile:
         raise HTTPException(status_code=404, detail="Lawyer profile not found.")
         
+    # Create TrustReport first to generate the report ID
+    report = TrustReport(
+        reporter_id=current_user.id,
+        reported_client_id=client_profile.id,
+        reason=reason,
+        description=description,
+        evidence=None,
+        status="PENDING"
+    )
+    db.add(report)
+    await db.flush() # Populate report.id
+
     # Handle multiple evidence files
-    evidence_url = None
     if evidence:
         import io
         import zipfile
-        import uuid
+        import datetime
         from pathlib import Path
         
         valid_files = [f for f in evidence if f.filename and len(f.filename.strip()) > 0]
@@ -692,25 +703,15 @@ async def submit_client_report(
             
             if total_size > 0:
                 zip_buffer.seek(0)
-                filename = f"evidence_{uuid.uuid4().hex}.zip"
+                now_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"report_{report.id}_{now_str}.zip"
                 upload_dir = Path("media/report_evidence")
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 file_path = upload_dir / filename
                 with open(file_path, "wb") as f:
                     f.write(zip_buffer.getvalue())
-                evidence_url = f"report_evidence/{filename}"
-
-    # Create TrustReport
-    report = TrustReport(
-        reporter_id=current_user.id,
-        reported_client_id=client_profile.id,
-        reason=reason,
-        description=description,
-        evidence=evidence_url,
-        status="PENDING"
-    )
-    db.add(report)
-    await db.flush() # Populate report.id
+                report.evidence = f"report_evidence/{filename}"
+                db.add(report)
     
     formatted_report_id = f"ri::{report.id:05d}"
     

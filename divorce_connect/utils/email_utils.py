@@ -237,6 +237,9 @@ def send_report_action_to_reporter(reporter_name, reporter_email, reported_name,
     elif report_status == "REJECTED":
         template_name = "emails/report_rejected_email.html"
         subject = "❌ Report Closed — DivorceConnect India"
+    elif report_status == "CLOSED":
+        template_name = "emails/report_closed_email.html"
+        subject = "🛡️ Report Closed — DivorceConnect India"
         
     _send_html_email(
         subject=subject,

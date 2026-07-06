@@ -443,8 +443,19 @@ async def submit_trust_report(
     lawyer_user_res = await db.execute(select(User).where(User.id == reported_lawyer.user_id))
     reported_lawyer_user = lawyer_user_res.scalar_one_or_none()
 
+    # Create TrustReport first to generate the report ID
+    report = TrustReport(
+        reporter_id=current_user.id,
+        reported_lawyer_id=reported_lawyer.id,
+        reason=reason,
+        description=description,
+        evidence=None,
+        status="PENDING"
+    )
+    db.add(report)
+    await db.flush() # Populate report.id
+
     # Process evidence files: zip them together
-    evidence_url = None
     if evidence:
         # Check if there's actually files uploaded (filename could be empty)
         valid_files = [f for f in evidence if f.filename and len(f.filename.strip()) > 0]
@@ -463,25 +474,16 @@ async def submit_trust_report(
             
             if total_size > 0:
                 zip_buffer.seek(0)
-                filename = f"evidence_{uuid.uuid4().hex}.zip"
+                import datetime
+                now_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"report_{report.id}_{now_str}.zip"
                 upload_dir = Path("media/report_evidence")
                 upload_dir.mkdir(parents=True, exist_ok=True)
                 file_path = upload_dir / filename
                 with open(file_path, "wb") as f:
                     f.write(zip_buffer.getvalue())
-                evidence_url = f"report_evidence/{filename}" # Relative to media directory as Django expects
-
-    # Create TrustReport
-    report = TrustReport(
-        reporter_id=current_user.id,
-        reported_lawyer_id=reported_lawyer.id,
-        reason=reason,
-        description=description,
-        evidence=evidence_url,
-        status="PENDING"
-    )
-    db.add(report)
-    await db.flush() # Populate report.id
+                report.evidence = f"report_evidence/{filename}" # Relative to media directory as Django expects
+                db.add(report)
 
     # Create notifications
     formatted_report_id = f"ri::{report.id:05d}"

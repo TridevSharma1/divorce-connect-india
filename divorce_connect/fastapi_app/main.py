@@ -298,29 +298,15 @@ async def dynamic_page(request: Request, page_path: str):
             elif reported_lawyer:
                 reported_user_obj = reported_lawyer.user
 
-            from sqlalchemy import func
-            
-            # Count warnings against this reported target user
+            # Get warnings count directly from the reported user's profile columns
             warnings_count = 0
             if reported_client:
-                warnings_count = await db.scalar(
-                    select(func.count(TrustReport.id))
-                    .where(TrustReport.reported_client_id == reported_client.id, TrustReport.status == "WARNED")
-                )
+                warnings_count = reported_client.warnings_count or 0
             elif reported_lawyer:
-                warnings_count = await db.scalar(
-                    select(func.count(TrustReport.id))
-                    .where(TrustReport.reported_lawyer_id == reported_lawyer.id, TrustReport.status == "WARNED")
-                )
+                warnings_count = reported_lawyer.warnings_count or 0
 
-            # Count rejected/false reports filed by this reporter
-            false_reports_count = await db.scalar(
-                select(func.count(TrustReport.id))
-                .where(
-                    TrustReport.reporter_id == report.reporter_id,
-                    TrustReport.status == "REJECTED"
-                )
-            )
+            # Get false reports count directly from the reporter's base user column
+            false_reports_count = reporter_user.false_reports_count or 0
 
             if request.method == "POST":
                 form = await request.form()
@@ -356,6 +342,13 @@ async def dynamic_page(request: Request, page_path: str):
                         pass
                 elif action == "warn":
                     report.status = "WARNED"
+                    # Increment warning count on reported user's profile
+                    if reported_client:
+                        reported_client.warnings_count = (reported_client.warnings_count or 0) + 1
+                        db.add(reported_client)
+                    elif reported_lawyer:
+                        reported_lawyer.warnings_count = (reported_lawyer.warnings_count or 0) + 1
+                        db.add(reported_lawyer)
                     db.add(report)
                     await db.commit()
                     try:
@@ -382,7 +375,12 @@ async def dynamic_page(request: Request, page_path: str):
                     except Exception:
                         pass
                 elif action == "ban_reporter":
-                    if false_reports_count < 6:
+                    # Increment false reports count
+                    if reporter_user:
+                        reporter_user.false_reports_count = (reporter_user.false_reports_count or 0) + 1
+                        db.add(reporter_user)
+                        
+                    if reporter_user.false_reports_count < 6:
                         raise HTTPException(status_code=400, detail="Banning the reporter requires at least 6 false reports.")
                     
                     # Deactivate reporter user
@@ -412,10 +410,24 @@ async def dynamic_page(request: Request, page_path: str):
                         pass
                 elif action == "reject":
                     report.status = "REJECTED"
+                    # Increment false report count on reporter's user record
+                    if reporter_user:
+                        reporter_user.false_reports_count = (reporter_user.false_reports_count or 0) + 1
+                        db.add(reporter_user)
                     db.add(report)
                     await db.commit()
                     try:
                         send_report_action_to_reporter(reporter_name, reporter_email, reported_name, "REJECTED", "Rejected", notes, report_reason)
+                    except Exception:
+                        pass
+                elif action == "close":
+                    if report.status not in ["WARNED", "BANNED", "REJECTED"]:
+                        raise HTTPException(status_code=400, detail="Cannot close report until an action (Warn, Ban, Reject) has been taken first.")
+                    report.status = "CLOSED"
+                    db.add(report)
+                    await db.commit()
+                    try:
+                        send_report_action_to_reporter(reporter_name, reporter_email, reported_name, "CLOSED", "Closed", notes, report_reason)
                     except Exception:
                         pass
                     

@@ -29,6 +29,7 @@ class User(Base):
     
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    false_reports_count: Mapped[int] = mapped_column(Integer, default=0)
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip() or self.email
@@ -80,6 +81,7 @@ class ClientProfile(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
+    warnings_count: Mapped[int] = mapped_column(Integer, default=0)
     
     user = relationship("User", backref="client_profile")
 
@@ -110,6 +112,7 @@ class LawyerProfile(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
+    warnings_count: Mapped[int] = mapped_column(Integer, default=0)
     
     user = relationship("User", backref="lawyer_profile")
 
@@ -335,6 +338,7 @@ class TrustReport(Base):
             "REJECTED": "Rejected",
             "WARNED": "Warned",
             "BANNED": "Banned",
+            "CLOSED": "Closed",
         }.get(self.status, self.status)
 
 

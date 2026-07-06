@@ -438,6 +438,22 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
                             </a>
                           </div>
                         </template>
+                    </template>
+
+                    <!-- ── FILE / ZIP with download ── -->
+                    <template x-if="f.type === 'file'">
+                      <div>
+                        <input type="text" class="f-input mb-2"
+                               x-model="formData[f.name]"
+                               placeholder="report_evidence/..." />
+                        <template x-if="formData[f.name]">
+                          <div class="flex items-center gap-4 mt-1">
+                            <a :href="formData[f.name].startsWith('http') ? formData[f.name] : '/media/' + formData[f.name]" target="_blank"
+                               class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
+                              📥 Download File
+                            </a>
+                          </div>
+                        </template>
                       </div>
                     </template>
 
@@ -630,7 +646,7 @@ const SCHEMAS = {
         {name:'reported_lawyer_id',  label:'Reported Lawyer ID',    type:'number'},
         {name:'reason',              label:'Reason',                type:'text'},
         {name:'description',         label:'Description',           type:'textarea', fullWidth:true},
-        {name:'evidence',            label:'Evidence URL',          type:'text', fullWidth:true},
+        {name:'evidence',            label:'Evidence URL',          type:'file', fullWidth:true},
       ]},
       { title:'Admin Review', fields:[
         {name:'status',      label:'Status',       type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'WARNED',label:'Warned'},{value:'BANNED',label:'Banned'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Dismissed'}]},
@@ -761,7 +777,7 @@ const SCHEMAS = {
           {value:'ADDRESS_PROOF',label:'Address Proof'},{value:'INCOME_PROOF',label:'Income Proof'},
           {value:'COURT_ORDER',label:'Court Order'},{value:'OTHER',label:'Other'},
         ]},
-        {name:'document_file',   label:'File URL',         type:'text', fullWidth:true},
+        {name:'document_file',   label:'File URL',         type:'file', fullWidth:true},
         {name:'uploaded_at',     label:'Uploaded At',      type:'ro'},
       ]},
     ],

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Report Update — DivorceConnect India</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#f4f4f5; font-family:'Inter',Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrapper { max-width:620px; margin:40px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 40px rgba(0,0,0,0.10); }
+  .header { background:#0a0a0a; padding:44px 48px 36px; text-align:center; }
+  .header-icon { font-size:42px; margin-bottom:16px; }
+  .header-logo { font-family:'Playfair Display',Georgia,serif; font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; }
+  .header-logo span { color:#d4af6a; }
+  .header-tagline { color:#9ca3af; font-size:12px; letter-spacing:2px; text-transform:uppercase; margin-top:6px; }
+  .hero-bar { height:4px; background:linear-gradient(90deg,#d4af6a 0%,#f5d694 50%,#d4af6a 100%); }
+  .body { padding:48px 48px 40px; }
+  .status-pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:6px 16px; border-radius:100px; margin-bottom:24px; background:#e4e4e7; color:#3f3f46; }
+  .headline { font-family:'Playfair Display',Georgia,serif; font-size:26px; font-weight:800; color:#0a0a0a; line-height:1.3; margin-bottom:18px; letter-spacing:-0.5px; }
+  .intro { font-size:15px; color:#374151; line-height:1.75; margin-bottom:32px; }
+  .info-block { background:#f9f9f9; border-left:3px solid #d4af6a; border-radius:0 8px 8px 0; padding:16px 20px; margin-bottom:28px; }
+  .info-block p { font-size:13.5px; color:#374151; line-height:1.65; }
+  .divider { height:1px; background:#e4e4e7; margin:28px 0; }
+  .note { font-size:13px; color:#9ca3af; line-height:1.65; }
+  .footer { background:#f4f4f5; padding:28px 48px; text-align:center; border-top:1px solid #e4e4e7; }
+  .footer p { font-size:12px; color:#9ca3af; line-height:1.7; }
+  .footer a { color:#0a0a0a; text-decoration:none; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="header-icon">🛡️</div>
+    <div class="header-logo">Divorce<span>Connect</span> India</div>
+    <div class="header-tagline">Trust &amp; Safety</div>
+  </div>
+  <div class="hero-bar"></div>
+  <div class="body">
+    <div class="status-pill">Report Closed</div>
+    <h1 class="headline">Your Report Has Been Closed</h1>
+    <p class="intro">Dear <strong>{{ reporter_name }}</strong>,</p>
+    <p class="intro">Our Trust &amp; Safety team has completed the review of the report you submitted against <strong>{{ reported_name }}</strong>. The case has been resolved and marked as closed.</p>
+    <div class="info-block">
+      <p>⚖️ &nbsp;<strong>Resolution:</strong> Closed</p>
+      <p style="margin-top:8px;">📋 &nbsp;<strong>Reason Reported:</strong> {{ report_reason }}</p>
+      <p style="margin-top:8px;">📅 &nbsp;<strong>Action Date:</strong> {{ action_date }}</p>
+    </div>
+    <div class="info-block" style="border-left-color: #0a0a0a;">
+      <p>💬 &nbsp;<strong>Admin Notes:</strong><br><span style="display:block; margin-top:6px; font-style:italic; color:#4b5563;">"{{ admin_notes }}"</span></p>
+    </div>
+    <p class="intro" style="margin-bottom:0;">Thank you for your cooperation and for helping us keep DivorceConnect India professional and secure.</p>
+    <div class="divider"></div>
+    <p class="note">If you have any further questions or require additional support, please contact us at <a href="mailto:trust@divorceconnect.in" style="color:#0a0a0a;font-weight:600;">trust@divorceconnect.in</a>.</p>
+  </div>
+  <div class="footer">
+    <p>© 2025 DivorceConnect India — All rights reserved.<br>
+    <a href="https://divorceconnect.in">divorceconnect.in</a> &nbsp;·&nbsp; <a href="mailto:support@divorceconnect.in">support@divorceconnect.in</a></p>
+  </div>
+</div>
+</body>
+</html>
