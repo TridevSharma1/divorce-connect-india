@@ -709,7 +709,7 @@ const SCHEMAS = {
 
   'client-profiles': {
     label:'Client Profiles', endpoint:'/api/superuser/client-profiles',
-    listCols:['id','user_id','first_name','last_name','mobile_number','marital_status','is_deleted'],
+    listCols:['id','custom_id','user_id','first_name','last_name','mobile_number','marital_status','is_deleted'],
     sections:[
       { title:'Personal Information', fields:[
         {name:'id',             label:'ID',              type:'ro'},
@@ -779,6 +779,7 @@ const SCHEMAS = {
         {name:'verified',           label:'Verified',         type:'bool'},
         {name:'is_profile_complete',label:'Profile Complete', type:'bool'},
         {name:'is_deleted',         label:'Soft Deleted',     type:'bool'},
+        {name:'bar_council_license',label:'Bar Council License Document', type:'file', fullWidth:true},
       ]},
       { title:'Timestamps', fields:[
         {name:'date_joined',label:'Date Joined',type:'ro'},
@@ -909,6 +910,7 @@ const SCHEMAS = {
         {name:'mobile_number',    label:'Mobile Number',     type:'text'},
         {name:'alternate_mobile_number',label:'Alternate Mobile',type:'text'},
         {name:'profile_picture',  label:'Profile Picture',   type:'image', fullWidth:true},
+        {name:'bar_council_license',label:'Bar Council License Document', type:'file', fullWidth:true},
       ]},
       { title:'Review Info', fields:[
         {name:'submitted_at',label:'Submitted At',type:'ro'},

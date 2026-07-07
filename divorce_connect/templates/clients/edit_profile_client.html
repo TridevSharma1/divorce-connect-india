@@ -554,6 +554,26 @@
         if (form) {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+
+                const dobVal = document.getElementById('date_of_birth').value;
+                if (dobVal) {
+                    const dob = new Date(dobVal);
+                    const today = new Date();
+                    let age = today.getFullYear() - dob.getFullYear();
+                    const m = today.getMonth() - dob.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                        age--;
+                    }
+                    if (age < 18) {
+                        if (typeof showToastNotification === 'function') {
+                            showToastNotification("Warning", "You must be at least 18 years of age.");
+                        } else {
+                            alert("You must be at least 18 years of age.");
+                        }
+                        return;
+                    }
+                }
+
                 const formData = new FormData(form);
 
                 try {

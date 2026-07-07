@@ -322,7 +322,14 @@ async def update_client_profile(
     
     if date_of_birth and date_of_birth.strip():
         try:
-            profile.date_of_birth = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            dob_parsed = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            today = datetime.date.today()
+            age = today.year - dob_parsed.year - ((today.month, today.day) < (dob_parsed.month, dob_parsed.day))
+            if age < 18:
+                raise HTTPException(status_code=400, detail="You must be at least 18 years of age.")
+            profile.date_of_birth = dob_parsed
+        except HTTPException:
+            raise
         except Exception:
             pass
             

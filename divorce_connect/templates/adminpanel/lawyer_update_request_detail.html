@@ -105,6 +105,32 @@
                     </div>
                 </div>
 
+                <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+                    <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Bar Council License Document</p>
+                    <div class="mt-4 grid gap-6 lg:grid-cols-2">
+                        <div>
+                            <p class="text-sm text-slate-500">Requested Document</p>
+                            {% if update_request.bar_council_license %}
+                            <a href="{{ update_request.bar_council_license }}" target="_blank" class="mt-2 inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold gap-1">
+                                📥 Download / View Document
+                            </a>
+                            {% else %}
+                            <p class="mt-2 text-slate-500 text-sm">No change requested</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500">Current Document</p>
+                            {% if lawyer.bar_council_license %}
+                            <a href="{{ lawyer.bar_council_license }}" target="_blank" class="mt-2 inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold gap-1">
+                                📥 Download / View Document
+                            </a>
+                            {% else %}
+                            <p class="mt-2 text-slate-500 text-sm">No document uploaded</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mt-10 rounded-3xl border border-slate-200 bg-white p-6">
                     <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Biography</p>
                     <div class="mt-4 grid gap-6 lg:grid-cols-2">

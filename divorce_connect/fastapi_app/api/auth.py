@@ -112,6 +112,19 @@ async def register_user(
     """
     Register a new user in the database.
     """
+    import re
+    if (
+        len(user_in.password) < 10
+        or not re.search(r"[A-Z]", user_in.password)
+        or not re.search(r"[a-z]", user_in.password)
+        or not re.search(r"\d", user_in.password)
+        or not re.search(r"[@$!%*?&_#^()\-+={}\[\]|\\:;\"'<>,.?/~`]", user_in.password)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 10 characters long, and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+        )
+
     # Check if user already exists
     result = await db.execute(select(User).where(User.email == user_in.email))
     if result.scalar_one_or_none():
@@ -258,7 +271,7 @@ async def refresh_access_token(
 ):
     """
     Take a refresh token and return a new access token.
-    Replaces DRF's TokenRefreshView.
+    Replaces DRF TokenRefreshView.
     """
     refresh_token = payload.refresh
     credentials_exception = HTTPException(
@@ -376,8 +389,13 @@ async def confirm_delete_account(
         """
         
     # Check if expired (30 minutes)
-    now = datetime.datetime.utcnow()
-    if (now - token_obj.created_at).total_seconds() > 1800:
+    created_at = token_obj.created_at
+    if created_at.tzinfo is not None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+    else:
+        now = datetime.datetime.utcnow()
+        
+    if (now - created_at).total_seconds() > 1800:
         token_obj.is_used = True
         await db.commit()
         return """
@@ -431,7 +449,8 @@ async def confirm_delete_account(
     <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-emerald-600">
             <h1 class="text-2xl font-bold text-gray-900 mb-2">Account Successfully Deactivated</h1>
-            <p class="text-sm text-gray-600 mb-6">Your profile and account listings have been soft-deleted. We're sorry to see you go.</p>
+            <p class="text-sm text-gray-600 mb-2">Your profile and account listings have been deleted. We're sorry to see you go.</p>
+            <p class="text-xs text-gray-400 mb-6">Your account will be permanently deleted in 14 days from the time of deletion from our database.</p>
             <a href="/" class="inline-block bg-emerald-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-emerald-700 transition">Go to Homepage</a>
         </div>
     </body>

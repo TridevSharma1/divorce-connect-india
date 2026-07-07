@@ -135,7 +135,7 @@
                         {% csrf_token %}
                         <div>
                             <label for="admin_notes" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Admin Review Notes</label>
-                            <textarea id="admin_notes" name="admin_notes" rows="4" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-slate-900 focus:ring-slate-900 text-sm placeholder:text-slate-400" placeholder="Add justification for the action being taken (e.g. warning details, ban reasons, or dismissing comments).">{{ report.admin_notes|default:"" }}</textarea>
+                            <textarea id="admin_notes" name="admin_notes" rows="4" {% if report.status != 'PENDING' %}disabled{% endif %} class="w-full rounded-xl border-slate-200 shadow-sm focus:border-slate-900 focus:ring-slate-900 text-sm placeholder:text-slate-400 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed" placeholder="Add justification for the action being taken (e.g. warning details, ban reasons, or dismissing comments).">{{ report.admin_notes|default:"" }}</textarea>
                         </div>
 
                         <!-- Warnings/Banning Criteria Banner -->
@@ -151,35 +151,25 @@
                         {% endif %}
 
                         <!-- Buttons Layout -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-4 pt-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
                             <!-- Dismiss Action -->
-                            <button type="submit" name="action" value="reject" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                            <button type="submit" name="action" value="reject" {% if report.status != 'PENDING' %}disabled{% endif %} class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 ❌ False Report / Reject
                             </button>
                             
                             <!-- Warn Action -->
-                            <button type="submit" name="action" value="warn" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                            <button type="submit" name="action" value="warn" {% if report.status != 'PENDING' %}disabled{% endif %} class="w-full bg-amber-500 hover:bg-amber-600 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 ⚠️ Warn User
                             </button>
 
                             <!-- Ban Action -->
-                            <button type="submit" name="action" value="ban" {% if warnings_count < 3 %}disabled title="Requires at least 3 warnings (Current warnings: {{ warnings_count }}/3)"{% endif %} class="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                            <button type="submit" name="action" value="ban" {% if report.status != 'PENDING' or warnings_count < 3 %}disabled title="Requires at least 3 warnings (Current warnings: {{ warnings_count }}/3)"{% endif %} class="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 🚫 Ban Account
                             </button>
 
                             <!-- Ban Reporter Action -->
-                            <button type="submit" name="action" value="ban_reporter" {% if false_reports_count < 6 %}disabled title="Requires at least 6 false reports (Current: {{ false_reports_count }}/6)"{% endif %} class="w-full bg-red-800 hover:bg-red-900 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
+                            <button type="submit" name="action" value="ban_reporter" {% if report.status != 'PENDING' or false_reports_count < 6 %}disabled title="Requires at least 6 false reports (Current: {{ false_reports_count }}/6)"{% endif %} class="w-full bg-red-800 hover:bg-red-900 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
                                 🚫 Ban Reporter
-                            </button>
-
-                            <!-- Approve Action -->
-                            <button type="submit" name="action" value="approve" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
-                                ✅ Approve / Archive
-                            </button>
-
-                            <!-- Close Report Action -->
-                            <button type="submit" name="action" value="close" {% if report.status not in ['WARNED', 'BANNED', 'REJECTED'] %}disabled title="Cannot close report until an action (Warn, Ban, Reject) has been taken."{% endif %} class="w-full bg-slate-800 hover:bg-slate-900 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white py-3.5 px-4 rounded-xl font-bold text-xs transition duration-150 flex items-center justify-center gap-2">
-                                🔒 Close Report
                             </button>
                         </div>
                     </form>

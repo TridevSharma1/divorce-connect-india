@@ -113,6 +113,7 @@ class LawyerProfile(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     warnings_count: Mapped[int] = mapped_column(Integer, default=0)
+    bar_council_license: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     
     user = relationship("User", backref="lawyer_profile")
 
@@ -277,6 +278,7 @@ class LawyerProfileUpdateRequest(Base):
     mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
     alternate_mobile_number: Mapped[Optional[str]] = mapped_column(String(13), nullable=True)
     profile_picture: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    bar_council_license: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="PENDING")
     submitted_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     reviewed_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, nullable=True)

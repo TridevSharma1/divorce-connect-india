@@ -116,6 +116,15 @@ async def lifespan(app: FastAPI):
     # But for scaffolding, we'll create the tables synchronously or via async engine.
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from sqlalchemy import text
+        try:
+            await conn.execute(text("ALTER TABLE lawyers_lawyerprofile ADD COLUMN bar_council_license VARCHAR(255);"))
+        except Exception:
+            pass
+        try:
+            await conn.execute(text("ALTER TABLE lawyers_lawyerprofileupdaterequest ADD COLUMN bar_council_license VARCHAR(255);"))
+        except Exception:
+            pass
         
     if not broker.is_worker_process:
         logger.info("Connecting to NATS broker...")
@@ -424,7 +433,7 @@ async def dynamic_page(request: Request, page_path: str):
                     except Exception:
                         pass
                 elif action == "warn":
-                    report.status = "WARNED"
+                    report.status = "CLOSED"
                     # Increment warning count on reported user's profile
                     if reported_client:
                         reported_client.warnings_count = (reported_client.warnings_count or 0) + 1
@@ -438,10 +447,14 @@ async def dynamic_page(request: Request, page_path: str):
                         send_report_action_to_reported(reported_name, reported_email, "WARNED", "Warned", notes)
                     except Exception:
                         pass
+                    try:
+                        send_report_action_to_reporter(reporter_name, reporter_email, reported_name, "APPROVED", "Approved", notes, report_reason)
+                    except Exception:
+                        pass
                 elif action == "ban":
                     if warnings_count < 3:
                         raise HTTPException(status_code=400, detail="Banning the target requires at least 3 warnings.")
-                    report.status = "BANNED"
+                    report.status = "CLOSED"
                     if reported_client:
                         reported_client.is_deleted = True
                         db.add(reported_client)
@@ -484,7 +497,7 @@ async def dynamic_page(request: Request, page_path: str):
                         rep_lw.is_deleted = True
                         db.add(rep_lw)
                         
-                    report.status = "REJECTED"  # Mark current report as rejected
+                    report.status = "CLOSED"  # Mark current report as closed
                     db.add(report)
                     await db.commit()
                     try:
@@ -492,7 +505,7 @@ async def dynamic_page(request: Request, page_path: str):
                     except Exception:
                         pass
                 elif action == "reject":
-                    report.status = "REJECTED"
+                    report.status = "CLOSED"
                     # Increment false report count on reporter's user record
                     if reporter_user:
                         reporter_user.false_reports_count = (reporter_user.false_reports_count or 0) + 1
@@ -583,6 +596,8 @@ async def dynamic_page(request: Request, page_path: str):
                         lawyer.alternate_mobile_number = update_request.alternate_mobile_number
                     if update_request.profile_picture:
                         lawyer.profile_picture = update_request.profile_picture
+                    if update_request.bar_council_license:
+                        lawyer.bar_council_license = update_request.bar_council_license
                         
                     db.add(lawyer)
                     update_request.status = "APPROVED"
@@ -656,7 +671,26 @@ async def dynamic_page(request: Request, page_path: str):
                 if not user:
                     return RedirectResponse(url="/forgot-password/?error=not-found", status_code=303)
 
-                await generate_otp_for_user(user.id, db)
+                otp_code = await generate_otp_for_user(user.id, db)
+
+                try:
+                    from .api.auth import render_email_template
+                    from .notifications import send_email
+                    html_body = render_email_template(
+                        "emails/otp_email.html",
+                        {
+                            "user_name": user.get_full_name() or user.email,
+                            "otp_code": otp_code,
+                        }
+                    )
+                    send_email(
+                        to_address=user.email,
+                        subject="🔐 Password Reset Verification Code — DivorceConnect India",
+                        html_body=html_body,
+                        purpose="auth"
+                    )
+                except Exception:
+                    pass
 
             return RedirectResponse(url=f"/verify-otp/?email={quote(email)}&purpose=password_reset", status_code=303)
 
@@ -671,6 +705,16 @@ async def dynamic_page(request: Request, page_path: str):
                 return RedirectResponse(url=f"/reset-password/?email={quote(email)}&error=missing-fields", status_code=303)
             if new_password != confirm_password:
                 return RedirectResponse(url=f"/reset-password/?email={quote(email)}&error=match", status_code=303)
+
+            import re
+            if (
+                len(new_password) < 10
+                or not re.search(r"[A-Z]", new_password)
+                or not re.search(r"[a-z]", new_password)
+                or not re.search(r"\d", new_password)
+                or not re.search(r"[@$!%*?&_#^()\-+={}\[\]|\\:;\"'<>,.?/~`]", new_password)
+            ):
+                return RedirectResponse(url=f"/reset-password/?email={quote(email)}&error=weak-password", status_code=303)
 
             from sqlalchemy import select
             from .database import AsyncSessionLocal
@@ -741,6 +785,22 @@ async def dynamic_page(request: Request, page_path: str):
         
     try:
         context = {"request": request, "email": request.query_params.get("email", "")}
+        error_param = request.query_params.get("error")
+        if error_param:
+            msg_text = {
+                "missing-fields": "All fields are required.",
+                "match": "Passwords do not match.",
+                "weak-password": "Password must be at least 10 characters long, and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+                "not-found": "Email not found.",
+                "missing-email": "Please enter your email.",
+            }.get(error_param, "An error occurred.")
+            class DummyMessage:
+                def __init__(self, text, tags):
+                    self.message = text
+                    self.tags = tags
+                def __str__(self):
+                    return self.message
+            context["messages"] = [DummyMessage(msg_text, "error")]
         if template_name == "case_order.html":
             from .database import AsyncSessionLocal
             from sqlalchemy import select

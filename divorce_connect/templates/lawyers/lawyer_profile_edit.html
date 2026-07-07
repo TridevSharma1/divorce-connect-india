@@ -78,6 +78,22 @@
                         <input type="text" id="state_bar_council" name="state_bar_council" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition">
                     </div>
 
+                    <!-- Bar Council License Document -->
+                    <div class="md:col-span-2">
+                        <label for="bar_council_license" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Bar Council License Document <span class="text-red-500">*</span> <span class="text-xs font-normal text-gray-500">(PDF or Image, max 5MB)</span>
+                        </label>
+                        <div class="flex gap-2 items-center">
+                            <input type="file" id="bar_council_license" name="bar_council_license" accept=".pdf,image/*" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white">
+                            <button type="button" id="clear-license-btn" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-lg border-2 border-gray-300 text-sm font-semibold transition hidden">
+                                Clear
+                            </button>
+                        </div>
+                        <p id="license-download-link" class="text-xs text-blue-600 mt-2 hidden">
+                            <a href="#" target="_blank" class="hover:underline">View current uploaded document</a>
+                        </p>
+                    </div>
+
                     <!-- Years of Experience -->
                     <div>
                         <label for="years_of_experience" class="block text-sm font-semibold text-gray-900 mb-2">
@@ -228,10 +244,34 @@
             document.getElementById("mobile_number").value = data.mobile_number || "";
             document.getElementById("alternate_mobile_number").value = data.alternate_mobile_number || "";
 
+            if (data.bar_council_license) {
+                const licenseLink = document.getElementById("license-download-link");
+                const a = licenseLink.querySelector("a");
+                a.href = data.bar_council_license;
+                licenseLink.classList.remove("hidden");
+            }
+
             if (data.profile_picture) {
                 const img = document.getElementById("profilePreview");
                 img.src = data.profile_picture;
                 img.classList.remove("hidden");
+            }
+
+            // Hook up Clear button
+            const licenseInput = document.getElementById("bar_council_license");
+            const clearBtn = document.getElementById("clear-license-btn");
+            if (licenseInput && clearBtn) {
+                licenseInput.addEventListener("change", () => {
+                    if (licenseInput.files.length > 0) {
+                        clearBtn.classList.remove("hidden");
+                    } else {
+                        clearBtn.classList.add("hidden");
+                    }
+                });
+                clearBtn.addEventListener("click", () => {
+                    licenseInput.value = "";
+                    clearBtn.classList.add("hidden");
+                });
             }
 
         } catch (err) {
@@ -242,6 +282,49 @@
         const form = document.getElementById("profileForm");
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
+
+            const dobVal = document.getElementById("date_of_birth").value;
+            if (dobVal) {
+                const dob = new Date(dobVal);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                if (age < 18) {
+                    if (typeof showToastNotification === 'function') {
+                        showToastNotification("Warning", "You must be at least 18 years of age.");
+                    } else {
+                        alert("You must be at least 18 years of age.");
+                    }
+                    return;
+                }
+            }
+
+            const licenseInput = document.getElementById("bar_council_license");
+            const hasExistingLicense = !document.getElementById("license-download-link").classList.contains("hidden");
+            
+            if (!hasExistingLicense && (!licenseInput || licenseInput.files.length === 0)) {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Warning", "Please upload your Bar Council License document.");
+                } else {
+                    alert("Please upload your Bar Council License document.");
+                }
+                return;
+            }
+
+            if (licenseInput && licenseInput.files.length > 0) {
+                const file = licenseInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    if (typeof showToastNotification === 'function') {
+                        showToastNotification("Warning", "Bar Council License document must be under 5 MB.");
+                    } else {
+                        alert("Bar Council License document must be under 5 MB.");
+                    }
+                    return;
+                }
+            }
 
             const formData = new FormData(form);
 

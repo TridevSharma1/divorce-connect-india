@@ -1011,7 +1011,7 @@ async def bulk_approve_lawyer_update(
             "full_name", "gender", "date_of_birth", "bar_registration_number",
             "state_bar_council", "years_of_experience", "specialization",
             "bio", "consultation_fee", "office_city", "mobile_number",
-            "alternate_mobile_number", "profile_picture",
+            "alternate_mobile_number", "profile_picture", "bar_council_license",
         ):
             val = getattr(req, field, None)
             if val is not None:

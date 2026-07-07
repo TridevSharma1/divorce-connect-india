@@ -411,6 +411,7 @@ async def get_lawyer_profile_endpoint(
         "mobile_number": lawyer_profile.mobile_number,
         "alternate_mobile_number": lawyer_profile.alternate_mobile_number or "",
         "profile_picture": lawyer_profile.profile_picture or "",
+        "bar_council_license": lawyer_profile.bar_council_license or "",
         "custom_id": lawyer_profile.custom_id,
         "rating": lawyer_profile.rating,
         "verified": lawyer_profile.verified
@@ -434,6 +435,7 @@ async def update_lawyer_profile_endpoint(
     mobile_number: str = Form(...),
     alternate_mobile_number: str | None = Form(None),
     profile_picture: UploadFile | None = File(None),
+    bar_council_license: UploadFile | None = File(None),
     db: AsyncSession = Depends(get_db)
 ):
     import datetime
@@ -442,6 +444,23 @@ async def update_lawyer_profile_endpoint(
     if not profile:
         profile = LawyerProfile(user_id=current_user.id)
         db.add(profile)
+        
+    license_url = profile.bar_council_license if profile else None
+    if not license_url and (not bar_council_license or not bar_council_license.filename):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Bar Council License document is required."
+        )
+
+    if bar_council_license and bar_council_license.filename:
+        content = await bar_council_license.read()
+        if len(content) > 5 * 1024 * 1024:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Bar Council License document must be under 5 MB."
+            )
+        await bar_council_license.seek(0)
+        license_url = await upload_to_cloudinary(bar_council_license, folder="bar_council_licenses")
         
     # Check if bar_registration_number is already registered to another lawyer
     if bar_registration_number:
@@ -468,6 +487,12 @@ async def update_lawyer_profile_endpoint(
         if date_of_birth:
             try:
                 dob_parsed = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+                today = datetime.date.today()
+                age = today.year - dob_parsed.year - ((today.month, today.day) < (dob_parsed.month, dob_parsed.day))
+                if age < 18:
+                    raise HTTPException(status_code=400, detail="You must be at least 18 years of age.")
+            except HTTPException:
+                raise
             except:
                 pass
                 
@@ -490,6 +515,7 @@ async def update_lawyer_profile_endpoint(
             mobile_number=mobile_number,
             alternate_mobile_number=alternate_mobile_number,
             profile_picture=pic_url,
+            bar_council_license=license_url,
             status="PENDING"
         )
         db.add(update_request)
@@ -523,7 +549,14 @@ async def update_lawyer_profile_endpoint(
     profile.gender = gender
     if date_of_birth:
         try:
-            profile.date_of_birth = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            dob_parsed = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            today = datetime.date.today()
+            age = today.year - dob_parsed.year - ((today.month, today.day) < (dob_parsed.month, dob_parsed.day))
+            if age < 18:
+                raise HTTPException(status_code=400, detail="You must be at least 18 years of age.")
+            profile.date_of_birth = dob_parsed
+        except HTTPException:
+            raise
         except:
             pass
     profile.bar_registration_number = bar_registration_number
@@ -540,6 +573,8 @@ async def update_lawyer_profile_endpoint(
     # Handle image upload
     if profile_picture and profile_picture.filename:
         profile.profile_picture = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
+    if license_url:
+        profile.bar_council_license = license_url
         
     await db.commit()
 
