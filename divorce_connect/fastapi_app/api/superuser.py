@@ -436,7 +436,21 @@ async def list_otp_codes(
     q = q.order_by(OTPCode.id.desc())
     total = await db.scalar(select(func.count()).select_from(q.subquery()))
     rows = await db.execute(_paginate(q, page))
-    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+    otp_records = rows.scalars().all()
+
+    user_ids = [otp.user_id for otp in otp_records if otp.user_id]
+    user_map = {}
+    if user_ids:
+        users_res = await db.execute(select(User.id, User.email).where(User.id.in_(user_ids)))
+        user_map = {uid: email for uid, email in users_res.all()}
+
+    results = []
+    for otp in otp_records:
+        item = _serialize(otp)
+        item["email"] = user_map.get(otp.user_id)
+        results.append(item)
+
+    return {"total": total, "page": page, "results": results}
 
 
 @router.delete("/otp-codes/{otp_id}", status_code=204)
@@ -511,8 +525,23 @@ async def list_admin_update_requests(
         q = q.where(AdminPanelProfileUpdateRequest.status == status_filter.upper())
     q = q.order_by(AdminPanelProfileUpdateRequest.id.desc())
     total = await db.scalar(select(func.count()).select_from(q.subquery()))
-    rows = await db.execute(_paginate(q, page))
-    return {"total": total, "page": page, "results": [_serialize(r) for r in rows.scalars()]}
+    result = await db.execute(_paginate(q, page))
+    requests = result.scalars().all()
+
+    admin_ids = [r.admin_profile_id for r in requests]
+    admin_profiles_res = await db.execute(
+        select(AdminPanelProfile.id, AdminPanelProfile.custom_id).where(AdminPanelProfile.id.in_(admin_ids))
+    )
+    admin_map = {ap[0]: ap[1] for ap in admin_profiles_res.all()}
+
+    results = []
+    for req in requests:
+        item = _serialize(req)
+        custom_id = admin_map.get(req.admin_profile_id)
+        item['custom_id'] = custom_id or (f"ad:{req.admin_profile_id:05d}" if req.admin_profile_id else None)
+        results.append(item)
+
+    return {"total": total, "page": page, "results": results}
 
 
 # ── Lawyer Verification Requests ──────────────────────────────────────────────

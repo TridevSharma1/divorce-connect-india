@@ -6,7 +6,7 @@ import datetime
 import math
 
 from ..database import get_db
-from ..models import User, AdminPanelProfile, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, TrustReport, GetInTouch
+from ..models import User, AdminPanelProfile, AdminPanelProfileUpdateRequest, LawyerProfile, CaseRequest, CaseDocument, Payment, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, TrustReport, GetInTouch
 from ..security import get_current_user
 from .cloudinary_utils import upload_to_cloudinary
 
@@ -308,7 +308,16 @@ async def get_admin_profile(
         db.add(admin_profile)
         await db.commit()
         await db.refresh(admin_profile)
-        
+
+    pending_update_res = await db.execute(
+        select(AdminPanelProfileUpdateRequest)
+        .where(
+            AdminPanelProfileUpdateRequest.admin_profile_id == admin_profile.id,
+            AdminPanelProfileUpdateRequest.status == "PENDING"
+        )
+    )
+    has_pending_update = bool(pending_update_res.scalar_one_or_none())
+
     return {
         "id": admin_profile.id,
         "custom_id": admin_profile.custom_id,
@@ -324,6 +333,7 @@ async def get_admin_profile(
         "is_verified_by_superuser": admin_profile.is_verified_by_superuser,
         "date_of_join": admin_profile.date_of_join.strftime("%Y-%m-%d %H:%M:%S") if admin_profile.date_of_join else "",
         "updated_at": admin_profile.updated_at.strftime("%Y-%m-%d %H:%M:%S") if admin_profile.updated_at else "",
+        "has_pending_update_request": has_pending_update,
         "is_staff": current_user.is_staff
     }
 
@@ -348,18 +358,8 @@ async def update_admin_profile(
         
     admin_profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
     admin_profile = admin_profile_res.scalar_one_or_none()
-    
-    if not admin_profile:
-        admin_profile = AdminPanelProfile(user_id=current_user.id)
-        db.add(admin_profile)
-        await db.flush() # get the id
-        
-    if not admin_profile.custom_id:
-        admin_profile.custom_id = f"ad:{admin_profile.id:05d}"
-        
-    admin_profile.full_name = full_name
-    admin_profile.gender = gender
-    
+
+    dob_parsed = None
     if date_of_birth:
         try:
             dob_parsed = datetime.datetime.strptime(date_of_birth, "%Y-%m-%d").date()
@@ -367,22 +367,86 @@ async def update_admin_profile(
             age = today.year - dob_parsed.year - ((today.month, today.day) < (dob_parsed.month, dob_parsed.day))
             if age < 18:
                 raise HTTPException(status_code=400, detail="You must be at least 18 years of age.")
-            admin_profile.date_of_birth = dob_parsed
         except HTTPException:
             raise
         except Exception:
             pass
-            
+
+    picture_url = None
+    if profile_picture and profile_picture.filename:
+        picture_url = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
+
+    if not admin_profile:
+        admin_profile = AdminPanelProfile(user_id=current_user.id)
+        db.add(admin_profile)
+        await db.flush()  # get the id
+
+    if not admin_profile.custom_id:
+        admin_profile.custom_id = f"ad:{admin_profile.id:05d}"
+
+    if admin_profile.is_verified_by_superuser:
+        pending_res = await db.execute(
+            select(AdminPanelProfileUpdateRequest).where(
+                AdminPanelProfileUpdateRequest.admin_profile_id == admin_profile.id,
+                AdminPanelProfileUpdateRequest.status == "PENDING"
+            )
+        )
+        if pending_res.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="You already have an admin profile update pending approval.")
+
+        update_request = AdminPanelProfileUpdateRequest(
+            admin_profile_id=admin_profile.id,
+            full_name=full_name,
+            gender=gender,
+            date_of_birth=dob_parsed,
+            mobile_number=mobile_number,
+            alternate_mobile_number=alternate_mobile_number,
+            profile_picture=picture_url,
+            status="PENDING"
+        )
+        db.add(update_request)
+        await db.commit()
+
+        try:
+            from ..notifications import create_and_broadcast_notification
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=current_user.id,
+                title="Profile Update Pending Approval",
+                message="Your admin profile update has been submitted and is pending superuser approval.",
+                url="/admin_dashboard/"
+            )
+
+            admin_res = await db.execute(
+                select(User).where(
+                    ((User.is_staff == True) | (User.role == "admin")) & (User.id != current_user.id)
+                )
+            )
+            for admin in admin_res.scalars().all():
+                await create_and_broadcast_notification(
+                    db=db,
+                    user_id=admin.id,
+                    title="Admin Profile Update Request",
+                    message=f"Admin {current_user.email} has submitted a profile update for approval.",
+                    url="/superuser_dashboard/#admin-update-requests"
+                )
+        except Exception:
+            pass
+
+        return {"message": "Profile update submitted successfully for superuser approval.", "pending": True}
+
+    admin_profile.full_name = full_name
+    admin_profile.gender = gender
+    if dob_parsed:
+        admin_profile.date_of_birth = dob_parsed
     admin_profile.mobile_number = mobile_number
     admin_profile.alternate_mobile_number = alternate_mobile_number
-    
-    if profile_picture and profile_picture.filename:
-        admin_profile.profile_picture = await upload_to_cloudinary(profile_picture, folder="profile_pictures")
-        
+    if picture_url:
+        admin_profile.profile_picture = picture_url
     admin_profile.is_profile_complete = True
     admin_profile.is_verified_by_superuser = False
     admin_profile.updated_at = datetime.datetime.utcnow()
-    
+
     await db.commit()
 
     try:

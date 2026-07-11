@@ -550,11 +550,12 @@ const SCHEMAS = {
 
   'otp-codes': {
     label:'OTP Codes', endpoint:'/api/superuser/otp-codes',
-    listCols:['id','user_id','code','is_used','created_at'],
+    listCols:['id','user_id','email','code','is_used','created_at'],
     sections:[
       { title:'OTP', fields:[
         {name:'id',       label:'ID',          type:'ro'},
         {name:'user_id',  label:'User ID (FK)',type:'number'},
+        {name:'email',    label:'Email',       type:'text'},
         {name:'code',     label:'OTP Code',    type:'text'},
         {name:'is_used',  label:'Used',        type:'bool'},
         {name:'created_at',label:'Created At', type:'ro'},
@@ -629,11 +630,12 @@ const SCHEMAS = {
 
   'admin-update-requests': {
     label:'Admin Profile Update Requests', endpoint:'/api/superuser/admin-update-requests',
-    listCols:['id','admin_profile_id','full_name','status','submitted_at'],
+    listCols:['id','admin_profile_id','custom_id','full_name','status','submitted_at'],
     sections:[
       { title:'Request Status', fields:[
         {name:'id',               label:'ID',                type:'ro'},
         {name:'admin_profile_id', label:'Admin Profile ID',  type:'number'},
+        {name:'custom_id',        label:'Admin Custom ID',   type:'ro'},
         {name:'status',           label:'Status',            type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
         {name:'admin_notes',      label:'Admin Notes',       type:'textarea', fullWidth:true},
       ]},

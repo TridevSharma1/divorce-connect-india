@@ -5,34 +5,42 @@
 
 {% block extra_css %}
 <style>
+    body { background: #05070b !important; }
+
     .page-shell {
-        background: #f5f7fb;
+        background:
+            radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 24%),
+            radial-gradient(circle at bottom right, rgba(148,163,184,0.16), transparent 28%),
+            linear-gradient(135deg, #06080d 0%, #0f172a 45%, #111827 100%);
     }
 
     .card-clean {
-        background: #ffffff;
-        border: 1px solid #e4e4e7;
-        border-radius: 1.25rem;
-        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 1.4rem;
+        box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+        backdrop-filter: blur(16px);
     }
 
     .section-card {
-        background: #ffffff;
-        border: 1px solid #e4e4e7;
-        border-radius: 1.25rem;
+        background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 1.4rem;
         padding: 1.5rem;
+        box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+        backdrop-filter: blur(14px);
     }
 
     .section-title {
         font-size: 1rem;
         font-weight: 700;
-        color: #18181b;
+        color: #f8fafc;
         margin-bottom: 0.25rem;
     }
 
     .section-subtitle {
         font-size: 0.875rem;
-        color: #71717a;
+        color: #cbd5e1;
         margin-bottom: 1.25rem;
     }
 
@@ -40,72 +48,72 @@
         display: block;
         font-size: 0.875rem;
         font-weight: 600;
-        color: #3f3f46;
+        color: #e2e8f0;
         margin-bottom: 0.5rem;
     }
 
     .field-help {
         font-size: 0.75rem;
-        color: #71717a;
+        color: #94a3b8;
         margin-top: 0.4rem;
     }
 
     .form-input-clean {
         width: 100%;
-        border: 1px solid #d4d4d8;
-        background: #ffffff;
-        color: #18181b;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(2,6,23,0.7);
+        color: #f8fafc;
         padding: 0.85rem 1rem;
-        border-radius: 0.875rem;
+        border-radius: 0.95rem;
         font-size: 0.95rem;
         transition: all 0.2s ease;
     }
 
     .form-input-clean:focus {
         outline: none;
-        border-color: #111827;
-        box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.08);
+        border-color: #f8fafc;
+        box-shadow: 0 0 0 4px rgba(248,250,252,0.12);
     }
 
     .form-input-clean:disabled {
-        background: #f4f4f5;
-        color: #a1a1aa;
+        background: rgba(15,23,42,0.9);
+        color: #94a3b8;
         cursor: not-allowed;
     }
 
     .btn-primary-clean {
-        background: #111827;
-        color: #ffffff;
-        border: 1px solid #111827;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        color: #020617;
+        border: 1px solid rgba(255,255,255,0.18);
         transition: all 0.2s ease;
     }
 
     .btn-primary-clean:hover {
-        background: #000000;
-        border-color: #000000;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(255,255,255,0.12);
     }
 
     .btn-secondary-clean {
-        background: #ffffff;
-        color: #18181b;
-        border: 1px solid #d4d4d8;
+        background: rgba(255,255,255,0.06);
+        color: #f8fafc;
+        border: 1px solid rgba(255,255,255,0.12);
         transition: all 0.2s ease;
     }
 
     .btn-secondary-clean:hover {
-        background: #fafafa;
+        background: rgba(255,255,255,0.12);
     }
 
     .btn-danger-clean {
-        background: #ffffff;
-        color: #dc2626;
-        border: 1px solid #fca5a5;
+        background: rgba(127,29,29,0.18);
+        color: #fecaca;
+        border: 1px solid rgba(248,113,113,0.3);
         transition: all 0.2s ease;
     }
 
     .btn-danger-clean:hover {
-        background: #fef2f2;
-        color: #b91c1c;
+        background: rgba(127,29,29,0.28);
+        color: #ffe4e6;
     }
 
     .profile-photo-wrap {
@@ -119,9 +127,9 @@
         height: 100%;
         border-radius: 9999px;
         object-fit: cover;
-        border: 3px solid #ffffff;
-        box-shadow: 0 0 0 1px #d4d4d8;
-        background: #ffffff;
+        border: 3px solid rgba(255,255,255,0.2);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+        background: #111827;
     }
 
     .profile-photo-placeholder {
@@ -131,28 +139,28 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #18181b;
-        color: #ffffff;
+        background: linear-gradient(145deg, #111827, #1f2937);
+        color: #f8fafc;
         font-size: 2rem;
         font-weight: 700;
-        box-shadow: 0 0 0 1px #d4d4d8;
+        border: 3px solid rgba(255,255,255,0.15);
     }
 
     .upload-chip {
         position: absolute;
         right: -4px;
         bottom: -4px;
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 2.3rem;
+        height: 2.3rem;
         border-radius: 9999px;
-        background: #111827;
-        color: #ffffff;
-        border: 3px solid #ffffff;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        color: #020617;
+        border: 3px solid #0f172a;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.25);
     }
 
     .sidebar-link {
@@ -160,16 +168,16 @@
         align-items: center;
         gap: 0.75rem;
         padding: 0.85rem 1rem;
-        border-radius: 0.875rem;
+        border-radius: 0.95rem;
         font-size: 0.95rem;
         font-weight: 500;
-        color: #3f3f46;
+        color: #cbd5e1;
         transition: all 0.2s ease;
     }
 
     .sidebar-link:hover {
-        background: #f4f4f5;
-        color: #18181b;
+        background: rgba(255,255,255,0.08);
+        color: #f8fafc;
     }
 
     .status-badge {
@@ -178,22 +186,23 @@
         gap: 0.4rem;
         padding: 0.4rem 0.7rem;
         border-radius: 9999px;
-        background: #ecfdf3;
-        color: #027a48;
+        background: rgba(16,185,129,0.15);
+        color: #bbf7d0;
         font-size: 0.75rem;
         font-weight: 600;
     }
 
     .danger-box {
-        background: #fffafa;
-        border: 1px solid #fecaca;
-        border-radius: 1.25rem;
+        background: rgba(127,29,29,0.16);
+        border: 1px solid rgba(248,113,113,0.24);
+        border-radius: 1.4rem;
+        box-shadow: 0 14px 36px rgba(0,0,0,0.18);
     }
 
     .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.45);
+        background: rgba(2,6,23,0.55);
         backdrop-filter: blur(3px);
         display: none;
         align-items: center;
@@ -202,17 +211,15 @@
         padding: 1rem;
     }
 
-    .modal-overlay.show {
-        display: flex;
-    }
+    .modal-overlay.show { display: flex; }
 
     .modal-panel {
         width: 100%;
         max-width: 32rem;
-        background: white;
+        background: #0f172a;
         border-radius: 1.25rem;
-        border: 1px solid #e4e4e7;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.25);
     }
 
     .top-toast {
@@ -260,13 +267,13 @@
         <!-- Header -->
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
             <div>
-                <nav class="flex items-center gap-2 text-sm text-zinc-500 mb-2">
-                    <a href="/client_dashboard/" class="hover:text-zinc-800">Dashboard</a>
+                <nav class="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                    <a href="/client_dashboard/" class="hover:text-white">Dashboard</a>
                     <span>/</span>
-                    <span class="text-zinc-800 font-medium">Profile Settings</span>
+                    <span class="text-white font-medium">Profile Settings</span>
                 </nav>
-                <h1 class="text-3xl font-bold text-zinc-950">Profile Settings</h1>
-                <p class="text-sm text-zinc-600 mt-1">Update your personal information, contact details, and account profile.</p>
+                <h1 class="text-3xl font-bold text-white">Profile Settings</h1>
+                <p class="text-sm text-slate-400 mt-1">Update your personal information, contact details, and account profile.</p>
             </div>
 
             <div class="flex items-center gap-3">
@@ -300,9 +307,9 @@
                                 </button>
                             </div>
 
-                            <h2 id="display_full_name" class="text-xl font-semibold text-zinc-950">Loading...</h2>
-                            <p id="display_email" class="text-sm text-zinc-500 mt-1">Loading...</p>
-                            <p id="display_client_id" class="text-xs font-bold text-zinc-700 bg-zinc-100 border border-zinc-200/50 rounded-lg px-2.5 py-1 inline-block mt-2">Client ID: Loading...</p>
+                            <h2 id="display_full_name" class="text-xl font-semibold text-white">Loading...</h2>
+                            <p id="display_email" class="text-sm text-slate-400 mt-1">Loading...</p>
+                            <p id="display_client_id" class="text-xs font-bold text-slate-300 bg-slate-800/70 border border-slate-700 rounded-lg px-2.5 py-1 inline-block mt-2">Client ID: Loading...</p>
 
                             <div class="mt-4">
                                 <span class="status-badge">
@@ -315,14 +322,14 @@
                                 Change Photo
                             </button>
 
-                            <p class="text-xs text-zinc-500 mt-3">
+                            <p class="text-xs text-slate-400 mt-3">
                                 Use a clear square image for best results.
                             </p>
                         </div>
                     </div>
 
                     <div class="card-clean p-4">
-                        <h3 class="text-sm font-semibold text-zinc-900 px-2 mb-2">Quick Links</h3>
+                        <h3 class="text-sm font-semibold text-white px-2 mb-2">Quick Links</h3>
                         <nav class="space-y-1">
                             <a href="/client_dashboard/" class="sidebar-link">
                                 <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,8 +442,8 @@
 
                     <div class="card-clean p-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                         <div>
-                            <h3 class="text-sm font-semibold text-zinc-900">Save your changes</h3>
-                            <p class="text-sm text-zinc-500">Make sure your information is accurate before continuing.</p>
+                            <h3 class="text-sm font-semibold text-white">Save your changes</h3>
+                            <p class="text-sm text-slate-400">Make sure your information is accurate before continuing.</p>
                         </div>
                         <div class="flex gap-3">
                             <a href="/client_dashboard/" class="btn-secondary-clean px-5 py-3 rounded-xl text-sm font-medium">
@@ -455,7 +462,7 @@
         <div class="mt-8 lg:ml-[calc(33.333%-0.5rem)] lg:w-[calc(66.666%+0.5rem)]">
             <div class="danger-box p-6">
                 <h2 class="text-lg font-semibold text-red-700 mb-2">Deactivate Account</h2>
-                <p class="text-sm text-zinc-600 leading-relaxed mb-5">
+                <p class="text-sm text-slate-400 leading-relaxed mb-5">
                     Deactivating your account will disable access and hide your profile from active listings. You can contact support later if you need help restoring access.
                 </p>
                 <button type="button" class="btn-danger-clean px-5 py-3 rounded-xl text-sm font-semibold" onclick="openDeleteModal()">
@@ -470,8 +477,8 @@
 <div id="deleteModal" class="modal-overlay">
     <div id="modal-container" class="modal-panel transform transition-all duration-200 scale-95 opacity-0">
         <div class="p-6 border-b border-zinc-100">
-            <h2 class="text-xl font-semibold text-zinc-950">Confirm account deactivation</h2>
-            <p class="text-sm text-zinc-500 mt-2">
+            <h2 class="text-xl font-semibold text-white">Confirm account deactivation</h2>
+            <p class="text-sm text-slate-400 mt-2">
                 This will soft-delete your account and restrict login access until reactivation is approved.
             </p>
         </div>

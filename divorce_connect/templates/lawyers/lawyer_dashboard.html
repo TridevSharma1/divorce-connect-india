@@ -9,197 +9,232 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" id="dashboard-container" style="display: none;">
+<style>
+body {
+    background: linear-gradient(135deg, #020617 0%, #111827 45%, #030712 100%);
+    color: #f8fafc;
+}
 
-    <section id="action-required-section" class="mb-10 rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm hidden">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+#dashboard-container {
+    color-scheme: dark;
+}
+
+.panel-surface {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 20px 45px rgba(2, 6, 23, 0.45);
+}
+
+.panel-glow {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(15, 23, 42, 0.76));
+}
+</style>
+
+<div class="min-h-screen bg-transparent text-slate-100">
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12" id="dashboard-container" style="display: none;">
+        <section id="action-required-section" class="mb-8 hidden rounded-[28px] border border-amber-400/40 bg-amber-500/10 p-6 shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.28em] text-amber-300">Action required</p>
+                    <h2 id="action-title" class="mt-3 text-2xl font-bold text-white"></h2>
+                    <p id="action-desc" class="mt-2 text-sm leading-6 text-slate-300"></p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                    <a href="/lawyer_profile_edit/" class="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-slate-200">Edit Profile</a>
+                    <a href="/lawyer_case_orders/" class="inline-flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">View Requests</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.26em] text-amber-700">Action required</p>
-                <h2 id="action-title" class="mt-3 text-2xl font-bold text-amber-900"></h2>
-                <p id="action-desc" class="mt-2 text-sm leading-6 text-amber-800"></p>
+                <p class="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Professional practice dashboard</p>
+                <h1 class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Lawyer command center</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-400">Manage clients, review requests, and stay ahead with a polished legal operations view.</p>
             </div>
-            <div class="flex flex-col gap-3 sm:flex-row">
-                <a href="/lawyer_profile_edit/" class="btn-primary inline-flex items-center justify-center">Edit Profile</a>
-                <a href="/lawyer_case_orders/" class="btn-secondary inline-flex items-center justify-center">View Requests</a>
-            </div>
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm font-medium text-slate-300">Black • White • Grey theme</div>
         </div>
-    </section>
 
-    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <main class="space-y-10">
-            <section class="grid gap-6 lg:grid-cols-2">
-                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <main class="space-y-8">
+                <section class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                    <article class="panel-surface panel-glow rounded-[28px] p-8">
+                        <div class="flex items-center gap-4">
+                            <div class="flex h-16 w-16 items-center justify-center rounded-3xl border border-slate-700 bg-slate-900/70 text-slate-200">
+                                <img id="profile-picture" class="h-16 w-16 rounded-3xl object-cover hidden" src="" alt="">
+                                <svg id="profile-picture-placeholder" class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 14a4 4 0 10-8 0m8 0v1a3 3 0 11-6 0v-1m6 0a2 2 0 00-2-2H8a2 2 0 00-2 2m12 0v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Welcome back</p>
+                                <h2 id="lawyer-full-name" class="mt-2 text-3xl font-bold tracking-tight text-white">Loading...</h2>
+                                <p class="mt-2 text-sm text-slate-400"><span id="lawyer-specialization"></span> • <span id="lawyer-city"></span></p>
+                            </div>
+                        </div>
+                        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                                <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Rating</p>
+                                <p id="lawyer-rating" class="mt-3 text-xl font-semibold text-white">-</p>
+                            </div>
+                            <div class="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                                <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Consultation fee</p>
+                                <p class="mt-3 text-xl font-semibold text-white">₹<span id="lawyer-fee">0.00</span></p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel-surface rounded-[28px] p-8">
+                        <h3 class="text-xl font-semibold text-white">Practice overview</h3>
+                        <div class="mt-6 space-y-4">
+                            <div class="flex items-center justify-between gap-4 rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                                <div>
+                                    <p class="text-sm text-slate-400">Profile status</p>
+                                    <p id="status-profile-text" class="mt-1 text-base font-semibold text-white">-</p>
+                                </div>
+                                <span id="status-profile-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
+                            </div>
+                            <div class="flex items-center justify-between gap-4 rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                                <div>
+                                    <p class="text-sm text-slate-400">Verification</p>
+                                    <p id="status-verification-text" class="mt-1 text-base font-semibold text-white">-</p>
+                                </div>
+                                <span id="status-verification-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
+                            </div>
+                            <div class="flex items-center justify-between gap-4 rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                                <div>
+                                    <p class="text-sm text-slate-400">Pending update</p>
+                                    <p id="status-update-text" class="mt-1 text-base font-semibold text-white">-</p>
+                                </div>
+                                <span id="status-update-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <article class="stat-card rounded-[24px] border border-slate-800 p-6">
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Total cases</p>
+                        <p id="stat-total-cases" class="mt-4 text-3xl font-bold text-white">0</p>
+                    </article>
+                    <article class="stat-card rounded-[24px] border border-slate-800 p-6">
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Active cases</p>
+                        <p id="stat-active-cases" class="mt-4 text-3xl font-bold text-white">0</p>
+                    </article>
+                    <article class="stat-card rounded-[24px] border border-slate-800 p-6">
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Pending requests</p>
+                        <p id="stat-pending-requests" class="mt-4 text-3xl font-bold text-white">0</p>
+                    </article>
+                    <article class="stat-card rounded-[24px] border border-slate-800 p-6">
+                        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Verified docs</p>
+                        <p id="stat-verified-docs" class="mt-4 text-3xl font-bold text-white">0</p>
+                    </article>
+                </section>
+
+                <section class="panel-surface rounded-[28px] p-8">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">Revenue summary</h3>
+                            <p class="mt-2 text-sm text-slate-400">Estimated revenue based on accepted cases and your current fee.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-slate-300">Updated this month</div>
+                    </div>
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
+                            <p class="text-sm text-slate-400">Monthly estimate</p>
+                            <p class="mt-3 text-3xl font-bold text-white">₹<span id="stat-monthly-revenue">0</span></p>
+                        </div>
+                        <div class="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
+                            <p class="text-sm text-slate-400">Yearly estimate</p>
+                            <p class="mt-3 text-3xl font-bold text-white">₹<span id="stat-yearly-revenue">0</span></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid gap-6 xl:grid-cols-2">
+                    <article class="panel-surface rounded-[28px] p-8">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Incoming case requests</h3>
+                                <p class="mt-2 text-sm text-slate-400">Review and respond to new client requests.</p>
+                            </div>
+                            <span id="pending-requests-badge" class="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-200">0 new</span>
+                        </div>
+                        <div id="pending-requests-list" class="mt-6 space-y-4">
+                            <div class="rounded-3xl border border-dashed border-slate-700 bg-slate-950/60 p-8 text-center text-slate-400">
+                                <p class="font-semibold">Loading...</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel-surface rounded-[28px] p-8">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Ready cases</h3>
+                                <p class="mt-2 text-sm text-slate-400">Cases with verified documents awaiting your approval.</p>
+                            </div>
+                            <span id="ready-cases-badge" class="rounded-full bg-emerald-900/70 px-3 py-1 text-xs font-semibold text-emerald-300">0 ready</span>
+                        </div>
+                        <div id="ready-cases-list" class="mt-6 space-y-4">
+                            <div class="rounded-3xl border border-dashed border-slate-700 bg-slate-950/60 p-8 text-center text-slate-400">
+                                <p class="font-semibold">No cases ready yet.</p>
+                                <p class="mt-2 text-sm">Document verification results will appear here.</p>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+            </main>
+
+            <aside class="space-y-6">
+                <section class="panel-surface rounded-[28px] p-8">
                     <div class="flex items-center gap-4">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-700">
-                            <img id="profile-picture" class="h-16 w-16 rounded-3xl object-cover hidden" src="" alt="">
-                            <svg id="profile-picture-placeholder" class="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 14a4 4 0 10-8 0m8 0v1a3 3 0 11-6 0v-1m6 0a2 2 0 00-2-2H8a2 2 0 00-2 2m12 0v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4" />
+                        <div class="flex h-16 w-16 items-center justify-center rounded-3xl border border-slate-700 bg-slate-900/70 text-slate-200">
+                            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15a9.003 9.003 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm font-semibold text-slate-500">Welcome back</p>
-                            <h1 id="lawyer-full-name" class="text-3xl font-bold tracking-tight text-slate-900">Loading...</h1>
-                            <p class="mt-2 text-sm text-slate-600"><span id="lawyer-specialization"></span> - <span id="lawyer-city"></span></p>
+                            <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Profile at a glance</p>
+                            <p id="aside-specialization" class="mt-2 text-lg font-semibold text-white">-</p>
                         </div>
                     </div>
-                    <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-3xl bg-slate-50 p-4">
-                            <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Rating</p>
-                            <p id="lawyer-rating" class="mt-3 text-xl font-semibold text-slate-900">-</p>
+                    <div class="mt-6 space-y-4 text-sm text-slate-400">
+                        <div class="flex items-center justify-between">
+                            <span>Clients served</span>
+                            <span id="stat-active-clients" class="font-semibold text-white">0</span>
                         </div>
-                        <div class="rounded-3xl bg-slate-50 p-4">
-                            <p class="text-xs uppercase tracking-[0.24em] text-slate-500">Consultation fee</p>
-                            <p class="mt-3 text-xl font-semibold text-slate-900">₹<span id="lawyer-fee">0.00</span></p>
+                        <div class="flex items-center justify-between">
+                            <span>Accepted cases</span>
+                            <span id="stat-aside-active-cases" class="font-semibold text-white">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>Completed cases</span>
+                            <span id="stat-completed-cases" class="font-semibold text-white">0</span>
                         </div>
                     </div>
-                </article>
+                </section>
 
-                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
-                    <h2 class="text-xl font-semibold text-slate-900">Practice overview</h2>
-                    <div class="mt-6 space-y-4">
-                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
-                            <div>
-                                <p class="text-sm text-slate-500">Profile status</p>
-                                <p id="status-profile-text" class="mt-1 text-base font-semibold text-slate-900">-</p>
-                            </div>
-                            <span id="status-profile-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
-                        </div>
-                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
-                            <div>
-                                <p class="text-sm text-slate-500">Verification</p>
-                                <p id="status-verification-text" class="mt-1 text-base font-semibold text-slate-900">-</p>
-                            </div>
-                            <span id="status-verification-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
-                        </div>
-                        <div class="flex items-center justify-between gap-4 rounded-3xl bg-slate-50 p-4">
-                            <div>
-                                <p class="text-sm text-slate-500">Pending update</p>
-                                <p id="status-update-text" class="mt-1 text-base font-semibold text-slate-900">-</p>
-                            </div>
-                            <span id="status-update-badge" class="rounded-full px-3 py-1 text-xs font-semibold"></span>
-                        </div>
+                <section class="panel-surface rounded-[28px] p-6">
+                    <h3 class="text-lg font-semibold text-white">Quick actions</h3>
+                    <div class="mt-6 grid gap-3">
+                        <a href="/lawyer_case_orders/" class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-900">Review case requests</a>
+                        <a href="/lawyer_earnings/" class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-900">View earnings</a>
+                        <a href="/lawyer_settings/" class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-900">Account settings</a>
+                        <a href="/lawyer_billing/" class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-900">Billing & payments</a>
                     </div>
-                </article>
-            </section>
+                </section>
 
-            <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
-                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Total cases</p>
-                    <p id="stat-total-cases" class="mt-4 text-3xl font-bold text-slate-900">0</p>
-                </article>
-                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
-                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Active cases</p>
-                    <p id="stat-active-cases" class="mt-4 text-3xl font-bold text-slate-900">0</p>
-                </article>
-                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
-                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Pending requests</p>
-                    <p id="stat-pending-requests" class="mt-4 text-3xl font-bold text-slate-900">0</p>
-                </article>
-                <article class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
-                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Verified docs</p>
-                    <p id="stat-verified-docs" class="mt-4 text-3xl font-bold text-slate-900">0</p>
-                </article>
-            </section>
-
-            <section class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                        <h2 class="text-xl font-semibold text-slate-900">Revenue summary</h2>
-                        <p class="mt-2 text-sm text-slate-600">Estimated revenue based on accepted cases and current fee.</p>
-                    </div>
-                    <div class="rounded-3xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">Updated this month</div>
-                </div>
-                <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                    <div class="rounded-3xl bg-slate-50 p-5">
-                        <p class="text-sm text-slate-500">Monthly estimate</p>
-                        <p class="mt-3 text-3xl font-bold text-slate-900">₹<span id="stat-monthly-revenue">0</span></p>
-                    </div>
-                    <div class="rounded-3xl bg-slate-50 p-5">
-                        <p class="text-sm text-slate-500">Yearly estimate</p>
-                        <p class="mt-3 text-3xl font-bold text-slate-900">₹<span id="stat-yearly-revenue">0</span></p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="grid gap-6 lg:grid-cols-2">
-                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between gap-4">
-                        <div>
-                            <h2 class="text-xl font-semibold text-slate-900">Incoming case requests</h2>
-                            <p class="mt-2 text-sm text-slate-600">Review and respond to new client requests.</p>
-                        </div>
-                        <span id="pending-requests-badge" class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">0 new</span>
-                    </div>
-                    <div id="pending-requests-list" class="mt-6 space-y-4">
-                        <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
-                            <p class="font-semibold">Loading...</p>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
-                    <div class="flex items-center justify-between gap-4">
-                        <div>
-                            <h2 class="text-xl font-semibold text-slate-900">Ready cases</h2>
-                            <p class="mt-2 text-sm text-slate-600">Cases with verified documents awaiting your approval.</p>
-                        </div>
-                        <span id="ready-cases-badge" class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">0 ready</span>
-                    </div>
-                    <div id="ready-cases-list" class="mt-6 space-y-4">
-                        <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
-                            <p class="font-semibold">No cases ready yet.</p>
-                            <p class="mt-2 text-sm">Document verification results will appear here.</p>
-                        </div>
-                    </div>
-                </article>
-            </section>
-        </main>
-
-        <aside class="space-y-6">
-            <section class="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
-                <div class="flex items-center gap-4">
-                    <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 text-slate-700">
-                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15a9.003 9.003 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Profile at a glance</p>
-                        <p id="aside-specialization" class="mt-2 text-lg font-semibold text-slate-900">-</p>
-                    </div>
-                </div>
-                <div class="mt-6 space-y-4 text-sm text-slate-600">
-                    <div class="flex items-center justify-between">
-                        <span>Clients served</span>
-                        <span id="stat-active-clients" class="font-semibold text-slate-900">0</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>Accepted cases</span>
-                        <span id="stat-aside-active-cases" class="font-semibold text-slate-900">0</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>Completed cases</span>
-                        <span id="stat-completed-cases" class="font-semibold text-slate-900">0</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
-                <h2 class="text-lg font-semibold text-slate-900">Quick actions</h2>
-                <div class="mt-6 grid gap-3">
-                    <a href="/lawyer_case_orders/" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Review case requests</a>
-                    <a href="/lawyer_earnings/" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">View earnings</a>
-                    <a href="/lawyer_settings/" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Account settings</a>
-                    <a href="/lawyer_billing/" class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100">Billing & payments</a>
-                </div>
-            </section>
-
-            <section class="rounded-3xl bg-slate-950 p-8 text-white shadow-sm">
-                <h2 class="text-lg font-semibold">Support</h2>
-                <p class="mt-4 text-sm leading-6 text-slate-300">Need help with a case or verification? Reach out to our support team for fast assistance and updates.</p>
-                <a href="/lawyer_support/" class="mt-6 inline-flex w-full items-center justify-center rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-950">Contact support</a>
-            </section>
-        </aside>
+                <section class="rounded-[28px] bg-slate-950 p-8 text-white shadow-[0_20px_45px_rgba(2,6,23,0.45)]">
+                    <h3 class="text-lg font-semibold">Support</h3>
+                    <p class="mt-4 text-sm leading-6 text-slate-300">Need help with a case or verification? Reach out to our support team for fast assistance and updates.</p>
+                    <a href="/lawyer_support/" class="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-950">Contact support</a>
+                </section>
+            </aside>
+        </div>
     </div>
 </div>
 

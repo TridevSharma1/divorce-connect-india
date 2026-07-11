@@ -75,6 +75,25 @@ const Auth = {
             nameElements.forEach(el => {
                 el.textContent = user.first_name || user.email.split('@')[0];
             });
+
+            // Populate user's avatar in navbars
+            console.log("User data received:", user);
+            console.log("Profile picture value:", user.profile_picture);
+            const avatarElements = document.querySelectorAll(".auth-user-avatar");
+            console.log("Avatar elements found:", avatarElements.length);
+            
+            avatarElements.forEach((el, idx) => {
+                const displayName = user.first_name || user.email.split('@')[0] || "U";
+                const initials = displayName.charAt(0).toUpperCase();
+
+                if (user.profile_picture) {
+                    console.log(`Setting image for avatar ${idx}:`, user.profile_picture);
+                    el.innerHTML = `<img src="${user.profile_picture}" alt="${displayName}" class="w-full h-full object-cover rounded-full" />`;
+                } else {
+                    console.log(`Setting initials for avatar ${idx}: ${initials}`);
+                    el.innerHTML = `<span class="text-xs font-semibold text-zinc-700">${initials}</span>`;
+                }
+            });
             
         } else {
             if(guestNav) guestNav.style.display = "flex";

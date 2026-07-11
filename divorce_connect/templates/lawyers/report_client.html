@@ -4,6 +4,34 @@
 
 {% block extra_css %}
 <style>
+    body {
+        background: linear-gradient(135deg, #020617 0%, #111827 45%, #030712 100%);
+        color-scheme: dark;
+    }
+
+    .panel-surface {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 20px 45px rgba(2, 6, 23, 0.45);
+    }
+
+    .form-input {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        color: #f8fafc;
+    }
+
+    .form-input::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+    }
+
+    .form-input:focus {
+        background: rgba(15, 23, 42, 0.8);
+        border-color: rgba(255, 255, 255, 0.4);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-inter { font-family: 'Inter', sans-serif; }
 </style>
@@ -16,24 +44,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="bg-white text-gray-900 min-h-screen flex flex-col">
+<div class="min-h-screen flex flex-col bg-transparent text-white">
 
     <!-- Header Section -->
-    <header class="py-12 text-center border-b border-gray-100">
-        <h1 class="font-playfair text-5xl font-bold text-black mb-2">Report a Client</h1>
-        <p class="text-gray-600 text-sm max-w-2xl mx-auto">Help us maintain a safe and trustworthy platform.</p>
+    <header class="border-b border-slate-800 bg-slate-950/80 px-4 py-12 backdrop-blur-sm sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-4xl text-center">
+            <h1 class="font-playfair text-4xl font-bold text-white mb-2">Report a Client</h1>
+            <p class="text-slate-400 text-sm">Help us maintain a safe and trustworthy platform.</p>
+        </div>
     </header>
 
     <!-- Warning Banner -->
-    <section class="bg-red-50 border-t border-b border-red-100 py-8 px-6">
-        <div class="max-w-4xl mx-auto flex items-start gap-4">
+    <section class="border-b border-slate-800 bg-red-500/10 px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-4xl flex items-start gap-4">
             <!-- Shield Icon -->
-            <svg class="w-6 h-6 text-red-800 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="h-6 w-6 flex-shrink-0 mt-1 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M2.166 4.999a11.954 11.954 0 0010-8.457 11.954 11.954 0 0010 8.457V9.5c0 5.55-3.84 10.74-9 12.02-5.16-1.28-9-6.47-9-12.02V4.999z" clip-rule="evenodd" />
             </svg>
             <div>
-                <h2 class="font-semibold text-red-900 mb-1">Trust & Safety Policy</h2>
-                <p class="text-red-800 text-sm leading-relaxed">
+                <h2 class="mb-1 font-semibold text-red-400">Trust & Safety Policy</h2>
+                <p class="text-sm leading-relaxed text-slate-300">
                     DivorceConnect India enforces a strict zero-tolerance policy for abuse and fraud. Please use this form to report abusive language, deliberate no-shows, or chargeback fraud. All reports are investigated by our Trust & Safety team within 24–48 hours.
                 </p>
             </div>
@@ -41,19 +71,19 @@
     </section>
 
     <!-- Main Content -->
-    <main class="py-12 px-6 bg-white flex-grow">
-        <div class="max-w-3xl mx-auto">
+    <main class="flex-grow px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl">
             <!-- Report Form Card -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+            <div class="panel-surface rounded-lg p-8">
                 <form id="reportForm" method="post" enctype="multipart/form-data" class="space-y-6">
                     <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
 
                     <!-- Field 1: Select Client -->
                     <div>
-                        <label for="clientSelect" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
-                            Which client are you reporting?
+                        <label for="clientSelect" class="mb-2 block text-sm font-semibold text-slate-300">
+                            Which client are you reporting? <span class="text-red-400">*</span>
                         </label>
-                        <select id="clientSelect" name="client" required class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm">
+                        <select id="clientSelect" name="client" required class="form-input w-full rounded-lg px-4 py-2 transition">
                             <option value="">— Select a client —</option>
                             {% for client in clients %}
                                 <option value="{{ client.id }}">{{ client.get_full_name }}</option>
@@ -65,10 +95,10 @@
 
                     <!-- Field 2: Reason for Report -->
                     <div>
-                        <label for="reasonSelect" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
-                            Primary Reason
+                        <label for="reasonSelect" class="mb-2 block text-sm font-semibold text-slate-300">
+                            Primary Reason <span class="text-red-400">*</span>
                         </label>
-                        <select id="reasonSelect" name="reason" required class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm">
+                        <select id="reasonSelect" name="reason" required class="form-input w-full rounded-lg px-4 py-2 transition">
                             <option value="">— Select a reason —</option>
                             <option value="abusive_language">Abusive Language / Harassment</option>
                             <option value="no_show">Deliberate No-Show</option>
@@ -79,8 +109,8 @@
 
                     <!-- Field 3: Detailed Description -->
                     <div>
-                        <label for="detailsTextarea" class="block font-inter font-600 text-gray-900 mb-2 text-sm">
-                            Incident Details
+                        <label for="detailsTextarea" class="mb-2 block text-sm font-semibold text-slate-300">
+                            Incident Details <span class="text-red-400">*</span>
                         </label>
                         <textarea
                             id="detailsTextarea"
@@ -88,21 +118,21 @@
                             rows="6"
                             required
                             placeholder="Please provide a factual timeline of the events and quote any specific messages if applicable..."
-                            class="w-full px-4 py-3 border border-gray-300 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition font-inter text-sm resize-vertical"></textarea>
-                        <p class="text-gray-500 text-xs mt-1">Min. 20 characters. Be specific and factual.</p>
+                            class="form-input w-full rounded-lg px-4 py-2 transition resize-vertical"></textarea>
+                        <p class="mt-1 text-xs text-slate-500">Min. 20 characters. Be specific and factual.</p>
                     </div>
 
                     <!-- Field 4: Evidence Upload -->
                     <div>
-                        <label class="block font-inter font-600 text-gray-900 mb-3 text-sm">
+                        <label class="mb-3 block text-sm font-semibold text-slate-300">
                             Attach Evidence
                         </label>
-                        <div id="uploadZone" class="relative border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 px-6 py-8 text-center cursor-pointer transition hover:border-gray-400 hover:bg-gray-100">
-                            <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div id="uploadZone" class="relative rounded-lg border-2 border-dashed border-slate-700 bg-slate-900 px-6 py-8 text-center cursor-pointer transition hover:border-slate-600 hover:bg-slate-800">
+                            <svg class="mx-auto mb-2 h-8 w-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
-                            <p class="font-inter font-500 text-gray-900 text-sm mb-1">Upload screenshots, emails, or chat logs</p>
-                            <p class="text-gray-500 text-xs">Max 5MB. Supports JPG, PNG, PDF.</p>
+                            <p class="mb-1 text-sm font-semibold text-white">Upload screenshots, emails, or chat logs</p>
+                            <p class="text-xs text-slate-500">Max 5MB. Supports JPG, PNG, PDF.</p>
                             <input
                                 type="file"
                                 id="fileInput"
@@ -112,19 +142,19 @@
                                 class="absolute inset-0 opacity-0 cursor-pointer"
                                 aria-label="File upload">
                         </div>
-                        <div id="fileNameDisplay" class="mt-2 text-sm text-gray-600 hidden">
-                            <span class="font-inter font-500">File:</span> <span id="fileName" class="text-gray-900"></span>
+                        <div id="fileNameDisplay" class="mt-2 hidden text-sm text-slate-400">
+                            <span class="font-semibold">File:</span> <span id="fileName" class="text-slate-300"></span>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex justify-end items-center gap-3 pt-6 border-t border-gray-100">
-                        <button type="button" onclick="document.getElementById('reportForm').reset(); document.getElementById('fileNameDisplay').classList.add('hidden');" class="px-6 py-2.5 text-gray-900 font-inter font-500 text-sm hover:text-black transition">
+                    <div class="flex justify-end items-center gap-3 border-t border-slate-800 pt-6">
+                        <button type="button" onclick="document.getElementById('reportForm').reset(); document.getElementById('fileNameDisplay').classList.add('hidden');" class="rounded-lg border border-slate-700 bg-slate-900 px-6 py-3 font-semibold text-slate-300 transition hover:bg-slate-800">
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            class="px-6 py-2.5 bg-black text-white font-inter font-600 text-sm rounded-md hover:bg-gray-900 transition shadow-sm">
+                            class="rounded-lg bg-white px-6 py-3 font-semibold text-slate-950 transition hover:bg-slate-200">
                             Submit Official Report
                         </button>
                     </div>
@@ -136,19 +166,19 @@
     </main>
 
     <!-- Confirmation Modal (Hidden by Default) -->
-    <div id="confirmationModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+    <div id="confirmationModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div class="panel-surface w-full max-w-md rounded-lg p-8 text-center">
             <!-- Checkmark Icon -->
-            <svg class="w-12 h-12 mx-auto mb-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto mb-4 h-12 w-12 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h2 class="font-playfair text-2xl font-bold text-black mb-2">Report Submitted</h2>
-            <p class="text-gray-600 text-sm leading-relaxed mb-6">
+            <h2 class="mb-2 font-playfair text-2xl font-bold text-white">Report Submitted</h2>
+            <p class="mb-6 text-sm leading-relaxed text-slate-300">
                 Our Trust & Safety team has received your evidence and will review the client's account immediately.
             </p>
             <button
                 onclick="closeModal()"
-                class="w-full px-6 py-2.5 bg-black text-white font-inter font-600 text-sm rounded-md hover:bg-gray-900 transition">
+                class="w-full rounded-lg bg-white px-6 py-3 font-semibold text-slate-950 transition hover:bg-slate-200">
                 Return to Dashboard
             </button>
         </div>

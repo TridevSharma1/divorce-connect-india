@@ -53,6 +53,32 @@ async def get_current_user_details(
     """
     role = await get_user_role(current_user, db)
 
+    profile_picture = None
+    if role == "client":
+        try:
+            client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
+            client_profile = client_res.scalar_one_or_none()
+            if client_profile:
+                profile_picture = client_profile.profile_picture
+        except Exception as e:
+            print(f"Error fetching client profile picture: {e}")
+    elif role == "lawyer":
+        try:
+            lawyer_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+            lawyer_profile = lawyer_res.scalar_one_or_none()
+            if lawyer_profile:
+                profile_picture = lawyer_profile.profile_picture
+        except Exception as e:
+            print(f"Error fetching lawyer profile picture: {e}")
+    elif role == "admin":
+        try:
+            admin_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == current_user.id))
+            admin_profile = admin_res.scalar_one_or_none()
+            if admin_profile:
+                profile_picture = admin_profile.profile_picture
+        except Exception as e:
+            print(f"Error fetching admin profile picture: {e}")
+
     return {
         "id": current_user.id,
         "email": current_user.email,
@@ -61,7 +87,8 @@ async def get_current_user_details(
         "username": current_user.username,
         "is_active": current_user.is_active,
         "created_at": current_user.created_at,
-        "role": role
+        "role": role,
+        "profile_picture": profile_picture
     }
 
 def render_email_template(template_name: str, context: dict) -> str:

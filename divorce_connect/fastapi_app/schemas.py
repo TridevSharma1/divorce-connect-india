@@ -27,6 +27,7 @@ class UserResponse(UserBase):
     is_active: bool
     created_at: datetime.datetime
     role: str
+    profile_picture: Optional[str] = None
 
     class Config:
         from_attributes = True

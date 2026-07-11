@@ -164,10 +164,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const alertBox = document.getElementById("alert-box");
+    const submitButton = document.querySelector("button[type='submit']");
+    const formElements = document.querySelectorAll("#profile-form input, #profile-form select, #profile-form button");
 
     function showAlert(msg, type="info") {
         alertBox.innerText = msg;
-        alertBox.className = `mb-6 p-4 rounded-lg ${type === 'success' ? 'bg-emerald-50 border-2 border-emerald-300 text-emerald-900' : 'bg-rose-50 border-2 border-rose-300 text-rose-900'}`;
+        alertBox.className = `mb-6 p-4 rounded-lg ${type === 'success' ? 'bg-emerald-50 border-2 border-emerald-300 text-emerald-900' : type === 'danger' ? 'bg-rose-50 border-2 border-rose-300 text-rose-900' : 'bg-slate-50 border-2 border-slate-300 text-slate-900'}`;
+    }
+
+    function disableForm() {
+        formElements.forEach(el => el.disabled = true);
+        submitButton.classList.add('cursor-not-allowed', 'opacity-70');
     }
 
     // 1. Fetch current profile to populate
@@ -183,6 +190,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("date_of_birth").value = data.date_of_birth || "";
             document.getElementById("mobile_number").value = data.mobile_number || "";
             document.getElementById("alternate_mobile_number").value = data.alternate_mobile_number || "";
+
+            if (data.has_pending_update_request) {
+                showAlert("Your latest profile changes are pending superuser approval. You cannot submit another update until the pending request is resolved.", "info");
+                disableForm();
+            }
         }
         document.getElementById("edit-container").style.display = "block";
     } catch (err) {
