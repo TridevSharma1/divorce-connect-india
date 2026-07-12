@@ -54,12 +54,16 @@ async def get_current_user_details(
     role = await get_user_role(current_user, db)
 
     profile_picture = None
+    full_name = f"{current_user.first_name} {current_user.last_name}".strip() or current_user.username or current_user.email
+
     if role == "client":
         try:
             client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
             client_profile = client_res.scalar_one_or_none()
             if client_profile:
                 profile_picture = client_profile.profile_picture
+                # Client names can come from the User record
+                full_name = f"{current_user.first_name} {current_user.last_name}".strip() or current_user.email
         except Exception as e:
             print(f"Error fetching client profile picture: {e}")
     elif role == "lawyer":
@@ -68,6 +72,7 @@ async def get_current_user_details(
             lawyer_profile = lawyer_res.scalar_one_or_none()
             if lawyer_profile:
                 profile_picture = lawyer_profile.profile_picture
+                full_name = lawyer_profile.full_name or full_name
         except Exception as e:
             print(f"Error fetching lawyer profile picture: {e}")
     elif role == "admin":
@@ -76,6 +81,7 @@ async def get_current_user_details(
             admin_profile = admin_res.scalar_one_or_none()
             if admin_profile:
                 profile_picture = admin_profile.profile_picture
+                full_name = admin_profile.full_name or full_name
         except Exception as e:
             print(f"Error fetching admin profile picture: {e}")
 
@@ -85,6 +91,7 @@ async def get_current_user_details(
         "first_name": current_user.first_name,
         "last_name": current_user.last_name,
         "username": current_user.username,
+        "full_name": full_name,
         "is_active": current_user.is_active,
         "created_at": current_user.created_at,
         "role": role,

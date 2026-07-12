@@ -62,12 +62,10 @@
     <!-- Profile Dropdown -->
     <div class="relative">
         <button onclick="toggleDropdown('adminDropdown')" class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
-                </svg>
+            <div class="auth-user-avatar w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden border border-gray-300">
+                <span class="text-sm font-semibold text-gray-700">A</span>
             </div>
-            <span class="hidden md:inline text-sm font-medium"><span class="auth-user-name">Profile</span></span>
+            <span class="hidden md:inline text-sm font-medium text-gray-900"><span class="auth-user-name">Profile</span></span>
         </button>
 
         <div id="adminDropdown" class="dropdown-menu">

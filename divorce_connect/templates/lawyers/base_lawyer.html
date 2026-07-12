@@ -35,6 +35,28 @@
             border-bottom: 2px solid #000000;
             padding-bottom: 2px;
         }
+        .mobile-menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #111827;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .mobile-menu-toggle:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+        .lawyer-mobile-menu {
+            display: none;
+        }
+        .lawyer-mobile-menu.open {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -65,6 +87,13 @@
                 </div>
 
                 <!-- Right: Notifications & Profile -->
+                <div class="flex items-center space-x-2">
+                    <button type="button" class="mobile-menu-toggle md:hidden" onclick="toggleLawyerMobileMenu()" aria-label="Open mobile menu">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
                 <div class="flex items-center space-x-4">
                     <!-- Notifications Placeholder -->
                     <!-- <button class="text-gray-600 hover:text-black relative">
@@ -105,7 +134,7 @@
         </div>
 
         <!-- Mobile Menu (for smaller screens) -->
-        <div class="md:hidden border-t border-gray-200 px-4 py-2 bg-white">
+        <div id="lawyerMobileMenu" class="lawyer-mobile-menu md:hidden border-t border-gray-200 px-4 py-2 bg-white">
             <div class="flex flex-col space-y-2">
                 <a href="/lawyer_dashboard/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Dashboard</a>
                 <a href="/lawyer_case_orders/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Case Orders</a>
@@ -113,6 +142,7 @@
                 <a href="/lawyer_earnings/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Earnings</a>
                 <a href="/lawyer_billing/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Billing</a>
                 <a href="/lawyer_settings/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-black hover:bg-gray-100 rounded">Settings</a>
+                <button type="button" class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded" onclick="window.location.href='/logout/'">Logout</button>
             </div>
         </div>
     </nav>
@@ -211,6 +241,23 @@
             }
         });
     </script>
+    <script>
+        function toggleLawyerMobileMenu() {
+            const menu = document.getElementById('lawyerMobileMenu');
+            if (!menu) return;
+            menu.classList.toggle('open');
+        }
 
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('lawyerMobileMenu');
+            const button = event.target.closest('.mobile-menu-toggle');
+            if (!menu) return;
+
+            if (button) return;
+            if (!event.target.closest('#lawyerMobileMenu')) {
+                menu.classList.remove('open');
+            }
+        });
+    </script>
 </body>
 </html>

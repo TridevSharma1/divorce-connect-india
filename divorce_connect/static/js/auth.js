@@ -44,36 +44,53 @@ const Auth = {
         const clientNav = document.getElementById("nav-client");
         const lawyerNav = document.getElementById("nav-lawyer");
         const adminNav = document.getElementById("nav-admin");
+        const clientStaticNav = document.getElementById("nav-client-static");
+        const lawyerStaticNav = document.getElementById("nav-lawyer-static");
+        const adminStaticNav = document.getElementById("nav-admin-static");
+        const mobileMenus = document.querySelectorAll(".mobile-menu");
 
         const footerClient = document.getElementById("footer-col-client");
         const footerLawyer = document.getElementById("footer-col-lawyer");
         const footerAdmin = document.getElementById("footer-col-admin");
 
-        if(guestNav) guestNav.style.display = "none";
-        if(clientNav) clientNav.style.display = "none";
-        if(lawyerNav) lawyerNav.style.display = "none";
-        if(adminNav) adminNav.style.display = "none";
+        if (guestNav) guestNav.style.display = "none";
+        if (clientNav) clientNav.style.display = "none";
+        if (lawyerNav) lawyerNav.style.display = "none";
+        if (adminNav) adminNav.style.display = "none";
+        if (clientStaticNav) clientStaticNav.style.display = "none";
+        if (lawyerStaticNav) lawyerStaticNav.style.display = "none";
+        if (adminStaticNav) adminStaticNav.style.display = "none";
+        mobileMenus.forEach((menu) => menu.classList.remove("active"));
 
-        if(footerClient) footerClient.style.display = "none";
-        if(footerLawyer) footerLawyer.style.display = "none";
-        if(footerAdmin) footerAdmin.style.display = "none";
+        if (footerClient) footerClient.style.display = "none";
+        if (footerLawyer) footerLawyer.style.display = "none";
+        if (footerAdmin) footerAdmin.style.display = "none";
+
+        let activeRole = "guest";
 
         if (user) {
             if (user.role === "admin" || user.is_staff) {
-                if(adminNav) adminNav.style.display = "flex";
-                if(footerAdmin) footerAdmin.style.display = "block";
+                if (adminNav) adminNav.style.display = "flex";
+                if (adminStaticNav) adminStaticNav.style.display = "flex";
+                if (footerAdmin) footerAdmin.style.display = "block";
+                activeRole = "admin";
             } else if (user.role === "lawyer") {
-                if(lawyerNav) lawyerNav.style.display = "flex";
-                if(footerLawyer) footerLawyer.style.display = "block";
+                if (lawyerNav) lawyerNav.style.display = "flex";
+                if (lawyerStaticNav) lawyerStaticNav.style.display = "flex";
+                if (footerLawyer) footerLawyer.style.display = "block";
+                activeRole = "lawyer";
             } else {
-                if(clientNav) clientNav.style.display = "flex";
-                if(footerClient) footerClient.style.display = "block";
+                if (clientNav) clientNav.style.display = "flex";
+                if (clientStaticNav) clientStaticNav.style.display = "flex";
+                if (footerClient) footerClient.style.display = "block";
+                activeRole = "client";
             }
             
             // Populate user's name in navbars
+            const displayName = (user.full_name || user.first_name || user.username || (user.email ? user.email.split('@')[0] : '')).trim() || 'User';
             const nameElements = document.querySelectorAll(".auth-user-name");
             nameElements.forEach(el => {
-                el.textContent = user.first_name || user.email.split('@')[0];
+                el.textContent = displayName;
             });
 
             // Populate user's avatar in navbars
@@ -83,7 +100,6 @@ const Auth = {
             console.log("Avatar elements found:", avatarElements.length);
             
             avatarElements.forEach((el, idx) => {
-                const displayName = user.first_name || user.email.split('@')[0] || "U";
                 const initials = displayName.charAt(0).toUpperCase();
 
                 if (user.profile_picture) {
@@ -98,7 +114,10 @@ const Auth = {
         } else {
             if(guestNav) guestNav.style.display = "flex";
             if(footerClient) footerClient.style.display = "block";
+            activeRole = "guest";
         }
+
+        document.body.dataset.mobileNavRole = activeRole;
     }
 };
 

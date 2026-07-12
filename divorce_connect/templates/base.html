@@ -56,6 +56,15 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
+        header.header-sticky {
+            position: sticky;
+        }
+
+        header.header-sticky,
+        header.header-sticky > div {
+            position: relative;
+        }
+
         .btn-primary {
             background-color: var(--deep-black);
             color: var(--pure-white);
@@ -174,14 +183,99 @@
             top: 100%;
             left: 0;
             right: 0;
-            background-color: var(--pure-white);
-            border-bottom: 2px solid #f0f0f0;
+            background-color: rgba(255, 255, 255, 0.94);
             padding: 1rem;
             z-index: 40;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(16px);
         }
 
         .mobile-menu.active {
             display: block;
+        }
+
+        .mobile-menu-panel {
+            background: #fff;
+            border-radius: 1.25rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 32px 80px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+        }
+
+        .mobile-menu-title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .mobile-close {
+            border: none;
+            background: transparent;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #111827;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .mobile-menu nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem 1.25rem;
+        }
+
+        .mobile-menu nav .nav-link,
+        .mobile-menu nav .text-link {
+            padding: 0.95rem 1rem;
+            border-radius: 0.95rem;
+            font-size: 0.98rem;
+            color: #111827;
+            background-color: #f8fafc;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-menu nav .nav-link:hover,
+        .mobile-menu nav .text-link:hover {
+            background-color: #111827;
+            color: #f8fafc;
+            border-color: transparent;
+        }
+
+        .mobile-menu nav .logout-item {
+            color: #dc2626;
+            font-weight: 700;
+            background-color: #fff3f2;
+            border-color: #fed7d7;
+        }
+
+        .mobile-menu nav .logout-item:hover {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .mobile-menu .divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 1rem 0;
+        }
+
+        .mobile-menu .section-note {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
         }
 
         @media (max-width: 768px) {
@@ -213,7 +307,7 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center gap-8">
+                <div class="hidden md:flex items-center gap-4 lg:gap-8 flex-wrap">
                     {% block navbar %}
                     <div id="nav-client" style="display: none;" class="flex items-center gap-8">
                         {% include 'includes/navbar_client.html' %}
@@ -236,7 +330,7 @@
                 </div>
 
                 <!-- Mobile Toggle -->
-                <button class="mobile-toggle md:hidden flex items-center gap-2" onclick="toggleMobileMenu()">
+                <button class="mobile-toggle md:hidden flex items-center gap-2 text-gray-900" onclick="toggleMobileMenu()">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -244,11 +338,54 @@
             </div>
 
             <!-- Mobile Navigation -->
-            <div class="mobile-menu md:hidden" id="mobileMenu">
-                <!-- We can extend auth.js to handle mobile navs as well if needed, but for now we'll just include standard links for guest fallback. Real implementation would toggle mobile views exactly like desktop views. -->
-                <a href="/" class="nav-link">Home</a>
-                <a href="/login/" class="nav-link">Login</a>
-                <a href="/register/" class="nav-link btn-primary mt-2">Get Started</a>
+            <div class="mobile-menu md:hidden" id="mobile-nav-client">
+                <div class="mobile-menu-panel">
+                    <div class="mobile-menu-header">
+                        <span class="mobile-menu-title">Client Menu</span>
+                        <button class="mobile-close" onclick="toggleMobileMenu()" aria-label="Close menu">×</button>
+                    </div>
+                    <nav>
+                        {% include 'includes/navbar_client_mobile.html' %}
+                    </nav>
+                </div>
+            </div>
+
+            <div class="mobile-menu md:hidden" id="mobile-nav-lawyer">
+                <div class="mobile-menu-panel">
+                    <div class="mobile-menu-header">
+                        <span class="mobile-menu-title">Lawyer Menu</span>
+                        <button class="mobile-close" onclick="toggleMobileMenu()" aria-label="Close menu">×</button>
+                    </div>
+                    <nav>
+                        {% include 'includes/navbar_lawyer_mobile.html' %}
+                    </nav>
+                </div>
+            </div>
+
+            <div class="mobile-menu md:hidden" id="mobile-nav-admin">
+                <div class="mobile-menu-panel">
+                    <div class="mobile-menu-header">
+                        <span class="mobile-menu-title">Admin Menu</span>
+                        <button class="mobile-close" onclick="toggleMobileMenu()" aria-label="Close menu">×</button>
+                    </div>
+                    <nav>
+                        {% include 'includes/navbar_admin_mobile.html' %}
+                    </nav>
+                </div>
+            </div>
+
+            <div class="mobile-menu md:hidden" id="mobile-nav-guest">
+                <div class="mobile-menu-panel">
+                    <div class="mobile-menu-header">
+                        <span class="mobile-menu-title">Menu</span>
+                        <button class="mobile-close" onclick="toggleMobileMenu()" aria-label="Close menu">×</button>
+                    </div>
+                    <nav>
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="/login/" class="nav-link">Login</a>
+                        <a href="/register/" class="nav-link">Get Started</a>
+                    </nav>
+                </div>
             </div>
         </div>
     </header>
@@ -444,9 +581,54 @@
     </footer>
 
     <script>
+        function getCurrentNavRole() {
+            const explicitRole = (document.body.dataset.mobileNavRole || '').toLowerCase();
+            if (explicitRole) return explicitRole;
+
+            const path = window.location.pathname.toLowerCase();
+            if (path.startsWith('/admin') || path.startsWith('/superuser') || path.startsWith('/dashboard')) return 'admin';
+
+            const lawyerPathPrefixes = [
+                '/lawyer_dashboard', '/lawyer_case_orders', '/lawyer_case_status', '/lawyer_earnings',
+                '/lawyer_settings', '/lawyer_billing', '/lawyer_profile', '/lawyer_support',
+                '/lawyer_report_client', '/lawyer_profile_edit', '/lawyer_accept_case', '/lawyer_case_detail',
+                '/lawyer_view_case_documents'
+            ];
+            if (lawyerPathPrefixes.some(prefix => path.startsWith(prefix))) return 'lawyer';
+
+            const clientPathPrefixes = [
+                '/client', '/clients', '/lawyers_section', '/lawyer_detail', '/support',
+                '/client_cases', '/client_dashboard', '/client_profile', '/case_detail'
+            ];
+            if (clientPathPrefixes.some(prefix => path.startsWith(prefix))) return 'client';
+
+            const navClient = document.getElementById('nav-client');
+            const navLawyer = document.getElementById('nav-lawyer');
+            const navAdmin = document.getElementById('nav-admin');
+            const navLawyerStatic = document.getElementById('nav-lawyer-static');
+            const navClientStatic = document.getElementById('nav-client-static');
+            const navAdminStatic = document.getElementById('nav-admin-static');
+
+            if (navAdmin && window.getComputedStyle(navAdmin).display !== 'none') return 'admin';
+            if (navLawyer && window.getComputedStyle(navLawyer).display !== 'none') return 'lawyer';
+            if (navClient && window.getComputedStyle(navClient).display !== 'none') return 'client';
+            if (navAdminStatic && window.getComputedStyle(navAdminStatic).display !== 'none') return 'admin';
+            if (navLawyerStatic && window.getComputedStyle(navLawyerStatic).display !== 'none') return 'lawyer';
+            if (navClientStatic && window.getComputedStyle(navClientStatic).display !== 'none') return 'client';
+            return 'guest';
+        }
+
         function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('active');
+            const role = getCurrentNavRole();
+            const menu = document.getElementById(`mobile-nav-${role}`);
+            if (!menu) return;
+
+            const isOpen = menu.classList.contains('active');
+            document.querySelectorAll('.mobile-menu').forEach((item) => item.classList.remove('active'));
+
+            if (!isOpen) {
+                menu.classList.add('active');
+            }
         }
 
         function toggleDropdown(id) {
@@ -458,6 +640,13 @@
                 }
             });
         }
+
+        document.addEventListener('click', function(event) {
+            const header = document.querySelector('header');
+            if (header && !header.contains(event.target)) {
+                document.querySelectorAll('.mobile-menu').forEach((item) => item.classList.remove('active'));
+            }
+        });
     </script>
 
     <!-- Premium Toast Notifications -->
