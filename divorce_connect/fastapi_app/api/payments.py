@@ -2,6 +2,7 @@ import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, ConfigDict
 
@@ -25,6 +26,13 @@ class PaymentVerify(BaseModel):
 class PaymentResponse(BaseModel):
     id: int
     case_request_id: int
+    case_custom_id: Optional[str] = None
+    invoice_number: str
+    lawyer_name: Optional[str] = None
+    lawyer_email: Optional[str] = None
+    lawyer_office_city: Optional[str] = None
+    client_name: Optional[str] = None
+    client_email: Optional[str] = None
     amount: float
     currency: str
     razorpay_payment_id: Optional[str]
@@ -91,7 +99,10 @@ async def verify_payment(
     db: AsyncSession = Depends(get_db)
 ):
     # Fetch Payment
-    res = await db.execute(select(Payment).where(Payment.id == payment_id))
+    res = await db.execute(select(Payment).options(
+        joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+        joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+    ).where(Payment.id == payment_id))
     payment = res.scalar_one_or_none()
     if not payment:
         raise HTTPException(status_code=404, detail="Payment record not found")
@@ -153,7 +164,10 @@ async def get_payment_details(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    res = await db.execute(select(Payment).where(Payment.id == payment_id))
+    res = await db.execute(select(Payment).options(
+        joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+        joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+    ).where(Payment.id == payment_id))
     payment = res.scalar_one_or_none()
     if not payment:
         raise HTTPException(status_code=404, detail="Payment record not found")
@@ -183,9 +197,15 @@ async def list_payments(
     if current_user.is_staff:
         # Admin can view all payments or filter
         if case_id:
-            query = select(Payment).where(Payment.case_request_id == case_id)
+            query = select(Payment).options(
+                joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+                joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+            ).where(Payment.case_request_id == case_id)
         else:
-            query = select(Payment)
+            query = select(Payment).options(
+                joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+                joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+            )
     else:
         # Client or Lawyer sees their payments
         client_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == current_user.id))
@@ -210,7 +230,10 @@ async def list_payments(
             return []
 
         from sqlalchemy import or_
-        query = select(Payment).where(or_(*conditions))
+        query = select(Payment).options(
+            joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+            joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+        ).where(or_(*conditions))
         if case_id:
             query = query.where(Payment.case_request_id == case_id)
 

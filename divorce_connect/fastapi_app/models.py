@@ -114,6 +114,8 @@ class LawyerProfile(Base):
     custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
     warnings_count: Mapped[int] = mapped_column(Integer, default=0)
     bar_council_license: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    vacation_mode: Mapped[bool] = mapped_column(Boolean, default=False)
+    working_hours: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
     user = relationship("User", backref="lawyer_profile")
 
@@ -174,6 +176,9 @@ class CaseRequest(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     custom_id: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
 
+    client: Mapped["ClientProfile"] = relationship("ClientProfile", backref="case_requests")
+    lawyer: Mapped["LawyerProfile"] = relationship("LawyerProfile", backref="case_requests")
+
 
 class CaseMessage(Base):
     __tablename__ = "lawyers_casemessage"
@@ -221,6 +226,47 @@ class Payment(Base):
 
     case_request: Mapped["CaseRequest"] = relationship("CaseRequest", backref="payments")
 
+    @property
+    def case_custom_id(self) -> Optional[str]:
+        return self.case_request.custom_id if self.case_request else None
+
+    @property
+    def invoice_number(self) -> str:
+        seed = (self.id * 15485863) & 0xFFFFFFFF
+        seed = (seed * 1103515245 + 12345) & 0xFFFFFFFF
+        rand_num = (seed % 90000) + 10000
+        return f"inv:{rand_num:05d}"
+
+    @property
+    def lawyer_name(self) -> Optional[str]:
+        if self.case_request and self.case_request.lawyer:
+            return self.case_request.lawyer.full_name
+        return None
+
+    @property
+    def lawyer_email(self) -> Optional[str]:
+        if self.case_request and self.case_request.lawyer and self.case_request.lawyer.user:
+            return self.case_request.lawyer.user.email
+        return None
+
+    @property
+    def lawyer_office_city(self) -> Optional[str]:
+        if self.case_request and self.case_request.lawyer:
+            return self.case_request.lawyer.office_city
+        return None
+
+    @property
+    def client_name(self) -> Optional[str]:
+        if self.case_request and self.case_request.client:
+            return f"{self.case_request.client.first_name} {self.case_request.client.last_name}".strip()
+        return None
+
+    @property
+    def client_email(self) -> Optional[str]:
+        if self.case_request and self.case_request.client and self.case_request.client.user:
+            return self.case_request.client.user.email
+        return None
+
 
 class Reminder(Base):
     __tablename__ = "reminders"
@@ -236,6 +282,22 @@ class Reminder(Base):
 
     user: Mapped["User"] = relationship("User", backref="reminders")
     case_request: Mapped[Optional["CaseRequest"]] = relationship("CaseRequest", backref="reminders")
+
+
+class WithdrawRequest(Base):
+    __tablename__ = "withdraw_requests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    lawyer_id: Mapped[int] = mapped_column(ForeignKey("lawyers_lawyerprofile.id", ondelete="CASCADE"))
+    amount: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
+    method: Mapped[str] = mapped_column(String(20), nullable=False)  # 'bank' or 'upi'
+    method_details: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="PENDING")  # 'PENDING', 'APPROVED', 'REJECTED'
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    lawyer = relationship("LawyerProfile", backref="withdraw_requests")
 
 
 class DeleteAccountToken(Base):

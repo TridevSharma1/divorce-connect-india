@@ -14,7 +14,7 @@
     .toggle-checkbox input { opacity: 0; width: 0; height: 0; }
     .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .4s; border-radius: 34px; }
     .toggle-slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
-    input:checked + .toggle-slider { background-color: #f8fafc; }
+    input:checked + .toggle-slider { background-color: #3b82f6; }
     input:checked + .toggle-slider:before { transform: translateX(24px); }
     input[type="text"], input[type="password"], input[type="email"], input[type="time"], select { transition: all 0.2s ease; }
     input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="time"]:focus, select:focus { outline: none; border-color: #f8fafc; box-shadow: inset 0 0 0 1px #f8fafc; }
@@ -115,6 +115,98 @@
 
   <script>
     function resetForm() { document.getElementById('settingsForm').reset(); }
-    document.getElementById('settingsForm').addEventListener('submit', function(e) { e.preventDefault(); console.log('Settings saved'); });
+    
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        window.location.href = "/login/";
+        return;
+      }
+
+      const form = document.getElementById('settingsForm');
+
+      // 1. Load settings
+      try {
+        const res = await fetch("/api/lawyer/settings", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          // populate vacation mode
+          form.elements.vacationMode.checked = data.vacationMode;
+
+          // populate working hours
+          const wh = data.workingHours;
+          const days = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+          days.forEach(day => {
+            const dayData = wh[day];
+            if (dayData) {
+              const chk = form.querySelector(`input[name="dayEnable"][value="${day}"]`);
+              if (chk) chk.checked = dayData.enabled;
+              
+              const startInput = form.querySelector(`input[name="${day}Start"]`);
+              if (startInput) startInput.value = dayData.start;
+
+              const endInput = form.querySelector(`input[name="${day}End"]`);
+              if (endInput) endInput.value = dayData.end;
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Error loading settings:", e);
+      }
+
+      // 2. Save settings
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const payload = {
+          vacationMode: form.elements.vacationMode.checked,
+          workingHours: {},
+          emailAlerts: form.elements.emailAlerts ? form.elements.emailAlerts.checked : true,
+          smsAlerts: form.elements.smsAlerts ? form.elements.smsAlerts.checked : false,
+          twoFactorAuth: form.elements.twoFactorAuth ? form.elements.twoFactorAuth.checked : false
+        };
+
+        const days = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+        days.forEach(day => {
+          const chk = form.querySelector(`input[name="dayEnable"][value="${day}"]`);
+          const startInput = form.querySelector(`input[name="${day}Start"]`);
+          const endInput = form.querySelector(`input[name="${day}End"]`);
+          
+          payload.workingHours[day] = {
+            enabled: chk ? chk.checked : false,
+            start: startInput ? startInput.value : "09:00",
+            end: endInput ? endInput.value : "17:00"
+          };
+        });
+
+        try {
+          const res = await fetch("/api/lawyer/settings", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            if (typeof showToastNotification === 'function') {
+              showToastNotification("Success", "Settings saved successfully!");
+            } else {
+              alert("Settings saved successfully!");
+            }
+          } else {
+            throw new Error("Failed to save settings");
+          }
+        } catch (err) {
+          if (typeof showToastNotification === 'function') {
+            showToastNotification("Error", err.message);
+          } else {
+            alert(err.message);
+          }
+        }
+      });
+    });
   </script>
 {% endblock %}

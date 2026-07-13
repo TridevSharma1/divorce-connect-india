@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments Control Center - DivorceConnect India Admin Portal{% endblock %}
+
+{% block navbar %}
+<div id="nav-admin-static" class="flex items-center gap-8">
+    {% include 'includes/navbar_admin.html' %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .verified-badge { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 600; color: #34d399; }
+        .invoice-item { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); transition: background-color 0.2s ease; }
+        .invoice-item:last-child { border-bottom: none; }
+        .invoice-item:hover { background-color: rgba(255, 255, 255, 0.02); }
+        .btn-outline { padding: 0.625rem 1.25rem; border: 1.5px solid #f8fafc; background-color: transparent; color: #f8fafc; font-weight: 600; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn-outline:hover { background-color: #f8fafc; color: #020617; }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            color: #ffffff;
+            border-bottom-color: #ffffff;
+        }
+
+        .action-btn-approve {
+            background: #10b981;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: opacity 0.2s ease;
+        }
+        .action-btn-approve:hover {
+            opacity: 0.9;
+        }
+        .action-btn-reject {
+            background: #ef4444;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: opacity 0.2s ease;
+        }
+        .action-btn-reject:hover {
+            opacity: 0.9;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f8fafc;
+            font-size: 0.9rem;
+            margin-top: 0.375rem;
+            transition: all 0.2s ease;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#111827,_#020617_60%,_#020617)] px-4 py-8 text-slate-100">
+        <div class="mx-auto max-w-6xl">
+            <!-- Header section -->
+            <div class="mb-8 rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
+                <span class="mb-3 inline-flex rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300">Operations Control</span>
+                <h1 class="text-4xl font-bold text-white">Payments & Payouts Center</h1>
+                <p class="mt-2 text-base text-slate-400">Track client consulting deposits, audit escrow accounts, and process lawyer withdrawals.</p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="mb-6 border-b border-slate-800 flex gap-4">
+                <button id="tab-withdrawals" class="tab-btn active" onclick="switchTab('withdrawals')">Withdrawal Requests</button>
+                <button id="tab-payments" class="tab-btn" onclick="switchTab('payments')">Client Payments History</button>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Withdrawal Requests Tab View -->
+                <div id="view-withdrawals" class="rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
+                    <h2 class="mb-2 text-2xl font-bold text-white">Lawyer Withdrawal Logs</h2>
+                    <p class="mb-6 text-sm text-slate-400">Review pending payouts, approve bank transfers, and reject invalid payout transactions.</p>
+                    
+                    <div id="withdraw-loader" class="py-8 text-center">
+                        <div class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-r-transparent align-[-0.125em]" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div id="withdraw-empty" class="hidden py-8 text-center">
+                        <p class="text-sm text-slate-400">No lawyer withdrawal requests found.</p>
+                    </div>
+
+                    <!-- Requests Table -->
+                    <div id="withdraw-table-container" class="hidden overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    <th class="py-4 px-3">Lawyer Details</th>
+                                    <th class="py-4 px-3">Amount Requested</th>
+                                    <th class="py-4 px-3">Transfer Method</th>
+                                    <th class="py-4 px-3">Status</th>
+                                    <th class="py-4 px-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawals-tbody" class="divide-y divide-slate-800/40 text-sm text-slate-300">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Client Payments Tab View -->
+                <div id="view-payments" class="hidden rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
+                    <h2 class="mb-2 text-2xl font-bold text-white">Consultation Payments Audits</h2>
+                    <p class="mb-6 text-sm text-slate-400">Escrow history of client consultation fees paid to lawyers.</p>
+                    
+                    <div id="payments-loader" class="py-8 text-center">
+                        <div class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-r-transparent align-[-0.125em]" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div id="payments-empty" class="hidden py-8 text-center">
+                        <p class="text-sm text-slate-400">No consultation payments found.</p>
+                    </div>
+
+                    <!-- Client Payments Table -->
+                    <div id="payments-table-container" class="hidden overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    <th class="py-4 px-3">Invoice #</th>
+                                    <th class="py-4 px-3">Billed Client</th>
+                                    <th class="py-4 px-3">Assigned Lawyer</th>
+                                    <th class="py-4 px-3">Amount</th>
+                                    <th class="py-4 px-3">Gateway Ref</th>
+                                    <th class="py-4 px-3">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-tbody" class="divide-y divide-slate-800/40 text-sm text-slate-300">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Confirmation Modal -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-2" id="action-modal-title">Process Withdrawal</h3>
+            <p class="text-sm text-slate-400 mb-6" id="action-modal-desc">Please enter optional reference number or notes for this action.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">Admin Notes / Ref ID</label>
+                    <input type="text" id="input-admin-notes" class="form-input" placeholder="e.g. Transaction completed - Ref #928374">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button onclick="closeModal('action-modal')" class="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                    <button id="btn-submit-action" class="px-6 py-2.5 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition">Submit Action</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Premium Toast Manager
+    function showPremiumToast(message, type = 'error') {
+        let container = document.getElementById('premium-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'premium-toast-container';
+            container.className = 'fixed top-24 right-6 z-[10000] flex flex-col gap-3 max-w-sm w-full pointer-events-none';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-2xl border bg-slate-900 border-slate-800 text-white transform transition-all duration-500 translate-x-[120%] opacity-0';
+        
+        let icon = '';
+        if (type === 'success') {
+            icon = `<svg class="w-6 h-6 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        } else {
+            icon = `<svg class="w-6 h-6 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        }
+
+        toast.innerHTML = `
+            <div class="flex-shrink-0 mt-0.5">${icon}</div>
+            <div class="flex-1">
+                <p class="text-[0.9rem] font-semibold text-slate-100 leading-snug">${message}</p>
+            </div>
+            <button onclick="this.closest('.pointer-events-auto').remove()" class="flex-shrink-0 text-slate-500 hover:text-slate-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
+
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.remove('translate-x-[120%]', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+        }, 50);
+
+        setTimeout(() => {
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-[120%]', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+
+    function switchTab(tab) {
+        document.getElementById("tab-withdrawals").classList.toggle("active", tab === 'withdrawals');
+        document.getElementById("tab-payments").classList.toggle("active", tab === 'payments');
+
+        document.getElementById("view-withdrawals").classList.toggle("hidden", tab !== 'withdrawals');
+        document.getElementById("view-payments").classList.toggle("hidden", tab !== 'payments');
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    let activeWithdrawId = null;
+    let activeAction = null;
+
+    function openActionModal(id, action) {
+        activeWithdrawId = id;
+        activeAction = action;
+
+        const title = document.getElementById("action-modal-title");
+        const desc = document.getElementById("action-modal-desc");
+        const notesInput = document.getElementById("input-admin-notes");
+
+        notesInput.value = "";
+        if (action === 'approve') {
+            title.innerText = "Approve Withdrawal Payout";
+            desc.innerText = "Confirm bank/UPI payout. Add optional reference transaction ID below.";
+            notesInput.placeholder = "e.g. Cleared - TXN#1092837";
+        } else {
+            title.innerText = "Reject Withdrawal Request";
+            desc.innerText = "Specify the rejection reason below to explain to the lawyer.";
+            notesInput.placeholder = "e.g. Account details mismatch";
+        }
+
+        openModal("action-modal");
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
+        // Action submit listener
+        document.getElementById("btn-submit-action").addEventListener("click", async () => {
+            const notes = document.getElementById("input-admin-notes").value.trim();
+            if (activeAction === 'reject' && !notes) {
+                showPremiumToast("Rejection notes are required.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/admin/withdrawals/${activeWithdrawId}/action`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        action: activeAction,
+                        admin_notes: notes
+                    })
+                });
+
+                if (res.ok) {
+                    showPremiumToast("Payout request updated successfully.", "success");
+                    closeModal("action-modal");
+                    loadWithdrawals();
+                } else {
+                    const err = await res.json();
+                    showPremiumToast(err.detail || "Action failed.");
+                }
+            } catch (e) {
+                console.error(e);
+                showPremiumToast("An error occurred.");
+            }
+        });
+
+        // Load Withdrawal Requests
+        async function loadWithdrawals() {
+            document.getElementById("withdraw-loader").style.display = "block";
+            document.getElementById("withdraw-empty").classList.add("hidden");
+            document.getElementById("withdraw-table-container").classList.add("hidden");
+
+            try {
+                const res = await fetch("/api/admin/withdrawals", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                document.getElementById("withdraw-loader").style.display = "none";
+                if (!res.ok) {
+                    showPremiumToast("Failed to load withdrawals logs.");
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data || data.length === 0) {
+                    document.getElementById("withdraw-empty").classList.remove("hidden");
+                    return;
+                }
+
+                const tbody = document.getElementById("withdrawals-tbody");
+                tbody.innerHTML = "";
+                document.getElementById("withdraw-table-container").classList.remove("hidden");
+
+                data.forEach(r => {
+                    const dateStr = new Date(r.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    let statusBadge = "";
+                    if (r.status === "PENDING") {
+                        statusBadge = `<span class="px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-xs font-bold text-amber-400">PENDING</span>`;
+                    } else if (r.status === "APPROVED") {
+                        statusBadge = `<span class="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400">APPROVED</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2 py-1 rounded bg-rose-500/10 border border-rose-500/20 text-xs font-bold text-rose-400">REJECTED</span>`;
+                    }
+
+                    const tr = document.createElement("tr");
+                    tr.className = "border-b border-slate-800/20 hover:bg-white/[0.01] transition";
+                    tr.innerHTML = `
+                        <td class="py-4 px-3">
+                            <span class="block font-bold text-white">${r.lawyer_name}</span>
+                            <span class="text-xs text-slate-500">${r.lawyer_email}</span>
+                        </td>
+                        <td class="py-4 px-3 font-bold text-white">₹${r.amount.toFixed(2)}</td>
+                        <td class="py-4 px-3">
+                            <span class="block text-xs font-bold uppercase text-slate-400">${r.method}</span>
+                            <span class="text-xs text-slate-500 font-mono">${r.method_details}</span>
+                        </td>
+                        <td class="py-4 px-3">
+                            ${statusBadge}
+                            ${r.admin_notes ? `<span class="block text-[11px] text-slate-500 mt-1 italic font-mono">Note: ${r.admin_notes}</span>` : ''}
+                        </td>
+                        <td class="py-4 px-3 text-right">
+                            ${r.status === "PENDING" ? `
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="openActionModal(${r.id}, 'approve')" class="action-btn-approve text-xs">Approve</button>
+                                    <button onclick="openActionModal(${r.id}, 'reject')" class="action-btn-reject text-xs">Reject</button>
+                                </div>
+                            ` : `
+                                <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">${r.status}</span>
+                            `}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Load Client Payments History
+        async function loadPayments() {
+            document.getElementById("payments-loader").style.display = "block";
+            document.getElementById("payments-empty").classList.add("hidden");
+            document.getElementById("payments-table-container").classList.add("hidden");
+
+            try {
+                const res = await fetch("/api/payments/", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                document.getElementById("payments-loader").style.display = "none";
+                if (!res.ok) {
+                    showPremiumToast("Failed to load payments logs.");
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data || data.length === 0) {
+                    document.getElementById("payments-empty").classList.remove("hidden");
+                    return;
+                }
+
+                const tbody = document.getElementById("payments-tbody");
+                tbody.innerHTML = "";
+                document.getElementById("payments-table-container").classList.remove("hidden");
+
+                data.forEach(p => {
+                    const dateStr = new Date(p.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    });
+
+                    const tr = document.createElement("tr");
+                    tr.className = "border-b border-slate-800/20 hover:bg-white/[0.01] transition";
+                    tr.innerHTML = `
+                        <td class="py-4 px-3 font-bold text-white">${p.invoice_number.toUpperCase()}</td>
+                        <td class="py-4 px-3">
+                            <span class="block font-bold text-white">${p.client_name || 'N/A'}</span>
+                            <span class="text-xs text-slate-500">${p.client_email || 'N/A'}</span>
+                        </td>
+                        <td class="py-4 px-3">
+                            <span class="block font-bold text-white">${p.lawyer_name || 'N/A'}</span>
+                            <span class="text-xs text-slate-500">${p.lawyer_email || 'N/A'}</span>
+                        </td>
+                        <td class="py-4 px-3 font-bold text-emerald-400">₹${p.amount.toFixed(2)}</td>
+                        <td class="py-4 px-3 font-mono text-xs text-slate-500">${p.razorpay_payment_id || 'N/A'}</td>
+                        <td class="py-4 px-3 text-slate-400">${dateStr}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        loadWithdrawals();
+        loadPayments();
+    });
+</script>
+{% endblock %}

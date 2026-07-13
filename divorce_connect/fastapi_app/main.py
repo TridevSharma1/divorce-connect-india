@@ -739,6 +739,8 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "verify_register_otp.html"
     elif page_path in ["client_profile", "profile/edit"]:
         template_name = "edit_profile_client.html"
+    elif page_path in ["client_payments", "payments"]:
+        template_name = "client_payments.html"
     elif page_path in ["lawyer_profile", "lawyers/profile"]:
         template_name = "lawyers/profile_lawyer.html"
     elif page_path in ["delete-account", "api/auth/delete-account"]:
@@ -766,6 +768,8 @@ async def dynamic_page(request: Request, page_path: str):
         template_name = "pending_cases_list.html"
     elif page_path in ["case_documents_verification_list", "case-documents-verification", "adminpanel/documents/verify"]:
         template_name = "case_documents_verification_list.html"
+    elif page_path in ["admin_payments", "admin-payments"]:
+        template_name = "adminpanel/admin_payments.html"
     elif page_path in ["admin_profile", "admin-profile"]:
         template_name = "profile_admin.html"
     elif page_path in ["admin_profile_edit", "admin-profile-edit"]:

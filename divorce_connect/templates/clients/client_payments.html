@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments & Invoices – DivorceConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-shell {
+        background: linear-gradient(180deg, #f6f6f6 0%, #efefef 100%);
+    }
+    .hero-card {
+        background: linear-gradient(135deg, #0a0a0a 0%, #171717 100%);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+    }
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.04);
+    }
+    .payment-row {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s ease;
+    }
+    .payment-row:last-child {
+        border-bottom: none;
+    }
+    .payment-row:hover {
+        background: #f8fafc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-shell min-h-screen px-4 py-12 text-slate-800 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl">
+        <!-- Header Card -->
+        <div class="hero-card mb-8 rounded-[32px] p-6 sm:p-8">
+            <span class="mb-2 inline-block rounded-full border border-zinc-700 bg-zinc-900/70 px-3 py-1 text-xs font-bold uppercase tracking-[0.25em] text-zinc-300">Finance Center</span>
+            <h1 class="text-3xl font-semibold text-white sm:text-4xl">Payments & Invoices</h1>
+            <p class="mt-2 text-sm text-zinc-300">View your transaction history, check payment status, and download tax-compliant platform invoices.</p>
+        </div>
+
+        <!-- Payments Section -->
+        <div class="glass-card p-6 sm:p-8">
+            <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-zinc-950">Transaction History</h2>
+                    <p class="text-xs text-zinc-500 mt-1">Showing all consultation fee transactions and payments.</p>
+                </div>
+            </div>
+
+            <!-- Loader -->
+            <div id="payments-loader" class="py-16 text-center">
+                <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-slate-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                    <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![rect(0,0,0,0)]">Loading...</span>
+                </div>
+                <p class="mt-4 text-sm text-slate-500">Fetching payments history...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="payments-empty" class="hidden py-16 text-center">
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 border border-slate-200 text-slate-500">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-zinc-900 mb-1">No transactions found</h3>
+                <p class="text-sm text-slate-500 max-w-sm mx-auto">You haven't made any payments yet. Consultation payments will be listed here after case initiation.</p>
+            </div>
+
+            <!-- Payments List -->
+            <div id="payments-container" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
+                            <th class="py-4 px-4">Transaction ID</th>
+                            <th class="py-4 px-4">Case ID</th>
+                            <th class="py-4 px-4">Date</th>
+                            <th class="py-4 px-4">Amount</th>
+                            <th class="py-4 px-4">Status</th>
+                            <th class="py-4 px-4 text-right">Invoices</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-table-body" class="text-sm">
+                        <!-- Filled dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    let currentUser = null;
+    try {
+        currentUser = await Auth.getCurrentUser();
+    } catch (e) {
+        console.error("Failed to load user info:", e);
+    }
+
+    async function loadPayments() {
+        try {
+            const res = await fetch("/api/payments/", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            document.getElementById("payments-loader").style.display = "none";
+
+            if (!res.ok) {
+                console.error("Failed to load payments");
+                return;
+            }
+
+            const payments = await res.json();
+            if (!payments || payments.length === 0) {
+                document.getElementById("payments-empty").classList.remove("hidden");
+                return;
+            }
+
+            const container = document.getElementById("payments-container");
+            const tbody = document.getElementById("payments-table-body");
+            tbody.innerHTML = "";
+            container.classList.remove("hidden");
+
+            payments.forEach(p => {
+                const dateStr = new Date(p.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                let statusBadge = "";
+                if (p.status === "SUCCEEDED") {
+                    statusBadge = `<span class="inline-flex rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-600">✓ Succeeded</span>`;
+                } else if (p.status === "FAILED") {
+                    statusBadge = `<span class="inline-flex rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-xs font-bold text-rose-600">✗ Failed</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-600">⏳ Pending</span>`;
+                }
+
+                const tr = document.createElement("tr");
+                tr.className = "payment-row";
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-mono text-slate-600 text-xs">${p.razorpay_payment_id || p.id}</td>
+                    <td class="py-4 px-4 text-slate-900 font-semibold">${p.case_custom_id || '#' + p.case_request_id}</td>
+                    <td class="py-4 px-4 text-slate-500">${dateStr}</td>
+                    <td class="py-4 px-4 text-slate-900 font-bold">₹${p.amount.toFixed(2)}</td>
+                    <td class="py-4 px-4">${statusBadge}</td>
+                    <td class="py-4 px-4 text-right">
+                        ${p.status === "SUCCEEDED" ? `
+                            <button onclick="downloadInvoice(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-950 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition active:scale-95 shadow-md">
+                                📥 Download
+                            </button>
+                        ` : '<span class="text-xs text-slate-400 italic">No Invoice</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    window.downloadInvoice = function(payment) {
+        // Construct printable invoice layout
+        const dateStr = new Date(payment.created_at).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const clientName = currentUser ? (currentUser.full_name || (currentUser.first_name + " " + (currentUser.last_name || ""))).trim() : "Valued Client";
+        const clientEmail = currentUser ? currentUser.email : "N/A";
+
+        const invoiceHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Invoice - ${payment.invoice_number.toUpperCase()}</title>
+                <style>
+                    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 40px; }
+                    .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); border-radius: 12px; }
+                    .header-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                    .header-table td { vertical-align: top; }
+                    .logo { font-size: 28px; font-weight: bold; color: #0f172a; }
+                    .invoice-details { text-align: right; font-size: 14px; color: #555; white-space: nowrap; }
+                    .section-title { font-size: 18px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; color: #000; }
+                    .items-table { width: 100%; border-collapse: collapse; text-align: left; }
+                    .items-table th { background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+                    .items-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                    .totals { text-align: right; margin-top: 30px; }
+                    .totals table { margin-left: auto; border-collapse: collapse; }
+                    .totals td { padding: 8px 12px; font-size: 14px; }
+                    .totals .grand-total { font-size: 18px; font-weight: bold; color: #0f172a; border-top: 2px solid #e2e8f0; }
+                    .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #64748b; border-top: 1px solid #eee; padding-top: 20px; }
+                    
+                    .details-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 30px; }
+                    .details-td { font-size: 12px; vertical-align: top; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; }
+
+                    @media print {
+                        body { margin: 15mm 10mm 15mm 10mm; }
+                        .invoice-box { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="invoice-box">
+                    <table class="header-table">
+                        <tr>
+                            <td>
+                                <div class="logo">DivorceConnect India</div>
+                                <p style="font-size: 12px; color: #64748b; margin-top: 5px;">
+                                    Online Escrow Legal Billing & Consultation Services<br>
+                                    New Delhi, India
+                                </p>
+                            </td>
+                            <td class="invoice-details">
+                                <h1 style="margin: 0; font-size: 24px; color: #0f172a;">INVOICE</h1>
+                                <p style="margin: 5px 0;">Invoice #: <strong>${payment.invoice_number.toUpperCase()}</strong></p>
+                                <p style="margin: 5px 0;">Date: ${dateStr}</p>
+                                <p style="margin: 5px 0;">Status: <strong style="color: #10b981;">PAID</strong></p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">Billing & Service Details</div>
+                    <table class="details-table">
+                        <tr>
+                            <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-right: 15px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                                <strong>Platform Operator:</strong><br>
+                                DivorceConnect India<br>
+                                GSTIN: 07AAAAA1111A1Z1<br>
+                                support@divorceconnectindia.com
+                            </td>
+                            <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-left: 15px; border-bottom: 1px solid #f1f5f9;">
+                                <strong>Transaction Details:</strong><br>
+                                Payment Gateway: Razorpay<br>
+                                Transaction Ref ID: ${payment.razorpay_payment_id || 'N/A'}<br>
+                                Case Request ID: ${payment.case_custom_id || '#' + payment.case_request_id}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="details-td" style="width: 50%; padding-top: 15px; padding-right: 15px; border-right: 1px solid #f1f5f9;">
+                                <strong>Assigned Lawyer:</strong><br>
+                                ${payment.lawyer_name || 'N/A'}<br>
+                                Email: ${payment.lawyer_email || 'N/A'}<br>
+                                Office: ${payment.lawyer_office_city || 'N/A'}
+                            </td>
+                            <td class="details-td" style="width: 50%; padding-top: 15px; padding-left: 15px;">
+                                <strong>Billed To:</strong><br>
+                                ${clientName}<br>
+                                Email: ${clientEmail}<br>
+                                Role: Client Profile
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">Invoice Items</div>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th style="text-align: right;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Legal Consultation Service Fee (Case Request ${payment.case_custom_id || '#' + payment.case_request_id})</td>
+                                <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="totals">
+                        <table>
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                            </tr>
+                            <tr class="grand-total">
+                                <td>Total Paid (INR):</td>
+                                <td style="text-align: right;">₹${payment.amount.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="footer">
+                        This is a computer-generated document. No signature is required.<br>
+                        Thank you for using DivorceConnect India.
+                    </div>
+                </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        const printWindow = window.open("", "_blank");
+        printWindow.document.open();
+        printWindow.document.write(invoiceHtml);
+        printWindow.document.close();
+    };
+
+    loadPayments();
+});
+</script>
+{% endblock %}

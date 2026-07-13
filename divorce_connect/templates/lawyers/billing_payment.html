@@ -14,9 +14,9 @@
         .mask-text { letter-spacing: 0.15em; font-weight: 600; color: #94a3b8; }
         .verified-badge { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 600; color: #34d399; }
         .verified-badge svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .invoice-item { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #1f2937; transition: background-color 0.2s ease; }
+        .invoice-item { display: grid; grid-template-columns: 2fr 1fr 1fr; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); transition: background-color 0.2s ease; }
         .invoice-item:last-child { border-bottom: none; }
-        .invoice-item:hover { background-color: rgba(15, 23, 42, 0.7); }
+        .invoice-item:hover { background-color: rgba(255, 255, 255, 0.02); }
         .btn-outline { padding: 0.625rem 1.25rem; border: 1.5px solid #f8fafc; background-color: transparent; color: #f8fafc; font-weight: 600; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
         .btn-outline:hover { background-color: #f8fafc; color: #020617; }
         .btn-download { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; font-size: 0.875rem; font-weight: 600; color: #f8fafc; background-color: transparent; border: none; cursor: pointer; transition: opacity 0.2s ease; }
@@ -24,22 +24,108 @@
         .btn-download svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; }
         .password-hint { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; }
         .password-hint svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; }
-        .upload-zone { border: 2px dashed #334155; background-color: rgba(15, 23, 42, 0.7); border-radius: 1rem; padding: 2rem; text-align: center; transition: all 0.2s ease; cursor: pointer; }
-        .upload-zone:hover { border-color: #f8fafc; background-color: rgba(30, 41, 59, 0.9); }
-        .upload-zone svg { width: 28px; height: 28px; stroke: #cbd5e1; stroke-width: 1.5; margin: 0 auto 0.75rem; }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f8fafc;
+            font-size: 0.9rem;
+            margin-top: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f8fafc;
+            box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.1);
+        }
+        
+        /* Custom Payout Method Selectors */
+        .method-card {
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .method-card:hover {
+            background: rgba(255,255,255,0.02);
+            border-color: rgba(255,255,255,0.15);
+        }
+        input[name="withdraw-method"]:checked + .method-card {
+            border-color: #f8fafc;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        input[name="withdraw-method"]:checked + .method-card .radio-dot {
+            opacity: 1;
+            background-color: #f8fafc;
+        }
+        .radio-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .radio-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
     </style>
 {% endblock %}
 
 {% block content %}
     <div class="min-h-screen bg-[radial-gradient(circle_at_top,_#111827,_#020617_60%,_#020617)] px-4 py-8 text-slate-100">
         <div class="mx-auto max-w-4xl">
-            <div class="mb-8 rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
-                <span class="mb-3 inline-flex rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300">Finance Center</span>
-                <h1 class="text-4xl font-bold text-white">Billing & Payment</h1>
-                <p class="mt-2 text-base text-slate-400">Manage your payout methods, tax compliance, and platform invoices.</p>
+            <!-- Header section -->
+            <div class="mb-8 rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div>
+                    <span class="mb-3 inline-flex rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300">Finance Center</span>
+                    <h1 class="text-4xl font-bold text-white">Billing & Payment</h1>
+                    <p class="mt-2 text-base text-slate-400">Manage your payout methods, tax compliance, and consultation invoices.</p>
+                </div>
+                <button onclick="openWithdrawModal()" class="flex-shrink-0 px-6 py-3.5 bg-white text-slate-950 font-bold rounded-2xl hover:bg-slate-200 transition shadow-xl shadow-white/5 active:scale-95">
+                    💸 Withdraw Funds
+                </button>
             </div>
 
             <div class="space-y-8">
+                <!-- Payout Methods -->
                 <div class="rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
                     <h2 class="mb-2 text-2xl font-bold text-white">Payout Methods</h2>
                     <p class="mb-6 text-sm text-slate-400">Where your earned funds are deposited.</p>
@@ -50,17 +136,17 @@
                                     <div class="mb-3 flex items-center gap-3">
                                         <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                         <div>
-                                            <p class="font-semibold text-white">Bank Account</p>
+                                            <p class="font-semibold text-white" id="display-bank-nickname">Bank Account</p>
                                             <p class="mt-1 text-xs text-slate-500">Primary Payout Method</p>
                                         </div>
                                     </div>
                                     <div class="ml-9 space-y-2">
-                                        <p class="text-sm font-medium text-slate-300">Account Number: <span class="mask-text">•••• •••• •••• 4589</span></p>
-                                        <p class="text-sm text-slate-400">Bank: <span class="font-medium text-white">HDFC Bank</span></p>
-                                        <p class="text-sm text-slate-400">IFSC Code: <span class="font-medium text-white">HDFC0001234</span></p>
+                                        <p class="text-sm text-slate-300">Account Number: <span id="display-bank-acc" class="font-mono text-slate-200">•••• •••• •••• 4589</span></p>
+                                        <p class="text-sm text-slate-400">Bank: <span id="display-bank-name" class="font-medium text-white">HDFC Bank</span></p>
+                                        <p class="text-sm text-slate-400">IFSC Code: <span id="display-bank-ifsc" class="font-medium text-white">HDFC0001234</span></p>
                                     </div>
                                 </div>
-                                <button class="btn-outline">Edit Details</button>
+                                <button onclick="openModal('bank-modal')" class="btn-outline">Edit Details</button>
                             </div>
                             <div class="password-hint ml-9 mt-4"><svg fill="none" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7S3.732 16.057 2.458 12z" stroke="currentColor"></path></svg>Requires password confirmation</div>
                         </div>
@@ -76,66 +162,742 @@
                                         </div>
                                     </div>
                                     <div class="ml-9">
-                                        <p class="text-sm font-medium text-slate-300">UPI ID: <span class="mask-text">sharma••••@okhdfcbank</span></p>
+                                        <p class="text-sm text-slate-300">UPI ID: <span id="display-upi-id" class="font-mono text-slate-200">sharma99@okhdfcbank</span></p>
                                     </div>
                                 </div>
-                                <button class="btn-outline">Edit Details</button>
+                                <button onclick="openModal('upi-modal')" class="btn-outline">Edit Details</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Client Payments & Invoices -->
                 <div class="rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
-                    <h2 class="mb-2 text-2xl font-bold text-white">Tax Information</h2>
-                    <p class="mb-6 text-sm text-slate-400">Required for TDS deductions and compliance.</p>
-                    <div class="space-y-6">
-                        <div class="border-b border-slate-800 pb-6">
-                            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                <div class="flex-1">
-                                    <p class="mb-3 font-semibold text-white">PAN (Permanent Account Number)</p>
-                                    <div class="ml-0 space-y-2">
-                                        <p class="text-sm text-slate-300">PAN: <span class="mask-text font-medium">ABCDE****F</span></p>
-                                        <div class="verified-badge"><svg fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor"></path></svg>Verified</div>
-                                    </div>
-                                </div>
-                                <button class="btn-outline">Update</button>
-                            </div>
+                    <h2 class="mb-2 text-2xl font-bold text-white">Client Consultation Invoices</h2>
+                    <p class="mb-6 text-sm text-slate-400">Records of consultation fees paid by clients through the escrow gateway.</p>
+                    
+                    <div id="payments-loader" class="py-8 text-center">
+                        <div class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-r-transparent align-[-0.125em]" role="status">
+                            <span class="sr-only">Loading...</span>
                         </div>
+                        <p class="mt-2 text-sm text-slate-400">Fetching payments history...</p>
+                    </div>
 
-                        <div class="border-b border-slate-800 pb-6">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <p class="mb-3 font-semibold text-white">GST (Goods & Services Tax)</p>
-                                    <div class="ml-0 space-y-2">
-                                        <p class="text-sm text-slate-400">Not Provided <span class="text-xs text-slate-500">(Optional for your current tier)</span></p>
-                                        <a href="/lawyer_billing/" class="text-sm font-medium text-slate-200 transition hover:text-white">Add GSTIN →</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="payments-empty" class="hidden py-8 text-center">
+                        <p class="text-sm text-slate-400">No client consultation payments found.</p>
+                    </div>
 
-                        <div>
-                            <p class="mb-3 font-semibold text-white">Tax Documents</p>
-                            <div class="upload-zone">
-                                <svg fill="none" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke="currentColor"></path></svg>
-                                <p class="text-sm font-medium text-slate-200">Upload updated tax documents</p>
-                                <p class="mt-1 text-xs text-slate-500">PDF, JPG up to 5MB each</p>
-                            </div>
-                        </div>
+                    <div id="payments-list" class="hidden space-y-0">
+                        <!-- Rendered dynamically -->
                     </div>
                 </div>
 
+                <!-- Withdrawal Progress -->
                 <div class="rounded-3xl border border-slate-800 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
-                    <h2 class="mb-2 text-2xl font-bold text-white">Platform Invoices</h2>
-                    <p class="mb-6 text-sm text-slate-400">Monthly records of platform fees deducted from your earnings.</p>
-                    <div class="space-y-0">
-                        <div class="invoice-item"><div><p class="text-sm font-semibold text-white">October 2024</p><p class="mt-1 text-xs text-slate-500">INV-2024-10</p></div><div><p class="text-sm text-slate-300">Fee: <span class="font-semibold text-white">₹1,250</span></p></div><div class="flex justify-end"><button class="btn-download"><svg fill="none" viewBox="0 0 24 24"><path d="M12 16v-4m0 0V8m0 4l-4-4m4 4l4-4M4 20h16" stroke="currentColor"></path></svg>Download PDF</button></div></div>
-                        <div class="invoice-item"><div><p class="text-sm font-semibold text-white">September 2024</p><p class="mt-1 text-xs text-slate-500">INV-2024-09</p></div><div><p class="text-sm text-slate-300">Fee: <span class="font-semibold text-white">₹1,250</span></p></div><div class="flex justify-end"><button class="btn-download"><svg fill="none" viewBox="0 0 24 24"><path d="M12 16v-4m0 0V8m0 4l-4-4m4 4l4-4M4 20h16" stroke="currentColor"></path></svg>Download PDF</button></div></div>
-                        <div class="invoice-item"><div><p class="text-sm font-semibold text-white">August 2024</p><p class="mt-1 text-xs text-slate-500">INV-2024-08</p></div><div><p class="text-sm text-slate-300">Fee: <span class="font-semibold text-white">₹1,250</span></p></div><div class="flex justify-end"><button class="btn-download"><svg fill="none" viewBox="0 0 24 24"><path d="M12 16v-4m0 0V8m0 4l-4-4m4 4l4-4M4 20h16" stroke="currentColor"></path></svg>Download PDF</button></div></div>
-                        <div class="invoice-item"><div><p class="text-sm font-semibold text-white">July 2024</p><p class="mt-1 text-xs text-slate-500">INV-2024-07</p></div><div><p class="text-sm text-slate-300">Fee: <span class="font-semibold text-white">₹1,250</span></p></div><div class="flex justify-end"><button class="btn-download"><svg fill="none" viewBox="0 0 24 24"><path d="M12 16v-4m0 0V8m0 4l-4-4m4 4l4-4M4 20h16" stroke="currentColor"></path></svg>Download PDF</button></div></div>
+                    <h2 class="mb-2 text-2xl font-bold text-white">Withdrawal History & Progress</h2>
+                    <p class="mb-6 text-sm text-slate-400">Track the status, approval process, and completion of your funds transfers.</p>
+                    
+                    <div id="withdraw-history-loader" class="py-8 text-center">
+                        <div class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-r-transparent align-[-0.125em]" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-sm text-slate-400">Fetching history...</p>
+                    </div>
+
+                    <div id="withdraw-history-empty" class="hidden py-8 text-center text-slate-400 text-sm">
+                        No withdrawal requests submitted yet.
+                    </div>
+
+                    <div id="withdraw-history-list" class="hidden space-y-6">
+                        <!-- Rendered dynamically -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Bank Account Modal -->
+    <div id="bank-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Edit Bank Details</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">Bank Name</label>
+                    <input type="text" id="input-bank-name" class="form-input" placeholder="e.g. HDFC Bank">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">Account Number</label>
+                    <input type="password" id="input-bank-acc" class="form-input" placeholder="Enter Account Number">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">re enter Account Number</label>
+                    <input type="text" id="input-bank-acc-confirm" class="form-input" placeholder="Re-enter Account Number">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">IFSC Code</label>
+                    <input type="text" id="input-bank-ifsc" class="form-input" placeholder="e.g. HDFC0001234">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">nickname</label>
+                    <input type="text" id="input-bank-nickname" class="form-input" placeholder="e.g. Primary Bank Account">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button onclick="closeModal('bank-modal')" class="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                    <button onclick="saveBankDetails()" class="px-4 py-2 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPI Modal -->
+    <div id="upi-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-4">Edit UPI ID</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase">UPI ID</label>
+                    <input type="text" id="input-upi-id" class="form-input" placeholder="e.g. name@okhdfcbank">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button onclick="closeModal('upi-modal')" class="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                    <button onclick="saveUPI()" class="px-4 py-2 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdraw-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold text-white mb-2">Withdraw Funds</h3>
+            <p class="text-sm text-slate-400 mb-6">Select your preferred payout method to transfer your earnings.</p>
+            
+            <div class="mb-6 rounded-2xl bg-slate-900/80 border border-slate-800 p-5">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Withdrawable Balance</span>
+                <div class="mt-1 text-3xl font-extrabold text-white" id="withdraw-available-amount">₹0.00</div>
+            </div>
+
+            <div class="space-y-4">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Choose Payout Method</span>
+                
+                <!-- Primary Bank Account Option -->
+                <label class="block cursor-pointer">
+                    <input type="radio" name="withdraw-method" value="bank" checked class="sr-only">
+                    <div class="method-card">
+                        <div class="flex items-center gap-3">
+                            <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <div class="text-left">
+                                <span class="block text-sm font-bold text-white" id="withdraw-bank-nickname">Primary Bank Account</span>
+                                <span class="text-xs text-slate-400" id="withdraw-bank-details">HDFC Bank •••• 4589</span>
+                            </div>
+                        </div>
+                        <div class="radio-circle">
+                            <div class="radio-dot"></div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Secondary UPI ID Option -->
+                <label class="block cursor-pointer">
+                    <input type="radio" name="withdraw-method" value="upi" class="sr-only">
+                    <div class="method-card">
+                        <div class="flex items-center gap-3">
+                            <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <div class="text-left">
+                                <span class="block text-sm font-bold text-white">UPI Payout Method</span>
+                                <span class="text-xs text-slate-400" id="withdraw-upi-details">sharma99@okhdfcbank</span>
+                            </div>
+                        </div>
+                        <div class="radio-circle">
+                            <div class="radio-dot"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="pt-6 flex justify-end gap-3">
+                <button onclick="closeModal('withdraw-modal')" class="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                <button id="btn-confirm-withdrawal" onclick="processWithdrawal()" class="px-6 py-2.5 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition">Confirm Withdrawal</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showPremiumToast(message, type = 'error') {
+        let container = document.getElementById('premium-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'premium-toast-container';
+            container.className = 'fixed top-24 right-6 z-[10000] flex flex-col gap-3 max-w-sm w-full pointer-events-none';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-2xl border bg-slate-900 border-slate-800 text-white transform transition-all duration-500 translate-x-[120%] opacity-0';
+        
+        let icon = '';
+        if (type === 'success') {
+            icon = `<svg class="w-6 h-6 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        } else {
+            icon = `<svg class="w-6 h-6 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        }
+
+        toast.innerHTML = `
+            <div class="flex-shrink-0 mt-0.5">${icon}</div>
+            <div class="flex-1">
+                <p class="text-[0.9rem] font-semibold text-slate-100 leading-snug">${message}</p>
+            </div>
+            <button onclick="this.closest('.pointer-events-auto').remove()" class="flex-shrink-0 text-slate-500 hover:text-slate-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
+
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.remove('translate-x-[120%]', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+        }, 50);
+
+        setTimeout(() => {
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-[120%]', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
+
+    // Modal management
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+        
+        // Populate inputs from DOM or localStorage values
+        if (id === 'bank-modal') {
+            document.getElementById('input-bank-name').value = localStorage.getItem('lw_bank_name') || 'HDFC Bank';
+            document.getElementById('input-bank-acc').value = localStorage.getItem('lw_bank_acc') || '50100239482938';
+            document.getElementById('input-bank-acc-confirm').value = localStorage.getItem('lw_bank_acc') || '50100239482938';
+            document.getElementById('input-bank-ifsc').value = localStorage.getItem('lw_bank_ifsc') || 'HDFC0001234';
+            document.getElementById('input-bank-nickname').value = localStorage.getItem('lw_bank_nickname') || 'Primary Bank Account';
+        } else if (id === 'upi-modal') {
+            document.getElementById('input-upi-id').value = localStorage.getItem('lw_upi_id') || 'sharma99@okhdfcbank';
+        }
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    let withdrawableBalance = 0;
+
+    async function openWithdrawModal() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        try {
+            const res = await fetch("/api/lawyer/earnings", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                withdrawableBalance = data.totals.available_balance || 0;
+            }
+        } catch (e) {
+            console.error("Error fetching earnings:", e);
+        }
+
+        document.getElementById("withdraw-available-amount").innerText = "₹" + withdrawableBalance.toFixed(2);
+
+        // Load payout details from localStorage
+        const bankName = localStorage.getItem('lw_bank_name') || 'HDFC Bank';
+        const bankAcc = localStorage.getItem('lw_bank_acc') || '50100239482938';
+        const bankNickname = localStorage.getItem('lw_bank_nickname') || 'Primary Bank Account';
+        const upiId = localStorage.getItem('lw_upi_id') || 'sharma99@okhdfcbank';
+
+        document.getElementById("withdraw-bank-nickname").innerText = bankNickname;
+        document.getElementById("withdraw-bank-details").innerText = bankName + " •••• " + bankAcc.slice(-4);
+        document.getElementById("withdraw-upi-details").innerText = upiId;
+
+        const confirmBtn = document.getElementById("btn-confirm-withdrawal");
+        if (withdrawableBalance <= 0) {
+            confirmBtn.disabled = true;
+            confirmBtn.classList.add("opacity-50", "pointer-events-none");
+        } else {
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove("opacity-50", "pointer-events-none");
+        }
+
+        openModal("withdraw-modal");
+    }
+
+    async function processWithdrawal() {
+        if (withdrawableBalance <= 0) {
+            showPremiumToast("You do not have any withdrawable balance.");
+            return;
+        }
+
+        const chosenMethod = document.querySelector('input[name="withdraw-method"]:checked').value;
+        let details = "";
+        if (chosenMethod === 'bank') {
+            const bankName = localStorage.getItem('lw_bank_name') || 'HDFC Bank';
+            const bankAcc = localStorage.getItem('lw_bank_acc') || '50100239482938';
+            const bankIfsc = localStorage.getItem('lw_bank_ifsc') || 'HDFC0001234';
+            details = `Bank: ${bankName}, Acc: ${bankAcc}, IFSC: ${bankIfsc}`;
+        } else {
+            details = localStorage.getItem('lw_upi_id') || 'sharma99@okhdfcbank';
+        }
+
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        try {
+            const res = await fetch("/api/lawyer/withdraw", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    amount: withdrawableBalance,
+                    method: chosenMethod,
+                    method_details: details
+                })
+            });
+
+            if (res.ok) {
+                showPremiumToast("Withdrawal request of ₹" + withdrawableBalance.toFixed(2) + " submitted successfully.", "success");
+                closeModal("withdraw-modal");
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                const errData = await res.json();
+                showPremiumToast(errData.detail || "Withdrawal failed.");
+            }
+        } catch (e) {
+            console.error(e);
+            showPremiumToast("An error occurred during withdrawal.");
+        }
+    }
+
+    // Persist details in localStorage and sync with views
+    function saveBankDetails() {
+        const name = document.getElementById('input-bank-name').value.trim();
+        const acc = document.getElementById('input-bank-acc').value.trim();
+        const accConfirm = document.getElementById('input-bank-acc-confirm').value.trim();
+        const ifsc = document.getElementById('input-bank-ifsc').value.trim();
+        const nickname = document.getElementById('input-bank-nickname').value.trim();
+
+        if (!name || !acc || !accConfirm || !ifsc || !nickname) {
+            showPremiumToast("All fields are required.");
+            return;
+        }
+
+        if (acc !== accConfirm) {
+            showPremiumToast("Account numbers do not match.");
+            return;
+        }
+
+        localStorage.setItem('lw_bank_name', name);
+        localStorage.setItem('lw_bank_acc', acc);
+        localStorage.setItem('lw_bank_ifsc', ifsc);
+        localStorage.setItem('lw_bank_nickname', nickname);
+        
+        loadProfileData();
+        closeModal('bank-modal');
+    }
+
+    function saveUPI() {
+        const upi = document.getElementById('input-upi-id').value.trim();
+        if (!upi) {
+            showPremiumToast("UPI ID is required.");
+            return;
+        }
+        localStorage.setItem('lw_upi_id', upi);
+        loadProfileData();
+        closeModal('upi-modal');
+    }
+
+    function loadProfileData() {
+        // Load Bank Account Details
+        const bankName = localStorage.getItem('lw_bank_name') || 'HDFC Bank';
+        const bankAcc = localStorage.getItem('lw_bank_acc') || '50100239482938';
+        const bankIfsc = localStorage.getItem('lw_bank_ifsc') || 'HDFC0001234';
+        const bankNickname = localStorage.getItem('lw_bank_nickname') || 'Primary Bank Account';
+
+        document.getElementById('display-bank-nickname').textContent = bankNickname;
+        document.getElementById('display-bank-name').textContent = bankName;
+        document.getElementById('display-bank-ifsc').textContent = bankIfsc;
+        
+        if (bankAcc.length > 4) {
+            document.getElementById('display-bank-acc').textContent = '•••• •••• •••• ' + bankAcc.slice(-4);
+        } else {
+            document.getElementById('display-bank-acc').textContent = bankAcc;
+        }
+
+        // Load UPI ID Details
+        const upiId = localStorage.getItem('lw_upi_id') || 'sharma99@okhdfcbank';
+        if (upiId.includes('@')) {
+            const parts = upiId.split('@');
+            const prefix = parts[0];
+            const suffix = parts[1];
+            if (prefix.length > 3) {
+                document.getElementById('display-upi-id').textContent = prefix.slice(0, 3) + '••••@' + suffix;
+            } else {
+                document.getElementById('display-upi-id').textContent = '•••@' + suffix;
+            }
+        } else {
+            document.getElementById('display-upi-id').textContent = upiId;
+        }
+    }
+
+    async function loadWithdrawalsHistory() {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        const loader = document.getElementById("withdraw-history-loader");
+        const empty = document.getElementById("withdraw-history-empty");
+        const list = document.getElementById("withdraw-history-list");
+
+        loader.style.display = "block";
+        empty.classList.add("hidden");
+        list.classList.add("hidden");
+
+        try {
+            const res = await fetch("/api/lawyer/withdrawals", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            loader.style.display = "none";
+
+            if (res.ok) {
+                const data = await res.json();
+                if (!data || data.length === 0) {
+                    empty.classList.remove("hidden");
+                    return;
+                }
+
+                list.classList.remove("hidden");
+                list.innerHTML = "";
+
+                data.forEach(w => {
+                    const initDate = new Date(w.created_at);
+                    const initDateStr = initDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    
+                    const estCreditDate = new Date(initDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    const estCreditDateStr = estCreditDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+                    const updateDate = new Date(w.updated_at);
+                    const updateDateStr = updateDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                    let step1Class = "text-emerald-400";
+                    let step2Class = "text-slate-500";
+                    let step2Label = "Admin Approval Pending";
+                    let step2Icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    
+                    let step3Class = "text-slate-500";
+                    let step3Label = "Pending Transfer";
+                    
+                    let infoMsg = "";
+                    if (w.status === "PENDING") {
+                        step2Class = "text-amber-400";
+                        infoMsg = `<p class="mt-3 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-center gap-2">
+                            <span>ℹ️</span> Will be credited in 7 days from the date of initiation (Estimated: ${estCreditDateStr})
+                        </p>`;
+                    } else if (w.status === "APPROVED") {
+                        step2Class = "text-emerald-400";
+                        step2Label = "Approved by Administrator";
+                        step2Icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                        
+                        step3Class = "text-emerald-400";
+                        step3Label = `Completed on ${updateDateStr}`;
+                        
+                        infoMsg = `<p class="mt-3 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-2">
+                            <span>✅</span> Funds successfully disbursed to your payout target.
+                        </p>`;
+                    } else if (w.status === "REJECTED") {
+                        step2Class = "text-rose-400";
+                        step2Label = "Rejected by Administrator";
+                        step2Icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                        
+                        step3Class = "text-rose-500 line-through";
+                        step3Label = "Transfer Cancelled";
+                        
+                        infoMsg = `<p class="mt-3 text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 flex flex-col gap-1">
+                            <span class="font-bold">❌ Reason for rejection:</span>
+                            <span>${w.admin_notes || 'No reason provided.'}</span>
+                        </p>`;
+                    }
+
+                    const card = document.createElement("div");
+                    card.className = "rounded-2xl border border-slate-800 bg-slate-900/40 p-5 hover:border-slate-700 transition";
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between gap-4 mb-4">
+                            <div>
+                                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">Method: ${w.method.toUpperCase()}</span>
+                                <p class="text-xs text-slate-400 mt-0.5 font-mono">${w.method_details}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-lg font-bold text-white">₹${w.amount.toFixed(2)}</span>
+                                <span class="text-xs text-slate-500">${initDateStr}</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Steps Tracker -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-slate-800/60 pt-4">
+                            <div class="flex items-center gap-2.5 ${step1Class}">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-300">Date Initiated</span>
+                                    <span class="text-[11px] text-slate-500">${initDateStr}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2.5 ${step2Class}">
+                                <div class="w-8 h-8 rounded-full bg-current/10 border border-current/30 flex items-center justify-center">
+                                    ${step2Icon}
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-300">Admin Approval</span>
+                                    <span class="text-[11px] text-slate-500">${step2Label}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2.5 ${step3Class}">
+                                <div class="w-8 h-8 rounded-full bg-current/10 border border-current/30 flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-300">Disbursement</span>
+                                    <span class="text-[11px] text-slate-500">${step3Label}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${infoMsg}
+                    `;
+                    list.appendChild(card);
+                });
+            }
+        } catch (e) {
+            console.error(e);
+            loader.style.display = "none";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
+        loadProfileData();
+        loadWithdrawalsHistory();
+
+        try {
+            const res = await fetch("/api/payments/", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            document.getElementById("payments-loader").style.display = "none";
+
+            if (!res.ok) {
+                console.error("Failed to load payments");
+                return;
+            }
+
+            const payments = await res.json();
+            if (!payments || payments.length === 0) {
+                document.getElementById("payments-empty").classList.remove("hidden");
+                return;
+            }
+
+            const container = document.getElementById("payments-list");
+            container.innerHTML = "";
+            container.classList.remove("hidden");
+
+            payments.forEach(p => {
+                const dateStr = new Date(p.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                const invTitle = new Date(p.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'long'
+                });
+
+                const invoiceNo = p.invoice_number ? p.invoice_number.toUpperCase() : `INV-${p.id}`;
+
+                const item = document.createElement("div");
+                item.className = "invoice-item";
+                item.innerHTML = `
+                    <div>
+                        <p class="text-sm font-semibold text-white">${invTitle} Consultation</p>
+                        <p class="mt-1 text-xs text-slate-500">${invoiceNo} (Case Request ID: ${p.case_custom_id || '#' + p.case_request_id})</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-300">Earned: <span class="font-semibold text-white">₹${p.amount.toFixed(2)}</span></p>
+                    </div>
+                    <div class="flex justify-end">
+                        ${p.status === "SUCCEEDED" ? `
+                            <button onclick="downloadInvoice(${JSON.stringify(p).replace(/"/g, '&quot;')})" class="btn-download">
+                                <svg fill="none" viewBox="0 0 24 24"><path d="M12 16v-4m0 0V8m0 4l-4-4m4 4l4-4M4 20h16" stroke="currentColor"></path></svg>
+                                Download Invoice
+                            </button>
+                        ` : `
+                            <span class="text-xs text-slate-500 italic uppercase tracking-wider">${p.status}</span>
+                        `}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        } catch (e) {
+            console.error(e);
+        }
+
+        window.downloadInvoice = function(payment) {
+            const dateStr = new Date(payment.created_at).toLocaleDateString(undefined, {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const clientName = payment.client_name ? payment.client_name : "Valued Client";
+            const clientEmail = payment.client_email ? payment.client_email : "N/A";
+            const lawyerName = payment.lawyer_name ? payment.lawyer_name : "Assigned Lawyer";
+            const lawyerEmail = payment.lawyer_email ? payment.lawyer_email : "N/A";
+            const lawyerOffice = payment.lawyer_office_city ? payment.lawyer_office_city : "N/A";
+
+            const invoiceHtml = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Invoice - ${payment.invoice_number.toUpperCase()}</title>
+                    <style>
+                        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 40px; }
+                        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); border-radius: 12px; }
+                        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                        .header-table td { vertical-align: top; }
+                        .logo { font-size: 28px; font-weight: bold; color: #0f172a; }
+                        .invoice-details { text-align: right; font-size: 14px; color: #555; white-space: nowrap; }
+                        .section-title { font-size: 18px; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; color: #000; }
+                        .items-table { width: 100%; border-collapse: collapse; text-align: left; }
+                        .items-table th { background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+                        .items-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                        .totals { text-align: right; margin-top: 30px; }
+                        .totals table { margin-left: auto; border-collapse: collapse; }
+                        .totals td { padding: 8px 12px; font-size: 14px; }
+                        .totals .grand-total { font-size: 18px; font-weight: bold; color: #0f172a; border-top: 2px solid #e2e8f0; }
+                        .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #64748b; border-top: 1px solid #eee; padding-top: 20px; }
+                        
+                        .details-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 30px; }
+                        .details-td { font-size: 12px; vertical-align: top; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; }
+
+                        @media print {
+                            body { margin: 15mm 10mm 15mm 10mm; }
+                            .invoice-box { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="invoice-box">
+                        <table class="header-table">
+                            <tr>
+                                <td>
+                                    <div class="logo">DivorceConnect India</div>
+                                    <p style="font-size: 12px; color: #64748b; margin-top: 5px;">
+                                        Online Escrow Legal Billing & Consultation Services<br>
+                                        New Delhi, India
+                                    </p>
+                                </td>
+                                <td class="invoice-details">
+                                    <h1 style="margin: 0; font-size: 24px; color: #0f172a;">INVOICE</h1>
+                                    <p style="margin: 5px 0;">Invoice #: <strong>${payment.invoice_number.toUpperCase()}</strong></p>
+                                    <p style="margin: 5px 0;">Date: ${dateStr}</p>
+                                    <p style="margin: 5px 0;">Status: <strong style="color: #10b981;">PAID</strong></p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="section-title">Billing & Service Details</div>
+                        <table class="details-table">
+                            <tr>
+                                <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-right: 15px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                                    <strong>Platform Operator:</strong><br>
+                                    DivorceConnect India<br>
+                                    GSTIN: 07AAAAA1111A1Z1<br>
+                                    support@divorceconnectindia.com
+                                </td>
+                                <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-left: 15px; border-bottom: 1px solid #f1f5f9;">
+                                    <strong>Transaction Details:</strong><br>
+                                    Payment Gateway: Razorpay<br>
+                                    Transaction Ref ID: ${payment.razorpay_payment_id || 'N/A'}<br>
+                                    Case Request ID: ${payment.case_custom_id || '#' + payment.case_request_id}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="details-td" style="width: 50%; padding-top: 15px; padding-right: 15px; border-right: 1px solid #f1f5f9;">
+                                    <strong>Assigned Lawyer:</strong><br>
+                                    ${lawyerName}<br>
+                                    Email: ${lawyerEmail}<br>
+                                    Office: ${lawyerOffice}
+                                </td>
+                                <td class="details-td" style="width: 50%; padding-top: 15px; padding-left: 15px;">
+                                    <strong>Billed To:</strong><br>
+                                    ${clientName}<br>
+                                    Email: ${clientEmail}<br>
+                                    Role: Client Profile
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="section-title">Invoice Items</div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th style="text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Legal Consultation Service Fee (Case Request ${payment.case_custom_id || '#' + payment.case_request_id})</td>
+                                    <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="totals">
+                            <table>
+                                <tr>
+                                    <td>Subtotal:</td>
+                                    <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                                </tr>
+                                <tr class="grand-total">
+                                    <td>Total Paid (INR):</td>
+                                    <td style="text-align: right;">₹${payment.amount.toFixed(2)}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="footer">
+                            This is a computer-generated document. No signature is required.<br>
+                            Thank you for using DivorceConnect India.
+                        </div>
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open("", "_blank");
+            printWindow.document.open();
+            printWindow.document.write(invoiceHtml);
+            printWindow.document.close();
+        };
+    });
+</script>
 {% endblock %}

@@ -268,6 +268,12 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
                   </template>
                   <td @click.stop>
                     <div class="flex items-center gap-1.5">
+                      <template x-if="activeKey === 'payments'">
+                        <button class="px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:text-white bg-emerald-950/20 hover:bg-emerald-600/50 rounded-lg transition-all" @click.stop="downloadPaymentInvoice(row)">Invoice</button>
+                      </template>
+                      <template x-if="activeKey === 'withdraw-requests'">
+                        <button class="px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:text-white bg-emerald-950/20 hover:bg-emerald-600/50 rounded-lg transition-all" @click.stop="downloadWithdrawInvoice(row)">Receipt</button>
+                      </template>
                       <button class="px-3 py-1.5 text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-900/30 hover:bg-indigo-600/50 rounded-lg transition-all" @click="openDetail(row)">Edit</button>
                       <button class="px-3 py-1.5 text-xs font-semibold text-red-400 hover:text-red-300 bg-red-900/20 hover:bg-red-900/40 rounded-lg transition-all" @click.stop="quickDel(row.id)">Del</button>
                     </div>
@@ -307,6 +313,12 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
               x-text="view === 'add' ? 'New Record' : 'Record #' + (formData.id || '')"></span>
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">
+        <template x-if="view === 'detail' && activeKey === 'payments'">
+          <button class="btn btn-ghost text-xs text-emerald-400 border-emerald-800/50 hover:bg-emerald-950/20" @click="downloadPaymentInvoice(formData)">📥 Download Invoice</button>
+        </template>
+        <template x-if="view === 'detail' && activeKey === 'withdraw-requests'">
+          <button class="btn btn-ghost text-xs text-emerald-400 border-emerald-800/50 hover:bg-emerald-950/20" @click="downloadWithdrawInvoice(formData)">📥 Download Receipt</button>
+        </template>
         <button class="btn btn-ghost text-xs" @click="backList()">Cancel</button>
         <button x-show="view === 'detail'" x-cloak class="btn btn-danger text-xs" @click="delOpen = true">&#128465; Delete</button>
         <button class="btn btn-primary text-xs" @click="saveRec()" :disabled="busy">
@@ -920,6 +932,46 @@ const SCHEMAS = {
       ]},
     ],
   },
+
+  'payments': {
+    label:'Client Payments History', endpoint:'/api/superuser/payments',
+    listCols:['id','invoice_number','amount','status','created_at'],
+    sections:[
+      { title:'Payment Info', fields:[
+        {name:'id',               label:'ID',               type:'ro'},
+        {name:'invoice_number',   label:'Invoice Number',   type:'text'},
+        {name:'amount',           label:'Amount (₹)',       type:'number'},
+        {name:'currency',         label:'Currency',         type:'text'},
+        {name:'status',           label:'Status',           type:'text'},
+        {name:'razorpay_payment_id', label:'Razorpay Payment ID', type:'text'},
+        {name:'case_request_id',  label:'Case Request ID (FK)', type:'number'},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'created_at',       label:'Created At',       type:'ro'},
+        {name:'updated_at',       label:'Updated At',       type:'ro'},
+      ]}
+    ]
+  },
+
+  'withdraw-requests': {
+    label:'Lawyer Withdraw Requests', endpoint:'/api/superuser/withdraw-requests',
+    listCols:['id','lawyer_id','amount','status','method','created_at'],
+    sections:[
+      { title:'Withdrawal Request details', fields:[
+        {name:'id',               label:'ID',               type:'ro'},
+        {name:'lawyer_id',        label:'Lawyer ID (FK)',   type:'number'},
+        {name:'amount',           label:'Amount (₹)',       type:'number'},
+        {name:'method',           label:'Method',           type:'select', choices:[{value:'bank',label:'Bank Account'},{value:'upi',label:'UPI Payout'}]},
+        {name:'method_details',   label:'Method Details',   type:'textarea', fullWidth:true},
+        {name:'status',           label:'Approval Status',   type:'select', choices:[{value:'PENDING',label:'Pending'},{value:'APPROVED',label:'Approved'},{value:'REJECTED',label:'Rejected'}]},
+        {name:'admin_notes',      label:'Admin Notes / Ref ID', type:'textarea', fullWidth:true},
+      ]},
+      { title:'Timestamps', fields:[
+        {name:'created_at',       label:'Initiated At',     type:'ro'},
+        {name:'updated_at',       label:'Processed At',     type:'ro'},
+      ]}
+    ]
+  },
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -954,6 +1006,10 @@ const NAV_DATA = [
     {k:'case-messages',icon:'💬',label:'Case Messages'},
     {k:'lawyer-ratings',icon:'⭐',label:'Lawyer Ratings'},
     {k:'lawyer-update-requests',icon:'🔄',label:'Lawyer Update Requests'},
+  ]},
+  { label:'PAYMENTS & PAYOUTS', open:true, items:[
+    {k:'payments',icon:'💵',label:'Client Payments'},
+    {k:'withdraw-requests',icon:'💸',label:'Lawyer Withdraw Requests'},
   ]},
 ];
 
@@ -1167,6 +1223,274 @@ function SU() {
       this.view = 'list';
       this.delOpen = false;
       this.loadList();
+    },
+
+    async downloadPaymentInvoice(row) {
+      try {
+        const res = await fetch(`/api/payments/${row.id}`, {
+          headers: { "Authorization": "Bearer " + this.token }
+        });
+        if (!res.ok) throw new Error("Failed to fetch payment details");
+        const payment = await res.json();
+        
+        const dateStr = new Date(payment.created_at).toLocaleDateString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+
+        const invoiceHtml = `
+          <html>
+          <head>
+              <title>Invoice - DivorceConnect India</title>
+              <style>
+                  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 0; padding: 40px; }
+                  .invoice-box { max-width: 800px; margin: auto; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); padding: 30px; border-radius: 10px; }
+                  .logo { font-size: 28px; font-weight: bold; color: #1e3a8a; }
+                  .header-table, .details-table, .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                  .invoice-details { text-align: right; font-size: 14px; }
+                  .section-title { font-size: 14px; text-transform: uppercase; color: #64748b; font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; }
+                  .details-td { vertical-align: top; font-size: 14px; line-height: 1.6; }
+                  .items-table th { background: #f8fafc; text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: #475569; }
+                  .items-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                  .totals { float: right; width: 300px; margin-top: 20px; }
+                  .totals table { width: 100%; font-size: 14px; }
+                  .grand-total { font-size: 18px; font-weight: bold; color: #0f172a; border-top: 2px solid #e2e8f0; }
+                  .grand-total td { padding-top: 10px; }
+                  .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+              </style>
+          </head>
+          <body>
+              <div class="invoice-box">
+                  <table class="header-table">
+                      <tr>
+                          <td>
+                              <div class="logo">DivorceConnect India</div>
+                              <p style="font-size: 12px; color: #64748b; margin-top: 5px;">
+                                  Online Escrow Legal Billing & Consultation Services<br>
+                                  New Delhi, India
+                              </p>
+                          </td>
+                          <td class="invoice-details">
+                              <h1 style="margin: 0; font-size: 24px; color: #0f172a;">INVOICE</h1>
+                              <p style="margin: 5px 0;">Invoice #: <strong>${payment.invoice_number ? payment.invoice_number.toUpperCase() : 'INV-'+payment.id}</strong></p>
+                              <p style="margin: 5px 0;">Date: ${dateStr}</p>
+                              <p style="margin: 5px 0;">Status: <strong style="color: #10b981;">${payment.status.toUpperCase()}</strong></p>
+                          </td>
+                      </tr>
+                  </table>
+
+                  <div class="section-title">Billing & Service Details</div>
+                  <table class="details-table">
+                      <tr>
+                          <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-right: 15px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                              <strong>Platform Operator:</strong><br>
+                              DivorceConnect India<br>
+                              GSTIN: 07AAAAA1111A1Z1<br>
+                              support@divorceconnectindia.com
+                          </td>
+                          <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-left: 15px; border-bottom: 1px solid #f1f5f9;">
+                              <strong>Transaction Details:</strong><br>
+                              Payment Gateway: Razorpay<br>
+                              Transaction Ref ID: ${payment.razorpay_payment_id || 'N/A'}<br>
+                              Case Request ID: ${payment.case_custom_id || '#' + payment.case_request_id}
+                          </td>
+                      </tr>
+                      <tr>
+                          <td class="details-td" style="width: 50%; padding-top: 15px; padding-right: 15px; border-right: 1px solid #f1f5f9;">
+                              <strong>Assigned Lawyer:</strong><br>
+                              ${payment.lawyer_name || 'N/A'}<br>
+                              Email: ${payment.lawyer_email || 'N/A'}<br>
+                              Office: ${payment.lawyer_office_city || 'N/A'}
+                          </td>
+                          <td class="details-td" style="width: 50%; padding-top: 15px; padding-left: 15px;">
+                              <strong>Billed To:</strong><br>
+                              ${payment.client_name || 'N/A'}<br>
+                              Email: ${payment.client_email || 'N/A'}<br>
+                              Role: Client Profile
+                          </td>
+                      </tr>
+                  </table>
+
+                  <div class="section-title">Invoice Items</div>
+                  <table class="items-table">
+                      <thead>
+                          <tr>
+                              <th>Description</th>
+                              <th style="text-align: right;">Amount</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>Legal Consultation Service Fee (Case Request ${payment.case_custom_id || '#' + payment.case_request_id})</td>
+                              <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+                  <div class="totals">
+                      <table>
+                          <tr>
+                              <td>Subtotal:</td>
+                              <td style="text-align: right; font-weight: 600;">₹${payment.amount.toFixed(2)}</td>
+                          </tr>
+                          <tr class="grand-total">
+                              <td>Total Paid (INR):</td>
+                              <td style="text-align: right;">₹${payment.amount.toFixed(2)}</td>
+                          </tr>
+                      </table>
+                  </div>
+
+                  <div class="footer">
+                      This is a computer-generated document. No signature is required.<br>
+                      Thank you for choosing DivorceConnect India.
+                  </div>
+              </div>
+              <script>
+                  window.onload = function() { window.print(); }
+              <\/script>
+          </body>
+          </html>
+        `;
+        const printWindow = window.open("", "_blank");
+        printWindow.document.open();
+        printWindow.document.write(invoiceHtml);
+        printWindow.document.close();
+      } catch (e) {
+        this.pop("Error generating invoice: " + e.message, false);
+      }
+    },
+
+    async downloadWithdrawInvoice(row) {
+      try {
+        const res = await fetch("/api/admin/withdrawals", {
+          headers: { "Authorization": "Bearer " + this.token }
+        });
+        if (!res.ok) throw new Error("Failed to fetch withdrawals");
+        const list = await res.json();
+        const payout = list.find(x => x.id === row.id);
+        if (!payout) throw new Error("Payout details not found");
+
+        const dateStr = new Date(payout.created_at).toLocaleDateString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+
+        const receiptHtml = `
+          <html>
+          <head>
+              <title>Payout Receipt - DivorceConnect India</title>
+              <style>
+                  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 0; padding: 40px; }
+                  .invoice-box { max-width: 800px; margin: auto; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); padding: 30px; border-radius: 10px; }
+                  .logo { font-size: 28px; font-weight: bold; color: #c2410c; }
+                  .header-table, .details-table, .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                  .invoice-details { text-align: right; font-size: 14px; }
+                  .section-title { font-size: 14px; text-transform: uppercase; color: #64748b; font-weight: bold; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; }
+                  .details-td { vertical-align: top; font-size: 14px; line-height: 1.6; }
+                  .items-table th { background: #f8fafc; text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: #475569; }
+                  .items-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                  .totals { float: right; width: 300px; margin-top: 20px; }
+                  .totals table { width: 100%; font-size: 14px; }
+                  .grand-total { font-size: 18px; font-weight: bold; color: #0f172a; border-top: 2px solid #e2e8f0; }
+                  .grand-total td { padding-top: 10px; }
+                  .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+              </style>
+          </head>
+          <body>
+              <div class="invoice-box">
+                  <table class="header-table">
+                      <tr>
+                          <td>
+                              <div class="logo">DivorceConnect India</div>
+                              <p style="font-size: 12px; color: #64748b; margin-top: 5px;">
+                                  Online Escrow Legal Billing & Consultation Services<br>
+                                  New Delhi, India
+                              </p>
+                          </td>
+                          <td class="invoice-details">
+                              <h1 style="margin: 0; font-size: 24px; color: #0f172a;">PAYOUT RECEIPT</h1>
+                              <p style="margin: 5px 0;">Receipt #: <strong>REC-PAY-${payout.id}</strong></p>
+                              <p style="margin: 5px 0;">Date: ${dateStr}</p>
+                              <p style="margin: 5px 0;">Status: <strong style="color: #f59e0b;">${payout.status.toUpperCase()}</strong></p>
+                          </td>
+                      </tr>
+                  </table>
+
+                  <div class="section-title">Lawyer Payout Details</div>
+                  <table class="details-table">
+                      <tr>
+                          <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-right: 15px; border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                              <strong>Payer:</strong><br>
+                              DivorceConnect India Escrow Account<br>
+                              GSTIN: 07AAAAA1111A1Z1<br>
+                              support@divorceconnectindia.com
+                          </td>
+                          <td class="details-td" style="width: 50%; padding-bottom: 15px; padding-left: 15px; border-bottom: 1px solid #f1f5f9;">
+                              <strong>Payout Channel:</strong><br>
+                              Method: ${payout.method.toUpperCase()}<br>
+                              Target info: ${payout.method_details}<br>
+                              Status Code: ${payout.status}
+                          </td>
+                      </tr>
+                      <tr>
+                          <td class="details-td" style="width: 50%; padding-top: 15px; padding-right: 15px; border-right: 1px solid #f1f5f9;">
+                              <strong>Recipient Lawyer:</strong><br>
+                              ${payout.lawyer_name}<br>
+                              Email: ${payout.lawyer_email}<br>
+                              Role: Verified Legal Consultant
+                          </td>
+                          <td class="details-td" style="width: 50%; padding-top: 15px; padding-left: 15px;">
+                              <strong>Audit Notes / Ref ID:</strong><br>
+                              ${payout.admin_notes || 'Pending processing.'}
+                          </td>
+                      </tr>
+                  </table>
+
+                  <div class="section-title">Receipt Items</div>
+                  <table class="items-table">
+                      <thead>
+                          <tr>
+                              <th>Description</th>
+                              <th style="text-align: right;">Amount</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>Disbursement of Earned Consultation Fees (Withdrawal request #${payout.id})</td>
+                              <td style="text-align: right; font-weight: 600;">₹${payout.amount.toFixed(2)}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+                  <div class="totals">
+                      <table>
+                          <tr>
+                              <td>Subtotal:</td>
+                              <td style="text-align: right; font-weight: 600;">₹${payout.amount.toFixed(2)}</td>
+                          </tr>
+                          <tr class="grand-total">
+                              <td>Total Disbursed (INR):</td>
+                              <td style="text-align: right;">₹${payout.amount.toFixed(2)}</td>
+                          </tr>
+                      </table>
+                  </div>
+
+                  <div class="footer">
+                      This is a computer-generated document. No signature is required.<br>
+                      Thank you for choosing DivorceConnect India.
+                  </div>
+              </div>
+              <script>
+                  window.onload = function() { window.print(); }
+              <\/script>
+          </body>
+          </html>
+        `;
+        const printWindow = window.open("", "_blank");
+        printWindow.document.open();
+        printWindow.document.write(receiptHtml);
+        printWindow.document.close();
+      } catch (e) {
+        this.pop("Error generating receipt: " + e.message, false);
+      }
     },
 
     // ── Selection ────────────────────────────────────────────────────────────

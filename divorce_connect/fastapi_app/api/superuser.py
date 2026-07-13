@@ -35,6 +35,7 @@ from ..models import (
     SystemIssue,
     TrustReport,
     User,
+    WithdrawRequest,
 )
 from ..notifications import create_and_broadcast_notification
 from ..security import get_current_user
@@ -101,6 +102,8 @@ async def _inject_custom_fields(model_path: str, record, d: Dict[str, Any], db: 
     elif model_path == "system-issues":
         if not d.get("ticket_id") and getattr(record, "id", None):
             d["ticket_id"] = f"ti:{record.id:05d}"
+    elif model_path == "payments":
+        d["invoice_number"] = getattr(record, "invoice_number", None)
     return d
 
 
@@ -1184,6 +1187,66 @@ async def superuser_login_endpoint(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+# ── Payments ──────────────────────────────────────────────────────────────────
+
+@router.get("/payments")
+async def list_payments(
+    search: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    _su: User = Depends(check_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    q = select(Payment)
+    if search:
+        q = q.where(
+            or_(
+                Payment.razorpay_payment_id.ilike(f"%{search}%"),
+                Payment.status.ilike(f"%{search}%")
+            )
+        )
+    q = q.order_by(Payment.id.desc())
+    total = await db.scalar(select(func.count()).select_from(q.subquery()))
+    rows = await db.execute(_paginate(q, page))
+    
+    results = []
+    for r in rows.scalars():
+        d = _serialize(r)
+        d = await _inject_custom_fields("payments", r, d, db)
+        results.append(d)
+        
+    return {"total": total, "page": page, "results": results}
+
+
+# ── Withdraw Requests ─────────────────────────────────────────────────────────
+
+@router.get("/withdraw-requests")
+async def list_withdraw_requests(
+    search: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    _su: User = Depends(check_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    q = select(WithdrawRequest)
+    if search:
+        q = q.where(
+            or_(
+                WithdrawRequest.method.ilike(f"%{search}%"),
+                WithdrawRequest.status.ilike(f"%{search}%")
+            )
+        )
+    q = q.order_by(WithdrawRequest.id.desc())
+    total = await db.scalar(select(func.count()).select_from(q.subquery()))
+    rows = await db.execute(_paginate(q, page))
+    
+    results = []
+    for r in rows.scalars():
+        d = _serialize(r)
+        d = await _inject_custom_fields("withdraw-requests", r, d, db)
+        results.append(d)
+        
+    return {"total": total, "page": page, "results": results}
+
+
 # ─── MODEL MAPPINGS (shared by all generic handlers) ─────────────────────────
 
 MODEL_MAPPINGS = {
@@ -1205,6 +1268,8 @@ MODEL_MAPPINGS = {
     "case-messages": CaseMessage,
     "lawyer-ratings": LawyerRating,
     "case-requests": CaseRequest,
+    "payments": Payment,
+    "withdraw-requests": WithdrawRequest,
 }
 
 

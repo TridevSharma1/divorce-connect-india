@@ -14,6 +14,45 @@
         animation: shimmer 1.5s infinite linear;
         border-radius: 0.75rem;
     }
+    /* Glassmorphism modal styling */
+    .glass-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(2, 6, 23, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .glass-modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .glass-modal {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-radius: 28px;
+        padding: 2.25rem 2rem;
+        max-width: 440px;
+        width: 90%;
+        transform: scale(0.9);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        text-align: center;
+    }
+    .glass-modal-overlay.active .glass-modal {
+        transform: scale(1);
+    }
 </style>
 {% endblock %}
 
@@ -126,7 +165,7 @@
                         </div>
                     </div>
                     <div class="space-y-4 border-t border-slate-800 pt-6 text-sm">
-                        <div class="flex items-center justify-between"><span class="text-slate-400">Contact Number</span><span class="font-semibold text-slate-100" id="detail-user-mobile">-</span></div>
+                        <div id="contact-number-row" class="flex items-center justify-between"><span class="text-slate-400">Contact Number</span><span class="font-semibold text-slate-100" id="detail-user-mobile">-</span></div>
                         <div class="flex items-center justify-between"><span class="text-slate-400">Email Address</span><span class="break-all font-semibold text-slate-100" id="detail-user-email">-</span></div>
                         <div id="detail-user-extra-fields" class="space-y-4"></div>
                     </div>
@@ -142,7 +181,56 @@
         </div>
     </div>
 
+    <!-- Glass Confirm Modal -->
+    <div id="glass-confirm-modal" class="glass-modal-overlay">
+        <div class="glass-modal">
+            <div class="text-4xl mb-4">💳</div>
+            <h3 class="text-xl font-extrabold text-white mb-2" id="glass-confirm-title">Confirm Payment</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-6" id="glass-confirm-message">Are you sure you want to proceed?</p>
+            <div class="flex gap-4 justify-center">
+                <button type="button" id="glass-confirm-cancel" class="px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-slate-300 text-sm font-bold transition hover:bg-slate-800/80 hover:text-white active:scale-95">
+                    Cancel
+                </button>
+                <button type="button" id="glass-confirm-ok" class="px-5 py-2.5 rounded-xl bg-white text-slate-950 text-sm font-bold transition hover:bg-slate-100 shadow-lg shadow-white/10 active:scale-95">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+    function showGlassConfirm(message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById("glass-confirm-modal");
+            const msgEl = document.getElementById("glass-confirm-message");
+            const btnOk = document.getElementById("glass-confirm-ok");
+            const btnCancel = document.getElementById("glass-confirm-cancel");
+
+            if (!modal || !btnOk || !btnCancel) {
+                resolve(confirm(message));
+                return;
+            }
+
+            msgEl.innerText = message;
+            modal.classList.add("active");
+
+            function cleanUp(result) {
+                modal.classList.remove("active");
+                btnOk.removeEventListener("click", onOk);
+                btnCancel.removeEventListener("click", onCancel);
+                resolve(result);
+            }
+
+            function onOk() { cleanUp(true); }
+            function onCancel() { cleanUp(false); }
+
+            btnOk.addEventListener("click", onOk);
+            btnCancel.addEventListener("click", onCancel);
+        });
+    }
+
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -322,12 +410,55 @@ document.addEventListener("DOMContentLoaded", async () => {
             mobileEl.innerText = client.mobile_number || "Not specified";
             emailEl.innerText = client.email || "Not specified";
             
+            if (document.getElementById("contact-number-row")) {
+                document.getElementById("contact-number-row").style.display = 'flex';
+            }
             picEl.classList.add("hidden");
             picFallback.classList.remove("hidden");
+
+            // Fetch and display client payment status for the lawyer
+            const payContainer = document.createElement("div");
+            payContainer.id = "lawyer-payment-status-container";
+            extraFields.appendChild(payContainer);
+            
+            fetch(`/api/payments/?case_id=${caseId}`, {
+                headers: { "Authorization": "Bearer " + token }
+            })
+            .then(res => res.json())
+            .then(payments => {
+                const container = document.getElementById("lawyer-payment-status-container");
+                if (!container) return;
+                
+                const successfulPayment = Array.isArray(payments) && payments.find(p => p.status === 'SUCCEEDED');
+                if (successfulPayment) {
+                    container.innerHTML = `
+                        <div class="mt-6 pt-6 border-t border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Payment Status</span>
+                            <span class="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400">
+                                ✓ Paid (INR ${successfulPayment.amount})
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="mt-6 pt-6 border-t border-slate-800 flex items-center justify-between">
+                            <span class="text-slate-400 font-bold">Payment Status</span>
+                            <span class="rounded-full bg-rose-500/10 border border-rose-500/20 px-3 py-1 text-xs font-bold text-rose-400">
+                                Unpaid
+                            </span>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => console.error(err));
         } else {
             // Logged in user is Client -> Show Lawyer Details
             document.getElementById("user-details-title").innerText = "Assigned Lawyer";
             document.getElementById("chat-header-title").innerText = "Chat with Lawyer";
+            
+            if (document.getElementById("contact-number-row")) {
+                document.getElementById("contact-number-row").style.display = 'none';
+            }
             
             const lawyer = data.lawyer_details;
             if (lawyer) {
@@ -374,11 +505,139 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <span class="text-slate-400">Years of Experience</span>
                         <span class="font-semibold text-slate-100">${expText}</span>
                     </div>
-                    <div class="flex gap-2 mt-3">
-                        ${lawyer.mobile_number ? `<button type="button" data-tel="${lawyer.mobile_number}" class="contact-action call-action px-3 py-1.5 bg-white text-slate-900 rounded-xl font-semibold text-xs hover:bg-slate-100">Call</button>` : ''}
-                        ${lawyer.email ? `<button type="button" data-email="${lawyer.email}" class="contact-action email-action px-3 py-1.5 bg-white text-slate-900 rounded-xl font-semibold text-xs hover:bg-slate-100">Email</button>` : ''}
-                    </div>
+                    <div id="payment-card-option-container"></div>
                 `;
+
+                // Fetch payment status
+                fetch(`/api/payments/?case_id=${caseId}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                })
+                .then(res => res.json())
+                .then(payments => {
+                    const container = document.getElementById("payment-card-option-container");
+                    if (!container) return;
+
+                    const successfulPayment = Array.isArray(payments) && payments.find(p => p.status === 'SUCCEEDED');
+                    if (successfulPayment) {
+                        container.innerHTML = `
+                            <div class="mt-6 pt-6 border-t border-slate-800 flex items-center justify-between">
+                                <span class="text-slate-400 font-bold">Payment Status</span>
+                                <span class="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400">
+                                    ✓ Paid (INR ${successfulPayment.amount})
+                                </span>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `
+                            <div class="mt-6 pt-6 border-t border-slate-800">
+                                <button type="button" id="pay-lawyer-btn" class="w-full rounded-2xl bg-white py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-200 shadow-lg shadow-white/5 active:scale-[0.98]">
+                                    💳 Pay Consultation Fee (${feeText ? '₹' + feeText : 'N/A'})
+                                </button>
+                            </div>
+                        `;
+
+                        const payBtn = document.getElementById("pay-lawyer-btn");
+                        if (payBtn) {
+                             payBtn.addEventListener("click", async () => {
+                                 const confirmPay = await showGlassConfirm(`Proceed to pay consultation fee of ₹${feeText}?`);
+                                 if (!confirmPay) return;
+
+                                 try {
+                                    payBtn.disabled = true;
+                                    payBtn.innerText = "Processing...";
+                                    
+                                    // Create Payment
+                                    const payRes = await fetch('/api/payments/', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Authorization': 'Bearer ' + token,
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            case_request_id: parseInt(caseId),
+                                            amount: parseFloat(lawyer.consultation_fee)
+                                        })
+                                    });
+
+                                    if (!payRes.ok) {
+                                        const err = await payRes.json();
+                                        throw new Error(err.detail || "Failed to initiate payment");
+                                    }
+
+                                    const payment = await payRes.json();
+
+                                     // Initialize Razorpay Options
+                                     const options = {
+                                         "key": "rzp_test_TCv4T15OKvKZbM",
+                                         "amount": parseFloat(lawyer.consultation_fee) * 100, // in paise
+                                         "currency": "INR",
+                                         "name": "DivorceConnect India",
+                                         "description": `Consultation Fee for Case #${caseId}`,
+                                         "handler": async function (response) {
+                                             try {
+                                                 payBtn.innerText = "Verifying...";
+                                                 
+                                                 // Verify Payment
+                                                 const verifyRes = await fetch(`/api/payments/${payment.id}/verify`, {
+                                                     method: 'POST',
+                                                     headers: {
+                                                         'Authorization': 'Bearer ' + token,
+                                                         'Content-Type': 'application/json'
+                                                     },
+                                                     body: JSON.stringify({
+                                                         razorpay_payment_id: response.razorpay_payment_id,
+                                                         status: "SUCCEEDED"
+                                                     })
+                                                 });
+
+                                                 if (!verifyRes.ok) {
+                                                     throw new Error("Failed to verify payment status");
+                                                 }
+
+                                                 if (typeof showToastNotification === 'function') {
+                                                     showToastNotification("Payment Successful", `Consultation fee of ₹${feeText} paid!`);
+                                                 } else {
+                                                     alert(`Payment Successful! Paid ₹${feeText}`);
+                                                 }
+
+                                                 loadCaseDetails();
+                                             } catch (error) {
+                                                 console.error(error);
+                                                 alert(error.message || "An error occurred during verification");
+                                                 payBtn.disabled = false;
+                                                 payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                             }
+                                         },
+                                         "prefill": {
+                                             "name": data.client_details ? `${data.client_details.first_name} ${data.client_details.last_name}` : "",
+                                             "email": data.client_details ? data.client_details.email : "",
+                                             "contact": data.client_details ? data.client_details.mobile_number : ""
+                                         },
+                                         "theme": {
+                                             "color": "#020617"
+                                         },
+                                         "modal": {
+                                             "ondismiss": function() {
+                                                 payBtn.disabled = false;
+                                                 payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                             }
+                                         }
+                                     };
+                                     const rzp = new Razorpay(options);
+                                     rzp.open();
+                                 } catch (error) {
+                                     console.error(error);
+                                     alert(error.message || "An error occurred during payment");
+                                     payBtn.disabled = false;
+                                     payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                 }
+                            });
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to load payment details", err);
+                });
             } else {
                 nameEl.innerText = "Assigning Lawyer...";
                 subtitleEl.innerText = "Please wait";

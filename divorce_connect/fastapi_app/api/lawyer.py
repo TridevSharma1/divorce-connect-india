@@ -1,10 +1,12 @@
+from typing import Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
-from typing import Dict, Any, List
+from pydantic import BaseModel
+
 
 from ..database import get_db
-from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest
+from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, WithdrawRequest
 from ..security import get_current_user
 from .cloudinary_utils import upload_to_cloudinary
 
@@ -204,6 +206,97 @@ async def respond_case_request(
     await db.commit()
     return {"message": f"Request status updated to {req.status}"}
 
+
+class WithdrawCreate(BaseModel):
+    amount: float
+    method: str
+    method_details: str
+
+
+@router.post("/withdraw")
+async def request_withdrawal(
+    withdrawal: WithdrawCreate,
+    current_user: User = Depends(check_verified_lawyer),
+    db: AsyncSession = Depends(get_db)
+):
+    # Fetch lawyer profile
+    lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found")
+
+    consultation_fee = float(lawyer_profile.consultation_fee) if lawyer_profile.consultation_fee else 0.0
+
+    # Calculate completed cases count
+    completed_res = await db.execute(
+        select(func.count()).select_from(CaseRequest)
+        .where(CaseRequest.lawyer_id == lawyer_profile.id, CaseRequest.status == 'COMPLETED')
+    )
+    completed_count = completed_res.scalar() or 0
+    total_earnings = consultation_fee * completed_count
+
+    # Calculate total already withdrawn/pending
+    withdrawn_res = await db.execute(
+        select(func.sum(WithdrawRequest.amount)).where(
+            WithdrawRequest.lawyer_id == lawyer_profile.id,
+            WithdrawRequest.status.in_(["PENDING", "APPROVED"])
+        )
+    )
+    total_withdrawn = float(withdrawn_res.scalar() or 0.0)
+
+    available_balance = total_earnings - total_withdrawn
+
+    if withdrawal.amount > available_balance:
+        raise HTTPException(status_code=400, detail="Insufficient withdrawable balance")
+
+    if withdrawal.amount <= 0:
+        raise HTTPException(status_code=400, detail="Withdrawal amount must be greater than zero")
+
+    # Create withdrawal request
+    req = WithdrawRequest(
+        lawyer_id=lawyer_profile.id,
+        amount=withdrawal.amount,
+        method=withdrawal.method,
+        method_details=withdrawal.method_details,
+        status="PENDING"
+    )
+    db.add(req)
+    await db.commit()
+    return {"message": "Withdrawal request submitted successfully", "id": req.id}
+
+
+@router.get("/withdrawals")
+async def get_lawyer_withdrawals(
+    current_user: User = Depends(check_verified_lawyer),
+    db: AsyncSession = Depends(get_db)
+):
+    # Fetch lawyer profile
+    lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found")
+
+    res = await db.execute(
+        select(WithdrawRequest)
+        .where(WithdrawRequest.lawyer_id == lawyer_profile.id)
+        .order_by(WithdrawRequest.created_at.desc())
+    )
+    reqs = res.scalars().all()
+    out = []
+    for r in reqs:
+        out.append({
+            "id": r.id,
+            "amount": float(r.amount),
+            "method": r.method,
+            "method_details": r.method_details,
+            "status": r.status,
+            "created_at": r.created_at.isoformat() if r.created_at else "",
+            "updated_at": r.updated_at.isoformat() if r.updated_at else "",
+            "admin_notes": r.admin_notes
+        })
+    return out
+
+
 @router.get("/earnings")
 async def get_lawyer_earnings(
     current_user: User = Depends(check_verified_lawyer),
@@ -231,7 +324,17 @@ async def get_lawyer_earnings(
     accepted_count = accepted_res.scalar() or 0
     
     total_generated = consultation_fee * (completed_count + accepted_count)
-    available_balance = consultation_fee * completed_count
+    
+    # Calculate total already withdrawn/pending
+    withdrawn_res = await db.execute(
+        select(func.sum(WithdrawRequest.amount)).where(
+            WithdrawRequest.lawyer_id == lawyer_profile.id,
+            WithdrawRequest.status.in_(["PENDING", "APPROVED"])
+        )
+    )
+    total_withdrawn = float(withdrawn_res.scalar() or 0.0)
+
+    available_balance = (consultation_fee * completed_count) - total_withdrawn
     escrow_balance = consultation_fee * accepted_count
     
     import datetime
@@ -812,3 +915,66 @@ async def submit_client_report(
             pass
         
     return {"status": "success", "message": "Report submitted successfully"}
+
+
+# --- Lawyer Settings ---
+
+class SettingsUpdatePayload(BaseModel):
+    vacationMode: bool
+    workingHours: dict
+    emailAlerts: bool
+    smsAlerts: bool
+    twoFactorAuth: bool
+
+@router.get("/settings")
+async def get_lawyer_settings(
+    current_user: User = Depends(check_verified_lawyer),
+    db: AsyncSession = Depends(get_db)
+):
+    lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found")
+
+    import json
+    wh = {}
+    if lawyer_profile.working_hours:
+        try:
+            wh = json.loads(lawyer_profile.working_hours)
+        except Exception:
+            pass
+            
+    # Default values if not set
+    if not wh:
+        wh = {
+            "monday": {"enabled": True, "start": "09:00", "end": "17:00"},
+            "tuesday": {"enabled": True, "start": "09:00", "end": "17:00"},
+            "wednesday": {"enabled": True, "start": "09:00", "end": "17:00"},
+            "thursday": {"enabled": True, "start": "09:00", "end": "17:00"},
+            "friday": {"enabled": True, "start": "09:00", "end": "17:00"}
+        }
+
+    return {
+        "vacationMode": lawyer_profile.vacation_mode,
+        "workingHours": wh,
+        "emailAlerts": True,
+        "smsAlerts": False,
+        "twoFactorAuth": False
+    }
+
+@router.post("/settings")
+async def save_lawyer_settings(
+    payload: SettingsUpdatePayload,
+    current_user: User = Depends(check_verified_lawyer),
+    db: AsyncSession = Depends(get_db)
+):
+    lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
+    lawyer_profile = lawyer_profile_res.scalar_one_or_none()
+    if not lawyer_profile:
+        raise HTTPException(status_code=404, detail="Lawyer profile not found")
+
+    import json
+    lawyer_profile.vacation_mode = payload.vacationMode
+    lawyer_profile.working_hours = json.dumps(payload.workingHours)
+    await db.commit()
+    return {"message": "Settings updated successfully"}

@@ -391,9 +391,9 @@
 
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 hover:-translate-y-2 transition duration-300">
-                    <div class="text-5xl mb-6">📞</div>
-                    <h3 class="text-2xl font-bold">Primary Mobile</h3>
-                    <p class="mt-4 text-gray-400 text-lg" id="contact-mobile">-</p>
+                    <div class="text-5xl mb-6">✉️</div>
+                    <h3 class="text-2xl font-bold">Email Address</h3>
+                    <p class="mt-4 text-gray-400 text-lg break-all" id="contact-email">-</p>
                 </div>
 
                 <div class="rounded-[30px] p-8 hover:-translate-y-2 transition duration-300 hidden" id="contact-alternate-box">
@@ -406,6 +406,24 @@
                     <div class="text-5xl mb-6">📍</div>
                     <h3 class="text-2xl font-bold">Office Location</h3>
                     <p class="mt-4 text-gray-400 text-lg" id="contact-city">Not Specified</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- WORKING HOURS -->
+        <!-- ========================================================= -->
+        <section class="mt-20">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-14 h-[2px] bg-white"></div>
+                <p class="section-label">
+                    Working Hours
+                </p>
+            </div>
+
+            <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center" id="working-hours-grid">
+                    <!-- Loaded dynamically -->
                 </div>
             </div>
         </section>
@@ -799,12 +817,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("personal-city").innerText = data.office_city || 'N/A';
 
         // Contact info blocks
-        document.getElementById("contact-mobile").innerText = data.mobile_number || 'Not Disclosed';
+        document.getElementById("contact-email").innerText = data.email || 'Not Disclosed';
         if (data.alternate_mobile_number) {
             document.getElementById("contact-alternate").innerText = data.alternate_mobile_number;
             document.getElementById("contact-alternate-box").classList.remove("hidden");
         }
         document.getElementById("contact-city").innerText = data.office_city || 'Not Specified';
+
+        // Render Working Hours
+        const wh = data.working_hours || {};
+        const daysOfWeek = [
+            { key: "monday", label: "Monday" },
+            { key: "tuesday", label: "Tuesday" },
+            { key: "wednesday", label: "Wednesday" },
+            { key: "thursday", label: "Thursday" },
+            { key: "friday", label: "Friday" }
+        ];
+        
+        let whHtml = "";
+        daysOfWeek.forEach(d => {
+            const dayData = wh[d.key];
+            const enabled = dayData ? dayData.enabled : true;
+            const start = dayData ? dayData.start : "09:00";
+            const end = dayData ? dayData.end : "17:00";
+            
+            if (enabled) {
+                whHtml += `
+                    <div class="bg-black/40 border border-white/5 rounded-2xl p-5 hover:border-white/25 transition">
+                        <p class="font-bold text-white text-lg mb-2">${d.label}</p>
+                        <p class="text-emerald-400 font-semibold text-sm">${start} – ${end}</p>
+                    </div>
+                `;
+            } else {
+                whHtml += `
+                    <div class="bg-black/20 border border-white/5 opacity-50 rounded-2xl p-5">
+                        <p class="font-bold text-gray-400 text-lg mb-2">${d.label}</p>
+                        <p class="text-rose-400 font-semibold text-sm">Closed</p>
+                    </div>
+                `;
+            }
+        });
+        document.getElementById("working-hours-grid").innerHTML = whHtml;
 
         // Avatar configuration
         if (data.profile_picture) {

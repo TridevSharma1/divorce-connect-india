@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from ..database import get_db
-from ..models import User, LawyerProfile, AdminPanelProfile
+from ..models import User, LawyerProfile, AdminPanelProfile, WithdrawRequest
 from ..security import get_current_user
 
 router = APIRouter()
@@ -13,6 +13,9 @@ async def check_verified_admin(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if current_user.is_superuser:
+        return current_user
+
     if not (current_user.is_staff or current_user.role == "admin"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         
@@ -242,5 +245,66 @@ async def get_document_verification_list(
         "total_pending": total_pending,
         "cases_with_pending_docs": cases_with_pending_docs
     }
+
+
+from sqlalchemy.orm import joinedload
+from pydantic import BaseModel
+
+class WithdrawAction(BaseModel):
+    action: str  # 'approve' or 'reject'
+    admin_notes: Optional[str] = None
+
+@router.get("/withdrawals")
+async def get_all_withdrawals(
+    current_user: User = Depends(check_verified_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    res = await db.execute(
+        select(WithdrawRequest)
+        .options(joinedload(WithdrawRequest.lawyer).joinedload(LawyerProfile.user))
+        .order_by(WithdrawRequest.created_at.desc())
+    )
+    reqs = res.scalars().all()
+    out = []
+    for r in reqs:
+        out.append({
+            "id": r.id,
+            "lawyer_id": r.lawyer_id,
+            "lawyer_name": r.lawyer.full_name if r.lawyer else "Unknown",
+            "lawyer_email": r.lawyer.user.email if r.lawyer and r.lawyer.user else "Unknown",
+            "amount": float(r.amount),
+            "method": r.method,
+            "method_details": r.method_details,
+            "status": r.status,
+            "created_at": r.created_at.isoformat() if r.created_at else "",
+            "admin_notes": r.admin_notes
+        })
+    return out
+
+@router.post("/withdrawals/{withdraw_id}/action")
+async def process_withdrawal_action(
+    withdraw_id: int,
+    action_data: WithdrawAction,
+    current_user: User = Depends(check_verified_admin),
+    db: AsyncSession = Depends(get_db)
+):
+    res = await db.execute(select(WithdrawRequest).where(WithdrawRequest.id == withdraw_id))
+    req = res.scalar_one_or_none()
+    if not req:
+        raise HTTPException(status_code=404, detail="Withdrawal request not found")
+
+    if req.status != "PENDING":
+        raise HTTPException(status_code=400, detail="Withdrawal request has already been processed")
+
+    if action_data.action == "approve":
+        req.status = "APPROVED"
+    elif action_data.action == "reject":
+        req.status = "REJECTED"
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action")
+
+    req.admin_notes = action_data.admin_notes
+    await db.commit()
+    return {"message": f"Withdrawal request status updated to {req.status}"}
 
 

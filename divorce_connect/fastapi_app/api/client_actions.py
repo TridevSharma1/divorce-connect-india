@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile, File
 from sqlalchemy.future import select
+from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Dict, Any, Optional
 import datetime
@@ -18,7 +20,11 @@ async def list_verified_lawyers(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    query = select(LawyerProfile).where(LawyerProfile.verified == True)
+    query = select(LawyerProfile).where(
+        LawyerProfile.verified == True,
+        or_(LawyerProfile.vacation_mode == False, LawyerProfile.vacation_mode == None),
+        LawyerProfile.is_deleted == False
+    )
     if specialization:
         query = query.where(LawyerProfile.specialization == specialization)
     if office_city:
@@ -51,7 +57,12 @@ async def get_active_lawyers(
 ):
     res = await db.execute(
         select(LawyerProfile)
-        .where(LawyerProfile.verified == True, LawyerProfile.is_profile_complete == True, LawyerProfile.is_deleted == False)
+        .where(
+            LawyerProfile.verified == True,
+            LawyerProfile.is_profile_complete == True,
+            LawyerProfile.is_deleted == False,
+            or_(LawyerProfile.vacation_mode == False, LawyerProfile.vacation_mode == None)
+        )
         .order_by(LawyerProfile.full_name)
     )
     lawyers = res.scalars().all()
@@ -73,7 +84,11 @@ async def get_lawyer_details(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    res = await db.execute(select(LawyerProfile).where(LawyerProfile.id == lawyer_id))
+    res = await db.execute(
+        select(LawyerProfile)
+        .options(joinedload(LawyerProfile.user))
+        .where(LawyerProfile.id == lawyer_id)
+    )
     lawyer = res.scalar_one_or_none()
     if not lawyer:
         raise HTTPException(status_code=404, detail="Lawyer not found")
@@ -140,6 +155,7 @@ async def get_lawyer_details(
         "date_of_birth": lawyer.date_of_birth.strftime("%Y-%m-%d") if lawyer.date_of_birth else "",
         "mobile_number": lawyer.mobile_number or "",
         "alternate_mobile_number": lawyer.alternate_mobile_number or "",
+        "email": lawyer.user.email if lawyer.user else "",
         "specialization": lawyer.specialization,
         "years_of_experience": lawyer.years_of_experience,
         "rating": lawyer.rating,
@@ -152,7 +168,9 @@ async def get_lawyer_details(
         "bar_registration_number": lawyer.bar_registration_number,
         "case_request": case_request,
         "has_rated": has_rated,
-        "reviews": reviews_list
+        "reviews": reviews_list,
+        "vacation_mode": lawyer.vacation_mode,
+        "working_hours": (lambda: (__import__('json').loads(lawyer.working_hours) if lawyer.working_hours else {}))()
     }
 
 @router.post("/lawyers/{lawyer_id}/hire")
