@@ -53,11 +53,9 @@
 
     .tab-controls {
         display: flex;
-        gap: 0.75rem;
+        gap: 2.25rem;
         overflow-x: auto;
         padding-bottom: 0.75rem;
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
         scroll-padding: 1rem;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
@@ -82,67 +80,7 @@
             padding-right: 0.85rem;
         }
 
-        .responsive-table-wrapper {
-            overflow-x: hidden;
-        }
 
-        .responsive-table-wrapper table,
-        .responsive-table-wrapper thead,
-        .responsive-table-wrapper tbody,
-        .responsive-table-wrapper th,
-        .responsive-table-wrapper td,
-        .responsive-table-wrapper tr {
-            display: block;
-        }
-
-        .responsive-table-wrapper thead tr {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-        }
-
-        .responsive-table-wrapper tr {
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            background: rgba(15, 23, 42, 0.95);
-            overflow: hidden;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
-        }
-
-        .responsive-table-wrapper td {
-            display: block;
-            padding: 1rem 1rem 1rem 1rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-            width: 100%;
-            text-align: left;
-        }
-
-        .responsive-table-wrapper td:last-child {
-            border-bottom: none;
-        }
-
-        .responsive-table-wrapper td[data-label]::before {
-            content: attr(data-label);
-            font-size: 0.75rem;
-            color: #94a3b8;
-            display: block;
-            margin-bottom: 0.5rem;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .responsive-table-wrapper td a {
-            display: inline-block;
-            width: auto;
-            white-space: normal;
-            word-break: break-word;
-        }
-
-        .responsive-table-wrapper td > div {
-            width: 100%;
-        }
 
         .page-header {
             padding-left: 1rem;
@@ -159,9 +97,7 @@
         }
 
         .tab-controls {
-            gap: 0.5rem;
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
+            gap: 1.25rem;
         }
 
         .tab-button {
@@ -220,43 +156,33 @@
 
         <!-- Content Area -->
         <div class="mx-auto max-w-7xl px-6 py-8">
-            <div class="responsive-table-wrapper">
+            <!-- Desktop View: Table Layout -->
+            <div class="responsive-table-wrapper hidden md:block">
                 <table class="w-full min-w-[720px] table-auto">
                     <thead>
-                    <tr class="border-b border-slate-800 bg-slate-950/80 text-left">
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-300">Client Details</th>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-300">Case Status</th>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-300">Documents status</th>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-300">Submitted</th>
-                        <th class="px-6 py-4 text-right text-sm font-semibold text-slate-300">Actions</th>
-                    </tr>
-                </thead>
-
-                <!-- Ready to Accept Tab -->
-                <tbody class="tab-content" id="ready-content">
-                    <!-- Loaded dynamically via JS -->
-                </tbody>
-
-                <!-- Active Cases Tab -->
-                <tbody class="tab-content hidden" id="active-content">
-                    <!-- Loaded dynamically via JS -->
-                </tbody>
-
-                <!-- Pending Verification Tab -->
-                <tbody class="tab-content hidden" id="pending-content">
-                    <!-- Loaded dynamically via JS -->
-                </tbody>
-
-                <!-- Completed Cases Tab -->
-                <tbody class="tab-content hidden" id="completed-content">
-                    <!-- Loaded dynamically via JS -->
-                </tbody>
-
-                <!-- Rejected Cases Tab -->
-                <tbody class="tab-content hidden" id="rejected-content">
-                    <!-- Loaded dynamically via JS -->
-                </tbody>
+                        <tr class="border-b border-slate-800 bg-slate-950/80 text-left">
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Client Details</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Case Status</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Documents status</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Submitted</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-slate-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tab-content" id="ready-content"></tbody>
+                    <tbody class="tab-content hidden" id="active-content"></tbody>
+                    <tbody class="tab-content hidden" id="pending-content"></tbody>
+                    <tbody class="tab-content hidden" id="completed-content"></tbody>
+                    <tbody class="tab-content hidden" id="rejected-content"></tbody>
                 </table>
+            </div>
+
+            <!-- Mobile View: Premium Card Layout -->
+            <div class="md:hidden space-y-4">
+                <div class="tab-content-mobile space-y-4" id="ready-content-mobile"></div>
+                <div class="tab-content-mobile space-y-4 hidden" id="active-content-mobile"></div>
+                <div class="tab-content-mobile space-y-4 hidden" id="pending-content-mobile"></div>
+                <div class="tab-content-mobile space-y-4 hidden" id="completed-content-mobile"></div>
+                <div class="tab-content-mobile space-y-4 hidden" id="rejected-content-mobile"></div>
             </div>
         </div>
     </div>
@@ -285,15 +211,19 @@
                     this.classList.remove('inactive-tab', 'text-slate-400', 'font-medium');
                     this.classList.add('active-tab', 'text-white', 'font-bold', 'border-b-2', 'border-white', '-mb-px');
 
-                    // Hide all tab contents
-                    document.querySelectorAll('.tab-content').forEach(content => {
+                    // Hide all tab contents (both desktop and mobile)
+                    document.querySelectorAll('.tab-content, .tab-content-mobile').forEach(content => {
                         content.classList.add('hidden');
                     });
 
-                    // Show the selected tab content
+                    // Show the selected tab content (both desktop and mobile)
                     const tabContent = document.getElementById(tabName + '-content');
                     if (tabContent) {
                         tabContent.classList.remove('hidden');
+                    }
+                    const tabContentMobile = document.getElementById(tabName + '-content-mobile');
+                    if (tabContentMobile) {
+                        tabContentMobile.classList.remove('hidden');
                     }
                 });
             });
@@ -320,168 +250,267 @@
 
                 // Hydrate Ready Cases
                 const readyList = document.getElementById("ready-content");
+                const readyListMobile = document.getElementById("ready-content-mobile");
                 readyList.innerHTML = "";
+                readyListMobile.innerHTML = "";
                 if (data.ready_cases.length === 0) {
-                    readyList.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">No cases ready to accept. When all documents are verified, cases will appear here.</td>
-                        </tr>
-                    `;
+                    readyList.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No cases ready to accept. When all documents are verified, cases will appear here.</td></tr>`;
+                    readyListMobile.innerHTML = `<div class="p-8 text-center border border-slate-800 rounded-3xl bg-slate-950/40 text-slate-400">No cases ready to accept. When all documents are verified, cases will appear here.</div>`;
                 } else {
                     data.ready_cases.forEach(caseItem => {
                         const tr = document.createElement("tr");
                         tr.className = "border-b border-slate-800 transition-colors hover:bg-slate-900/50";
                         tr.innerHTML = `
-                            <td data-label="Client Details" class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 <div class="font-semibold text-white">${caseItem.client_name}</div>
                                 <div class="mt-1 text-xs text-slate-400">${caseItem.client_email}</div>
                             </td>
-                            <td data-label="Case Status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Ready to Accept</span>
                             </td>
-                            <td data-label="Documents status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ All Verified</span>
                             </td>
-                            <td data-label="Submitted" class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
-                            <td data-label="Actions" class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
+                            <td class="px-6 py-4 text-right">
                                 <a href="/client_case_detail/?case_id=${caseItem.id}" class="font-semibold text-white hover:text-slate-200">Accept Case →</a>
                             </td>
                         `;
                         readyList.appendChild(tr);
+
+                        const card = document.createElement("div");
+                        card.className = "p-6 border border-slate-800 rounded-3xl bg-slate-950/40 space-y-4 hover:border-slate-700 transition duration-150";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="font-bold text-white text-base">${caseItem.client_name}</div>
+                                    <div class="text-xs text-slate-400 mt-1">${caseItem.client_email}</div>
+                                </div>
+                                <div class="text-right text-xs text-slate-500">${caseItem.created_at}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
+                                <span class="rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Ready to Accept</span>
+                                <span class="rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ All Verified</span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="w-full inline-flex items-center justify-center bg-white text-slate-950 font-bold text-xs py-3 rounded-2xl hover:bg-slate-200 transition duration-150">
+                                    Accept Case & Review
+                                </a>
+                            </div>
+                        `;
+                        readyListMobile.appendChild(card);
                     });
                 }
 
                 // Hydrate Active Cases
                 const activeList = document.getElementById("active-content");
+                const activeListMobile = document.getElementById("active-content-mobile");
                 activeList.innerHTML = "";
+                activeListMobile.innerHTML = "";
                 if (data.active_cases.length === 0) {
-                    activeList.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">No active cases yet.</td>
-                        </tr>
-                    `;
+                    activeList.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No active cases yet.</td></tr>`;
+                    activeListMobile.innerHTML = `<div class="p-8 text-center border border-slate-800 rounded-3xl bg-slate-950/40 text-slate-400">No active cases yet.</div>`;
                 } else {
                     data.active_cases.forEach(caseItem => {
                         const tr = document.createElement("tr");
                         tr.className = "border-b border-slate-800 transition-colors hover:bg-slate-900/50";
                         tr.innerHTML = `
-                            <td data-label="Client Details" class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 <div class="font-semibold text-white">${caseItem.client_name}</div>
                                 <div class="mt-1 text-xs text-slate-400">${caseItem.client_email}</div>
                             </td>
-                            <td data-label="Case Status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Accepted</span>
                             </td>
-                            <td data-label="Documents status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Verified</span>
                             </td>
-                            <td data-label="Submitted" class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
-                            <td data-label="Actions" class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
+                            <td class="px-6 py-4 text-right">
                                 <a href="/client_case_detail/?case_id=${caseItem.id}" class="font-semibold text-white hover:text-slate-200">View →</a>
                             </td>
                         `;
                         activeList.appendChild(tr);
+
+                        const card = document.createElement("div");
+                        card.className = "p-6 border border-slate-800 rounded-3xl bg-slate-950/40 space-y-4 hover:border-slate-700 transition duration-150";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="font-bold text-white text-base">${caseItem.client_name}</div>
+                                    <div class="text-xs text-slate-400 mt-1">${caseItem.client_email}</div>
+                                </div>
+                                <div class="text-right text-xs text-slate-500">${caseItem.created_at}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
+                                <span class="rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Accepted</span>
+                                <span class="rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Verified</span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="w-full inline-flex items-center justify-center bg-white text-slate-950 font-bold text-xs py-3 rounded-2xl hover:bg-slate-200 transition duration-150">
+                                    View Details
+                                </a>
+                            </div>
+                        `;
+                        activeListMobile.appendChild(card);
                     });
                 }
 
                 // Hydrate Pending Verification Cases
                 const pendingList = document.getElementById("pending-content");
+                const pendingListMobile = document.getElementById("pending-content-mobile");
                 pendingList.innerHTML = "";
+                pendingListMobile.innerHTML = "";
                 if (data.pending_verification.length === 0) {
-                    pendingList.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">No cases pending verification.</td>
-                        </tr>
-                    `;
+                    pendingList.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No cases pending verification.</td></tr>`;
+                    pendingListMobile.innerHTML = `<div class="p-8 text-center border border-slate-800 rounded-3xl bg-slate-950/40 text-slate-400">No cases pending verification.</div>`;
                 } else {
                     data.pending_verification.forEach(caseItem => {
                         const tr = document.createElement("tr");
                         tr.className = "border-b border-slate-800 transition-colors hover:bg-slate-900/50";
                         tr.innerHTML = `
-                            <td data-label="Client Details" class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 <div class="font-semibold text-white">${caseItem.client_name}</div>
                                 <div class="mt-1 text-xs text-slate-400">${caseItem.client_email}</div>
                             </td>
-                            <td data-label="Case Status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-amber-700 bg-amber-900/40 px-3 py-1 text-xs font-semibold text-amber-300">⏳ Pending</span>
                             </td>
-                            <td data-label="Documents status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-semibold text-slate-400">Pending Review</span>
                                 </div>
                             </td>
-                            <td data-label="Submitted" class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
-                            <td data-label="Actions" class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
+                            <td class="px-6 py-4 text-right">
                                 <a href="/client_case_detail/?case_id=${caseItem.id}" class="font-semibold text-white hover:text-slate-200">View →</a>
                             </td>
                         `;
                         pendingList.appendChild(tr);
+
+                        const card = document.createElement("div");
+                        card.className = "p-6 border border-slate-800 rounded-3xl bg-slate-950/40 space-y-4 hover:border-slate-700 transition duration-150";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="font-bold text-white text-base">${caseItem.client_name}</div>
+                                    <div class="text-xs text-slate-400 mt-1">${caseItem.client_email}</div>
+                                </div>
+                                <div class="text-right text-xs text-slate-500">${caseItem.created_at}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
+                                <span class="rounded-full border border-amber-700 bg-amber-900/40 px-3 py-1 text-xs font-semibold text-amber-300">⏳ Pending</span>
+                                <span class="rounded-full border border-slate-800 bg-slate-900/20 px-3 py-1 text-xs font-semibold text-slate-400">Pending Review</span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="w-full inline-flex items-center justify-center bg-white text-slate-950 font-bold text-xs py-3 rounded-2xl hover:bg-slate-200 transition duration-150">
+                                    View Details
+                                </a>
+                            </div>
+                        `;
+                        pendingListMobile.appendChild(card);
                     });
                 }
 
                 // Hydrate Completed Cases
                 const completedList = document.getElementById("completed-content");
+                const completedListMobile = document.getElementById("completed-content-mobile");
                 completedList.innerHTML = "";
+                completedListMobile.innerHTML = "";
                 if (data.completed_cases.length === 0) {
-                    completedList.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">No completed cases yet.</td>
-                        </tr>
-                    `;
+                    completedList.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No completed cases yet.</td></tr>`;
+                    completedListMobile.innerHTML = `<div class="p-8 text-center border border-slate-800 rounded-3xl bg-slate-950/40 text-slate-400">No completed cases yet.</div>`;
                 } else {
                     data.completed_cases.forEach(caseItem => {
                         const tr = document.createElement("tr");
                         tr.className = "border-b border-slate-800 transition-colors hover:bg-slate-900/50";
                         tr.innerHTML = `
-                            <td data-label="Client Details" class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 <div class="font-semibold text-white">${caseItem.client_name}</div>
                                 <div class="mt-1 text-xs text-slate-400">${caseItem.client_email}</div>
                             </td>
-                            <td data-label="Case Status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1 text-xs font-semibold text-slate-300">Completed</span>
                             </td>
-                            <td data-label="Documents status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Verified</span>
                             </td>
-                            <td data-label="Submitted" class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
-                            <td data-label="Actions" class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
+                            <td class="px-6 py-4 text-right">
                                 <a href="/client_case_detail/?case_id=${caseItem.id}" class="font-semibold text-white hover:text-slate-200">View →</a>
                             </td>
                         `;
                         completedList.appendChild(tr);
+
+                        const card = document.createElement("div");
+                        card.className = "p-6 border border-slate-800 rounded-3xl bg-slate-950/40 space-y-4 hover:border-slate-700 transition duration-150";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="font-bold text-white text-base">${caseItem.client_name}</div>
+                                    <div class="text-xs text-slate-400 mt-1">${caseItem.client_email}</div>
+                                </div>
+                                <div class="text-right text-xs text-slate-500">${caseItem.created_at}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
+                                <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1 text-xs font-semibold text-slate-300">Completed</span>
+                                <span class="rounded-full border border-emerald-700 bg-emerald-900/30 px-3 py-1 text-xs font-semibold text-emerald-300">✓ Verified</span>
+                            </div>
+                            <div class="pt-2">
+                                <a href="/client_case_detail/?case_id=${caseItem.id}" class="w-full inline-flex items-center justify-center bg-white text-slate-950 font-bold text-xs py-3 rounded-2xl hover:bg-slate-200 transition duration-150">
+                                    View Details
+                                </a>
+                            </div>
+                        `;
+                        completedListMobile.appendChild(card);
                     });
                 }
 
                 // Hydrate Rejected Cases
                 const rejectedList = document.getElementById("rejected-content");
+                const rejectedListMobile = document.getElementById("rejected-content-mobile");
                 rejectedList.innerHTML = "";
+                rejectedListMobile.innerHTML = "";
                 if (data.rejected_cases.length === 0) {
-                    rejectedList.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">No rejected cases.</td>
-                        </tr>
-                    `;
+                    rejectedList.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-400">No rejected cases.</td></tr>`;
+                    rejectedListMobile.innerHTML = `<div class="p-8 text-center border border-slate-800 rounded-3xl bg-slate-950/40 text-slate-400">No rejected cases.</div>`;
                 } else {
                     data.rejected_cases.forEach(caseItem => {
                         const tr = document.createElement("tr");
                         tr.className = "border-b border-slate-800 transition-colors hover:bg-slate-900/50";
                         tr.innerHTML = `
-                            <td data-label="Client Details" class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 <div class="font-semibold text-white">${caseItem.client_name}</div>
                                 <div class="mt-1 text-xs text-slate-400">${caseItem.client_email}</div>
                             </td>
-                            <td data-label="Case Status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="inline-flex rounded-full border border-red-700 bg-red-900/40 px-3 py-1 text-xs font-semibold text-red-300">✗ Rejected</span>
                             </td>
-                            <td data-label="Documents status" class="px-6 py-4 text-sm">
+                            <td class="px-6 py-4 text-sm">
                                 <span class="text-slate-500">-</span>
                             </td>
-                            <td data-label="Submitted" class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
-                            <td data-label="Actions" class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-sm text-slate-400">${caseItem.created_at}</td>
+                            <td class="px-6 py-4 text-right">
                                 <span class="font-semibold text-slate-500">No action</span>
                             </td>
                         `;
                         rejectedList.appendChild(tr);
+
+                        const card = document.createElement("div");
+                        card.className = "p-6 border border-slate-800 rounded-3xl bg-slate-950/40 space-y-4 hover:border-slate-700 transition duration-150";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="font-bold text-white text-base">${caseItem.client_name}</div>
+                                    <div class="text-xs text-slate-400 mt-1">${caseItem.client_email}</div>
+                                </div>
+                                <div class="text-right text-xs text-slate-500">${caseItem.created_at}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
+                                <span class="rounded-full border border-red-700 bg-red-900/40 px-3 py-1 text-xs font-semibold text-red-300">✗ Rejected</span>
+                            </div>
+                        `;
+                        rejectedListMobile.appendChild(card);
                     });
                 }
 

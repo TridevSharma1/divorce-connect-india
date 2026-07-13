@@ -733,7 +733,7 @@ async def lawyer_accept_case(
         raise HTTPException(status_code=400, detail="Case cannot be accepted. Documents must be verified first.")
         
     case.status = "ACCEPTED"
-    case.workflow_stage = "LAWYER_ASSIGNED"
+    case.workflow_stage = "PETITION_DRAFTED"
     
     await db.commit()
     
