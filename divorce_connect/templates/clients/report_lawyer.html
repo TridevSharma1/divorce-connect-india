@@ -157,7 +157,8 @@
                     lawyers.forEach(l => {
                         const spec = l.specialization_display || l.specialization || "";
                         const specText = spec ? ` — ${spec}` : "";
-                        selectProfessional.innerHTML += `<option value="${l.id}">${l.full_name}${specText}</option>`;
+                        const idText = l.custom_id ? ` (${l.custom_id})` : " (N/A)";
+                        selectProfessional.innerHTML += `<option value="${l.id}">${l.full_name}${idText}${specText}</option>`;
                     });
                 }
             } catch (err) {

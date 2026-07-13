@@ -131,6 +131,7 @@ async def get_case_detail(
         "lawyer_details": {
             "full_name": lawyer_profile.full_name if lawyer_profile else "Unassigned",
             "specialization": lawyer_profile.specialization if lawyer_profile else "",
+            "custom_id": lawyer_profile.custom_id if lawyer_profile else None,
             "office_city": lawyer_profile.office_city if lawyer_profile else "",
             "consultation_fee": float(lawyer_profile.consultation_fee) if lawyer_profile and lawyer_profile.consultation_fee else 0.0,
             "years_of_experience": lawyer_profile.years_of_experience if lawyer_profile else 0,

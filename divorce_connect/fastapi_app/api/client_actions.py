@@ -32,6 +32,7 @@ async def list_verified_lawyers(
             "id": lawyer.id,
             "full_name": lawyer.full_name,
             "specialization": lawyer.specialization,
+            "custom_id": lawyer.custom_id,
             "years_of_experience": lawyer.years_of_experience,
             "rating": lawyer.rating,
             "rating_count": lawyer.rating_count,
@@ -58,6 +59,7 @@ async def get_active_lawyers(
         {
             "id": l.id,
             "full_name": l.full_name,
+            "custom_id": l.custom_id,
             "specialization": l.specialization,
             "specialization_display": l.get_specialization_display
         }
@@ -133,6 +135,7 @@ async def get_lawyer_details(
     return {
         "id": lawyer.id,
         "full_name": lawyer.full_name,
+        "custom_id": lawyer.custom_id,
         "gender": lawyer.gender or "other",
         "date_of_birth": lawyer.date_of_birth.strftime("%Y-%m-%d") if lawyer.date_of_birth else "",
         "mobile_number": lawyer.mobile_number or "",

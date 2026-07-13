@@ -86,7 +86,7 @@
                         <select id="clientSelect" name="client" required class="form-input w-full rounded-lg px-4 py-2 transition">
                             <option value="">— Select a client —</option>
                             {% for client in clients %}
-                                <option value="{{ client.id }}">{{ client.get_full_name }}</option>
+                                <option value="{{ client.id }}">{{ client.get_full_name }}{% if client.custom_id %} ({{ client.custom_id }}){% endif %}</option>
                             {% else %}
                                 <option value="" disabled>No clients available</option>
                             {% endfor %}
@@ -207,12 +207,13 @@
                 const clients = await res.json();
                 const select = document.getElementById("clientSelect");
                 select.innerHTML = '<option value="">— Select a client —</option>';
-                clients.forEach(client => {
-                    const opt = document.createElement("option");
-                    opt.value = client.id;
-                    opt.textContent = client.full_name;
-                    select.appendChild(opt);
-                });
+                    clients.forEach(client => {
+                        const opt = document.createElement("option");
+                        opt.value = client.id;
+                        const idText = client.custom_id ? ` (${client.custom_id})` : "";
+                        opt.textContent = client.full_name + idText;
+                        select.appendChild(opt);
+                    });
             }
         } catch (e) {
             console.error("Error loading clients:", e);

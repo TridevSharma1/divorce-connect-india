@@ -363,6 +363,10 @@
                                     <span class="text-gray-500">Date of Birth</span>
                                     <span class="font-semibold" id="personal-dob">Not Available</span>
                                 </div>
+                                <div class="flex justify-between border-b border-white/5 pb-4">
+                                    <span class="text-gray-500">Lawyer ID</span>
+                                    <span class="font-semibold" id="personal-id">-</span>
+                                </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Office City</span>
                                     <span class="font-semibold" id="personal-city">N/A</span>
@@ -791,6 +795,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("personal-name").innerText = data.full_name;
         document.getElementById("personal-gender").innerText = data.gender || 'Other';
         document.getElementById("personal-dob").innerText = data.date_of_birth ? formatDate(data.date_of_birth) : 'Not Available';
+        document.getElementById("personal-id").innerText = data.custom_id || 'N/A';
         document.getElementById("personal-city").innerText = data.office_city || 'N/A';
 
         // Contact info blocks

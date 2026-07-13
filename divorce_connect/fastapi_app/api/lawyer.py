@@ -668,7 +668,8 @@ async def get_clients_list(
     return [
         {
             "id": client.id,
-            "full_name": f"{client.first_name} {client.last_name}".strip()
+            "full_name": f"{client.first_name} {client.last_name}".strip(),
+            "custom_id": client.custom_id
         }
         for client in clients
     ]

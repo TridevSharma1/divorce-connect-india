@@ -345,25 +345,38 @@ document.addEventListener("DOMContentLoaded", async () => {
                     picFallback.classList.remove("hidden");
                 }
 
-                // Add rating & extra fields
+                // Add rating & extra fields (safe rendering and dark-theme classes)
+                const ratingText = (typeof lawyer.rating === 'number') ? lawyer.rating.toFixed(1) : 'N/A';
+                const feeText = (lawyer.consultation_fee !== undefined && lawyer.consultation_fee !== null) ? Number(lawyer.consultation_fee).toFixed(2) : null;
+                const cityText = lawyer.office_city || 'N/A';
+                const expText = (lawyer.years_of_experience !== undefined && lawyer.years_of_experience !== null) ? `${lawyer.years_of_experience} Years` : 'N/A';
+                // Display only the lawyer's custom identifier when available
+                const lawyerId = lawyer.custom_id || 'N/A';
+
                 extraFields.innerHTML = `
-                    <div class="flex justify-between items-center border-t border-neutral-100 pt-4">
-                        <span class="text-neutral-500">Rating</span>
-                        <span class="font-semibold text-neutral-500 flex items-center gap-0.5">
-                            ★ ${lawyer.rating.toFixed(1)}
-                        </span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Lawyer ID</span>
+                        <span class="font-mono text-slate-200">${lawyerId}</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-slate-800 pt-4">
+                        <span class="text-slate-400">Rating</span>
+                        <span class="font-semibold text-slate-200 flex items-center gap-0.5">★ ${ratingText}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-neutral-500">Consultation Fee</span>
-                        <span class="font-bold text-black">₹${lawyer.consultation_fee.toFixed(2)}</span>
+                        <span class="text-slate-400">Consultation Fee</span>
+                        <span class="font-bold text-slate-100">${feeText ? '₹' + feeText : 'N/A'}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-neutral-500">City / Office</span>
-                        <span class="font-semibold text-black">${lawyer.office_city}</span>
+                        <span class="text-slate-400">City / Office</span>
+                        <span class="font-semibold text-slate-100">${cityText}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-neutral-500">Years of Experience</span>
-                        <span class="font-semibold text-black">${lawyer.years_of_experience} Years</span>
+                        <span class="text-slate-400">Years of Experience</span>
+                        <span class="font-semibold text-slate-100">${expText}</span>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        ${lawyer.mobile_number ? `<button type="button" data-tel="${lawyer.mobile_number}" class="contact-action call-action px-3 py-1.5 bg-white text-slate-900 rounded-xl font-semibold text-xs hover:bg-slate-100">Call</button>` : ''}
+                        ${lawyer.email ? `<button type="button" data-email="${lawyer.email}" class="contact-action email-action px-3 py-1.5 bg-white text-slate-900 rounded-xl font-semibold text-xs hover:bg-slate-100">Email</button>` : ''}
                     </div>
                 `;
             } else {
@@ -864,6 +877,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                 a.click();
                 document.body.removeChild(a);
             }
+        }
+    });
+
+    // Contact buttons (Call / Email) - handle taps and clicks to redirect
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-tel], button[data-email]');
+        if (!btn) return;
+        e.preventDefault();
+        if (btn.dataset.tel) {
+            // redirect to phone dialer
+            window.location.href = `tel:${btn.dataset.tel}`;
+        } else if (btn.dataset.email) {
+            // open mail client
+            window.location.href = `mailto:${btn.dataset.email}`;
         }
     });
 });
