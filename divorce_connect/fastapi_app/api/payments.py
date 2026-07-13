@@ -81,6 +81,15 @@ async def create_payment(
     await db.commit()
     await db.refresh(payment)
 
+    # Reload payment with related case and users so response_model can resolve computed fields
+    payment_res = await db.execute(
+        select(Payment).options(
+            joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+            joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+        ).where(Payment.id == payment.id)
+    )
+    payment = payment_res.scalar_one_or_none() or payment
+
     # Broadcast notification to both Client and Lawyer via WebSocket
     msg = f"New pending payment of INR {payment.amount} created for Case Request #{case.id}"
     if client:
@@ -121,6 +130,15 @@ async def verify_payment(
     await db.commit()
     await db.refresh(payment)
 
+    # Reload payment with related case and users so response_model can resolve computed fields
+    payment_res = await db.execute(
+        select(Payment).options(
+            joinedload(Payment.case_request).joinedload(CaseRequest.lawyer).joinedload(LawyerProfile.user),
+            joinedload(Payment.case_request).joinedload(CaseRequest.client).joinedload(ClientProfile.user)
+        ).where(Payment.id == payment.id)
+    )
+    payment = payment_res.scalar_one_or_none() or payment
+
     # Fetch user accounts to send notifications/emails
     client_res = await db.execute(select(ClientProfile).where(ClientProfile.id == case.client_id))
     client = client_res.scalar_one_or_none()
@@ -135,22 +153,21 @@ async def verify_payment(
         user_res = await db.execute(select(User).where(User.id == client.user_id))
         client_user = user_res.scalar_one_or_none()
         if client_user and client_user.email:
-            # Send Email Notification
-            email_body = f"""
-            <html>
-                <body>
-                    <h2>Payment Status Update</h2>
-                    <p>Dear {client.first_name},</p>
-                    <p>Your payment of <b>INR {payment.amount}</b> for Case Request #{case.id} has been processed.</p>
-                    <p>Status: <b>{payment.status}</b></p>
-                    <p>Razorpay Transaction ID: {payment.razorpay_payment_id or 'N/A'}</p>
-                    <br>
-                    <p>Regards,</p>
-                    <p>DivorceConnect India Team</p>
-                </body>
-            </html>
-            """
-            send_email(to_address=client_user.email, subject="Payment Status Update - DivorceConnect", html_body=email_body)
+            from utils.email_utils import _send_html_email
+
+            _send_html_email(
+                subject="✅ Payment Successful — DivorceConnect India",
+                template_name="emails/payment_success_email.html",
+                context={
+                    "client_name": client.first_name or client_user.get_full_name() or client_user.email,
+                    "case_reference": f"#{case.id}",
+                    "amount": f"₹{payment.amount:.2f}",
+                    "payment_date": payment.created_at.strftime("%d %b %Y, %I:%M %p") if payment.created_at else "N/A",
+                    "transaction_id": payment.razorpay_payment_id or "N/A",
+                },
+                recipient_email=client_user.email,
+                purpose="operations",
+            )
 
     if lawyer:
         await manager.send_personal_message(status_msg, user_id=lawyer.user_id)

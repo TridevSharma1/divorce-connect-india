@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 from ..database import get_db
-from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, WithdrawRequest
+from ..models import User, LawyerProfile, CaseRequest, CaseDocument, ClientProfile, CaseDocumentVerification, LawyerProfileUpdateRequest, WithdrawRequest,List
 from ..security import get_current_user
 from .cloudinary_utils import upload_to_cloudinary
 
@@ -921,7 +921,6 @@ async def submit_client_report(
 
 class SettingsUpdatePayload(BaseModel):
     vacationMode: bool
-    workingHours: dict
     emailAlerts: bool
     smsAlerts: bool
     twoFactorAuth: bool
@@ -936,27 +935,8 @@ async def get_lawyer_settings(
     if not lawyer_profile:
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
 
-    import json
-    wh = {}
-    if lawyer_profile.working_hours:
-        try:
-            wh = json.loads(lawyer_profile.working_hours)
-        except Exception:
-            pass
-            
-    # Default values if not set
-    if not wh:
-        wh = {
-            "monday": {"enabled": True, "start": "09:00", "end": "17:00"},
-            "tuesday": {"enabled": True, "start": "09:00", "end": "17:00"},
-            "wednesday": {"enabled": True, "start": "09:00", "end": "17:00"},
-            "thursday": {"enabled": True, "start": "09:00", "end": "17:00"},
-            "friday": {"enabled": True, "start": "09:00", "end": "17:00"}
-        }
-
     return {
         "vacationMode": lawyer_profile.vacation_mode,
-        "workingHours": wh,
         "emailAlerts": True,
         "smsAlerts": False,
         "twoFactorAuth": False
@@ -973,8 +953,7 @@ async def save_lawyer_settings(
     if not lawyer_profile:
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
 
-    import json
     lawyer_profile.vacation_mode = payload.vacationMode
-    lawyer_profile.working_hours = json.dumps(payload.workingHours)
+    lawyer_profile.working_hours = None
     await db.commit()
     return {"message": "Settings updated successfully"}

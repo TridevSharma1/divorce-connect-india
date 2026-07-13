@@ -422,9 +422,8 @@
             </div>
 
             <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center" id="working-hours-grid">
-                    <!-- Loaded dynamically -->
-                </div>
+                <p class="text-gray-400 text-sm uppercase tracking-[0.25em]">Standard Consultation Timing</p>
+                <p class="mt-4 text-2xl font-semibold text-white">Monday – Friday • 09:00 to 17:00</p>
             </div>
         </section>
 
@@ -824,40 +823,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         document.getElementById("contact-city").innerText = data.office_city || 'Not Specified';
 
-        // Render Working Hours
-        const wh = data.working_hours || {};
-        const daysOfWeek = [
-            { key: "monday", label: "Monday" },
-            { key: "tuesday", label: "Tuesday" },
-            { key: "wednesday", label: "Wednesday" },
-            { key: "thursday", label: "Thursday" },
-            { key: "friday", label: "Friday" }
-        ];
-        
-        let whHtml = "";
-        daysOfWeek.forEach(d => {
-            const dayData = wh[d.key];
-            const enabled = dayData ? dayData.enabled : true;
-            const start = dayData ? dayData.start : "09:00";
-            const end = dayData ? dayData.end : "17:00";
-            
-            if (enabled) {
-                whHtml += `
-                    <div class="bg-black/40 border border-white/5 rounded-2xl p-5 hover:border-white/25 transition">
-                        <p class="font-bold text-white text-lg mb-2">${d.label}</p>
-                        <p class="text-emerald-400 font-semibold text-sm">${start} – ${end}</p>
-                    </div>
-                `;
-            } else {
-                whHtml += `
-                    <div class="bg-black/20 border border-white/5 opacity-50 rounded-2xl p-5">
-                        <p class="font-bold text-gray-400 text-lg mb-2">${d.label}</p>
-                        <p class="text-rose-400 font-semibold text-sm">Closed</p>
-                    </div>
-                `;
-            }
-        });
-        document.getElementById("working-hours-grid").innerHTML = whHtml;
 
         // Avatar configuration
         if (data.profile_picture) {
@@ -1005,6 +970,19 @@ document.getElementById("hire-form").addEventListener("submit", async (e) => {
                     message: "Please complete your profile details before hiring a lawyer."
                 }));
                 window.location.href = "/profile/edit/";
+            } else if (err.detail === "existing_request") {
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Info", "You already have an active or pending request with this lawyer.");
+                } else {
+                    alert("You already have an active or pending request with this lawyer.");
+                }
+            } else if (err.detail && err.detail.toLowerCase().includes("working")) {
+                // Working hours error
+                if (typeof showToastNotification === 'function') {
+                    showToastNotification("Not Available", err.detail);
+                } else {
+                    alert(err.detail);
+                }
             } else {
                 if (typeof showToastNotification === 'function') {
                     showToastNotification("Error", err.detail || "Hire request submission failed.");

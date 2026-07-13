@@ -61,6 +61,10 @@ def ensure_sqlite_schema_compatibility(url: str | None = None) -> None:
     conn = sqlite3.connect(db_file)
     try:
         columns = [row[1] for row in conn.execute("PRAGMA table_info('accounts_baseuser')")]
+        if not columns:
+            # Table does not exist yet, schema will be created by SQLAlchemy metadata on startup.
+            return
+
         if "role" not in columns:
             conn.execute("ALTER TABLE accounts_baseuser ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'client'")
         if "razorpay_customer_id" not in columns:

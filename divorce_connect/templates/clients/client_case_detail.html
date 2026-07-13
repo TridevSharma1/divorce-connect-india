@@ -231,6 +231,15 @@
         });
     }
 
+    function getFriendlyErrorMessage(error, fallback) {
+        const msg = error && error.message ? String(error.message).trim() : "";
+        if (!msg) return fallback || "An unexpected error occurred. Please try again later.";
+        if (/traceback/i.test(msg) || /<html|<!DOCTYPE|<pre|syntax error|error:/i.test(msg) || msg.length > 120) {
+            return fallback || "An unexpected error occurred. Please try again later.";
+        }
+        return msg;
+    }
+
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -542,95 +551,134 @@ document.addEventListener("DOMContentLoaded", async () => {
                                  const confirmPay = await showGlassConfirm(`Proceed to pay consultation fee of ₹${feeText}?`);
                                  if (!confirmPay) return;
 
-                                 try {
-                                    payBtn.disabled = true;
-                                    payBtn.innerText = "Processing...";
-                                    
-                                    // Create Payment
-                                    const payRes = await fetch('/api/payments/', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Authorization': 'Bearer ' + token,
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            case_request_id: parseInt(caseId),
-                                            amount: parseFloat(lawyer.consultation_fee)
-                                        })
-                                    });
+                                 payBtn.disabled = true;
+                                 payBtn.innerText = "Processing...";
 
-                                    if (!payRes.ok) {
-                                        const err = await payRes.json();
-                                        throw new Error(err.detail || "Failed to initiate payment");
-                                    }
-
-                                    const payment = await payRes.json();
-
-                                     // Initialize Razorpay Options
-                                     const options = {
-                                         "key": "rzp_test_TCv4T15OKvKZbM",
-                                         "amount": parseFloat(lawyer.consultation_fee) * 100, // in paise
-                                         "currency": "INR",
-                                         "name": "DivorceConnect India",
-                                         "description": `Consultation Fee for Case #${caseId}`,
-                                         "handler": async function (response) {
-                                             try {
-                                                 payBtn.innerText = "Verifying...";
-                                                 
-                                                 // Verify Payment
-                                                 const verifyRes = await fetch(`/api/payments/${payment.id}/verify`, {
-                                                     method: 'POST',
-                                                     headers: {
-                                                         'Authorization': 'Bearer ' + token,
-                                                         'Content-Type': 'application/json'
-                                                     },
-                                                     body: JSON.stringify({
-                                                         razorpay_payment_id: response.razorpay_payment_id,
-                                                         status: "SUCCEEDED"
-                                                     })
-                                                 });
-
-                                                 if (!verifyRes.ok) {
-                                                     throw new Error("Failed to verify payment status");
-                                                 }
-
-                                                 if (typeof showToastNotification === 'function') {
-                                                     showToastNotification("Payment Successful", `Consultation fee of ₹${feeText} paid!`);
-                                                 } else {
-                                                     alert(`Payment Successful! Paid ₹${feeText}`);
-                                                 }
-
-                                                 loadCaseDetails();
-                                             } catch (error) {
-                                                 console.error(error);
-                                                 alert(error.message || "An error occurred during verification");
-                                                 payBtn.disabled = false;
-                                                 payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
-                                             }
-                                         },
-                                         "prefill": {
-                                             "name": data.client_details ? `${data.client_details.first_name} ${data.client_details.last_name}` : "",
-                                             "email": data.client_details ? data.client_details.email : "",
-                                             "contact": data.client_details ? data.client_details.mobile_number : ""
-                                         },
-                                         "theme": {
-                                             "color": "#020617"
-                                         },
-                                         "modal": {
-                                             "ondismiss": function() {
-                                                 payBtn.disabled = false;
-                                                 payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
-                                             }
+                                 const paymentPromise = fetch('/api/payments/', {
+                                     method: 'POST',
+                                     headers: {
+                                         'Accept': 'application/json',
+                                         'Authorization': 'Bearer ' + token,
+                                         'Content-Type': 'application/json'
+                                     },
+                                     body: JSON.stringify({
+                                         case_request_id: parseInt(caseId),
+                                         amount: parseFloat(lawyer.consultation_fee)
+                                     })
+                                 })
+                                 .then(async res => {
+                                     if (!res.ok) {
+                                         const text = await res.text();
+                                         let detail = 'Unable to initiate payment. Please try again.';
+                                         try {
+                                             const json = JSON.parse(text);
+                                             if (json && json.detail) detail = json.detail;
+                                         } catch (_) {
+                                             // Keep generic detail if response is not JSON.
                                          }
-                                     };
-                                     const rzp = new Razorpay(options);
-                                     rzp.open();
-                                 } catch (error) {
+                                         throw new Error(detail);
+                                     }
+                                     return res.json();
+                                 });
+
+                                 const options = {
+                                     "key": "rzp_test_TCv4T15OKvKZbM",
+                                     "amount": parseFloat(lawyer.consultation_fee) * 100, // in paise
+                                     "currency": "INR",
+                                     "name": "DivorceConnect India",
+                                     "description": `Consultation Fee for Case #${caseId}`,
+                                     "handler": async function (response) {
+                                         try {
+                                             payBtn.innerText = "Verifying...";
+                                             const payment = await paymentPromise;
+
+                                             const verifyRes = await fetch(`/api/payments/${payment.id}/verify`, {
+                                                 method: 'POST',
+                                                 headers: {
+                                                     'Accept': 'application/json',
+                                                     'Authorization': 'Bearer ' + token,
+                                                     'Content-Type': 'application/json'
+                                                 },
+                                                 body: JSON.stringify({
+                                                     razorpay_payment_id: response.razorpay_payment_id,
+                                                     status: "SUCCEEDED"
+                                                 })
+                                             });
+
+                                             if (!verifyRes.ok) {
+                                                 const text = await verifyRes.text();
+                                                 let detail = 'Unable to verify payment. Please contact support.';
+                                                 try {
+                                                     const json = JSON.parse(text);
+                                                     if (json && json.detail) detail = json.detail;
+                                                 } catch (_) {
+                                                     // Keep generic detail.
+                                                 }
+                                                 throw new Error(detail);
+                                             }
+
+                                             if (typeof showToastNotification === 'function') {
+                                                 showToastNotification("Payment Successful", `Consultation fee of ₹${feeText} paid!`);
+                                             } else {
+                                                 alert(`Payment Successful! Paid ₹${feeText}`);
+                                             }
+
+                                             loadCaseDetails();
+                                         } catch (error) {
+                                             console.error(error);
+                                             const message = typeof error.message === 'string' && error.message.length < 120
+                                                 ? error.message
+                                                 : 'An error occurred while verifying payment.';
+                                             if (typeof showToastNotification === 'function') {
+                                                 showToastNotification('Payment Error', message, false);
+                                             } else {
+                                                 alert(message);
+                                             }
+                                             payBtn.disabled = false;
+                                             payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                         }
+                                     },
+                                     "prefill": {
+                                         "name": data.client_details ? `${data.client_details.first_name} ${data.client_details.last_name}` : "",
+                                         "email": data.client_details ? data.client_details.email : "",
+                                         "contact": data.client_details ? data.client_details.mobile_number : ""
+                                     },
+                                     "theme": {
+                                         "color": "#020617"
+                                     },
+                                     "modal": {
+                                         "ondismiss": function() {
+                                             payBtn.disabled = false;
+                                             payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                         }
+                                     },
+                                     "error": function (response) {
+                                         const friendly = getFriendlyErrorMessage(new Error(response.error || response.description || 'Payment window failed to open.'), 'Payment window could not be opened. Please try again.');
+                                         if (typeof showToastNotification === 'function') {
+                                             showToastNotification('Payment Error', friendly, false);
+                                         } else {
+                                             alert(friendly);
+                                         }
+                                         payBtn.disabled = false;
+                                         payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
+                                     }
+                                 };
+
+                                 const rzp = new Razorpay(options);
+                                 rzp.open();
+
+                                 paymentPromise.catch(error => {
                                      console.error(error);
-                                     alert(error.message || "An error occurred during payment");
+                                     if (!payBtn.disabled) return;
                                      payBtn.disabled = false;
                                      payBtn.innerText = `💳 Pay Consultation Fee (₹${feeText})`;
-                                 }
+                                     const message = getFriendlyErrorMessage(error, 'Unable to initiate payment. Please try again later.');
+                                     if (typeof showToastNotification === 'function') {
+                                         showToastNotification('Payment Error', message, false);
+                                     } else {
+                                         alert(message);
+                                     }
+                                 });
                             });
                         }
                     }

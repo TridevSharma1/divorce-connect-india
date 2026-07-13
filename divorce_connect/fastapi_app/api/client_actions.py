@@ -169,8 +169,7 @@ async def get_lawyer_details(
         "case_request": case_request,
         "has_rated": has_rated,
         "reviews": reviews_list,
-        "vacation_mode": lawyer.vacation_mode,
-        "working_hours": (lambda: (__import__('json').loads(lawyer.working_hours) if lawyer.working_hours else {}))()
+        "vacation_mode": lawyer.vacation_mode
     }
 
 @router.post("/lawyers/{lawyer_id}/hire")
