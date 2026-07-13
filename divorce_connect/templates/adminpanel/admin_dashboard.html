@@ -375,12 +375,12 @@ async function loadDashboardData() {
             let html = "";
             for (let req of data.pending_lawyer_requests) {
                 html += `
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold">${req.lawyer_name || 'Lawyer'}</h4>
+                <a href="/lawyer_verification_list/" class="block p-4 border border-gray-200 rounded-lg hover:border-zinc-900 bg-slate-50/50 hover:bg-slate-50 transition duration-150 cursor-pointer">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-semibold text-gray-900">${req.lawyer_name || 'Lawyer'}</h4>
                         <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
                     </div>
-                </div>`;
+                </a>`;
             }
             lawList.innerHTML = html;
             const badge = document.getElementById("badge-pending-lawyers");

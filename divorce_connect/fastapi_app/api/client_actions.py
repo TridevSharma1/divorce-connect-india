@@ -169,7 +169,8 @@ async def get_lawyer_details(
         "case_request": case_request,
         "has_rated": has_rated,
         "reviews": reviews_list,
-        "vacation_mode": lawyer.vacation_mode
+        "vacation_mode": lawyer.vacation_mode,
+        "working_hours": lawyer.working_hours
     }
 
 @router.post("/lawyers/{lawyer_id}/hire")

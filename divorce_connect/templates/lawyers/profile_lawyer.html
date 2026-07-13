@@ -123,6 +123,10 @@
                             <span class="text-xs font-semibold text-gray-400 block mb-1">Date of Birth</span>
                             <span id="dob" class="font-semibold text-gray-300">{{ profile.date_of_birth|date:"d M, Y"|default:"Not specified" }}</span>
                         </div>
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 block mb-1">Email Address</span>
+                            <span id="contact_email" class="font-semibold text-gray-300">{{ profile.user.email }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -191,6 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById("mobile").innerText = data.mobile_number || "Not specified";
                 document.getElementById("alt_mobile").innerText = data.alternate_mobile_number || "None provided";
                 document.getElementById("gender").innerText = data.gender || "Not specified";
+                document.getElementById("contact_email").innerText = data.email || "";
                 
                 if (data.date_of_birth) {
                     const dob = new Date(data.date_of_birth);

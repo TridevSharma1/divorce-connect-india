@@ -501,6 +501,7 @@ async def get_lawyer_profile_endpoint(
         await db.refresh(lawyer_profile)
         
     return {
+        "email": current_user.email,
         "full_name": lawyer_profile.full_name,
         "gender": lawyer_profile.gender,
         "date_of_birth": lawyer_profile.date_of_birth.isoformat() if lawyer_profile.date_of_birth else "",
@@ -924,19 +925,34 @@ class SettingsUpdatePayload(BaseModel):
     emailAlerts: bool
     smsAlerts: bool
     twoFactorAuth: bool
+    workingHours: Optional[Dict[str, Any]] = None
 
 @router.get("/settings")
 async def get_lawyer_settings(
-    current_user: User = Depends(check_verified_lawyer),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if current_user.role != "lawyer":
+        raise HTTPException(status_code=403, detail="Only lawyers can access settings")
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
     if not lawyer_profile:
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
 
+    import json
+    wh_data = {}
+    if lawyer_profile.working_hours:
+        try:
+            wh_data = json.loads(lawyer_profile.working_hours)
+        except Exception:
+            pass
+    if not wh_data:
+        days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        wh_data = {day: {"enabled": True, "start": "09:00", "end": "17:00"} for day in days}
+
     return {
         "vacationMode": lawyer_profile.vacation_mode,
+        "workingHours": wh_data,
         "emailAlerts": True,
         "smsAlerts": False,
         "twoFactorAuth": False
@@ -945,15 +961,19 @@ async def get_lawyer_settings(
 @router.post("/settings")
 async def save_lawyer_settings(
     payload: SettingsUpdatePayload,
-    current_user: User = Depends(check_verified_lawyer),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
+    if current_user.role != "lawyer":
+        raise HTTPException(status_code=403, detail="Only lawyers can edit settings")
     lawyer_profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == current_user.id))
     lawyer_profile = lawyer_profile_res.scalar_one_or_none()
     if not lawyer_profile:
         raise HTTPException(status_code=404, detail="Lawyer profile not found")
 
+    import json
     lawyer_profile.vacation_mode = payload.vacationMode
-    lawyer_profile.working_hours = None
+    if payload.workingHours is not None:
+        lawyer_profile.working_hours = json.dumps(payload.workingHours)
     await db.commit()
     return {"message": "Settings updated successfully"}

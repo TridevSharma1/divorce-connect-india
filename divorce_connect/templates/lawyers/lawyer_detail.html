@@ -421,9 +421,11 @@
                 </p>
             </div>
 
-            <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8">
-                <p class="text-gray-400 text-sm uppercase tracking-[0.25em]">Standard Consultation Timing</p>
-                <p class="mt-4 text-2xl font-semibold text-white">Monday – Friday • 09:00 to 17:00</p>
+            <div class="rounded-[30px] bg-[#121212] border border-white/10 p-8 max-w-2xl">
+                <p class="text-gray-400 text-sm uppercase tracking-[0.25em] mb-6">Standard Consultation Timing</p>
+                <div id="working-hours-container" class="space-y-2">
+                    <p class="text-gray-500 text-sm">Loading working hours...</p>
+                </div>
             </div>
         </section>
 
@@ -822,6 +824,76 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("contact-alternate-box").classList.remove("hidden");
         }
         document.getElementById("contact-city").innerText = data.office_city || 'Not Specified';
+
+        // Render working hours dynamically
+        const whContainer = document.getElementById("working-hours-container");
+        if (whContainer) {
+            let whData = null;
+            if (data.working_hours) {
+                try {
+                    whData = JSON.parse(data.working_hours);
+                } catch (e) {
+                    console.error("Error parsing working hours:", e);
+                }
+            }
+            
+            const daysOrder = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+            const dayLabels = {
+                monday: "Monday",
+                tuesday: "Tuesday",
+                wednesday: "Wednesday",
+                thursday: "Thursday",
+                friday: "Friday",
+                saturday: "Saturday",
+                sunday: "Sunday"
+            };
+
+            function formatTime12(timeStr) {
+                if (!timeStr) return "";
+                const parts = timeStr.split(":");
+                let h = parseInt(parts[0]);
+                const m = parts[1] || "00";
+                const ampm = h >= 12 ? "PM" : "AM";
+                h = h % 12;
+                h = h ? h : 12;
+                const padH = String(h).padStart(2, '0');
+                return `${padH}:${m} ${ampm}`;
+            }
+
+            let whHtml = "";
+
+            for (let day of daysOrder) {
+                let enabled = false;
+                let start = "09:00";
+                let end = "17:00";
+                
+                if (whData && whData[day]) {
+                    enabled = whData[day].enabled;
+                    start = whData[day].start || "09:00";
+                    end = whData[day].end || "17:00";
+                } else if (!whData) {
+                    if (day !== "saturday" && day !== "sunday") {
+                        enabled = true;
+                    }
+                }
+
+                if (enabled) {
+                    whHtml += `
+                    <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+                        <span class="font-medium text-gray-300">${dayLabels[day]}</span>
+                        <span class="text-white font-bold bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-sm">${formatTime12(start)} – ${formatTime12(end)}</span>
+                    </div>`;
+                } else {
+                    whHtml += `
+                    <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-0 opacity-40">
+                        <span class="font-medium text-gray-500">${dayLabels[day]}</span>
+                        <span class="text-gray-500 font-medium px-4 py-2 text-sm uppercase tracking-wider">Closed</span>
+                    </div>`;
+                }
+            }
+            
+            whContainer.innerHTML = whHtml;
+        }
 
 
         // Avatar configuration

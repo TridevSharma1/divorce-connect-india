@@ -48,7 +48,14 @@ async def list_pending_lawyers(
             "specialization": lawyer.specialization,
             "bar_registration_number": lawyer.bar_registration_number,
             "years_of_experience": lawyer.years_of_experience,
-            "office_city": lawyer.office_city
+            "office_city": lawyer.office_city,
+            "bar_council_license": lawyer.bar_council_license,
+            "gender": lawyer.gender,
+            "bio": lawyer.bio,
+            "consultation_fee": lawyer.consultation_fee,
+            "mobile_number": lawyer.mobile_number,
+            "profile_picture": lawyer.profile_picture,
+            "state_bar_council": lawyer.state_bar_council,
         }
         for lawyer in lawyers
     ]

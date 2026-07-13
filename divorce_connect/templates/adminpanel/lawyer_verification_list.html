@@ -97,6 +97,113 @@
     </div>
 </div>
 
+<!-- Detail Modal -->
+<div id="detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-[#0a0a0a]/80 transition-opacity backdrop-blur-md" onclick="closeDetailModal()"></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-[32px] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-zinc-200">
+            <!-- Modal Header -->
+            <div class="bg-[#0a0a0a] px-8 py-7 text-white flex justify-between items-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_55%)]"></div>
+                <div class="relative">
+                    <span class="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-zinc-300">
+                        Application Review
+                    </span>
+                    <h3 class="text-3xl font-black mt-2 tracking-tight text-white font-serif" id="modal-lawyer-name">Lawyer Details</h3>
+                </div>
+                <button onclick="closeDetailModal()" class="relative text-zinc-400 hover:text-white transition p-2 hover:bg-white/10 rounded-full">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="px-8 py-8 bg-white">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left Column: Details -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-5">
+                            <div id="modal-lawyer-avatar" class="flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0a0a0a] text-3xl font-bold text-white shadow-lg overflow-hidden border border-zinc-800">
+                                L
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-[#0a0a0a] tracking-tight font-serif" id="modal-lawyer-title">Lawyer Title</h4>
+                                <span class="inline-flex mt-1.5 px-3 py-1 bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-semibold rounded-full" id="modal-lawyer-specialization">Specialization</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6 bg-zinc-50 border border-zinc-200/80 p-6 rounded-2xl">
+                            <div>
+                                <span class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Experience</span>
+                                <span class="text-base font-bold text-zinc-900 mt-1 block" id="modal-lawyer-exp">0 Years</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Office City</span>
+                                <span class="text-base font-bold text-zinc-900 mt-1 block" id="modal-lawyer-city">N/A</span>
+                            </div>
+                            <div class="pt-2">
+                                <span class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Consultation Fee</span>
+                                <span class="text-base font-bold text-zinc-900 mt-1 block" id="modal-lawyer-fee">₹0</span>
+                            </div>
+                            <div class="pt-2">
+                                <span class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Mobile Number</span>
+                                <span class="text-base font-bold text-zinc-900 mt-1 block" id="modal-lawyer-mobile">N/A</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Professional Biography</span>
+                            <p class="text-sm text-zinc-600 leading-relaxed bg-zinc-50 p-5 rounded-2xl border border-zinc-200/60 min-h-[100px]" id="modal-lawyer-bio">
+                                No biography provided.
+                            </p>
+                        </div>
+
+                        <div class="p-5 bg-zinc-50 border border-zinc-200 rounded-2xl">
+                            <span class="block text-[11px] font-bold text-[#0a0a0a] uppercase tracking-wider mb-1.5 font-serif">Bar Council Verification Info</span>
+                            <p class="text-sm text-zinc-600">
+                                State Council: <span id="modal-lawyer-state" class="font-bold text-zinc-950">N/A</span>
+                            </p>
+                            <p class="text-sm text-zinc-600 mt-0.5">
+                                Registration Number: <span id="modal-lawyer-reg" class="font-bold text-zinc-950">N/A</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Document Preview -->
+                    <div class="flex flex-col h-full min-h-[400px]">
+                        <span class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-3">Bar Council License File</span>
+                        <div class="flex-1 bg-zinc-50 border border-zinc-200 rounded-2xl overflow-hidden flex flex-col justify-center items-center relative">
+                            <!-- Preview Box -->
+                            <div id="modal-license-preview-container" class="w-full h-full flex items-center justify-center">
+                                <span class="text-sm text-zinc-400">No Document Uploaded</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-4">
+                            <a id="modal-download-btn" href="#" target="_blank" class="flex-1 inline-flex justify-center items-center gap-2 px-5 py-3.5 bg-[#0a0a0a] hover:bg-zinc-800 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Download Document
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-zinc-50 px-8 py-6 border-t border-zinc-200 flex justify-between items-center">
+                <button onclick="closeDetailModal()" class="px-5 py-3 bg-white border border-zinc-200 text-zinc-700 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-zinc-100 transition duration-150">Cancel</button>
+                <div class="flex gap-3">
+                    <button id="modal-reject-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Reject Application</button>
+                    <button id="modal-approve-btn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Approve & Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("access_token");
@@ -121,6 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const lawyers = await res.json();
+        window.loadedLawyers = lawyers; // Save list for modal rendering
         document.getElementById("verification-container").style.display = "block";
 
         document.getElementById("stat-pending-count").innerText = lawyers.length;
@@ -129,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (lawyers.length > 0) {
             const pendingList = document.getElementById("pending-list");
             pendingList.innerHTML = lawyers.map(lawyer => `
-                <div class="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-900 hover:shadow-2xl">
+                <div onclick="openDetailModal(${lawyer.id})" class="group block cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-900 hover:shadow-2xl">
                     <div class="p-8">
                         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                             <div class="flex items-center gap-6">
@@ -147,11 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-start lg:items-end gap-6">
-                                <div class="flex gap-2">
-                                    <button onclick="actionLawyer(${lawyer.id}, 'approve')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition">Approve</button>
-                                    <button onclick="actionLawyer(${lawyer.id}, 'reject')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition">Reject</button>
-                                </div>
+                            <div class="flex flex-col items-start lg:items-end justify-center">
                                 <p class="text-sm text-slate-500">License: <span class="font-semibold text-slate-700">${lawyer.bar_registration_number}</span></p>
                             </div>
                         </div>
@@ -167,6 +271,63 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error loading verification page", err);
     }
 });
+
+function openDetailModal(lawyerId) {
+    if (!window.loadedLawyers) return;
+    const lawyer = window.loadedLawyers.find(l => l.id === lawyerId);
+    if (!lawyer) return;
+
+    document.getElementById("modal-lawyer-name").innerText = lawyer.full_name;
+    document.getElementById("modal-lawyer-title").innerText = lawyer.full_name;
+    document.getElementById("modal-lawyer-specialization").innerText = lawyer.specialization || "General Family Law";
+    document.getElementById("modal-lawyer-exp").innerText = (lawyer.years_of_experience || "0") + " Years";
+    document.getElementById("modal-lawyer-city").innerText = lawyer.office_city || "Not Specified";
+    document.getElementById("modal-lawyer-fee").innerText = "₹" + (lawyer.consultation_fee || "0");
+    document.getElementById("modal-lawyer-mobile").innerText = lawyer.mobile_number || "Not Provided";
+    document.getElementById("modal-lawyer-bio").innerText = lawyer.bio || "No biography provided.";
+    document.getElementById("modal-lawyer-state").innerText = lawyer.state_bar_council || "N/A";
+    document.getElementById("modal-lawyer-reg").innerText = lawyer.bar_registration_number || "N/A";
+    
+    // Set up avatar
+    const avatar = document.getElementById("modal-lawyer-avatar");
+    if (lawyer.profile_picture) {
+        avatar.innerHTML = `<img src="${lawyer.profile_picture}" class="w-full h-full object-cover rounded-2xl" />`;
+    } else {
+        avatar.innerHTML = lawyer.full_name.charAt(0);
+    }
+
+    // Set up actions
+    document.getElementById("modal-approve-btn").onclick = () => actionLawyer(lawyer.id, 'approve');
+    document.getElementById("modal-reject-btn").onclick = () => actionLawyer(lawyer.id, 'reject');
+
+    // Document Preview
+    const previewContainer = document.getElementById("modal-license-preview-container");
+    const downloadBtn = document.getElementById("modal-download-btn");
+    
+    if (lawyer.bar_council_license) {
+        const fileUrl = lawyer.bar_council_license.startsWith('http') ? lawyer.bar_council_license : `/media/${lawyer.bar_council_license}`;
+        downloadBtn.href = fileUrl;
+        downloadBtn.style.display = 'inline-flex';
+        
+        // Check if PDF or Image
+        const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
+        if (isPdf) {
+            previewContainer.innerHTML = `<iframe src="${fileUrl}" class="w-full h-full" style="border: none;"></iframe>`;
+        } else {
+            previewContainer.innerHTML = `<img src="${fileUrl}" class="max-w-full max-h-full object-contain p-2" />`;
+        }
+    } else {
+        previewContainer.innerHTML = `<span class="text-sm text-slate-400">No Bar Council License Uploaded</span>`;
+        downloadBtn.style.display = 'none';
+    }
+
+    document.getElementById("detail-modal").classList.remove("hidden");
+}
+
+function closeDetailModal() {
+    document.getElementById("detail-modal").classList.add("hidden");
+    document.getElementById("modal-license-preview-container").innerHTML = "";
+}
 
 async function actionLawyer(lawyerId, action) {
     const token = localStorage.getItem("access_token");
