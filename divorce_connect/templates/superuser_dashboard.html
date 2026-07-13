@@ -299,6 +299,83 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
     </div>
   </div>
 
+  <!-- ══════════ CUSTOM CREATE ADMIN VIEW ══════════ -->
+  <div x-show="view === 'custom-create-admin'" x-cloak class="anim-up">
+    <!-- Sticky top bar -->
+    <div class="detail-top">
+      <div class="flex items-center gap-2 min-w-0 flex-1">
+        <span class="text-white font-semibold text-sm truncate">Create Admin User</span>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button class="btn btn-ghost text-xs" @click="loadModel('admin-profiles')">Cancel</button>
+        <button class="btn btn-primary text-xs" @click="createAdminUser()" :disabled="busy">
+          <span x-text="busy ? 'Creating…' : 'Create Admin User'"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="px-6 py-5 max-w-4xl">
+      <div class="sec-card">
+        <div class="sec-title">Admin Account Credentials</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">Email Address *</label>
+            <input type="email" class="f-input" x-model="formData.email" required placeholder="admin@example.com" />
+          </div>
+          <div>
+            <label class="field-label">Password *</label>
+            <input type="password" class="f-input" x-model="formData.password" required placeholder="Min 10 chars, uppercase, lowercase, number, symbol" />
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-card">
+        <div class="sec-title">Profile Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">First Name *</label>
+            <input type="text" class="f-input" x-model="formData.first_name" required />
+          </div>
+          <div>
+            <label class="field-label">Last Name *</label>
+            <input type="text" class="f-input" x-model="formData.last_name" required />
+          </div>
+          <div>
+            <label class="field-label">Gender</label>
+            <select class="f-select" x-model="formData.gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Mobile Number</label>
+            <input type="text" class="f-input" x-model="formData.mobile_number" placeholder="+91..." />
+          </div>
+          <div>
+            <label class="field-label">Alternate Mobile Number</label>
+            <input type="text" class="f-input" x-model="formData.alternate_mobile_number" />
+          </div>
+          <div>
+            <label class="field-label">Date of Birth</label>
+            <input type="date" class="f-input" x-model="formData.date_of_birth" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom save bar -->
+      <div class="flex items-center justify-between py-5 border-t border-slate-800 mt-2">
+        <p class="text-slate-500 text-xs">Directly creates a Base User and Admin Profile.</p>
+        <div class="flex items-center gap-3">
+          <button class="btn btn-ghost" @click="loadModel('admin-profiles')">Cancel</button>
+          <button class="btn btn-primary" @click="createAdminUser()" :disabled="busy"
+                  x-text="busy ? 'Creating…' : 'Create Admin User'"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════ DETAIL / ADD VIEW ══════════ -->
   <div x-show="view === 'detail' || view === 'add'" x-cloak class="anim-up">
     <!-- Sticky top bar -->
@@ -988,6 +1065,7 @@ const NAV_DATA = [
   ]},
   { label:'ADMIN PANEL', open:false, items:[
     {k:'admin-profiles',icon:'🏢',label:'Admin Profiles'},
+    {k:'create-admin',icon:'➕',label:'Create Admin User'},
     {k:'admin-update-requests',icon:'✏️',label:'Admin Update Requests'},
     {k:'lawyer-verification-requests',icon:'⚖️',label:'Lawyer Verifications'},
     {k:'trust-reports',icon:'🚩',label:'Trust Reports'},
@@ -1064,6 +1142,16 @@ function SU() {
 
     // ── Load model ──────────────────────────────────────────────────────────
     loadModel(key) {
+      if (key === 'create-admin') {
+        this.activeKey = key;
+        this.schema = null;
+        this.view = 'custom-create-admin';
+        this.formData = {
+          email: '', password: '', first_name: '', last_name: '',
+          gender: 'other', mobile_number: '', alternate_mobile_number: '', date_of_birth: ''
+        };
+        return;
+      }
       const s = SCHEMAS[key];
       if (!s) return;
       this.schema   = s;
@@ -1186,6 +1274,33 @@ function SU() {
         }
       } catch (e) {
         this.pop('Save failed: ' + e.message, false);
+      } finally {
+        this.busy = false;
+      }
+    },
+
+    async createAdminUser() {
+      if (!this.formData.email || !this.formData.password || !this.formData.first_name || !this.formData.last_name) {
+        this.pop('Please fill in all required fields (*)', false);
+        return;
+      }
+      this.busy = true;
+      try {
+        const payload = {
+          email: this.formData.email,
+          password: this.formData.password,
+          first_name: this.formData.first_name,
+          last_name: this.formData.last_name,
+          gender: this.formData.gender || 'other',
+          mobile_number: this.formData.mobile_number || '',
+          alternate_mobile_number: this.formData.alternate_mobile_number || null,
+          date_of_birth: this.formData.date_of_birth || null
+        };
+        const res = await this.req('POST', '/api/superuser/create-admin', payload);
+        this.pop('Admin user and profile created successfully!', true);
+        this.loadModel('admin-profiles');
+      } catch (e) {
+        this.pop('Creation failed: ' + e.message, false);
       } finally {
         this.busy = false;
       }

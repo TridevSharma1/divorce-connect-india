@@ -1247,7 +1247,95 @@ async def list_withdraw_requests(
     return {"total": total, "page": page, "results": results}
 
 
+# ─── Quick Admin User & Profile Creation ──────────────────────────────────────
+
+class CreateAdminPayload(BaseModel):
+    email: str
+    password: str
+    first_name: str
+    last_name: str
+    gender: str = "other"
+    mobile_number: str = ""
+    alternate_mobile_number: Optional[str] = None
+    date_of_birth: Optional[datetime.date] = None
+
+@router.post("/create-admin")
+async def create_admin_user(
+    payload: CreateAdminPayload,
+    _su: User = Depends(check_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    import re
+    from ..security import pwd_context
+    
+    # Validate password requirements
+    if (
+        len(payload.password) < 10
+        or not re.search(r"[A-Z]", payload.password)
+        or not re.search(r"[a-z]", payload.password)
+        or not re.search(r"\d", payload.password)
+        or not re.search(r"[@$!%*?&_#^()\-+={}\[\]|\\:;\"'<>,.?/~`]", payload.password)
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be at least 10 characters long, and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+        )
+
+    # Check if email already registered
+    email_clean = payload.email.strip().lower()
+    result = await db.execute(select(User).where(User.email == email_clean))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+
+    # Create User
+    hashed_password = pwd_context.hash(payload.password)
+    new_user = User(
+        email=email_clean,
+        password=hashed_password,
+        first_name=payload.first_name,
+        last_name=payload.last_name,
+        role="admin",
+        is_active=True,
+        is_staff=True
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+    # Create AdminPanelProfile
+    profile = AdminPanelProfile(
+        user_id=new_user.id,
+        full_name=f"{payload.first_name} {payload.last_name}".strip(),
+        gender=payload.gender,
+        mobile_number=payload.mobile_number,
+        alternate_mobile_number=payload.alternate_mobile_number,
+        date_of_birth=payload.date_of_birth,
+        is_profile_complete=True,
+        is_verified_by_superuser=True
+    )
+    db.add(profile)
+    await db.commit()
+    await db.refresh(profile)
+
+    # Set custom ID based on database primary key
+    profile.custom_id = f"ad:{profile.id:05d}"
+    await db.commit()
+    await db.refresh(profile)
+
+    return {
+        "user_id": new_user.id,
+        "email": new_user.email,
+        "profile_id": profile.id,
+        "full_name": profile.full_name,
+        "custom_id": profile.custom_id
+    }
+
+
 # ─── MODEL MAPPINGS (shared by all generic handlers) ─────────────────────────
+
 
 MODEL_MAPPINGS = {
     "users": User,
