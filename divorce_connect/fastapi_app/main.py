@@ -126,17 +126,30 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
         
-    if not broker.is_worker_process:
-        logger.info("Connecting to NATS broker...")
-        await broker.startup()
+    import os
+    nats_url = os.getenv("NATS_URL", "")
+    _broker_started = False
+    if not broker.is_worker_process and nats_url:
+        try:
+            logger.info(f"Connecting to NATS broker at {nats_url}...")
+            await broker.startup()
+            _broker_started = True
+            logger.info("NATS broker connected successfully.")
+        except Exception as e:
+            logger.warning(f"NATS broker connection failed (non-fatal): {e}. Background tasks via NATS will be unavailable.")
+    elif not nats_url:
+        logger.info("NATS_URL not set — skipping broker startup. Background tasks via NATS are disabled.")
         
     yield
     
     # Shutdown Event: Disconnect from NATS
     logger.info("Shutting down FastAPI application...")
-    if not broker.is_worker_process:
-        logger.info("Disconnecting from NATS broker...")
-        await broker.shutdown()
+    if _broker_started and not broker.is_worker_process:
+        try:
+            logger.info("Disconnecting from NATS broker...")
+            await broker.shutdown()
+        except Exception as e:
+            logger.warning(f"NATS broker shutdown error (non-fatal): {e}")
         
 app = FastAPI(
     title="DivorceConnect Complete Async Architecture",
