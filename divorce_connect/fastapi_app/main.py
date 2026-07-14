@@ -114,8 +114,12 @@ async def lifespan(app: FastAPI):
     
     # In a real production setup with Alembic, you would not create tables here.
     # But for scaffolding, we'll create the tables synchronously or via async engine.
+    from .database import DATABASE_URL as _db_url
+    _masked = _db_url[:30] + "..." if len(_db_url) > 30 else _db_url
+    logger.info(f"Using DATABASE_URL: {_masked}")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables created/verified successfully.")
         from sqlalchemy import text
         try:
             await conn.execute(text("ALTER TABLE lawyers_lawyerprofile ADD COLUMN bar_council_license VARCHAR(255);"))

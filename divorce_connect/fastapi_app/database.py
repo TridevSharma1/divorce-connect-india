@@ -5,7 +5,7 @@ from urllib.parse import urlparse, unquote
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-load_dotenv(find_dotenv())
+load_dotenv(find_dotenv(), override=False)
 
 # Pointing to the original Django database
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
