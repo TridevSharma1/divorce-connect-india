@@ -117,9 +117,19 @@ def send_password_reset_otp_email(user, otp_code):
     )
 
 
-def send_welcome_back_email(user):
+def send_welcome_back_email(user, role=None):
     """Send a Welcome Back email after successful OTP-verified login."""
     now = timezone.localtime(timezone.now())
+    dashboard_urls = {
+        "client": "https://divorceconnect.in/client_dashboard/",
+        "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
+        "admin": "https://divorceconnect.in/admin_dashboard/",
+    }
+    cases_urls = {
+        "client": "https://divorceconnect.in/client_cases/",
+        "lawyer": "https://divorceconnect.in/lawyers/dashboard/",
+        "admin": "https://divorceconnect.in/admin_dashboard/",
+    }
     _send_html_email(
         subject="👋 Welcome Back — DivorceConnect India",
         template_name="emails/welcome_back_email.html",
@@ -127,6 +137,8 @@ def send_welcome_back_email(user):
             "user_name": user.get_full_name() or user.email,
             "user_email": user.email,
             "login_time": now.strftime("%d %b %Y, %I:%M %p"),
+            "dashboard_url": dashboard_urls.get(role, "https://divorceconnect.in/"),
+            "cases_url": cases_urls.get(role, "https://divorceconnect.in/"),
         },
         recipient_email=user.email,
         purpose=PURPOSE_AUTH,
@@ -140,12 +152,18 @@ def send_registration_email(user, role):
         "lawyer": "Lawyer Account",
         "admin": "Admin Account",
     }
+    dashboard_urls = {
+        "client": "https://divorceconnect.in/client_dashboard/",
+        "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
+        "admin": "https://divorceconnect.in/admin_dashboard/",
+    }
     _send_html_email(
         subject="🎉 Welcome to DivorceConnect India — Registration Successful",
         template_name="emails/registration_email.html",
         context={
             "user_name": user.get_full_name() or user.email,
             "role_label": role_labels.get(role, "User Account"),
+            "dashboard_url": dashboard_urls.get(role, "https://divorceconnect.in/"),
         },
         recipient_email=user.email,
         purpose=PURPOSE_AUTH,

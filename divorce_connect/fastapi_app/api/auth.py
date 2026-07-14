@@ -538,14 +538,29 @@ async def verify_otp(
         data={"sub": user.email, "user_id": user.id}, expires_delta=access_token_expires
     )
     
+    user_role = await get_user_role(user, db)
     try:
         from ..notifications import send_email
+        dashboard_urls = {
+            "client": "https://divorceconnect.in/client_dashboard/",
+            "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
+            "admin": "https://divorceconnect.in/admin_dashboard/",
+        }
+        cases_urls = {
+            "client": "https://divorceconnect.in/client_cases/",
+            "lawyer": "https://divorceconnect.in/lawyers/dashboard/",
+            "admin": "https://divorceconnect.in/admin_dashboard/",
+        }
+        dashboard_url = dashboard_urls.get(user_role, "https://divorceconnect.in/")
+        cases_url = cases_urls.get(user_role, "https://divorceconnect.in/")
         html_body = render_email_template(
             "emails/welcome_back_email.html",
             {
                 "user_name": user.get_full_name(),
                 "user_email": user.email,
                 "login_time": now.strftime("%d %b %Y, %I:%M %p"),
+                "dashboard_url": dashboard_url,
+                "cases_url": cases_url,
             }
         )
         send_email(
@@ -557,7 +572,6 @@ async def verify_otp(
     except Exception as e:
         logger.error(f"Failed to send welcome back email: {e}")
         
-    user_role = await get_user_role(user, db)
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -621,11 +635,17 @@ async def verify_register_otp(
             "lawyer": "Lawyer Account",
             "admin": "Admin Account",
         }
+        dashboard_urls = {
+            "client": "https://divorceconnect.in/client_dashboard/",
+            "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
+            "admin": "https://divorceconnect.in/admin_dashboard/",
+        }
         html_body = render_email_template(
             "emails/registration_email.html",
             {
                 "user_name": user.get_full_name(),
                 "role_label": role_labels.get(user_role, "User Account"),
+                "dashboard_url": dashboard_urls.get(user_role, "https://divorceconnect.in/"),
             }
         )
         send_email(
