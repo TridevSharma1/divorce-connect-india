@@ -39,13 +39,13 @@ async def send_email_task(to_address: str, subject: str, html_body: str, purpose
     
     if purpose == "auth":
         smtp_host = os.getenv("SMTP_AUTH_HOST") or os.getenv("SMTP_HOST", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_AUTH_PORT") or os.getenv("SMTP_PORT", "587"))
+        smtp_port = int(os.getenv("SMTP_AUTH_PORT") or os.getenv("SMTP_PORT", "465"))
         smtp_user = os.getenv("SMTP_AUTH_USER") or os.getenv("SMTP_USER", "")
         smtp_password = os.getenv("SMTP_AUTH_PASSWORD") or os.getenv("SMTP_PASSWORD", "")
         smtp_use_tls = (os.getenv("SMTP_AUTH_USE_TLS") or os.getenv("SMTP_USE_TLS", "True")).lower() in ("true", "1")
     else:
         smtp_host = os.getenv("SMTP_OPERATIONS_HOST") or os.getenv("SMTP_HOST", "smtp.gmail.com")
-        smtp_port = int(os.getenv("SMTP_OPERATIONS_PORT") or os.getenv("SMTP_PORT", "587"))
+        smtp_port = int(os.getenv("SMTP_OPERATIONS_PORT") or os.getenv("SMTP_PORT", "465"))
         smtp_user = os.getenv("SMTP_OPERATIONS_USER") or os.getenv("SMTP_USER", "")
         smtp_password = os.getenv("SMTP_OPERATIONS_PASSWORD") or os.getenv("SMTP_PASSWORD", "")
         smtp_use_tls = (os.getenv("SMTP_OPERATIONS_USE_TLS") or os.getenv("SMTP_USE_TLS", "True")).lower() in ("true", "1")
@@ -61,10 +61,15 @@ async def send_email_task(to_address: str, subject: str, html_body: str, purpose
     msg.attach(MIMEText(html_body, "html"))
     
     try:
-        logger.info(f"Taskiq: Sending email via {purpose} SMTP to {to_address} (Host: {smtp_host}, User: {smtp_user})")
-        server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
-        if smtp_use_tls:
-            server.starttls()
+        logger.info(f"Taskiq: Sending email via {purpose} SMTP to {to_address} (Host: {smtp_host}:{smtp_port}, User: {smtp_user})")
+        # Port 465 uses SSL from the start (SMTP_SSL); port 587 uses STARTTLS.
+        # Render free tier blocks 587, so we default to 465 with SMTP_SSL.
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=15)
+        else:
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
+            if smtp_use_tls:
+                server.starttls()
         server.login(smtp_user, smtp_password)
         server.sendmail(msg["From"], [to_address], msg.as_string())
         server.quit()
