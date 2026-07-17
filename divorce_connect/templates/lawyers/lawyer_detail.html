@@ -102,6 +102,76 @@
     }
 
     ::selection { background: white; color: black; }
+
+    @media (max-width: 1024px) {
+        .page-shell > div {
+            padding: 2rem 1.25rem;
+        }
+
+        .rounded-3xl {
+            border-radius: 24px !important;
+        }
+
+        .p-12 { padding: 1.5rem !important; }
+        .px-10 { padding-left: 1rem !important; padding-right: 1rem !important; }
+        .gap-14 { gap: 1rem !important; }
+        .gap-8 { gap: 1rem !important; }
+    }
+
+    @media (max-width: 768px) {
+        .page-shell > div {
+            padding: 1.25rem 0.9rem;
+        }
+
+        .w-52.h-52 {
+            width: 11rem !important;
+            height: 11rem !important;
+        }
+
+        .text-5xl { font-size: 2rem !important; }
+        .text-4xl { font-size: 1.8rem !important; }
+        .text-3xl { font-size: 1.5rem !important; }
+        .text-7xl { font-size: 3rem !important; }
+
+        .p-12 { padding: 1rem !important; }
+        .px-10 { padding-left: 0.9rem !important; padding-right: 0.9rem !important; }
+        .py-16 { padding-top: 1.75rem !important; padding-bottom: 1.75rem !important; }
+        .mt-20 { margin-top: 2.5rem !important; }
+        .mt-16 { margin-top: 2rem !important; }
+        .mb-10 { margin-bottom: 1.5rem !important; }
+        .leading-8 { line-height: 1.65 !important; }
+
+        .flex.flex-wrap.gap-5 { gap: 0.75rem !important; }
+        .flex.flex-wrap.gap-4 { gap: 0.75rem !important; }
+
+        .primary-btn,
+        .secondary-btn,
+        .detail-pill {
+            width: 100% !important;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            justify-content: center !important;
+        }
+
+        .stat-card,
+        .rounded-3xl {
+            padding: 1.25rem !important;
+        }
+
+        .grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        .lg\:col-span-2 {
+            grid-column: auto !important;
+        }
+
+        .page-shell {
+            min-height: auto;
+        }
+    }
 </style>
 {% endblock %}
 

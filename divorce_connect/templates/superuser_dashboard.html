@@ -14,10 +14,13 @@ body{background:#0d1117;color:#e2e8f0;margin:0}
 
 /* Layout */
 .sidebar{width:268px;min-height:100vh;background:#161b2e;border-right:1px solid #21283c;position:fixed;top:0;left:0;z-index:30;overflow-y:auto;display:flex;flex-direction:column}
-.main-wrap{margin-left:268px;min-height:100vh}
+.main-wrap{margin-left:268px;min-height:100vh;padding-bottom:32px;transition:margin .2s ease}
+.sidebar-backdrop{display:none}
+.mobile-topbar{display:none}
 
 /* Cards */
 .card{background:#161b2e;border:1px solid #21283c;border-radius:12px}
+
 
 /* Form inputs - ALL ARE EDITABLE */
 .f-input{width:100%;background:#0d1117;border:1px solid #2d3a50;color:#e2e8f0;border-radius:8px;padding:10px 13px;font-size:14px;outline:none;transition:border-color .18s,box-shadow .18s}
@@ -87,11 +90,41 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
 /* Scrollbar */
 .slim-scroll::-webkit-scrollbar{width:4px}.slim-scroll::-webkit-scrollbar-track{background:transparent}.slim-scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
 
+@media (max-width:1024px){
+  .sidebar{transform:translateX(-100%);box-shadow:none;transition:transform .2s ease;width:calc(100vw - 24px);max-width:320px;}
+  .sidebar.open{transform:translateX(0);box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .main-wrap{margin-left:0}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.72);backdrop-filter:blur(2px);z-index:20}
+  .sidebar-backdrop.show{display:block}
+  .mobile-topbar{display:flex}
+}
+
+@media (max-width:768px){
+  .detail-top,.px-6{padding-left:1rem!important;padding-right:1rem!important}
+  .toast-bar{left:12px;right:12px;bottom:12px;min-width:auto}
+  .modal-box{padding:20px}
+  .f-input,.f-textarea,.f-select{font-size:16px}
+  .sec-card{padding:18px 16px}
+  .btn{padding:8px 14px;font-size:12px}
+  .detail-top,.detail-top > div{width:100%}
+  .detail-top{flex-direction:column;align-items:stretch}
+  .detail-top .flex{flex-wrap:wrap;gap:8px}
+  table{min-width:100%}
+  td, th{white-space:normal;word-break:break-word}
+  .nav-item{margin:4px 10px}
+  .sidebar{width:100vw;max-width:100vw}
+  .sidebar.open{width:100vw}
+  .mobile-topbar{padding-left:1rem;padding-right:1rem}
+  .main-wrap{padding-bottom:24px}
+}
+
 @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .anim-up{animation:slideUp .22s ease}
 </style>
 </head>
 <body x-data="SU()" x-init="boot()" @keydown.escape.window="esc()">
+
+<div class="sidebar-backdrop" :class="sidebarOpen ? 'show' : ''" @click="closeSidebar()"></div>
 
 <!-- ───────── TOAST ───────── -->
 <div x-show="toast.on" x-cloak x-transition class="toast-bar"
@@ -144,7 +177,7 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
 </div>
 
 <!-- ───────── SIDEBAR ───────── -->
-<aside class="sidebar slim-scroll">
+<aside class="sidebar slim-scroll" :class="sidebarOpen ? 'open' : ''">
   <!-- Logo -->
   <div class="px-5 py-5 border-b border-slate-800/50 flex-shrink-0">
     <div class="flex items-center gap-3">
@@ -201,27 +234,35 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
 
 <!-- ───────── MAIN ───────── -->
 <main class="main-wrap">
+  <div class="mobile-topbar items-center justify-between border-b border-slate-800/70 bg-slate-900/90 px-4 py-3 backdrop-blur">
+    <button class="btn btn-ghost text-xs" @click="toggleSidebar()">☰ Menu</button>
+    <div class="text-sm font-medium text-white truncate" x-text="schema ? schema.label : 'Dashboard'"></div>
+    <button class="btn btn-ghost text-xs" @click="logout()">Sign out</button>
+  </div>
 
   <!-- ══════════ LIST VIEW ══════════ -->
   <div x-show="view === 'list'" x-cloak>
-    <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-      <div>
-        <h1 class="text-white font-semibold text-xl" x-text="schema ? schema.label : ''"></h1>
-        <p class="text-slate-500 text-xs mt-0.5"><span class="text-slate-300" x-text="total"></span> total records</p>
-      </div>
+    <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:flex-wrap">
       <div class="flex items-center gap-3">
-        <div class="relative">
-          <input type="text" x-model="srch" @input.debounce.300ms="pg=1; loadList()" placeholder="Search…" class="f-input w-52" style="padding-left:34px" />
+        <button class="btn btn-ghost text-xs sm:hidden" @click="toggleSidebar()">☰ Menu</button>
+        <div>
+          <h1 class="text-white font-semibold text-xl" x-text="schema ? schema.label : ''"></h1>
+          <p class="text-slate-500 text-xs mt-0.5"><span class="text-slate-300" x-text="total"></span> total records</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative w-full sm:w-52">
+          <input type="text" x-model="srch" @input.debounce.300ms="pg=1; loadList()" placeholder="Search…" class="f-input w-full" style="padding-left:34px" />
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" style="font-size:13px">&#128269;</span>
         </div>
-        <button class="btn btn-primary" @click="openAdd()">&#43; Add Record</button>
+        <button class="btn btn-primary w-full sm:w-auto" @click="openAdd()">&#43; Add Record</button>
       </div>
     </header>
 
     <!-- Bulk toolbar -->
-    <div class="px-6 py-2 border-b border-slate-800/40 min-h-[46px] flex items-center gap-4">
+    <div class="px-6 py-2 border-b border-slate-800/40 min-h-[46px] flex flex-col gap-2 sm:flex-row sm:items-center">
       <span class="text-slate-500 text-xs">Page <span class="text-white font-medium" x-text="pg"></span> of <span x-text="pages"></span></span>
-      <div x-show="sel.length > 0" x-transition class="ml-auto flex items-center gap-2">
+      <div x-show="sel.length > 0" x-transition class="ml-auto flex flex-wrap items-center gap-2">
         <span class="text-indigo-400 text-xs font-medium" x-text="sel.length + ' selected'"></span>
         <template x-for="ba in bkActions" :key="ba.key">
           <button class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" :class="ba.cls" @click="runBulk(ba)" x-text="ba.label"></button>
@@ -267,7 +308,7 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
                     <td><span x-html="cellHtml(col, row[col])"></span></td>
                   </template>
                   <td @click.stop>
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex flex-wrap items-center gap-1.5">
                       <template x-if="activeKey === 'payments'">
                         <button class="px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:text-white bg-emerald-950/20 hover:bg-emerald-600/50 rounded-lg transition-all" @click.stop="downloadPaymentInvoice(row)">Invoice</button>
                       </template>
@@ -365,9 +406,9 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
       </div>
 
       <!-- Bottom save bar -->
-      <div class="flex items-center justify-between py-5 border-t border-slate-800 mt-2">
+      <div class="flex flex-col gap-3 border-t border-slate-800 py-5 mt-2 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-slate-500 text-xs">Directly creates a Base User and Admin Profile.</p>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
           <button class="btn btn-ghost" @click="loadModel('admin-profiles')">Cancel</button>
           <button class="btn btn-primary" @click="createAdminUser()" :disabled="busy"
                   x-text="busy ? 'Creating…' : 'Create Admin User'"></button>
@@ -389,7 +430,7 @@ td{padding:10px 14px;font-size:13px;color:#cbd5e1;vertical-align:middle;max-widt
         <span class="text-white font-semibold text-sm truncate"
               x-text="view === 'add' ? 'New Record' : 'Record #' + (formData.id || '')"></span>
       </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
         <template x-if="view === 'detail' && activeKey === 'payments'">
           <button class="btn btn-ghost text-xs text-emerald-400 border-emerald-800/50 hover:bg-emerald-950/20" @click="downloadPaymentInvoice(formData)">📥 Download Invoice</button>
         </template>
@@ -1104,6 +1145,7 @@ function SU() {
     view: 'list',
     activeKey: '',
     schema: null,
+    sidebarOpen: false,
 
     // list state
     rows: [], total: 0, pg: 1, pages: 1, pgRange: [],
@@ -1140,6 +1182,14 @@ function SU() {
       this.loadModel('users');
     },
 
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
+    },
+
+    closeSidebar() {
+      this.sidebarOpen = false;
+    },
+
     // ── Load model ──────────────────────────────────────────────────────────
     loadModel(key) {
       if (key === 'create-admin') {
@@ -1161,6 +1211,7 @@ function SU() {
       this.srch      = '';
       this.pg        = 1;
       this.view      = 'list';
+      this.closeSidebar();
       this.loadList();
     },
 
@@ -1213,6 +1264,7 @@ function SU() {
           }
         }
       }
+      this.closeSidebar();
       this.view = 'add';
       this.detBusy = false;
     },

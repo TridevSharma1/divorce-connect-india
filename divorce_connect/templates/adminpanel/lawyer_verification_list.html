@@ -104,17 +104,17 @@
         <div class="fixed inset-0 bg-[#0a0a0a]/80 transition-opacity backdrop-blur-md" onclick="closeDetailModal()"></div>
 
         <!-- Modal panel -->
-        <div class="inline-block align-bottom bg-white rounded-[32px] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-zinc-200">
+        <div class="inline-block align-bottom bg-white rounded-[32px] text-left overflow-hidden shadow-2xl transform transition-all w-full max-w-full sm:max-w-4xl sm:w-full border border-zinc-200">
             <!-- Modal Header -->
-            <div class="bg-[#0a0a0a] px-8 py-7 text-white flex justify-between items-center relative overflow-hidden">
+            <div class="bg-[#0a0a0a] px-6 py-6 text-white flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center relative overflow-hidden">
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_55%)]"></div>
-                <div class="relative">
+                <div class="relative w-full">
                     <span class="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-zinc-300">
                         Application Review
                     </span>
-                    <h3 class="text-3xl font-black mt-2 tracking-tight text-white font-serif" id="modal-lawyer-name">Lawyer Details</h3>
+                    <h3 class="text-2xl sm:text-3xl font-black mt-2 tracking-tight text-white font-serif" id="modal-lawyer-name">Lawyer Details</h3>
                 </div>
-                <button onclick="closeDetailModal()" class="relative text-zinc-400 hover:text-white transition p-2 hover:bg-white/10 rounded-full">
+                <button onclick="closeDetailModal()" class="relative text-zinc-400 hover:text-white transition p-2 hover:bg-white/10 rounded-full self-start sm:self-auto">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -122,8 +122,8 @@
             </div>
 
             <!-- Modal Content -->
-            <div class="px-8 py-8 bg-white">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="px-6 py-6 sm:px-8 sm:py-8 bg-white">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                     <!-- Left Column: Details -->
                     <div class="space-y-6">
                         <div class="flex items-center gap-5">
@@ -193,11 +193,11 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="bg-zinc-50 px-8 py-6 border-t border-zinc-200 flex justify-between items-center">
-                <button onclick="closeDetailModal()" class="px-5 py-3 bg-white border border-zinc-200 text-zinc-700 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-zinc-100 transition duration-150">Cancel</button>
-                <div class="flex gap-3">
-                    <button id="modal-reject-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Reject Application</button>
-                    <button id="modal-approve-btn" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Approve & Verify</button>
+            <div class="bg-zinc-50 px-6 py-6 sm:px-8 sm:py-6 border-t border-zinc-200 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+                <button onclick="closeDetailModal()" class="px-5 py-3 bg-white border border-zinc-200 text-zinc-700 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-zinc-100 transition duration-150 w-full sm:w-auto">Cancel</button>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center w-full sm:w-auto">
+                    <button id="modal-reject-btn" class="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Reject Application</button>
+                    <button id="modal-approve-btn" class="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Approve & Verify</button>
                 </div>
             </div>
         </div>
