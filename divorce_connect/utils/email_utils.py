@@ -121,14 +121,14 @@ def send_welcome_back_email(user, role=None):
     """Send a Welcome Back email after successful OTP-verified login."""
     now = timezone.localtime(timezone.now())
     dashboard_urls = {
-        "client": "https://divorceconnect.in/client_dashboard/",
-        "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
-        "admin": "https://divorceconnect.in/admin_dashboard/",
+        "client": "https://divorceconnectindia.com/client_dashboard/",
+        "lawyer": "https://divorceconnectindia.com/lawyer_dashboard/",
+        "admin": "https://divorceconnectindia.com/admin_dashboard/",
     }
     cases_urls = {
-        "client": "https://divorceconnect.in/client_cases/",
-        "lawyer": "https://divorceconnect.in/lawyers/dashboard/",
-        "admin": "https://divorceconnect.in/admin_dashboard/",
+        "client": "https://divorceconnectindia.com/client_cases/",
+        "lawyer": "https://divorceconnectindia.com/lawyers/dashboard/",
+        "admin": "https://divorceconnectindia.com/admin_dashboard/",
     }
     _send_html_email(
         subject="👋 Welcome Back — DivorceConnect India",
@@ -137,8 +137,8 @@ def send_welcome_back_email(user, role=None):
             "user_name": user.get_full_name() or user.email,
             "user_email": user.email,
             "login_time": now.strftime("%d %b %Y, %I:%M %p"),
-            "dashboard_url": dashboard_urls.get(role, "https://divorceconnect.in/"),
-            "cases_url": cases_urls.get(role, "https://divorceconnect.in/"),
+            "dashboard_url": dashboard_urls.get(role, "https://divorceconnectindia.com/"),
+            "cases_url": cases_urls.get(role, "https://divorceconnectindia.com/"),
         },
         recipient_email=user.email,
         purpose=PURPOSE_AUTH,
@@ -153,9 +153,9 @@ def send_registration_email(user, role):
         "admin": "Admin Account",
     }
     dashboard_urls = {
-        "client": "https://divorceconnect.in/client_dashboard/",
-        "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
-        "admin": "https://divorceconnect.in/admin_dashboard/",
+        "client": "https://divorceconnectindia.com/client_dashboard/",
+        "lawyer": "https://divorceconnectindia.com/lawyer_dashboard/",
+        "admin": "https://divorceconnectindia.com/admin_dashboard/",
     }
     _send_html_email(
         subject="🎉 Welcome to DivorceConnect India — Registration Successful",
@@ -163,7 +163,7 @@ def send_registration_email(user, role):
         context={
             "user_name": user.get_full_name() or user.email,
             "role_label": role_labels.get(role, "User Account"),
-            "dashboard_url": dashboard_urls.get(role, "https://divorceconnect.in/"),
+            "dashboard_url": dashboard_urls.get(role, "https://divorceconnectindia.com/"),
         },
         recipient_email=user.email,
         purpose=PURPOSE_AUTH,

@@ -166,13 +166,12 @@ def test_lawyer_case_order_page_shows_pending_case_for_authenticated_lawyer():
     user, _ = asyncio.run(seed_lawyer_case())
     token = create_access_token(data={"sub": user.email, "user_id": user.id})
     response = client.get(
-        "/lawyer_case_orders",
+        "/api/lawyer/case-requests",
         headers={"Authorization": f"Bearer {token}"},
-        follow_redirects=False,
     )
 
     assert response.status_code == 200
-    assert "Need help with a divorce filing." in response.text
+    assert any(r["message"] == "Need help with a divorce filing." for r in response.json())
 
 
 def test_forgot_password_page_renders():
@@ -299,16 +298,15 @@ def test_client_deactivate():
     assert response.status_code == 200
     assert "sent" in response.json()["message"]
     
-    # 2. Get the token from database using sqlite
-    import sqlite3
-    conn = sqlite3.connect("db.sqlite3")
-    cursor = conn.cursor()
-    cursor.execute("SELECT token FROM accounts_deleteaccounttoken ORDER BY id DESC LIMIT 1")
-    row = cursor.fetchone()
-    conn.close()
-    
-    assert row is not None
-    token = row[0]
+    # 2. Get the token from database using SQLAlchemy
+    token = None
+    async def get_token():
+        async with AsyncSessionLocal() as db:
+            res = await db.execute(select(DeleteAccountToken).order_by(DeleteAccountToken.id.desc()).limit(1))
+            obj = res.scalar_one_or_none()
+            return obj.token if obj else None
+    token = asyncio.run(get_token())
+    assert token is not None
     
     # 3. Confirm deactivation via token link
     response = client.get(f"/api/auth/confirm-delete/{token}")

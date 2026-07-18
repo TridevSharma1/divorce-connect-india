@@ -280,7 +280,12 @@ async def test_lawyer_profile_verification_check():
         "bio": "Expert divorce lawyer with 10 years of experience.",
         "mobile_number": "9999999999"
     }
-    response = client.post("/api/lawyer/profile", data=lawyer_profile_data, headers=headers)
+    response = client.post(
+        "/api/lawyer/profile",
+        data=lawyer_profile_data,
+        files={"bar_council_license": ("license.pdf", b"dummy PDF content", "application/pdf")},
+        headers=headers
+    )
     assert response.status_code == 200
     
     # 4. Check Admin Dashboard pending count (should now be initial_pending + 1 because profile is completed!)

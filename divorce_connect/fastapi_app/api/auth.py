@@ -595,17 +595,17 @@ async def verify_otp(
     try:
         from ..notifications import send_email
         dashboard_urls = {
-            "client": "https://divorceconnect.in/client_dashboard/",
-            "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
-            "admin": "https://divorceconnect.in/admin_dashboard/",
+            "client": "https://divorceconnectindia.com/client_dashboard/",
+            "lawyer": "https://divorceconnectindia.com/lawyer_dashboard/",
+            "admin": "https://divorceconnectindia.com/admin_dashboard/",
         }
         cases_urls = {
-            "client": "https://divorceconnect.in/client_cases/",
-            "lawyer": "https://divorceconnect.in/lawyers/dashboard/",
-            "admin": "https://divorceconnect.in/admin_dashboard/",
+            "client": "https://divorceconnectindia.com/client_cases/",
+            "lawyer": "https://divorceconnectindia.com/lawyers/dashboard/",
+            "admin": "https://divorceconnectindia.com/admin_dashboard/",
         }
-        dashboard_url = dashboard_urls.get(user_role, "https://divorceconnect.in/")
-        cases_url = cases_urls.get(user_role, "https://divorceconnect.in/")
+        dashboard_url = dashboard_urls.get(user_role, "https://divorceconnectindia.com/")
+        cases_url = cases_urls.get(user_role, "https://divorceconnectindia.com/")
         html_body = render_email_template(
             "emails/welcome_back_email.html",
             {
@@ -689,16 +689,16 @@ async def verify_register_otp(
             "admin": "Admin Account",
         }
         dashboard_urls = {
-            "client": "https://divorceconnect.in/client_dashboard/",
-            "lawyer": "https://divorceconnect.in/lawyer_dashboard/",
-            "admin": "https://divorceconnect.in/admin_dashboard/",
+            "client": "https://divorceconnectindia.com/client_dashboard/",
+            "lawyer": "https://divorceconnectindia.com/lawyer_dashboard/",
+            "admin": "https://divorceconnectindia.com/admin_dashboard/",
         }
         html_body = render_email_template(
             "emails/registration_email.html",
             {
                 "user_name": user.get_full_name(),
                 "role_label": role_labels.get(user_role, "User Account"),
-                "dashboard_url": dashboard_urls.get(user_role, "https://divorceconnect.in/"),
+                "dashboard_url": dashboard_urls.get(user_role, "https://divorceconnectindia.com/"),
             }
         )
         send_email(
