@@ -1,14 +1,14 @@
 {
   "builds": [
     {
-      "src": "divorce_connect/fastapi_app/main.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "divorce_connect/fastapi_app/main.py"
+      "dest": "api/index.py"
     }
   ]
 }

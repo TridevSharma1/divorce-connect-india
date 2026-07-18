@@ -98,4 +98,4 @@ dependencies = [
 ]
 
 [tool.vercel]
-src = "divorce_connect/fastapi_app/main.py"
+src = "api/index.py"
