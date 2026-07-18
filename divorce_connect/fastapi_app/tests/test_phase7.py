@@ -18,6 +18,8 @@ mock_client_user = User(
     role="client",
     first_name="Client",
     last_name="Test",
+    password="hashed",
+    is_active=True,
     is_staff=False
 )
 
@@ -27,7 +29,20 @@ mock_admin_user = User(
     role="admin",
     first_name="Admin",
     last_name="Test",
+    password="hashed",
+    is_active=True,
     is_staff=True
+)
+
+mock_client_user_9998 = User(
+    id=9998,
+    email="client_9998@example.com",
+    role="client",
+    first_name="Client",
+    last_name="9998",
+    password="hashed",
+    is_active=True,
+    is_staff=False
 )
 
 # Current user override placeholder
@@ -36,10 +51,20 @@ active_user = mock_client_user
 async def override_get_current_user():
     return active_user
 
+async def seed_mock_users():
+    async with AsyncSessionLocal() as db:
+        for u in [mock_client_user, mock_admin_user, mock_client_user_9998]:
+            res = await db.execute(select(User).where(User.id == u.id))
+            if not res.scalar_one_or_none():
+                # Clear session state by merging
+                await db.merge(u)
+        await db.commit()
+
 # Setup App Dependency Overrides
 @pytest.fixture(autouse=True)
 def setup_overrides():
     app.dependency_overrides[get_current_user] = override_get_current_user
+    asyncio.run(seed_mock_users())
 
 client = TestClient(app)
 

@@ -264,6 +264,31 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
         
+    # Check if user's profile is soft-deleted
+    from ..models import ClientProfile, LawyerProfile, AdminPanelProfile
+    is_deleted = False
+    if user.role == "client":
+        profile_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+    elif user.role == "lawyer":
+        profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+    elif user.role == "admin":
+        profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+
+    if is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This account has been deactivated or deleted."
+        )
+        
     # Generate OTP code
     otp_code = await generate_otp_for_user(user.id, db)
     
@@ -398,7 +423,7 @@ async def confirm_delete_account(
     token: str,
     db: AsyncSession = Depends(get_db)
 ):
-    from ..models import DeleteAccountToken, ClientProfile, LawyerProfile, User
+    from ..models import DeleteAccountToken, ClientProfile, LawyerProfile, AdminPanelProfile, User
     
     # Query token
     res = await db.execute(select(DeleteAccountToken).where(DeleteAccountToken.token == token, DeleteAccountToken.is_used == False))
@@ -465,6 +490,12 @@ async def confirm_delete_account(
     if lawyer_prof:
         lawyer_prof.is_deleted = True
         
+    # AdminPanelProfile
+    admin_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == token_obj.user_id))
+    admin_prof = admin_res.scalar_one_or_none()
+    if admin_prof:
+        admin_prof.is_deleted = True
+        
     # Deactivate User
     user_res = await db.execute(select(User).where(User.id == token_obj.user_id))
     user_obj = user_res.scalar_one_or_none()
@@ -524,6 +555,28 @@ async def verify_otp(
     if now > created_at + datetime.timedelta(minutes=10):
         raise HTTPException(status_code=400, detail="This OTP has expired. Please request a new one.")
         
+    # Check if user is soft-deleted
+    from ..models import ClientProfile, LawyerProfile, AdminPanelProfile
+    is_deleted = False
+    if user.role == "client":
+        profile_res = await db.execute(select(ClientProfile).where(ClientProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+    elif user.role == "lawyer":
+        profile_res = await db.execute(select(LawyerProfile).where(LawyerProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+    elif user.role == "admin":
+        profile_res = await db.execute(select(AdminPanelProfile).where(AdminPanelProfile.user_id == user.id))
+        profile = profile_res.scalar_one_or_none()
+        if profile and profile.is_deleted:
+            is_deleted = True
+
+    if is_deleted:
+        raise HTTPException(status_code=400, detail="This account has been deactivated or deleted.")
+
     otp_obj.is_used = True
     user.is_active = True
     await db.commit()

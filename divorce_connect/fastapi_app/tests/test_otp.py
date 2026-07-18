@@ -17,7 +17,7 @@ async def test_otp_registration_and_login_flow():
     # Use random email to avoid duplicate entries
     import random
     test_email = f"otp_test_{random.randint(10000, 99999)}@example.com"
-    password = "SuperSecurePassword123"
+    password = "SuperSecurePassword123!"
     
     # 1. Register User (Step 1)
     reg_payload = {
@@ -116,7 +116,7 @@ def test_otp_templates_rendering():
 async def test_admin_profile_verification_check():
     import random
     test_email = f"admin_test_{random.randint(10000, 99999)}@example.com"
-    password = "SuperSecurePassword123"
+    password = "SuperSecurePassword123!"
     
     # 1. Register Admin User
     reg_payload = {
@@ -176,7 +176,7 @@ async def test_lawyer_profile_verification_check():
     import random
     test_email = f"lawyer_test_{random.randint(10000, 99999)}@example.com"
     admin_email = f"admin_test_{random.randint(10000, 99999)}@example.com"
-    password = "SuperSecurePassword123"
+    password = "SuperSecurePassword123!"
     
     # 1. Register and verify Admin User
     admin_reg = {
