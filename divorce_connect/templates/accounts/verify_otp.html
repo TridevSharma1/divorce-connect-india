@@ -20,6 +20,18 @@
         .otp-input.filled { border-color: #0a0a0a; background: #0a0a0a; color: #d4af6a; }
         .timer-ring { transform: rotate(-90deg); }
         .timer-circle { stroke-dasharray: 188; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+        
+        @media (max-width: 480px) {
+            .otp-input {
+                width: 42px;
+                height: 52px;
+                font-size: 22px;
+                border-radius: 8px;
+            }
+            #otp-boxes {
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4">
@@ -34,7 +46,7 @@
             <!-- Gold top bar -->
             <div class="h-1 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600"></div>
 
-            <div class="p-8 sm:p-10">
+            <div class="p-6 sm:p-10">
                 <!-- Icon -->
                 <div class="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,9 +76,12 @@
                     <input type="hidden" name="csrf_token" value="fastapi_mock_csrf">
                     <!-- OTP Boxes -->
                     <div class="flex justify-center gap-3 mb-8" id="otp-boxes">
-                        {% for i in "123456" %}
-                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" data-index="{{ forloop.counter0 }}">
-                        {% endfor %}
+                        <input type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" class="otp-input" pattern="[0-9]*">
+                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" pattern="[0-9]*">
+                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" pattern="[0-9]*">
+                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" pattern="[0-9]*">
+                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" pattern="[0-9]*">
+                        <input type="text" maxlength="1" inputmode="numeric" class="otp-input" pattern="[0-9]*">
                     </div>
                     <input type="hidden" name="otp" id="otp-hidden">
 
