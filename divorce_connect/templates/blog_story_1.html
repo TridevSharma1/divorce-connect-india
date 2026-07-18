@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Navigating Amicable Settlements — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Case Story • Mutual Consent</span>
+            <h1 class="font-playfair text-3xl md:text-5xl font-bold mt-4 mb-4 tracking-tight">Navigating Amicable Settlements: The Power of Mediation</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Contributed by Adv. Rajeshwari Sen (Mumbai Bar Council)
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-6 mb-8 text-xs text-zinc-400">
+                <span>Published on January 16, 2026</span>
+                <a href="/blog/" class="text-zinc-900 hover:text-[#d4af6a] font-semibold flex items-center gap-1">&larr; Back to Blog</a>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-700 text-sm leading-relaxed space-y-6">
+                <p class="font-medium text-zinc-950 text-base leading-relaxed">
+                    Court trials in family disputes can drag on for years, depleting financial savings and causing immense psychological strain. In this article, I discuss how we successfully resolved a complex custody and alimony dispute within 90 days.
+                </p>
+                
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">The Case Background</h3>
+                <p>
+                    The clients had been married for 8 years and had a 6-year-old daughter. Over time, irreconcilable differences led them to seek separation. Initially, both parties were highly adversarial, claiming sole custody of the child and contesting maintenance figures.
+                </p>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Why Mediation Was Selected</h3>
+                <p>
+                    Rather than initiating a lengthy trial in the Mumbai Family Court, I advised our client to propose structural mediation. Mediation is a confidential process facilitated by a neutral third party that focuses on finding mutually acceptable solutions rather than assigning blame.
+                </p>
+
+                <div class="bg-[#fcfaf6] border border-zinc-200 rounded-2xl p-6 my-6">
+                    <h4 class="font-playfair text-base font-bold text-[#d4af6a] mb-2">Key Outcoms achieved:</h4>
+                    <ul class="list-disc pl-5 space-y-2 text-zinc-600 text-xs">
+                        <li><strong>Co-Parenting Plan:</strong> Agreed on joint legal custody with shared physical residency during summer and winter vacations.</li>
+                        <li><strong>Structured Maintenance:</strong> Reached an agreement on a one-time alimony lump sum, backed by a trust fund designated exclusively for the child's higher education.</li>
+                        <li><strong>Expedited Decree:</strong> Filed a petition for Mutual Consent Divorce, resulting in the decree being granted swiftly upon completion of the statutory 6-month cooling period.</li>
+                    </ul>
+                </div>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Conclusion</h3>
+                <p>
+                    Mediation shifts the focus from winning a battle to designing a stable future. For spouses seeking separation, prioritizing mediation can protect children from adversarial custody battles and preserve personal resources.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

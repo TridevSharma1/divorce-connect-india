@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluating Family Business Equity — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">Case Story • Asset Division</span>
+            <h1 class="font-playfair text-3xl md:text-5xl font-bold mt-4 mb-4 tracking-tight">Evaluating Family Business & Startup Equity During Divorce</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Contributed by Adv. Vikramaditya Rao (Delhi High Court)
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-blue-600 via-indigo-400 to-blue-600"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-6 mb-8 text-xs text-zinc-400">
+                <span>Published on January 11, 2026</span>
+                <a href="/blog/" class="text-zinc-900 hover:text-blue-500 font-semibold flex items-center gap-1">&larr; Back to Blog</a>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-700 text-sm leading-relaxed space-y-6">
+                <p class="font-medium text-zinc-950 text-base leading-relaxed">
+                    Dividing traditional assets like real estate is relatively straightforward. However, modern divorces frequently involve startup stock options, private company equity, and family business holdings. 
+                </p>
+                
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">The Challenge of Private Equity</h3>
+                <p>
+                    Unlike public shares, private startup equity has no active marketplace to establish its immediate cash value. If a spouse holds ESOPs (Employee Stock Ownership Plans) or founder shares, determining their fair value requires sophisticated forensic accounting.
+                </p>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Valuation Methodologies</h3>
+                <p>
+                    Indian courts consider multiple valuation frameworks depending on the stage of the business:
+                </p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Net Asset Value (NAV):</strong> Best suited for asset-heavy family businesses.</li>
+                    <li><strong>Discounted Cash Flow (DCF):</strong> Focuses on projected future earnings, common for established tech firms.</li>
+                    <li><strong>Recent Funding Rounds:</strong> Evaluates value based on institutional investments.</li>
+                </ul>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Structuring the Settlement</h3>
+                <p>
+                    To prevent operational disruption to the company, founder shares are rarely split in half. Instead, settlements are structured through:
+                </p>
+                <div class="bg-blue-50/40 border border-blue-100 rounded-2xl p-6 my-6">
+                    <ul class="list-disc pl-5 space-y-2 text-zinc-700 text-xs">
+                        <li><strong>Cash Out option:</strong> One spouse buys out the other's imputed equity share.</li>
+                        <li><strong>Structured Offsets:</strong> Offsetting the equity value by transferring other marital assets (such as real estate or retirement funds) to the non-owning spouse.</li>
+                        <li><strong>Deferred Payouts:</strong> Structuring payments to align with future liquidity events (e.g. an IPO or acquisition).</li>
+                    </ul>
+                </div>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Conclusion</h3>
+                <p>
+                    Handling business equity during divorce requires a collaborative effort between legal counsel and financial evaluators. Retaining expert forensic assistance early in the process ensures an equitable, stable division.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Lawyer Case Stories & Insights — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+    .story-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .story-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-20 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Shared Experiences & Expert Perspectives</span>
+            <h1 class="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 tracking-tight">Lawyer Case Stories</h1>
+            <p class="text-zinc-400 text-sm md:text-base max-w-2xl mx-auto font-light leading-relaxed">
+                Real case summaries, legal strategies, and navigation insights shared directly by verified family law professionals on DivorceConnect India.
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            <!-- Left & Center Columns: Stories Feed -->
+            <div class="lg:col-span-2 space-y-10">
+                
+                <!-- Story Card 1 -->
+                <article class="story-card bg-white border border-zinc-200/80 rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row">
+                    <div class="md:w-1/3 bg-zinc-950 flex flex-col justify-between p-8 text-white relative min-h-[220px]">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#2c251b_0%,#0a0a0a_100%)] opacity-70"></div>
+                        <div class="relative z-10">
+                            <span class="inline-flex items-center rounded-full bg-[#d4af6a]/10 px-2.5 py-1 text-xs font-semibold text-[#d4af6a] border border-[#d4af6a]/20">Mutual Consent</span>
+                        </div>
+                        <div class="relative z-10 mt-8">
+                            <p class="text-xs text-zinc-400 font-light">Contributed by</p>
+                            <h4 class="font-playfair text-base font-bold text-white mt-1">Adv. Rajeshwari Sen</h4>
+                            <p class="text-[11px] text-[#d4af6a] tracking-wider uppercase font-medium mt-0.5">Family Court, Mumbai</p>
+                        </div>
+                    </div>
+                    <div class="p-8 md:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-xs text-zinc-400 mb-3">
+                                <span>Published 2 days ago</span>
+                                <span>•</span>
+                                <span>5 min read</span>
+                            </div>
+                            <h3 class="font-playfair text-2xl font-bold text-zinc-950 mb-4 hover:text-[#d4af6a] transition-colors cursor-pointer">
+                                Navigating Amicable Settlements: The Power of Mediation over Litigation
+                            </h3>
+                            <p class="text-zinc-600 text-sm leading-relaxed font-light line-clamp-3">
+                                In this case summary, I detail how a highly contested child custody and asset division dispute was resolved in under 90 days. By stepping out of the adversarial courtroom and leveraging structural mediation sessions, both spouses reached a mutually beneficial agreement, saving substantial trial costs.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <a href="/blog_story_1/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 hover:text-[#d4af6a] transition-colors group">
+                                Read Full Story 
+                                <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Story Card 2 -->
+                <article class="story-card bg-white border border-zinc-200/80 rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row">
+                    <div class="md:w-1/3 bg-zinc-950 flex flex-col justify-between p-8 text-white relative min-h-[220px]">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#1e293b_0%,#0a0a0a_100%)] opacity-70"></div>
+                        <div class="relative z-10">
+                            <span class="inline-flex items-center rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-semibold text-blue-400 border border-blue-500/20">Complex Assets</span>
+                        </div>
+                        <div class="relative z-10 mt-8">
+                            <p class="text-xs text-zinc-400 font-light">Contributed by</p>
+                            <h4 class="font-playfair text-base font-bold text-white mt-1">Adv. Vikramaditya Rao</h4>
+                            <p class="text-[11px] text-[#d4af6a] tracking-wider uppercase font-medium mt-0.5">High Court, Delhi</p>
+                        </div>
+                    </div>
+                    <div class="p-8 md:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-xs text-zinc-400 mb-3">
+                                <span>Published 1 week ago</span>
+                                <span>•</span>
+                                <span>8 min read</span>
+                            </div>
+                            <h3 class="font-playfair text-2xl font-bold text-zinc-950 mb-4 hover:text-[#d4af6a] transition-colors cursor-pointer">
+                                Evaluating Family Business & Startup Equity During Divorce
+                            </h3>
+                            <p class="text-zinc-600 text-sm leading-relaxed font-light line-clamp-3">
+                                Modern separations increasingly involve intangible assets like startup stock options, venture shares, and family partnerships. This piece outlines the valuation methodologies accepted by Indian courts and explores strategies for structured buyouts that prevent operational disruption to active business entities.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <a href="/blog_story_2/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 hover:text-[#d4af6a] transition-colors group">
+                                Read Full Story 
+                                <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Story Card 3 -->
+                <article class="story-card bg-white border border-zinc-200/80 rounded-3xl overflow-hidden shadow-sm flex flex-col md:flex-row">
+                    <div class="md:w-1/3 bg-zinc-950 flex flex-col justify-between p-8 text-white relative min-h-[220px]">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#1c1917_0%,#0a0a0a_100%)] opacity-70"></div>
+                        <div class="relative z-10">
+                            <span class="inline-flex items-center rounded-full bg-[#d4af6a]/10 px-2.5 py-1 text-xs font-semibold text-[#d4af6a] border border-[#d4af6a]/20">Cross-Border</span>
+                        </div>
+                        <div class="relative z-10 mt-8">
+                            <p class="text-xs text-zinc-400 font-light">Contributed by</p>
+                            <h4 class="font-playfair text-base font-bold text-white mt-1">Adv. Meera Chawla</h4>
+                            <p class="text-[11px] text-[#d4af6a] tracking-wider uppercase font-medium mt-0.5">Supreme Court of India</p>
+                        </div>
+                    </div>
+                    <div class="p-8 md:w-2/3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-xs text-zinc-400 mb-3">
+                                <span>Published 2 weeks ago</span>
+                                <span>•</span>
+                                <span>6 min read</span>
+                            </div>
+                            <h3 class="font-playfair text-2xl font-bold text-zinc-950 mb-4 hover:text-[#d4af6a] transition-colors cursor-pointer">
+                                Jurisdiction Hurdles in NRI Matrimonial Disputes
+                            </h3>
+                            <p class="text-zinc-600 text-sm leading-relaxed font-light line-clamp-3">
+                                When Indian citizens reside abroad and file for separation in foreign courts, questions of local jurisdiction, child custody enforcement, and execution of foreign decrees arise. Here I analyze recent landmark judgments and detail how to establish legal protections in Indian courts.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <a href="/blog_story_3/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-900 hover:text-[#d4af6a] transition-colors group">
+                                Read Full Story 
+                                <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <aside class="lg:col-span-1 space-y-8">
+                
+                <!-- Share a Story Callout (Premium Card) -->
+                <div class="bg-zinc-950 text-white rounded-3xl p-8 border border-zinc-800 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,#3b3122_0%,#0a0a0a_100%)] opacity-80"></div>
+                    <div class="relative z-10">
+                        <span class="text-[10px] tracking-[0.2em] uppercase text-[#d4af6a] font-bold block mb-2">For Verified Lawyers</span>
+                        <h3 class="font-playfair text-2xl font-bold mb-4">Share Your Case Story</h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed font-light mb-6">
+                            Publishing anonymous case summaries helps clients understand complex legal pathways and builds trust in your expertise. Submit your case summary or legal analysis article for editorial review.
+                        </p>
+                        <button onclick="openStoryModal()" class="w-full inline-flex items-center justify-center rounded-xl bg-white text-zinc-950 px-5 py-3 text-xs font-semibold hover:bg-zinc-200 transition-colors shadow-md">
+                            Submit a Story
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Featured Authors -->
+                <div class="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm">
+                    <h3 class="font-playfair text-lg font-bold text-zinc-950 mb-6">Top Contributors</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-semibold text-zinc-700">RS</div>
+                            <div>
+                                <h5 class="text-xs font-bold text-zinc-950">Adv. Rajeshwari Sen</h5>
+                                <p class="text-[10px] text-zinc-400 font-light">12 Contributions • Mumbai</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-semibold text-zinc-700">VR</div>
+                            <div>
+                                <h5 class="text-xs font-bold text-zinc-950">Adv. Vikramaditya Rao</h5>
+                                <p class="text-[10px] text-zinc-400 font-light">9 Contributions • Delhi</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-semibold text-zinc-700">MC</div>
+                            <div>
+                                <h5 class="text-xs font-bold text-zinc-950">Adv. Meera Chawla</h5>
+                                <p class="text-[10px] text-zinc-400 font-light">7 Contributions • New Delhi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+            
+        </div>
+    </div>
+
+    <!-- Glassmorphic Premium Modal -->
+    <div id="storyModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeStoryModal()"></div>
+        <!-- Modal Card -->
+        <div class="relative w-full max-w-md transform scale-95 transition-all duration-300 bg-zinc-950/80 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 text-white shadow-2xl text-center">
+            <!-- Icon/Indicator -->
+            <div class="mx-auto w-12 h-12 rounded-full bg-[#d4af6a]/10 border border-[#d4af6a]/20 flex items-center justify-center mb-6">
+                <svg class="w-6 h-6 text-[#d4af6a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            
+            <span class="text-[10px] tracking-[0.2em] uppercase text-[#d4af6a] font-bold block mb-2">Portal Access</span>
+            <h3 class="font-playfair text-2xl font-bold mb-4">Coming Soon</h3>
+            <p class="text-zinc-400 text-xs leading-relaxed font-light mb-8">
+                The case story submission portal is opening soon! Complete your lawyer verification to contribute once the system goes live.
+            </p>
+            
+            <button onclick="closeStoryModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-[#d4af6a] to-[#f5d694] text-zinc-950 text-xs font-bold hover:brightness-110 transition-all shadow-lg shadow-[#d4af6a]/10">
+                Acknowledge
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openStoryModal() {
+        const modal = document.getElementById('storyModal');
+        const card = modal.querySelector('.relative');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+    }
+    
+    function closeStoryModal() {
+        const modal = document.getElementById('storyModal');
+        const card = modal.querySelector('.relative');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+    }
+</script>
+{% endblock %}

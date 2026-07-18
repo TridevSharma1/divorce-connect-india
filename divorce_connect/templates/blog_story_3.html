@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}NRI Matrimonial Disputes Jurisdiction — DivorceConnect India{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
+    .font-inter { font-family: 'Inter', Helvetica, Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-[#FAF9F6] min-h-screen font-inter text-zinc-900 pb-20">
+    <!-- Premium Header Banner -->
+    <header class="bg-[#0A0A0A] text-white py-16 px-6 border-b border-zinc-800 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,#1c1917_0%,#0a0a0a_80%)] opacity-80"></div>
+        <div class="max-w-5xl mx-auto relative z-10">
+            <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Case Story • Cross-Border</span>
+            <h1 class="font-playfair text-3xl md:text-5xl font-bold mt-4 mb-4 tracking-tight">Jurisdiction Hurdles in NRI Matrimonial Disputes</h1>
+            <p class="text-zinc-400 text-sm max-w-xl mx-auto font-light leading-relaxed">
+                Contributed by Adv. Meera Chawla (Supreme Court of India)
+            </p>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#d4af6a] via-[#f5d694] to-[#d4af6a]"></div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="bg-white border border-zinc-200/80 rounded-3xl p-6 sm:p-10 shadow-sm">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-6 mb-8 text-xs text-zinc-400">
+                <span>Published on January 04, 2026</span>
+                <a href="/blog/" class="text-zinc-900 hover:text-[#d4af6a] font-semibold flex items-center gap-1">&larr; Back to Blog</a>
+            </div>
+
+            <div class="prose prose-zinc max-w-none text-zinc-700 text-sm leading-relaxed space-y-6">
+                <p class="font-medium text-zinc-950 text-base leading-relaxed">
+                    Matrimonial disputes involving Non-Resident Indians (NRIs) introduce complex jurisdictional conflicts. When a marriage is solemnized in India but the spouses reside abroad, determining which country holds legal jurisdiction to grant a divorce is a critical question.
+                </p>
+                
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Conflict of Laws</h3>
+                <p>
+                    Frequently, one spouse files for divorce in their foreign country of residence (e.g. USA, UK, or Canada) under local laws, while the other spouse prefers to pursue legal proceedings in India under the Hindu Marriage Act, 1955, or the Special Marriage Act, 1954.
+                </p>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Enforceability of Foreign Decrees in India</h3>
+                <p>
+                    Under Section 13 of the Indian Code of Civil Procedure (CPC), a foreign judgment is not conclusive if:
+                </p>
+                <ul class="list-disc pl-5 space-y-2 text-zinc-600 text-xs">
+                    <li>It was not pronounced by a court of competent jurisdiction.</li>
+                    <li>It was not given on the merits of the case.</li>
+                    <li>It appears to be founded on an incorrect view of international law or refusal to recognize Indian law.</li>
+                    <li>The proceedings were opposed to natural justice or obtained by fraud.</li>
+                </ul>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Landmark Judicial Guidelines</h3>
+                <p>
+                    The Supreme Court of India has established that foreign matrimonial decrees (especially ex-parte decrees where one spouse was not present or did not consent) are generally not recognized in India if they violate personal laws under which the marriage was solemnized.
+                </p>
+
+                <div class="bg-amber-50/40 border border-amber-100 rounded-2xl p-6 my-6 text-zinc-700 text-xs leading-relaxed">
+                    <span class="font-bold text-amber-900 block mb-1">⚖️ Key Strategic Action:</span>
+                    In cross-border disputes, it is vital to immediately file a query regarding the foreign court's jurisdiction and seek protective anti-suit injunctions from Indian courts if foreign proceedings are initiated in bad faith or violate Indian statutory frameworks.
+                </div>
+
+                <h3 class="font-playfair text-xl font-bold text-black mt-8">Conclusion</h3>
+                <p>
+                    NRI divorce matters require a dual-legal strategy coordinating between foreign counsel and Indian Supreme Court specialists to protect child residency rights, maintenance, and asset divisions.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
