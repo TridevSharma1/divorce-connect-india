@@ -1,0 +1,2 @@
+[tool.vercel]
+src = "divorce_connect/fastapi_app/main.py"
