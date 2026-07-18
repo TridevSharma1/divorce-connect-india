@@ -172,10 +172,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount Static and Media files
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 if MEDIA_DIR.exists():
     app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon_endpoint():
+    from fastapi.responses import FileResponse
+    favicon_path = STATIC_DIR / "favicons" / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(str(favicon_path))
+    return status.HTTP_404_NOT_FOUND
 
 # Include API Routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
