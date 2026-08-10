@@ -13,13 +13,22 @@
         .error-input { border-color: #dc2626 !important; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-900">
+<body class="min-h-screen bg-slate-950 text-slate-900 relative">
+    <!-- Back to Home Floating Button (Mobile & Desktop Optimized) -->
+    <a href="/" class="fixed top-3 left-3 sm:top-5 sm:left-5 z-[999] inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-white/95 hover:bg-white text-slate-800 font-semibold text-xs sm:text-sm border border-slate-200/90 shadow-lg sm:shadow-xl backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 active:scale-95 group">
+        <svg class="w-4 h-4 text-slate-700 group-hover:text-slate-950 transition-colors transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span class="inline sm:hidden">Home</span>
+        <span class="hidden sm:inline">Back to Home</span>
+    </a>
+
     <div class="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.25),_transparent_32%),linear-gradient(135deg,_#f8fafc_0%,_#eef2ff_100%)] px-4 py-8">
         <div class="w-full max-w-6xl overflow-hidden rounded-[32px] shadow-2xl bg-white lg:grid lg:grid-cols-[1.05fr_0.95fr]">
             <div class="hidden lg:flex flex-col justify-between bg-slate-950 px-10 py-10 text-white">
                 <div>
-                    <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect" class="h-10 w-auto">
+                    <a href="/" class="inline-flex items-center gap-3 rounded-full bg-white/10 px-3.5 py-2 backdrop-blur hover:bg-white/20 transition">
+                        <img src="{% static 'Assets/LOGO_ICON.png' %}" alt="DivorceConnect" class="h-8 w-auto">
                         <span class="text-sm font-semibold tracking-[0.2em] uppercase">DivorceConnect</span>
                     </a>
                     <h1 class="mt-8 text-4xl font-semibold leading-tight">Find trusted legal support with confidence.</h1>

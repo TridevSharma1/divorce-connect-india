@@ -314,7 +314,7 @@
                 <!-- Logo -->
                 <div class="flex items-center gap-2">
                     <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-12 w-auto">
+                        <img src="{% static 'Assets/LOGO_ICON.png' %}" alt="DivorceConnect India" class="h-12 w-auto object-contain">
                     </a>
                 </div>
 
@@ -333,10 +333,16 @@
                         {% include 'includes/navbar_admin.html' %}
                     </div>
                     
-                    <div id="nav-guest" style="display: none;" class="flex items-center gap-8">
-                        <a href="/" class="text-link">Home</a>
-                        <a href="/login/" class="text-link">Login</a>
-                        <a href="/register/" class="btn-primary">Get Started</a>
+                    <div id="nav-guest" style="display: none;" class="flex items-center gap-6 lg:gap-8">
+                        <a href="/" class="text-link" data-guest-link="/">Home</a>
+                        <a href="/support/" class="text-link" data-guest-link="/support/">Support</a>
+                        <a href="/contact/" class="text-link" data-guest-link="/contact/">Contact Us</a>
+
+                        <!-- Visual Vertical Divider Line -->
+                        <div class="h-5 w-px bg-zinc-300 my-auto" aria-hidden="true"></div>
+
+                        <a href="/login/" class="text-link" data-guest-link="/login/">Login</a>
+                        <a href="/register/" class="btn-primary" data-guest-link="/register/">Get Started</a>
                     </div>
                     {% endblock %}
                 </div>
@@ -393,9 +399,12 @@
                         <button class="mobile-close" onclick="toggleMobileMenu()" aria-label="Close menu">×</button>
                     </div>
                     <nav>
-                        <a href="/" class="nav-link">Home</a>
-                        <a href="/login/" class="nav-link">Login</a>
-                        <a href="/register/" class="nav-link">Get Started</a>
+                        <a href="/" class="nav-link" data-guest-link="/">Home</a>
+                        <a href="/support/" class="nav-link" data-guest-link="/support/">Support</a>
+                        <a href="/contact/" class="nav-link" data-guest-link="/contact/">Contact Us</a>
+                        <div class="divider"></div>
+                        <a href="/login/" class="nav-link" data-guest-link="/login/">Login</a>
+                        <a href="/register/" class="btn-primary text-center my-2" data-guest-link="/register/">Get Started</a>
                     </nav>
                 </div>
             </div>
@@ -416,8 +425,8 @@
                 <!-- Column 1: Brand Info -->
                 <div class="space-y-6">
                     <!-- Logo placeholder -->
-                    <div class="flex items-center gap-2">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India Logo" class="h-8 w-auto">
+                    <div class="flex items-center gap-3">
+                        <img src="{% static 'Assets/LOGO_ICON.png' %}" alt="DivorceConnect India Logo" class="h-10 w-10 object-contain rounded-md bg-white p-0.5 shadow-sm">
                         <span class="text-xl font-bold tracking-tight text-white font-sans">DivorceConnectindia<span class="text-zinc-500">.com</span></span>
                     </div>
                     
@@ -651,6 +660,7 @@
                 document.querySelectorAll('.mobile-menu').forEach((item) => item.classList.remove('active'));
             }
         });
+
     </script>
 
     <!-- Premium Toast Notifications -->

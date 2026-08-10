@@ -1,103 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DivorceConnect India - Legal Professionals Marketplace</title>
+{% block title %}DivorceConnect India - Legal Professionals Marketplace{% endblock %}
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+{% block extra_css %}
     <style>
-        :root {
-            --deep-black: #0a0a0a;
-            --pure-white: #ffffff;
-            --subtle-gray: #f4f4f5;
-            --slate-gray: #e4e4e7;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--deep-black);
-            background-color: var(--pure-white);
-        }
-
-        h1, h2, h3, .serif-heading {
-            font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .header-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background-color: var(--pure-white);
-            border-bottom: 2px solid #f0f0f0;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-primary {
-            background-color: var(--deep-black);
-            color: var(--pure-white);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            padding: 0.875rem 2rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-primary:hover {
-            background-color: #1a1a1a;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            border: 2px solid var(--deep-black);
-            color: var(--deep-black);
-            background-color: transparent;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            display: inline-block;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--deep-black);
-            color: var(--pure-white);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .text-link {
-            color: var(--deep-black);
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s ease;
-        }
-
-        .text-link:hover {
-            opacity: 0.7;
-        }
-
         .feature-card {
             background-color: var(--subtle-gray);
             border: 1px solid var(--slate-gray);
@@ -133,27 +40,9 @@
             flex-grow: 1;
         }
     </style>
-</head>
-<body>
+{% endblock %}
 
-    <!-- Header -->
-    <header class="header-sticky">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center gap-2">
-                <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-20 w-auto">
-                </a>
-            </div>
-
-            <!-- Navigation -->
-            <div class="flex items-center gap-6">
-                <a href="/login/" class="text-link">Login</a>
-                <a href="/register/" class="btn-primary">Get Started</a>
-            </div>
-        </div>
-    </header>
-
+{% block content %}
     <!-- Premium Brand Section -->
     <section class="bg-gradient-to-b from-white via-gray-50 to-white py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -357,120 +246,4 @@
             </div>
         </div>
     </section>
-
-    <!-- Footer -->
-    <!-- Footer -->
-    <footer class="bg-zinc-950 text-zinc-300 font-sans mt-auto">
-        <!-- Main Footer Grid -->
-        <div class="max-w-7xl mx-auto px-6 py-16 md:px-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                
-                <!-- Column 1: Brand Info -->
-                <div class="space-y-6">
-                    <!-- Logo placeholder -->
-                    <div class="flex items-center gap-2">
-                        <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India Logo" class="h-8 w-auto">
-                        <span class="text-xl font-bold tracking-tight text-white font-sans">DivorceConnectindia<span class="text-zinc-500">.com</span></span>
-                    </div>
-                    
-                    <p class="text-sm text-zinc-400 leading-relaxed font-normal">
-                        DivorceConnect India is the nation’s premier trusted platform connecting legal professionals with individuals seeking guidance. We streamline navigation through complex legal waters with high-empathy technology, modern case tracking, and verified counseling solutions.
-                    </p>
-                    
-                    <!-- Social Media Icons (LinkedIn, X, Instagram) -->
-                    <div class="flex items-center gap-4 pt-2">
-                        <!-- LinkedIn -->
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white transition-colors duration-150" aria-label="LinkedIn">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                            </svg>
-                        </a>
-                        <!-- X (formerly Twitter) -->
-                        <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white transition-colors duration-150" aria-label="X">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                        </a>
-                        <!-- Instagram -->
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-white transition-colors duration-150" aria-label="Instagram">
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Column 2: Portals & Features -->
-                <div>
-                    <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Quick Links</h5>
-                    <ul class="space-y-3.5 text-sm">
-                        <li>
-                            <a href="/lawyers_section/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Find a Lawyer</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="/login/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Track My Case</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/register/" class="text-zinc-400 hover:text-white transition-colors duration-150 flex items-center gap-1.5 group">
-                                <span>Become an Expert</span>
-                                <span class="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 text-xs">&rarr;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Column 3: Support & Operations -->
-                <div>
-                    <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Support</h5>
-                    <ul class="space-y-3.5 text-sm">
-                        <li><a href="/contact/" class="text-zinc-400 hover:text-white transition-colors duration-150">Contact Us</a></li>
-                        <li><a href="/contact/" class="text-zinc-400 hover:text-white transition-colors duration-150">Request a Callback</a></li>
-                        <li><a href="/report-issue/" class="text-zinc-400 hover:text-white transition-colors duration-150">Report an Issue</a></li>
-                        <li><a href="/support/" class="text-zinc-400 hover:text-white transition-colors duration-150">FAQ</a></li>
-                        <li><a href="/blog/" class="text-zinc-400 hover:text-white transition-colors duration-150">Blog</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Column 4: Trust & Compliance -->
-                <div>
-                    <h5 class="text-sm font-semibold tracking-wider uppercase text-white mb-6">Legal</h5>
-                    <ul class="space-y-3.5 text-sm">
-                        <li><a href="/privacy-policy/" class="text-zinc-400 hover:text-white transition-colors duration-150">Privacy Policy</a></li>
-                        <li><a href="/terms-of-service/" class="text-zinc-400 hover:text-white transition-colors duration-150">Terms of Service</a></li>
-                        <li><a href="/refund-policy/" class="text-zinc-400 hover:text-white transition-colors duration-150">Refund Policy</a></li>
-                    </ul>
-                </div>
-                
-            </div>
-            
-            <!-- Mandatory BCI Disclaimer (Indian Legal Compliance) -->
-            <div class="border-t border-zinc-800 pt-8 mt-8">
-                <div class="bg-zinc-900/40 border border-zinc-800/60 rounded-lg p-5">
-                    <p class="text-[11px] md:text-xs text-zinc-500 leading-relaxed font-light">
-                        <span class="text-zinc-400 font-medium">Disclaimer:</span> DivorceConnect India is an independent legal technology platform and not a law firm. In compliance with the rules of the Bar Council of India, this platform is meant solely for informational and operational assistance purposes and does not constitute legal advice, solicitation, or advertising. Use of this platform or transmission of documents does not create an attorney-client relationship.
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Accessibility & Copyright Row -->
-            <div class="border-t border-zinc-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-                <div>
-                    <p>&copy; 2026 DivorceConnect India. All rights reserved.</p>
-                </div>
-                <div class="flex items-center gap-2 text-zinc-400">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>National Crisis Helpline: <a href="tel:112" class="underline text-white font-medium hover:text-zinc-200">112</a> / Mental Health Helpline: <a href="tel:18005990019" class="underline text-white font-medium hover:text-zinc-200">1800-599-0019</a></span>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+{% endblock %}
