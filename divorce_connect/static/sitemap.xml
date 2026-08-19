@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    <!-- Home / Landing Page -->
+    <url>
+        <loc>https://divorceconnectindia.com/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- Verified Lawyers Directory -->
+    <url>
+        <loc>https://divorceconnectindia.com/lawyers_section/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Counseling & Pre-Divorce Advisory -->
+    <url>
+        <loc>https://divorceconnectindia.com/counseling/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.85</priority>
+    </url>
+
+    <!-- About Platform & Verification -->
+    <url>
+        <loc>https://divorceconnectindia.com/about/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Contact & Callback -->
+    <url>
+        <loc>https://divorceconnectindia.com/contact/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Support & FAQs -->
+    <url>
+        <loc>https://divorceconnectindia.com/support/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Knowledge Base & Blog Directory -->
+    <url>
+        <loc>https://divorceconnectindia.com/blog/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.85</priority>
+    </url>
+
+    <!-- Blog Story 1: Mutual Consent Mediation -->
+    <url>
+        <loc>https://divorceconnectindia.com/blog_story_1/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.75</priority>
+    </url>
+
+    <!-- Blog Story 2: Startup Equity & Asset Division -->
+    <url>
+        <loc>https://divorceconnectindia.com/blog_story_2/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.75</priority>
+    </url>
+
+    <!-- Blog Story 3: Cross-Border Jurisdiction & NRI Divorce -->
+    <url>
+        <loc>https://divorceconnectindia.com/blog_story_3/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.75</priority>
+    </url>
+
+    <!-- Platform Legal Hub -->
+    <url>
+        <loc>https://divorceconnectindia.com/legal/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Privacy Policy -->
+    <url>
+        <loc>https://divorceconnectindia.com/privacy-policy/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Terms of Service -->
+    <url>
+        <loc>https://divorceconnectindia.com/terms-of-service/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Refund Policy -->
+    <url>
+        <loc>https://divorceconnectindia.com/refund-policy/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Report an Issue -->
+    <url>
+        <loc>https://divorceconnectindia.com/report-issue/</loc>
+        <lastmod>2026-08-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+</urlset>

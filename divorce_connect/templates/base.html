@@ -1,10 +1,47 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}DivorceConnect India{% endblock %}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>{% block title %}DivorceConnect India — Verified Divorce Lawyers & Family Legal Advisory Platform{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}India's premier confidential legal tech platform connecting individuals with verified divorce lawyers, mutual consent divorce advocates, child custody, and alimony legal experts across India.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}divorce lawyer india, mutual consent divorce lawyer, child custody lawyer india, alimony calculator india, divorce advocates delhi mumbai bangalore, family court lawyers india, section 13b hindu marriage act, contested divorce india, nri divorce lawyer india, divorce connect india{% endblock %}">
+    <meta name="robots" content="{% block meta_robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}">
+    <meta name="author" content="DivorceConnect India">
+    <meta name="publisher" content="DivorceConnect India">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN">
+    <meta name="geo.placename" content="India">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical %}https://divorceconnectindia.com/{% endblock %}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}https://divorceconnectindia.com/{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}DivorceConnect India — Verified Divorce Lawyers & Family Legal Advisory Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}India's premier confidential legal tech platform connecting individuals with verified divorce lawyers, mutual consent divorce advocates, child custody, and alimony legal experts across India.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://divorceconnectindia.com/static/favicons/android-chrome-512x512.png{% endblock %}">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="DivorceConnect India — Premier Legal Marketplace">
+    <meta property="og:site_name" content="DivorceConnect India">
+    <meta property="og:locale" content="en_IN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:url" content="{% block twitter_url %}https://divorceconnectindia.com/{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}DivorceConnect India — Verified Divorce Lawyers & Family Legal Advisory Platform{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}India's premier confidential legal tech platform connecting individuals with verified divorce lawyers, mutual consent divorce advocates, child custody, and alimony legal experts across India.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}https://divorceconnectindia.com/static/favicons/android-chrome-512x512.png{% endblock %}">
+    <meta name="twitter:site" content="@DivorceConnect">
+    <meta name="twitter:creator" content="@DivorceConnect">
 
     <!-- Favicon configurations for all devices -->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png">
@@ -13,13 +50,79 @@
     <link rel="manifest" href="/static/favicons/site.webmanifest">
     <link rel="shortcut icon" href="/static/favicons/favicon.ico">
 
+    <!-- Performance & Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Global JSON-LD Schema Markup -->
+    {% block schema_jsonld %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "LegalService",
+          "@id": "https://divorceconnectindia.com/#legalservice",
+          "name": "DivorceConnect India",
+          "url": "https://divorceconnectindia.com/",
+          "logo": "https://divorceconnectindia.com/static/Assets/LOGO.png",
+          "image": "https://divorceconnectindia.com/static/favicons/android-chrome-512x512.png",
+          "description": "India's premier confidential legal technology platform connecting clients with verified divorce lawyers, mutual consent divorce advocates, child custody, and alimony legal experts.",
+          "priceRange": "₹₹",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "IN"
+          },
+          "areaServed": [
+            {"@type": "Country", "name": "India"},
+            {"@type": "City", "name": "Delhi"},
+            {"@type": "City", "name": "Mumbai"},
+            {"@type": "City", "name": "Bengaluru"},
+            {"@type": "City", "name": "Chennai"},
+            {"@type": "City", "name": "Hyderabad"},
+            {"@type": "City", "name": "Kolkata"},
+            {"@type": "City", "name": "Pune"},
+            {"@type": "City", "name": "Ahmedabad"},
+            {"@type": "City", "name": "Gurugram"},
+            {"@type": "City", "name": "Noida"},
+            {"@type": "City", "name": "Chandigarh"}
+          ],
+          "knowsAbout": [
+            "Mutual Consent Divorce under Section 13B Hindu Marriage Act",
+            "Contested Divorce Proceedings in Indian Family Courts",
+            "Special Marriage Act Divorce",
+            "Child Custody and Guardianship Laws in India",
+            "Alimony, Maintenance & Financial Settlement Calculation",
+            "Pre-Divorce Marital Counseling & Mediation",
+            "NRI Divorce & Cross-Border Legal Advisory"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://divorceconnectindia.com/#website",
+          "name": "DivorceConnect India",
+          "url": "https://divorceconnectindia.com/",
+          "description": "Verified Divorce Lawyers & Family Legal Advisory Platform in India",
+          "publisher": {
+            "@id": "https://divorceconnectindia.com/#legalservice"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://divorceconnectindia.com/lawyers_section/?city={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+    {% endblock %}
 
     <style>
         :root {

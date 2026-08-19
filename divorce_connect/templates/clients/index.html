@@ -1,29 +1,131 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}DivorceConnect India - Legal Professionals Marketplace{% endblock %}
+{% block title %}Divorce Lawyers in India | Verified Mutual Consent & Family Advocates | DivorceConnect India{% endblock %}
+
+{% block meta_description %}Connect with India's top verified divorce lawyers for mutual consent divorce (Section 13B), child custody, alimony & contested matters across Delhi, Mumbai, Bangalore, Hyderabad, Chennai, Kolkata, Pune & nationwide.{% endblock %}
+
+{% block meta_keywords %}divorce lawyer india, mutual consent divorce lawyer, family court advocates delhi mumbai bangalore, section 13b hindu marriage act, child custody lawyer india, alimony maintenance settlement, contested divorce lawyer, nri divorce advisory india{% endblock %}
+
+{% block canonical %}https://divorceconnectindia.com/{% endblock %}
+
+{% block og_title %}Divorce Lawyers in India | Verified Mutual Consent & Family Advocates | DivorceConnect India{% endblock %}
+{% block og_description %}Connect with India's top verified divorce lawyers for mutual consent divorce (Section 13B), child custody, alimony & contested matters across Delhi, Mumbai, Bangalore, Pune & nationwide.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/{% endblock %}
+
+{% block twitter_title %}Divorce Lawyers in India | Verified Mutual Consent & Family Advocates | DivorceConnect India{% endblock %}
+{% block twitter_description %}Connect with India's top verified divorce lawyers for mutual consent divorce (Section 13B), child custody, alimony & contested matters across Delhi, Mumbai, Bangalore, Pune & nationwide.{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LegalService",
+      "@id": "https://divorceconnectindia.com/#legalservice",
+      "name": "DivorceConnect India",
+      "url": "https://divorceconnectindia.com/",
+      "logo": "https://divorceconnectindia.com/static/Assets/LOGO.png",
+      "image": "https://divorceconnectindia.com/static/favicons/android-chrome-512x512.png",
+      "description": "India's premier confidential legal technology platform connecting clients with verified divorce lawyers, mutual consent divorce advocates, child custody, and alimony legal experts.",
+      "priceRange": "₹₹",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN"
+      },
+      "areaServed": [
+        {"@type": "Country", "name": "India"},
+        {"@type": "City", "name": "Delhi"},
+        {"@type": "City", "name": "Mumbai"},
+        {"@type": "City", "name": "Bengaluru"},
+        {"@type": "City", "name": "Chennai"},
+        {"@type": "City", "name": "Hyderabad"},
+        {"@type": "City", "name": "Kolkata"},
+        {"@type": "City", "name": "Pune"},
+        {"@type": "City", "name": "Ahmedabad"},
+        {"@type": "City", "name": "Gurugram"},
+        {"@type": "City", "name": "Noida"},
+        {"@type": "City", "name": "Chandigarh"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://divorceconnectindia.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does mutual consent divorce work in India under Section 13B?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under Section 13B of the Hindu Marriage Act (and Section 28 of the Special Marriage Act), both spouses mutually agree to dissolve the marriage. The process involves filing a First Motion petition, followed by a statutory cooling-off period of 6 months (which can be waived by the court based on Supreme Court directives), and subsequently filing the Second Motion for the final decree of divorce."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is alimony and child maintenance calculated by Indian courts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Indian family courts calculate alimony and maintenance considering the standard of living of both spouses, the husband's and wife's net income, financial liabilities, dependent family members, and the welfare of minor children under Section 25 of the Hindu Marriage Act and Section 125 CrPC / BNSS."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can NRIs file for divorce in India without physical presence in court?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Non-Resident Indians (NRIs) can file for divorce in India through a Special Power of Attorney (SPA) registered with the Indian Embassy/Consulate and representation by a verified family law advocate. Indian Family Courts also facilitate video conferencing hearings for NRIs in mutual consent matters."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How are lawyers verified on DivorceConnect India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every legal practitioner on DivorceConnect India undergoes mandatory Bar Registration verification against State Bar Council registries, credential audits, and track record evaluations before receiving verified status on our platform."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
     <style>
         .feature-card {
-            background-color: var(--subtle-gray);
-            border: 1px solid var(--slate-gray);
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
             border-radius: 0.75rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 2.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2.25rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
         }
 
         .feature-card:hover {
-            border-color: var(--deep-black);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-            transform: translateY(-4px);
-            background-color: #fafafa;
+            border-color: #0a0a0a;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .practice-card {
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .practice-card:hover {
+            border-color: #0a0a0a;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.07);
+            transform: translateY(-2px);
         }
 
         .timeline-dot {
-            width: 2rem;
-            height: 2rem;
+            width: 2.5rem;
+            height: 2.5rem;
             background-color: var(--deep-black);
             border-radius: 50%;
             display: flex;
@@ -31,154 +133,259 @@
             justify-content: center;
             color: var(--pure-white);
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 1rem;
         }
 
-        .timeline-line {
-            height: 2px;
-            background-color: var(--slate-gray);
-            flex-grow: 1;
+        .faq-accordion summary::-webkit-details-marker {
+            display: none;
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Premium Brand Section -->
-    <section class="bg-gradient-to-b from-white via-gray-50 to-white py-16">
+    <!-- Premium Brand Showcase -->
+    <section class="bg-gradient-to-b from-white via-gray-50 to-white py-12 border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col items-center justify-center">
-                <!-- Logo Showcase -->
-                <div class="mb-8 transform hover:scale-105 transition-transform duration-300">
-                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India" class="h-56 w-auto drop-shadow-lg">
+                <!-- Brand Logo -->
+                <div class="mb-4 transform hover:scale-105 transition-transform duration-300">
+                    <img src="{% static 'Assets/LOGO.png' %}" alt="DivorceConnect India - Premier Legal Professionals Marketplace" width="400" height="150" class="h-44 sm:h-52 w-auto drop-shadow-md">
                 </div>
-                <p class="text-center text-gray-600 text-lg font-medium tracking-wide">
-                    India's Premier Legal Professionals Marketplace
+                <p class="text-center text-gray-700 text-sm sm:text-base font-semibold tracking-wider uppercase">
+                    India's Premier Verified Family Law & Divorce Advisory Marketplace
                 </p>
             </div>
         </div>
     </section>
 
     <!-- Hero Section -->
-    <section class="bg-white py-24 lg:py-32">
+    <section class="bg-white py-20 lg:py-28" aria-label="Hero Section">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-4xl mx-auto">
-                <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold serif-heading mb-6 leading-tight" style="color: #0a0a0a; font-weight: 800;">
-                    Navigate Legal Separation with Dignity and Clarity.
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-6 border border-zinc-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    100% Confidential • Bar Council Verified Advocates • Pan-India Coverage
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold serif-heading mb-6 leading-tight text-[#0a0a0a]">
+                    Navigate Legal Separation with Dignity, Discretion & Clarity.
                 </h1>
-                <p class="text-lg lg:text-xl text-gray-600 mb-12 leading-relaxed font-light">
-                    A secure, confidential platform connecting you with India's top verified legal professionals.
+                <p class="text-lg lg:text-xl text-gray-600 mb-10 leading-relaxed font-light max-w-3xl mx-auto">
+                    A secure, confidential legal technology platform connecting you with India's top verified family lawyers for <strong>mutual consent divorce</strong>, <strong>child custody</strong>, <strong>alimony settlements</strong>, and <strong>dispute mediation</strong>.
                 </p>
 
                 <!-- Hero CTAs -->
-                <div class="flex flex-col sm:flex-row gap-8 justify-center items-center">
-                    <a href="/register/" class="btn-primary text-lg px-10 py-4 font-semibold">
-                        Find a Lawyer
+                <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+                    <a href="/lawyers_section/" class="btn-primary text-base sm:text-lg px-8 py-4 font-semibold shadow-md">
+                        Find a Verified Divorce Lawyer
                     </a>
-                    <a href="/register/" class="btn-secondary text-lg px-10 py-4 font-semibold">
-                        Join as a Legal Expert
+                    <a href="/counseling/" class="btn-secondary text-base sm:text-lg px-8 py-4 font-semibold">
+                        Explore Pre-Divorce Counseling
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Trust Banner -->
-    <section class="bg-white border-t border-b border-gray-100 py-16">
+    <!-- Trust & Credibility Banner -->
+    <section class="bg-zinc-50 border-t border-b border-zinc-200 py-12" aria-label="Trust and Credibility">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <p class="text-sm font-semibold text-gray-700 uppercase tracking-widest">
-                    ✓ Trusted by Verified Legal Professionals Across India
+            <div class="text-center mb-8">
+                <p class="text-xs sm:text-sm font-bold text-zinc-700 uppercase tracking-widest">
+                    ✓ Verified Legal Standards & Strict Compliance
                 </p>
             </div>
 
-            <!-- Placeholder Logos -->
-            <div class="flex justify-center items-center gap-12 flex-wrap">
-                <!-- Shield Icon 1 -->
-                <div class="flex flex-col items-center gap-2">
-                    <svg class="w-12 h-12" style="color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m7.54-2.642a9 9 0 11-11.853 0m2.715-6.363l-2.882 5.982m8.002-5.989l2.868 5.987"></path>
-                    </svg>
-                    <span class="text-xs text-gray-600 font-medium">Verified Legal</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
+                    <p class="text-2xl sm:text-3xl font-bold text-zinc-950 serif-heading">100%</p>
+                    <p class="text-xs text-zinc-600 font-medium mt-1">Bar Council Verified</p>
                 </div>
-
-                <!-- Shield Icon 2 -->
-                <div class="flex flex-col items-center gap-2">
-                    <svg class="w-12 h-12" style="color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                    <span class="text-xs text-gray-600 font-medium">Secure & Safe</span>
+                <div class="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
+                    <p class="text-2xl sm:text-3xl font-bold text-zinc-950 serif-heading">End-to-End</p>
+                    <p class="text-xs text-zinc-600 font-medium mt-1">Encrypted & Confidential</p>
                 </div>
-
-                <!-- Shield Icon 3 -->
-                <div class="flex flex-col items-center gap-2">
-                    <svg class="w-12 h-12" style="color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="text-xs text-gray-600 font-medium">Trusted Choice</span>
+                <div class="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
+                    <p class="text-2xl sm:text-3xl font-bold text-zinc-950 serif-heading">28+ States</p>
+                    <p class="text-xs text-zinc-600 font-medium mt-1">Pan-India Court Network</p>
                 </div>
-
-                <!-- Shield Icon 4 -->
-                <div class="flex flex-col items-center gap-2">
-                    <svg class="w-12 h-12" style="color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                    <span class="text-xs text-gray-600 font-medium">Lightning Fast</span>
+                <div class="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
+                    <p class="text-2xl sm:text-3xl font-bold text-zinc-950 serif-heading">Zero</p>
+                    <p class="text-xs text-zinc-600 font-medium mt-1">Hidden Consultation Costs</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-24 bg-white">
+    <!-- Comprehensive Practice Areas / Services Section -->
+    <section class="py-24 bg-white" aria-labelledby="practice-areas-title">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold serif-heading mb-4">
-                    Why Choose DivorceConnect?
+            <div class="text-center mb-16 max-w-3xl mx-auto">
+                <span class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Specialized Legal Practice Areas</span>
+                <h2 id="practice-areas-title" class="text-3xl sm:text-4xl md:text-5xl font-bold serif-heading mt-2 mb-4 text-[#0a0a0a]">
+                    Expert Legal Solutions Tailored for Indian Family Law
                 </h2>
-                <p class="text-gray-600 text-lg font-light">
-                    Designed with you in mind. Transparent. Secure. Professional.
+                <p class="text-gray-600 text-base sm:text-lg font-light leading-relaxed">
+                    From streamlined mutual consent decrees to high-conflict child custody and financial settlements, our verified advocates provide comprehensive representation.
                 </p>
             </div>
 
-            <!-- Features Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Practice Areas Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Practice 1: Mutual Consent -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">Mutual Consent Divorce (Sec 13B)</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Drafting First & Second Motion petitions under Section 13B Hindu Marriage Act and Section 28 Special Marriage Act. Assistance with cooling-off period waiver applications before Family Courts.
+                        </p>
+                    </div>
+                    <a href="/lawyers_section/?specialization=MUTUAL_CONSENT" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>Find Mutual Consent Lawyers</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
 
-                <!-- Feature 1: Verified Experts -->
+                <!-- Practice 2: Child Custody -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">Child Custody & Visitation Rights</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Securing physical, legal, and shared custody arrangements under the Guardians and Wards Act, 1890, prioritizing the welfare and psychological well-being of the minor child.
+                        </p>
+                    </div>
+                    <a href="/lawyers_section/?specialization=CHILD_CUSTODY" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>Find Custody Advocates</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
+
+                <!-- Practice 3: Alimony & Maintenance -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">Alimony & Maintenance Settlements</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Expert guidance on interim maintenance (Sec 24 HMA / Sec 125 CrPC / BNSS), permanent alimony (Sec 25 HMA), streedhan recovery, and complex asset division.
+                        </p>
+                    </div>
+                    <a href="/lawyers_section/?specialization=ALIMONY" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>Explore Alimony Counsel</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
+
+                <!-- Practice 4: Contested Divorce -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">Contested Divorce Litigation</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Aggressive and ethical trial advocacy for grounds including cruelty (Sec 13(1)(ia)), desertion, adultery, domestic violence (DV Act), and 498A legal defenses.
+                        </p>
+                    </div>
+                    <a href="/lawyers_section/?specialization=CONTESTED_DIVORCE" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>Connect with Trial Lawyers</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
+
+                <!-- Practice 5: NRI Divorce Advisory -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">NRI Divorce & Cross-Border Law</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Specialized advisory for NRIs residing in USA, UK, Canada, UAE, and Australia. Power of Attorney filings, foreign divorce decree execution (Sec 13 CPC), and child relocation matters.
+                        </p>
+                    </div>
+                    <a href="/blog_story_3/" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>Read NRI Legal Guide</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
+
+                <!-- Practice 6: Pre-Divorce Counseling -->
+                <article class="practice-card flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center mb-5 text-zinc-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold serif-heading mb-2 text-zinc-950">Marital Counseling & Mediation</h3>
+                        <p class="text-zinc-600 text-sm leading-relaxed mb-4">
+                            Private, neutral psychological and financial counseling designed to assist couples in exploring reconciliation or achieving amicable, low-stress settlement terms.
+                        </p>
+                    </div>
+                    <a href="/counseling/" class="text-xs font-semibold text-zinc-900 hover:text-zinc-600 inline-flex items-center gap-1 group">
+                        <span>View Counseling Services</span>
+                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose DivorceConnect Section -->
+    <section class="py-24 bg-zinc-50 border-t border-zinc-200" aria-labelledby="why-us-title">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 max-w-3xl mx-auto">
+                <span class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">The DivorceConnect Standard</span>
+                <h2 id="why-us-title" class="text-3xl sm:text-4xl md:text-5xl font-bold serif-heading mt-2 mb-4 text-[#0a0a0a]">
+                    Why Clients Across India Trust DivorceConnect
+                </h2>
+                <p class="text-gray-600 text-base sm:text-lg font-light leading-relaxed">
+                    Designed from the ground up for privacy, transparency, and top-tier legal guidance.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
                 <div class="feature-card">
-                    <div class="mb-6">
-                        <svg class="w-12 h-12" style="color: #0a0a0a;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m7 4a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="w-12 h-12 rounded-xl bg-zinc-950 text-white flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold serif-heading mb-3">100% Verified Experts</h3>
-                    <p class="text-gray-600 leading-relaxed">
-                        Every legal professional on our platform is thoroughly vetted and verified to ensure quality and credibility.
+                    <h3 class="text-xl font-bold serif-heading mb-3 text-zinc-950">100% Bar Council Vetted</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Every advocate on our platform is individually verified against official State Bar Council directories to confirm credentials, practice tenure, and ethical compliance.
                     </p>
                 </div>
 
-                <!-- Feature 2: Secure Messaging -->
+                <!-- Feature 2 -->
                 <div class="feature-card">
-                    <div class="mb-6">
-                        <svg class="w-12 h-12" style="color: #0a0a0a;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <div class="w-12 h-12 rounded-xl bg-zinc-950 text-white flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold serif-heading mb-3">Secure & Confidential Messaging</h3>
-                    <p class="text-gray-600 leading-relaxed">
-                        End-to-end encrypted communication ensures your most sensitive details remain completely private and secure.
+                    <h3 class="text-xl font-bold serif-heading mb-3 text-zinc-950">Confidential Case Tracking</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Secure digital repository for case documentation, hearing schedules, and milestones with zero public exposure and complete client anonymity.
                     </p>
                 </div>
 
-                <!-- Feature 3: Transparent Fees -->
+                <!-- Feature 3 -->
                 <div class="feature-card">
-                    <div class="mb-6">
-                        <svg class="w-12 h-12" style="color: #0a0a0a;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="w-12 h-12 rounded-xl bg-zinc-950 text-white flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold serif-heading mb-3">Transparent Consultation Fees</h3>
-                    <p class="text-gray-600 leading-relaxed">
-                        No hidden charges. Clear, upfront pricing lets you make informed decisions about your legal matters.
+                    <h3 class="text-xl font-bold serif-heading mb-3 text-zinc-950">Transparent Fixed Fees</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Upfront clarity on consultation charges and case filing estimates. No surprise legal billing or unverified expense demands.
                     </p>
                 </div>
             </div>
@@ -186,62 +393,168 @@
     </section>
 
     <!-- How It Works Section -->
-    <section class="py-24 bg-gray-50">
+    <section class="py-24 bg-white" aria-labelledby="how-it-works-title">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold serif-heading mb-4">
-                    How It Works
+                <span class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step-by-Step Guidance</span>
+                <h2 id="how-it-works-title" class="text-3xl sm:text-4xl md:text-5xl font-bold serif-heading mt-2 mb-4 text-[#0a0a0a]">
+                    How DivorceConnect Works
                 </h2>
-                <p class="text-gray-600 text-lg font-light">
-                    Get connected to the right legal expert in three simple steps.
+                <p class="text-gray-600 text-base sm:text-lg font-light">
+                    Connect with the right legal professional in three straightforward, confidential steps.
                 </p>
             </div>
 
-            <!-- Timeline -->
-            <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-0">
-
+            <!-- Steps Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                 <!-- Step 1 -->
-                <div class="flex flex-col items-center">
-                    <div class="timeline-dot mb-4">1</div>
-                    <h3 class="text-lg font-bold serif-heading text-center">Sign Up</h3>
-                    <p class="text-sm text-gray-600 mt-2 text-center max-w-xs">
-                        Create your account in seconds with basic information.
+                <div class="flex flex-col items-center text-center p-6 bg-zinc-50 rounded-2xl border border-zinc-200">
+                    <div class="timeline-dot mb-4 shadow-sm">1</div>
+                    <h3 class="text-xl font-bold serif-heading text-zinc-950 mb-2">Create Confidential Account</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Sign up securely with your email. Your identity remains strictly private until you choose to schedule a formal consultation.
                     </p>
-                </div>
-
-                <!-- Timeline Line -->
-                <div class="hidden md:flex md:flex-col md:items-center">
-                    <div class="timeline-line w-24 mb-4"></div>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="flex flex-col items-center">
-                    <div class="timeline-dot mb-4">2</div>
-                    <h3 class="text-lg font-bold serif-heading text-center">Connect</h3>
-                    <p class="text-sm text-gray-600 mt-2 text-center max-w-xs">
-                        Browse verified experts and connect with the right professional.
+                <div class="flex flex-col items-center text-center p-6 bg-zinc-50 rounded-2xl border border-zinc-200">
+                    <div class="timeline-dot mb-4 shadow-sm">2</div>
+                    <h3 class="text-xl font-bold serif-heading text-zinc-950 mb-2">Browse Verified Lawyers</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Filter top family court advocates by city, court jurisdiction (High Court, Family Court), experience, and area of expertise.
                     </p>
                 </div>
 
-                <!-- Timeline Line -->
-                <div class="hidden md:flex md:flex-col md:items-center">
-                    <div class="timeline-line w-24 mb-4"></div>
-                </div>
-
                 <!-- Step 3 -->
-                <div class="flex flex-col items-center">
-                    <div class="timeline-dot mb-4">3</div>
-                    <h3 class="text-lg font-bold serif-heading text-center">Resolve</h3>
-                    <p class="text-sm text-gray-600 mt-2 text-center max-w-xs">
-                        Communicate securely and move forward with confidence.
+                <div class="flex flex-col items-center text-center p-6 bg-zinc-50 rounded-2xl border border-zinc-200">
+                    <div class="timeline-dot mb-4 shadow-sm">3</div>
+                    <h3 class="text-xl font-bold serif-heading text-zinc-950 mb-2">Consult & Track Progress</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Engage via structured messaging, schedule consultations, securely share documents, and track court milestones in real time.
                     </p>
                 </div>
             </div>
 
-            <!-- CTA -->
-            <div class="text-center mt-16">
-                <a href="/register/" class="btn-primary text-lg px-10 py-4 font-semibold">
-                    Get Started Today
+            <!-- CTA Button -->
+            <div class="text-center mt-12">
+                <a href="/register/" class="btn-primary text-base sm:text-lg px-10 py-4 font-semibold shadow-md">
+                    Start Confidential Legal Consultation &rarr;
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geographic Presence & Major Jurisdictions -->
+    <section class="py-16 bg-zinc-900 text-white" aria-labelledby="cities-served-title">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <span class="text-xs uppercase tracking-widest text-[#d4af6a] font-semibold">Pan-India Network</span>
+                <h2 id="cities-served-title" class="text-2xl sm:text-3xl font-bold serif-heading mt-2 text-white">
+                    Verified Family Advocates Across Major Indian Cities & High Courts
+                </h2>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
+                <a href="/lawyers_section/?city=Delhi" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Delhi NCR (Saket, Tis Hazari, Patiala House)</a>
+                <a href="/lawyers_section/?city=Mumbai" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Mumbai (Bandra Family Court & High Court)</a>
+                <a href="/lawyers_section/?city=Bengaluru" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Bengaluru (Nyaya Degula & Family Courts)</a>
+                <a href="/lawyers_section/?city=Chennai" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Chennai (Madras High Court & City Courts)</a>
+                <a href="/lawyers_section/?city=Hyderabad" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Hyderabad (Telangana Family Courts)</a>
+                <a href="/lawyers_section/?city=Kolkata" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Kolkata (Calcutta High Court & Alipore)</a>
+                <a href="/lawyers_section/?city=Pune" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Pune (Shivajinagar Family Court)</a>
+                <a href="/lawyers_section/?city=Chandigarh" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Chandigarh, Punjab & Haryana</a>
+                <a href="/lawyers_section/?city=Ahmedabad" class="px-4 py-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors border border-zinc-700">Ahmedabad (Gujarat High Court)</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section (Schema Ready for Google Featured Snippets) -->
+    <section class="py-24 bg-white border-b border-zinc-200" aria-labelledby="faq-title">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Frequently Asked Questions</span>
+                <h2 id="faq-title" class="text-3xl sm:text-4xl font-bold serif-heading mt-2 mb-4 text-[#0a0a0a]">
+                    Divorce Laws in India — Essential FAQs
+                </h2>
+                <p class="text-gray-600 text-sm sm:text-base font-light">
+                    Clear answers to common legal questions regarding mutual consent, child custody, alimony, and court procedures.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- FAQ 1 -->
+                <details class="faq-accordion group border border-zinc-200 rounded-2xl p-6 transition-all duration-200 open:bg-zinc-50">
+                    <summary class="flex justify-between items-center font-bold text-zinc-950 cursor-pointer text-base sm:text-lg">
+                        <span>How does mutual consent divorce work in India under Section 13B?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform duration-200">&darr;</span>
+                    </summary>
+                    <div class="mt-4 text-sm text-zinc-600 leading-relaxed space-y-2">
+                        <p>
+                            Under Section 13B of the Hindu Marriage Act, 1955 (and Section 28 of the Special Marriage Act, 1954), both spouses can jointly file for divorce if they have lived separately for at least one year and mutually agree that the marriage should be dissolved.
+                        </p>
+                        <p>
+                            The process consists of: (1) Filing the <strong>First Motion</strong> petition along with settlement terms regarding alimony and custody; (2) A statutory 6-month cooling period (which the Supreme Court allows to be waived under certain circumstances); and (3) Filing the <strong>Second Motion</strong> for the final decree.
+                        </p>
+                    </div>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details class="faq-accordion group border border-zinc-200 rounded-2xl p-6 transition-all duration-200 open:bg-zinc-50">
+                    <summary class="flex justify-between items-center font-bold text-zinc-950 cursor-pointer text-base sm:text-lg">
+                        <span>How is alimony and child maintenance calculated by Indian courts?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform duration-200">&darr;</span>
+                    </summary>
+                    <div class="mt-4 text-sm text-zinc-600 leading-relaxed">
+                        <p>
+                            There is no rigid statutory mathematical formula in India, but courts generally benchmark maintenance at 20% to 25% of the earning spouse's net income. Factors considered include: the duration of the marriage, age, health, earning capacity, existing liabilities, and maintaining a lifestyle comparable to the matrimonial home for the spouse and children.
+                        </p>
+                    </div>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details class="faq-accordion group border border-zinc-200 rounded-2xl p-6 transition-all duration-200 open:bg-zinc-50">
+                    <summary class="flex justify-between items-center font-bold text-zinc-950 cursor-pointer text-base sm:text-lg">
+                        <span>Who gets child custody in a divorce case in India?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform duration-200">&darr;</span>
+                    </summary>
+                    <div class="mt-4 text-sm text-zinc-600 leading-relaxed">
+                        <p>
+                            Under Indian jurisprudence (including the Guardians and Wards Act), the primary doctrine is the <strong>welfare of the minor child</strong>. While custody of children below the age of 5 is customarily granted to the mother, both parents are entitled to natural guardianship. Courts encourage joint legal custody and structured visitation rights for the non-custodial parent.
+                        </p>
+                    </div>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details class="faq-accordion group border border-zinc-200 rounded-2xl p-6 transition-all duration-200 open:bg-zinc-50">
+                    <summary class="flex justify-between items-center font-bold text-zinc-950 cursor-pointer text-base sm:text-lg">
+                        <span>Can NRIs file for divorce in India without physical court appearance?</span>
+                        <span class="text-zinc-400 group-open:rotate-180 transition-transform duration-200">&darr;</span>
+                    </summary>
+                    <div class="mt-4 text-sm text-zinc-600 leading-relaxed">
+                        <p>
+                            Yes. Non-Resident Indians can appoint a Special Power of Attorney (SPA) representative (such as a close family member or legal counsel) duly consularized by the Indian Embassy/Consulate. Many Indian Family Courts now record evidence and statements through secure video conferencing platforms.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section class="py-20 bg-zinc-950 text-white text-center">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold serif-heading mb-6 text-white">
+                Take the First Step with Complete Privacy
+            </h2>
+            <p class="text-zinc-400 text-base sm:text-lg font-light mb-10 max-w-2xl mx-auto">
+                Connect with verified legal professionals who understand your circumstances and prioritize your dignity and peace of mind.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="/register/" class="btn-primary text-base sm:text-lg px-10 py-4 font-semibold bg-white text-zinc-950 hover:bg-zinc-100 shadow-lg">
+                    Find Your Lawyer Today
+                </a>
+                <a href="/contact/" class="btn-secondary text-base sm:text-lg px-8 py-4 font-semibold border-zinc-600 text-zinc-200 hover:text-white hover:border-white">
+                    Request a Confidential Callback
                 </a>
             </div>
         </div>

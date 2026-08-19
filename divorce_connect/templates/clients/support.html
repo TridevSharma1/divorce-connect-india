@@ -1,6 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}Help Center - DivorceConnect India{% endblock %}
+{% block title %}Support & Help Center | Divorce FAQs — DivorceConnect India{% endblock %}
+{% block meta_description %}Find comprehensive answers to frequently asked questions regarding hiring verified divorce lawyers, escrow payments, secure document upload, and family legal procedures.{% endblock %}
+{% block meta_keywords %}divorce connect help center, divorce lawyer faqs india, legal support, escrow consultation fees, document verification help{% endblock %}
+{% block canonical %}https://divorceconnectindia.com/support/{% endblock %}
+
+{% block og_title %}Support & Help Center | Divorce FAQs — DivorceConnect India{% endblock %}
+{% block og_description %}Find comprehensive answers to frequently asked questions regarding hiring verified divorce lawyers, escrow payments, and family legal procedures.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/support/{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://divorceconnectindia.com/support/#faqpage",
+  "name": "DivorceConnect India Help Center & FAQ",
+  "url": "https://divorceconnectindia.com/support/",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How are my consultation fees held in escrow?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When you engage a lawyer through DivorceConnect India, your consultation fees are securely held in our trust escrow account until the consultation is complete, ensuring payment is only released once agreed services have been rendered."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What payment methods do you accept?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We accept UPI, Net Banking, Credit and Debit Cards (Visa, Mastercard, RuPay), and digital wallets. All transactions are encrypted via 256-bit SSL."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I securely upload documents to my lawyer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can upload case documents directly through your encrypted client dashboard. All documents are stored in secure cloud storage with restricted access permissions."
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
 <style>

@@ -172,9 +172,62 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_seo_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    return response
+
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 if MEDIA_DIR.exists():
     app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots_txt_endpoint():
+    from fastapi.responses import FileResponse, Response
+    robots_path = STATIC_DIR / "robots.txt"
+    if robots_path.exists():
+        return FileResponse(str(robots_path), media_type="text/plain", headers={"Cache-Control": "public, max-age=86400"})
+    content = """# robots.txt for DivorceConnect India
+User-agent: *
+Allow: /
+Allow: /about/
+Allow: /contact/
+Allow: /support/
+Allow: /counseling/
+Allow: /lawyers_section/
+Allow: /blog/
+Allow: /blog_story_1/
+Allow: /blog_story_2/
+Allow: /blog_story_3/
+Allow: /privacy-policy/
+Allow: /terms-of-service/
+Allow: /refund-policy/
+Allow: /legal/
+Allow: /report-issue/
+Allow: /static/
+Disallow: /api/
+Disallow: /adminpanel/
+Disallow: /superuser_dashboard/
+Disallow: /superuser_login/
+Disallow: /client_dashboard/
+Disallow: /lawyer_dashboard/
+Disallow: /login/
+Disallow: /register/
+Crawl-delay: 1
+Sitemap: https://divorceconnectindia.com/sitemap.xml
+"""
+    return Response(content=content, media_type="text/plain", headers={"Cache-Control": "public, max-age=86400"})
+
+@app.get("/sitemap.xml", include_in_schema=False)
+async def sitemap_xml_endpoint():
+    from fastapi.responses import FileResponse, Response
+    sitemap_path = STATIC_DIR / "sitemap.xml"
+    if sitemap_path.exists():
+        return FileResponse(str(sitemap_path), media_type="application/xml", headers={"Cache-Control": "public, max-age=43200"})
+    return Response(content="<?xml version='1.0' encoding='UTF-8'?><urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'><url><loc>https://divorceconnectindia.com/</loc></url></urlset>", media_type="application/xml")
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon_endpoint():
@@ -182,6 +235,15 @@ async def favicon_endpoint():
     favicon_path = STATIC_DIR / "favicons" / "favicon.ico"
     if favicon_path.exists():
         return FileResponse(str(favicon_path))
+    return status.HTTP_404_NOT_FOUND
+
+@app.get("/site.webmanifest", include_in_schema=False)
+@app.get("/manifest.json", include_in_schema=False)
+async def webmanifest_endpoint():
+    from fastapi.responses import FileResponse
+    manifest_path = STATIC_DIR / "favicons" / "site.webmanifest"
+    if manifest_path.exists():
+        return FileResponse(str(manifest_path), media_type="application/manifest+json")
     return status.HTTP_404_NOT_FOUND
 
 # Include API Routers

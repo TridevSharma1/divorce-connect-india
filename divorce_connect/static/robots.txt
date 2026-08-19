@@ -1,0 +1,64 @@
+# robots.txt for DivorceConnect India (https://divorceconnectindia.com)
+User-agent: *
+Allow: /
+Allow: /about/
+Allow: /contact/
+Allow: /support/
+Allow: /counseling/
+Allow: /lawyers_section/
+Allow: /blog/
+Allow: /blog_story_1/
+Allow: /blog_story_2/
+Allow: /blog_story_3/
+Allow: /privacy-policy/
+Allow: /privacy_policy/
+Allow: /terms-of-service/
+Allow: /terms_of_service/
+Allow: /refund-policy/
+Allow: /refund_policy/
+Allow: /legal/
+Allow: /report-issue/
+Allow: /report_issue/
+Allow: /static/
+Allow: /favicon.ico
+
+# Disallow Private Dashboards, Authentication, Admin & API Endpoints
+Disallow: /api/
+Disallow: /ws/
+Disallow: /adminpanel/
+Disallow: /superuser_dashboard/
+Disallow: /superuser_login/
+Disallow: /client_dashboard/
+Disallow: /client_case_detail/
+Disallow: /client_cases/
+Disallow: /client_payments/
+Disallow: /client_profile/
+Disallow: /edit_profile_client/
+Disallow: /report_lawyer/
+Disallow: /case_document_upload/
+Disallow: /lawyer_dashboard/
+Disallow: /lawyer_case_detail/
+Disallow: /lawyer_case_orders/
+Disallow: /lawyer_case_status/
+Disallow: /lawyer_profile/
+Disallow: /lawyer_profile_edit/
+Disallow: /lawyer_settings/
+Disallow: /edit_profile_lawyer/
+Disallow: /report_client/
+Disallow: /earning_dashboard/
+Disallow: /billing_payment/
+Disallow: /login/
+Disallow: /register/
+Disallow: /forgot_password/
+Disallow: /reset_password/
+Disallow: /verify_otp/
+Disallow: /verify_register_otp/
+Disallow: /registration_success/
+Disallow: /request_delete_account/
+Disallow: /logout/
+
+# Crawl-delay for non-aggressive indexing
+Crawl-delay: 1
+
+# XML Sitemap URL
+Sitemap: https://divorceconnectindia.com/sitemap.xml

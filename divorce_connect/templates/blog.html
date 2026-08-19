@@ -1,6 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}Lawyer Case Stories & Insights — DivorceConnect India{% endblock %}
+{% block title %}Divorce & Family Law Blog | Legal Case Stories & Insights — DivorceConnect India{% endblock %}
+{% block meta_description %}Explore real case summaries, legal strategies, mutual consent guides, child custody insights, and divorce legal advice written by verified family court advocates in India.{% endblock %}
+{% block meta_keywords %}divorce legal blog india, family law articles, mutual consent case stories, child custody legal guides, alimony advice india{% endblock %}
+{% block canonical %}https://divorceconnectindia.com/blog/{% endblock %}
+
+{% block og_title %}Divorce & Family Law Blog | Legal Case Stories & Insights — DivorceConnect India{% endblock %}
+{% block og_description %}Explore real case summaries, legal strategies, mutual consent guides, child custody insights, and divorce legal advice written by verified family court advocates in India.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/blog/{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "@id": "https://divorceconnectindia.com/blog/#blog",
+  "name": "DivorceConnect India Legal Knowledge Hub & Case Stories",
+  "url": "https://divorceconnectindia.com/blog/",
+  "description": "Expert case summaries, Indian family law insights, and legal navigation articles written by verified advocates.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "DivorceConnect India",
+    "url": "https://divorceconnectindia.com/"
+  }
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
 <style>

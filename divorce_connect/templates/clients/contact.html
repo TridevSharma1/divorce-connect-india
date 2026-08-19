@@ -1,6 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Contact Us | DivorceConnect India{% endblock %}
+{% block title %}Contact DivorceConnect India | Legal Support & Confidential Advisory{% endblock %}
+{% block meta_description %}Get in touch with DivorceConnect India. Reach our confidential support desk, request legal callbacks, or inquire about advocate verification and family law assistance.{% endblock %}
+{% block meta_keywords %}contact divorce connect, divorce legal support india, confidential divorce consultation, legal callback request{% endblock %}
+{% block canonical %}https://divorceconnectindia.com/contact/{% endblock %}
+
+{% block og_title %}Contact DivorceConnect India | Legal Support & Confidential Advisory{% endblock %}
+{% block og_description %}Get in touch with DivorceConnect India. Reach our confidential support desk, request legal callbacks, or inquire about advocate verification.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/contact/{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "@id": "https://divorceconnectindia.com/contact/#contactpage",
+  "name": "Contact DivorceConnect India",
+  "url": "https://divorceconnectindia.com/contact/",
+  "description": "Contact information and support request channel for DivorceConnect India.",
+  "mainEntity": {
+    "@type": "ContactPoint",
+    "contactType": "Customer Support & Legal Advisory Desk",
+    "areaServed": "IN",
+    "availableLanguage": ["English", "Hindi"]
+  }
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
 <style>

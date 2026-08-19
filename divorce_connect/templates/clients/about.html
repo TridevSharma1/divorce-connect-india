@@ -1,6 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}About DivorceConnect India - Legal Tech Platform{% endblock %}
+{% block title %}About DivorceConnect India | Trusted Legal Tech & Family Law Platform{% endblock %}
+{% block meta_description %}Learn about DivorceConnect India's mission to bring transparency, dignity, confidentiality, and verified legal excellence to divorce and family disputes across India.{% endblock %}
+{% block meta_keywords %}about divorce connect, verified legal technology india, bar council verified advocates, family law platform india, divorce advisory mission{% endblock %}
+{% block canonical %}https://divorceconnectindia.com/about/{% endblock %}
+
+{% block og_title %}About DivorceConnect India | Trusted Legal Tech & Family Law Platform{% endblock %}
+{% block og_description %}Learn about DivorceConnect India's mission to bring transparency, dignity, confidentiality, and verified legal excellence to divorce and family disputes across India.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/about/{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "@id": "https://divorceconnectindia.com/about/#aboutpage",
+  "name": "About DivorceConnect India",
+  "url": "https://divorceconnectindia.com/about/",
+  "description": "Information about DivorceConnect India, our verification protocols, and our commitment to ethical, confidential family legal assistance.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "DivorceConnect India",
+    "url": "https://divorceconnectindia.com/"
+  }
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
 <style>

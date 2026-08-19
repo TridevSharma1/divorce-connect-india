@@ -1,6 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Counseling & Support Services | DivorceConnect India{% endblock %}
+{% block title %}Pre-Divorce Counseling & Marital Mediation | DivorceConnect India{% endblock %}
+{% block meta_description %}Confidential marital counseling, pre-divorce mediation, and emotional support services by verified psychological and financial counselors across India.{% endblock %}
+{% block meta_keywords %}pre-divorce counseling, marital mediation india, divorce therapy, family counselor, relationship mediation{% endblock %}
+{% block canonical %}https://divorceconnectindia.com/counseling/{% endblock %}
+
+{% block og_title %}Pre-Divorce Counseling & Marital Mediation | DivorceConnect India{% endblock %}
+{% block og_description %}Confidential marital counseling, pre-divorce mediation, and emotional support services by verified psychological and financial counselors across India.{% endblock %}
+{% block og_url %}https://divorceconnectindia.com/counseling/{% endblock %}
+
+{% block schema_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": "https://divorceconnectindia.com/counseling/#service",
+  "name": "Pre-Divorce Counseling & Mediation Services",
+  "serviceType": "Marital Counseling & Family Dispute Mediation",
+  "provider": {
+    "@type": "Organization",
+    "name": "DivorceConnect India",
+    "url": "https://divorceconnectindia.com/"
+  },
+  "areaServed": "IN",
+  "description": "Private and confidential counseling and mediation for couples navigating marital separation, co-parenting planning, and amicable settlement."
+}
+</script>
+{% endblock %}
 
 {% block extra_css %}
     <style>
