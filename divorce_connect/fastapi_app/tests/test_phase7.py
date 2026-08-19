@@ -164,6 +164,8 @@ def test_lawyer_case_order_page_shows_pending_case_for_authenticated_lawyer():
             return user, case_request
 
     user, _ = asyncio.run(seed_lawyer_case())
+    global active_user
+    active_user = user
     token = create_access_token(data={"sub": user.email, "user_id": user.id})
     response = client.get(
         "/api/lawyer/case-requests",
