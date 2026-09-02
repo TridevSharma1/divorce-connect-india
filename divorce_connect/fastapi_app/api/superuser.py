@@ -999,6 +999,13 @@ async def bulk_approve_admin_update(
         req.reviewed_at = datetime.datetime.utcnow()
         req.reviewed_by_id = _su.id
 
+        user = await db.get(User, profile.user_id)
+        if user and profile.full_name:
+            parts = profile.full_name.strip().split(None, 1)
+            user.first_name = parts[0]
+            user.last_name = parts[1] if len(parts) > 1 else ""
+            user.updated_at = datetime.datetime.utcnow()
+
         await db.commit()
 
         try:
@@ -1559,6 +1566,94 @@ async def update_any_record(
 
     if hasattr(record, "updated_at"):
         record.updated_at = datetime.datetime.utcnow()
+
+    # ── Handle side effects / field syncing when status is updated via modal or PUT ──
+    if model_path == "admin-update-requests" and getattr(record, "status", None) == "APPROVED":
+        profile = await db.get(AdminPanelProfile, record.admin_profile_id)
+        if profile:
+            for f in ("full_name", "gender", "date_of_birth", "mobile_number",
+                      "alternate_mobile_number", "profile_picture"):
+                v = getattr(record, f, None)
+                if v is not None:
+                    setattr(profile, f, v)
+            profile.updated_at = datetime.datetime.utcnow()
+            user = await db.get(User, profile.user_id)
+            if user and profile.full_name:
+                parts = profile.full_name.strip().split(None, 1)
+                user.first_name = parts[0]
+                user.last_name = parts[1] if len(parts) > 1 else ""
+                user.updated_at = datetime.datetime.utcnow()
+        if not getattr(record, "reviewed_at", None):
+            record.reviewed_at = datetime.datetime.utcnow()
+        if not getattr(record, "reviewed_by_id", None):
+            record.reviewed_by_id = _su.id
+
+        try:
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=profile.user_id,
+                title="Profile Update Approved",
+                message="Your admin profile update request has been approved and applied.",
+                url="/admin_dashboard/",
+            )
+        except Exception:
+            pass
+
+    elif model_path == "lawyer-update-requests" and getattr(record, "status", None) in ("APPROVED", "approved"):
+        lawyer = await db.get(LawyerProfile, record.lawyer_id)
+        if lawyer:
+            for f in (
+                "full_name", "gender", "date_of_birth", "bar_registration_number",
+                "state_bar_council", "years_of_experience", "specialization",
+                "bio", "consultation_fee", "office_city", "mobile_number",
+                "alternate_mobile_number", "profile_picture", "bar_council_license"
+            ):
+                v = getattr(record, f, None)
+                if v is not None:
+                    setattr(lawyer, f, v)
+            lawyer.updated_at = datetime.datetime.utcnow()
+            user = await db.get(User, lawyer.user_id)
+            if user and lawyer.full_name:
+                parts = lawyer.full_name.strip().split(None, 1)
+                user.first_name = parts[0]
+                user.last_name = parts[1] if len(parts) > 1 else ""
+                user.updated_at = datetime.datetime.utcnow()
+        if not getattr(record, "reviewed_at", None):
+            record.reviewed_at = datetime.datetime.utcnow()
+
+        try:
+            await create_and_broadcast_notification(
+                db=db,
+                user_id=lawyer.user_id,
+                title="Profile Update Approved",
+                message="Your lawyer profile update has been approved and applied.",
+                url="/lawyer_profile/",
+            )
+        except Exception:
+            pass
+
+    elif model_path == "lawyer-verification-requests" and getattr(record, "status", None) in ("approved", "APPROVED"):
+        lawyer = await db.get(LawyerProfile, record.lawyer_id)
+        if lawyer:
+            lawyer.verified = True
+            lawyer.is_profile_complete = True
+            lawyer.updated_at = datetime.datetime.utcnow()
+            user = await db.get(User, lawyer.user_id)
+            if user:
+                user.is_active = True
+                user.updated_at = datetime.datetime.utcnow()
+        if not getattr(record, "reviewed_at", None):
+            record.reviewed_at = datetime.datetime.utcnow()
+        if not getattr(record, "reviewed_by_id", None):
+            record.reviewed_by_id = _su.id
+
+    elif model_path == "admin-profiles":
+        if getattr(record, "is_verified_by_superuser", False):
+            user = await db.get(User, record.user_id)
+            if user:
+                user.is_staff = True
+                user.is_active = True
+                user.updated_at = datetime.datetime.utcnow()
 
     try:
         await db.commit()

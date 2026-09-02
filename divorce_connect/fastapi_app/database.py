@@ -5,7 +5,11 @@ from urllib.parse import urlparse, unquote
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-load_dotenv(find_dotenv(), override=False)
+env_path = Path(__file__).resolve().parents[1] / '.env'
+if env_path.exists():
+    load_dotenv(env_path, override=True)
+else:
+    load_dotenv(find_dotenv(), override=False)
 
 # Pointing to the original Django database
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
@@ -26,12 +30,17 @@ def normalize_database_url(url: str) -> str:
 
 DATABASE_URL = normalize_database_url(DATABASE_URL)
 
+connect_args = {}
+if "postgresql+asyncpg" in DATABASE_URL:
+    if "sslmode=disable" not in DATABASE_URL and ("localhost" not in DATABASE_URL and "127.0.0.1" not in DATABASE_URL):
+        connect_args["ssl"] = True
+
 import sys
 if "pytest" in sys.modules or os.getenv("TESTING") == "1":
     from sqlalchemy.pool import NullPool
-    engine = create_async_engine(DATABASE_URL, echo=True, poolclass=NullPool)
+    engine = create_async_engine(DATABASE_URL, echo=True, poolclass=NullPool, connect_args=connect_args)
 else:
-    engine = create_async_engine(DATABASE_URL, echo=True)
+    engine = create_async_engine(DATABASE_URL, echo=True, connect_args=connect_args)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
